@@ -17,7 +17,7 @@ import javax.annotation.Nonnull;
 public final class HideAmmoHudInteraction extends SimpleInstantInteraction {
     @Nonnull
     public static final BuilderCodec<HideAmmoHudInteraction> CODEC =
-        BuilderCodec.builder(HideAmmoHudInteraction.class, HideAmmoHudInteraction::new, SimpleInstantInteraction.CODEC).build();
+            BuilderCodec.builder(HideAmmoHudInteraction.class, HideAmmoHudInteraction::new, SimpleInstantInteraction.CODEC).build();
 
     @Override
     protected void firstRun(@Nonnull InteractionType type, @Nonnull InteractionContext context, @Nonnull CooldownHandler cooldownHandler) {

@@ -62,29 +62,26 @@ final class MultiHudCompat {
                 Object multiHud = getInstance.invoke(null);
 
                 Method setMethod = cls.getMethod(
-                    "setCustomHud",
-                    Player.class,
-                    PlayerRef.class,
-                    String.class,
-                    CustomUIHud.class
+                        "setCustomHud",
+                        Player.class,
+                        PlayerRef.class,
+                        String.class,
+                        CustomUIHud.class
                 );
                 Method hideMethod = cls.getMethod(
-                    "hideCustomHud",
-                    Player.class,
-                    PlayerRef.class,
-                    String.class
+                        "hideCustomHud",
+                        Player.class,
+                        PlayerRef.class,
+                        String.class
                 );
 
                 instance = multiHud;
                 setCustomHudMethod = setMethod;
                 hideCustomHudMethod = hideMethod;
             } catch (ClassNotFoundException ignored) {
-                // MultipleHUD is optional.
             } catch (ReflectiveOperationException | RuntimeException ignored) {
-                // Keep compatibility optional and fail-safe.
             }
             initialized = true;
         }
     }
 }
-

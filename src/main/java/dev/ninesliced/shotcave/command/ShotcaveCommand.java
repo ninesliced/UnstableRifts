@@ -33,7 +33,7 @@ public class ShotcaveCommand extends AbstractCommand {
         context.sendMessage(Message.raw("=== Shotcave Commands ===").color(Color.ORANGE));
         context.sendMessage(Message.raw("Use cinematic camera tools for cave screenshots and recordings.").color(Color.YELLOW));
         context.sendMessage(Message.raw("- /shotcave topcamera").color(Color.WHITE)
-            .insert(Message.raw(" : Toggle top-down camera mode.").color(Color.GRAY)));
+                .insert(Message.raw(" : Toggle top-down camera mode.").color(Color.GRAY)));
         context.sendMessage(Message.raw("Tip: Run /shotcave --help to view all subcommands and usage.").color(Color.CYAN));
         return CompletableFuture.completedFuture(null);
     }

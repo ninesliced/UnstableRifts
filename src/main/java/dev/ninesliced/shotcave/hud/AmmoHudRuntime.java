@@ -86,7 +86,12 @@ public final class AmmoHudRuntime {
     }
 
     private void refreshHeldItemHud(@Nonnull Player player) {
-        PlayerRef playerRef = player.getPlayerRef();
+        Ref<EntityStore> ref = player.getReference();
+        if (ref == null || !ref.isValid()) {
+            return;
+        }
+
+        PlayerRef playerRef = ref.getStore().getComponent(ref, PlayerRef.getComponentType());
         if (playerRef == null || !playerRef.isValid()) {
             return;
         }
@@ -99,4 +104,3 @@ public final class AmmoHudRuntime {
         AmmoHudService.updateForHeldItem(player, playerRef, heldItem);
     }
 }
-

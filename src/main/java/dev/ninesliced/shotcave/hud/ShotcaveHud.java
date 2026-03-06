@@ -11,13 +11,15 @@ import javax.annotation.Nullable;
 public final class ShotcaveHud extends CustomUIHud {
     public static final String UI_PATH = "Hud/Shotcave/AmmoHud.ui";
 
-    /** Threshold below which ammo is considered "low" (fraction of max). */
+    /**
+     * Threshold below which ammo is considered "low" (fraction of max).
+     */
     private static final double LOW_AMMO_THRESHOLD = 0.25;
 
     private static final String COLOR_BRIGHT = "#e8ecf0";
-    private static final String COLOR_LOW    = "#d4534a";
-    private static final String BAR_NORMAL   = "#7aa8d4";
-    private static final String BAR_LOW      = "#d4534a";
+    private static final String COLOR_LOW = "#d4534a";
+    private static final String BAR_NORMAL = "#7aa8d4";
+    private static final String BAR_LOW = "#d4534a";
 
     private final int ammo;
     private final int maxAmmo;
@@ -39,22 +41,18 @@ public final class ShotcaveHud extends CustomUIHud {
         ui.set("#ShotcaveAmmoValue.TextSpans", Message.raw(Integer.toString(this.ammo)));
         ui.set("#ShotcaveMaxAmmoValue.TextSpans", Message.raw(Integer.toString(this.maxAmmo)));
 
-        // Weapon name
         if (this.weaponName != null && !this.weaponName.isBlank()) {
             ui.set("#ShotcaveWeaponName.TextSpans", Message.raw(this.weaponName));
         }
 
-        // Ammo bar: calculate right-anchor to simulate fill percentage
         double ratio = (double) this.ammo / (double) this.maxAmmo;
         boolean isLow = ratio <= LOW_AMMO_THRESHOLD && this.ammo > 0;
         boolean isEmpty = this.ammo <= 0;
 
-        // Use Right anchor to clip the fill bar (172 = track inner width = 200 - 2*14 padding)
         int barWidth = 172;
         int fillRight = barWidth - (int) Math.round(ratio * barWidth);
         ui.set("#ShotcaveAmmoBarFill.Anchor.Right", fillRight);
 
-        // Color changes for low / empty ammo
         if (isEmpty || isLow) {
             String ammoColor = isEmpty ? COLOR_LOW : COLOR_LOW;
             String barColor = BAR_LOW;

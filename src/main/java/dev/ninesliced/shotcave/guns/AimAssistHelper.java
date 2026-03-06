@@ -23,216 +23,176 @@ import java.util.List;
 
 /**
  * Shared aim-assist logic for hitscan weapons.
- * <p>
- * When aim-assist is active the system finds the best {@link LivingEntity} that is
- * in the player's X-Z look direction (within a configurable cone) and returns a
- * corrected shot direction that fully locks the Y (pitch) axis to aim at the
- * target's center mass. The X-Z direction receives a small nudge so near-misses
- * still connect, without feeling like an aimbot.
- * <p>
- * Candidates that are occluded by solid blocks (walls) are skipped;
- * the helper falls through to the next-best visible target.
  */
 public final class AimAssistHelper {
-
-    /**
-     * Maximum horizontal angular deviation (in radians) for a target to be
-     * considered "in front" of the player.  ~30 degrees gives comfortable
-     * coverage when the player only steers on the X-Z plane.
-     */
     private static final double XZ_CONE_RAD = Math.toRadians(30.0);
-
-    /**
-     * Fraction of the horizontal angular error that is corrected toward the target.
-     * 1.0 = full snap, 0.0 = no correction.  0.35 gives a subtle nudge that
-     * rewards good aim while still being forgiving enough for fun gameplay.
-     */
     private static final double XZ_CORRECTION_FACTOR = 0.35;
 
     private AimAssistHelper() {
     }
 
     /**
-     * Try to find an aim-assist-corrected direction.
-     *
-     * @param commandBuffer the current command buffer
-     * @param context       the interaction context (used to exclude the shooter)
-     * @param muzzle        the position the shot originates from
-     * @param rawDirection  the player's raw look direction (normalized)
-     * @param range         the maximum range of the weapon
-     * @return a corrected, normalized direction, or {@code null} if no suitable target was found
+     * Computes an assisted direction if a suitable target is visible.
      */
     @Nullable
     public static Vector3d computeAssistedDirection(@Nonnull CommandBuffer<EntityStore> commandBuffer,
-                                                     @Nonnull InteractionContext context,
-                                                     @Nonnull Vector3d muzzle,
-                                                     @Nonnull Vector3d rawDirection,
-                                                     double range) {
-        // Horizontal (X-Z) components of the raw look direction
-        double lookHorizLen = Math.sqrt(rawDirection.x * rawDirection.x + rawDirection.z * rawDirection.z);
-        if (lookHorizLen < 0.000001) {
-            // Player is looking straight up or down – no meaningful X-Z direction
-            return null;
+                                                    @Nonnull InteractionContext context,
+                                                    @Nonnull Vector3d muzzle,
+                                                    @Nonnull Vector3d rawDirection,
+                                                    double range) {
+        double rawHorizX = rawDirection.x;
+        double rawHorizZ = rawDirection.z;
+        double rawHorizLenSq = rawHorizX * rawHorizX + rawHorizZ * rawHorizZ;
+        if (rawHorizLenSq < 1.0E-8) {
+            return rawDirection;
         }
-        double lookXN = rawDirection.x / lookHorizLen;
-        double lookZN = rawDirection.z / lookHorizLen;
 
-        // Collect all valid candidates with their scores
+        double lookXN = rawHorizX / Math.sqrt(rawHorizLenSq);
+        double lookZN = rawHorizZ / Math.sqrt(rawHorizLenSq);
+        double minHorizontalDot = Math.cos(XZ_CONE_RAD);
+        double rangeSq = range * range;
+
         List<AimCandidate> candidates = new ArrayList<>();
 
-        Vector3d searchCenter = muzzle.clone().addScaled(rawDirection, range * 0.5);
-
-        Selector.selectNearbyEntities(commandBuffer, searchCenter, range * 0.6, candidate -> {
-            if (!candidate.isValid()) {
+        Selector.selectNearbyEntities(commandBuffer, muzzle, range, candidateRef -> {
+            if (!candidateRef.isValid()) {
                 return;
             }
-            if (candidate.equals(context.getEntity()) || candidate.equals(context.getOwningEntity())) {
+            if (candidateRef.equals(context.getEntity()) || candidateRef.equals(context.getOwningEntity())) {
                 return;
             }
 
-            Entity entity = EntityUtils.getEntity(candidate, commandBuffer);
+            Entity entity = EntityUtils.getEntity(candidateRef, commandBuffer);
             if (!(entity instanceof LivingEntity)) {
                 return;
             }
 
-            TransformComponent transform = commandBuffer.getComponent(candidate, TransformComponent.getComponentType());
-            BoundingBox boundingBox = commandBuffer.getComponent(candidate, BoundingBox.getComponentType());
-            if (transform == null) {
+            TransformComponent transform = commandBuffer.getComponent(candidateRef, TransformComponent.getComponentType());
+            BoundingBox box = commandBuffer.getComponent(candidateRef, BoundingBox.getComponentType());
+            if (transform == null || box == null) {
                 return;
             }
 
-            Vector3d ePos = transform.getPosition();
-            double dx = ePos.getX() - muzzle.x;
-            double dz = ePos.getZ() - muzzle.z;
-            double horizDist = Math.sqrt(dx * dx + dz * dz);
+            Vector3d entityPos = transform.getPosition();
+            double toTargetX = entityPos.x - muzzle.x;
+            double toTargetZ = entityPos.z - muzzle.z;
+            double horizDist = Math.sqrt(toTargetX * toTargetX + toTargetZ * toTargetZ);
             if (horizDist < 0.5 || horizDist > range) {
                 return;
             }
 
-            // Horizontal angle between player's look and direction to target
-            double toTargetXN = dx / horizDist;
-            double toTargetZN = dz / horizDist;
-            double dot = lookXN * toTargetXN + lookZN * toTargetZN;
-            double angleXZ = Math.acos(Math.min(1.0, Math.max(-1.0, dot)));
-
-            if (angleXZ > XZ_CONE_RAD) {
+            double toTargetHorizLenSq = toTargetX * toTargetX + toTargetZ * toTargetZ;
+            if (toTargetHorizLenSq < 1.0E-8) {
                 return;
             }
 
-            // Use the center-mass of the bounding box as the aim point
-            double targetCenterY;
-            if (boundingBox != null) {
-                targetCenterY = ePos.getY() + boundingBox.getBoundingBox().height() * 0.5;
-            } else {
-                targetCenterY = ePos.getY() + 1.0;
+            double toTargetHorizLen = Math.sqrt(toTargetHorizLenSq);
+            double toTargetHorizNormX = toTargetX / toTargetHorizLen;
+            double toTargetHorizNormZ = toTargetZ / toTargetHorizLen;
+
+            double horizontalDot = lookXN * toTargetHorizNormX + lookZN * toTargetHorizNormZ;
+            if (horizontalDot < minHorizontalDot) {
+                return;
             }
 
-            // Score: prefer targets that are closer to the crosshair direction
-            // (weighted combination of angular deviation and distance)
-            double distanceFactor = horizDist / range; // 0..1
-            double score = angleXZ + distanceFactor * 0.3;
+            double boxCenterY = (box.getBoundingBox().min.y + box.getBoundingBox().max.y) * 0.5;
+            double targetY = entityPos.y + boxCenterY;
+            double toTargetY = targetY - muzzle.y;
+            double distSq = toTargetX * toTargetX + toTargetY * toTargetY + toTargetZ * toTargetZ;
+            if (distSq > rangeSq) {
+                return;
+            }
 
-            candidates.add(new AimCandidate(
-                new Vector3d(ePos.getX(), targetCenterY, ePos.getZ()),
-                horizDist,
-                score
-            ));
+            double score = (1.0 - horizontalDot) + (horizDist / range) * 0.15;
+            candidates.add(new AimCandidate(candidateRef, toTargetX, toTargetY, toTargetZ, Math.sqrt(distSq), score));
         }, ref -> true);
 
         if (candidates.isEmpty()) {
             return null;
         }
 
-        // Sort by score (best first)
-        candidates.sort(Comparator.comparingDouble(c -> c.score));
-
-        // Try each candidate in order; skip those behind walls
+        candidates.sort(Comparator.comparingDouble(a -> a.score));
         World world = commandBuffer.getExternalData().getWorld();
 
-        for (AimCandidate aim : candidates) {
-            // Build the direction from muzzle to this candidate's center
-            double dx = aim.center.x - muzzle.x;
-            double dy = aim.center.y - muzzle.y;
-            double dz = aim.center.z - muzzle.z;
-            double fullDist = Math.sqrt(dx * dx + dy * dy + dz * dz);
-            if (fullDist < 0.001) {
+        for (AimCandidate candidate : candidates) {
+            double dist = candidate.distance;
+            if (dist < 1.0E-6) {
                 continue;
             }
 
-            double dirX = dx / fullDist;
-            double dirY = dy / fullDist;
-            double dirZ = dz / fullDist;
+            double dirX = candidate.toTargetX / dist;
+            double dirY = candidate.toTargetY / dist;
+            double dirZ = candidate.toTargetZ / dist;
 
-            // Check for solid blocks between the muzzle and the target
-            Vector3i wallBlock = TargetUtil.getTargetBlock(
-                world,
-                (id, fluidId) -> id != 0,
-                muzzle.x, muzzle.y, muzzle.z,
-                dirX, dirY, dirZ,
-                fullDist
+            Vector3i blockingBlock = TargetUtil.getTargetBlock(
+                    world,
+                    (id, fluidId) -> id != 0,
+                    muzzle.x,
+                    muzzle.y,
+                    muzzle.z,
+                    dirX,
+                    dirY,
+                    dirZ,
+                    (int) Math.ceil(dist)
             );
 
-            if (wallBlock != null) {
-                // A solid block is in the way – compute distance to that block
-                double wallDist = muzzle.distanceTo(
-                    (double) wallBlock.x + 0.5,
-                    (double) wallBlock.y + 0.5,
-                    (double) wallBlock.z + 0.5
-                );
-                if (wallDist < aim.horizDist) {
-                    // Wall is closer than the target – skip this candidate
+            if (blockingBlock != null) {
+                Vector3d blockCenter = new Vector3d(blockingBlock.x + 0.5, blockingBlock.y + 0.5, blockingBlock.z + 0.5);
+                double blockDistSq = muzzle.distanceSquaredTo(blockCenter);
+                double targetDistSq = dist * dist;
+                if (blockDistSq + 1.0E-6 < targetDistSq) {
                     continue;
                 }
             }
 
-            // This candidate has clear line of sight – build corrected direction
-            double horizDist = Math.sqrt(dx * dx + dz * dz);
-            if (horizDist < 0.000001) {
+            double targetHorizLen = Math.sqrt(dirX * dirX + dirZ * dirZ);
+            if (targetHorizLen < 1.0E-8) {
                 continue;
             }
 
-            // Target horizontal direction
-            double targetXN = dx / horizDist;
-            double targetZN = dz / horizDist;
+            double targetHorizNormX = dirX / targetHorizLen;
+            double targetHorizNormZ = dirZ / targetHorizLen;
 
-            // Blend the X-Z direction: subtly correct toward target
-            double blendedX = lookXN + (targetXN - lookXN) * XZ_CORRECTION_FACTOR;
-            double blendedZ = lookZN + (targetZN - lookZN) * XZ_CORRECTION_FACTOR;
-            double blendedLen = Math.sqrt(blendedX * blendedX + blendedZ * blendedZ);
-            if (blendedLen < 0.000001) {
+            double blendedHorizX = lookXN * (1.0 - XZ_CORRECTION_FACTOR) + targetHorizNormX * XZ_CORRECTION_FACTOR;
+            double blendedHorizZ = lookZN * (1.0 - XZ_CORRECTION_FACTOR) + targetHorizNormZ * XZ_CORRECTION_FACTOR;
+
+            double blendedHorizLen = Math.sqrt(blendedHorizX * blendedHorizX + blendedHorizZ * blendedHorizZ);
+            if (blendedHorizLen < 1.0E-8) {
                 continue;
             }
-            blendedX /= blendedLen;
-            blendedZ /= blendedLen;
+            blendedHorizX /= blendedHorizLen;
+            blendedHorizZ /= blendedHorizLen;
 
-            // Reconstruct direction with full Y correction (auto-pitch) and blended X-Z
-            double correctedPitch = Math.atan2(dy, horizDist);
-            double cosP = Math.cos(correctedPitch);
-
-            Vector3d corrected = new Vector3d(blendedX * cosP, Math.sin(correctedPitch), blendedZ * cosP);
-            if (corrected.squaredLength() < 0.000001) {
-                continue;
+            Vector3d out = new Vector3d(blendedHorizX * targetHorizLen, dirY, blendedHorizZ * targetHorizLen);
+            if (out.squaredLength() > 1.0E-8) {
+                out.normalize();
+                return out;
             }
-            corrected.normalize();
-            return corrected;
         }
 
-        // No candidate had clear line of sight
-        return null;
+        return rawDirection;
     }
 
-    /**
-     * Internal record for a scored aim-assist candidate.
-     */
     private static final class AimCandidate {
         @Nonnull
-        final Vector3d center;
-        final double horizDist;
+        final Ref<EntityStore> candidate;
+        final double toTargetX;
+        final double toTargetY;
+        final double toTargetZ;
+        final double distance;
         final double score;
 
-        AimCandidate(@Nonnull Vector3d center, double horizDist, double score) {
-            this.center = center;
-            this.horizDist = horizDist;
+        AimCandidate(@Nonnull Ref<EntityStore> candidate,
+                     double toTargetX,
+                     double toTargetY,
+                     double toTargetZ,
+                     double distance,
+                     double score) {
+            this.candidate = candidate;
+            this.toTargetX = toTargetX;
+            this.toTargetY = toTargetY;
+            this.toTargetZ = toTargetZ;
+            this.distance = distance;
             this.score = score;
         }
     }

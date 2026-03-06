@@ -32,18 +32,17 @@ public class Shotcave extends JavaPlugin {
     @Override
     protected void setup() {
         this.getCodecRegistry(Interaction.CODEC)
-            .register("ChainLightning", ChainLightningInteraction.class, ChainLightningInteraction.CODEC)
-            .register("ModularGunShoot", ModularGunShootInteraction.class, ModularGunShootInteraction.CODEC)
-            .register("GunValidate", GunValidationInteraction.class, GunValidationInteraction.CODEC)
-            .register("ReloadCheck", ReloadCheckInteraction.class, ReloadCheckInteraction.CODEC)
-            .register("Reload", ReloadInteraction.class, ReloadInteraction.CODEC)
-            .register("UpdateAmmoHud", UpdateAmmoHudInteraction.class, UpdateAmmoHudInteraction.CODEC)
-            .register("HideAmmoHud", HideAmmoHudInteraction.class, HideAmmoHudInteraction.CODEC);
+                .register("ChainLightning", ChainLightningInteraction.class, ChainLightningInteraction.CODEC)
+                .register("ModularGunShoot", ModularGunShootInteraction.class, ModularGunShootInteraction.CODEC)
+                .register("GunValidate", GunValidationInteraction.class, GunValidationInteraction.CODEC)
+                .register("ReloadCheck", ReloadCheckInteraction.class, ReloadCheckInteraction.CODEC)
+                .register("Reload", ReloadInteraction.class, ReloadInteraction.CODEC)
+                .register("UpdateAmmoHud", UpdateAmmoHudInteraction.class, UpdateAmmoHudInteraction.CODEC)
+                .register("HideAmmoHud", HideAmmoHudInteraction.class, HideAmmoHudInteraction.CODEC);
 
         try {
             this.getEntityStoreRegistry().registerEntityEventType(SwitchActiveSlotEvent.class);
         } catch (IllegalArgumentException ignored) {
-            // Event may already be registered by another plugin.
         }
         this.getEntityStoreRegistry().registerSystem(new ActiveSlotHudUpdateSystem());
 

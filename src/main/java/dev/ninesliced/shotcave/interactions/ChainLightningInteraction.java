@@ -51,120 +51,121 @@ public final class ChainLightningInteraction extends SimpleInstantInteraction {
 
     static {
         BuilderCodec.Builder<ChainLightningInteraction> builder = BuilderCodec.builder(
-            ChainLightningInteraction.class,
-            ChainLightningInteraction::new,
-            SimpleInstantInteraction.CODEC
+                ChainLightningInteraction.class,
+                ChainLightningInteraction::new,
+                SimpleInstantInteraction.CODEC
         );
 
         builder.documentation("Chains projectile damage across nearby living entities.");
         builder.appendInherited(
-            new KeyedCodec<String>("DamageRoot", Codec.STRING),
-            (o, v) -> o.damageRoot = v,
-            o -> o.damageRoot,
-            (o, p) -> o.damageRoot = p.damageRoot
+                new KeyedCodec<String>("DamageRoot", Codec.STRING),
+                (o, v) -> o.damageRoot = v,
+                o -> o.damageRoot,
+                (o, p) -> o.damageRoot = p.damageRoot
         ).addValidator(Validators.nonNull()).add();
 
         builder.appendInherited(
-            new KeyedCodec<Double>("JumpRange", Codec.DOUBLE),
-            (o, v) -> o.jumpRange = v,
-            o -> o.jumpRange,
-            (o, p) -> o.jumpRange = p.jumpRange
+                new KeyedCodec<Double>("JumpRange", Codec.DOUBLE),
+                (o, v) -> o.jumpRange = v,
+                o -> o.jumpRange,
+                (o, p) -> o.jumpRange = p.jumpRange
         ).addValidator(Validators.greaterThan(0.0)).add();
 
         builder.appendInherited(
-            new KeyedCodec<Integer>("MaxTargets", Codec.INTEGER),
-            (o, v) -> o.maxTargets = v,
-            o -> o.maxTargets,
-            (o, p) -> o.maxTargets = p.maxTargets
+                new KeyedCodec<Integer>("MaxTargets", Codec.INTEGER),
+                (o, v) -> o.maxTargets = v,
+                o -> o.maxTargets,
+                (o, p) -> o.maxTargets = p.maxTargets
         ).addValidator(Validators.greaterThan(0)).add();
 
         builder.appendInherited(
-            new KeyedCodec<Boolean>("IncludeInitialTarget", Codec.BOOLEAN),
-            (o, v) -> o.includeInitialTarget = v,
-            o -> o.includeInitialTarget,
-            (o, p) -> o.includeInitialTarget = p.includeInitialTarget
+                new KeyedCodec<Boolean>("IncludeInitialTarget", Codec.BOOLEAN),
+                (o, v) -> o.includeInitialTarget = v,
+                o -> o.includeInitialTarget,
+                (o, p) -> o.includeInitialTarget = p.includeInitialTarget
         ).add();
 
         builder.appendInherited(
-            new KeyedCodec<String>("BeamParticleId", Codec.STRING),
-            (o, v) -> o.beamParticleId = v,
-            o -> o.beamParticleId,
-            (o, p) -> o.beamParticleId = p.beamParticleId
+                new KeyedCodec<String>("BeamParticleId", Codec.STRING),
+                (o, v) -> o.beamParticleId = v,
+                o -> o.beamParticleId,
+                (o, p) -> o.beamParticleId = p.beamParticleId
         ).addValidator(Validators.nonNull()).add();
 
         builder.appendInherited(
-            new KeyedCodec<Double>("BeamStepDistance", Codec.DOUBLE),
-            (o, v) -> o.beamStepDistance = v,
-            o -> o.beamStepDistance,
-            (o, p) -> o.beamStepDistance = p.beamStepDistance
+                new KeyedCodec<Double>("BeamStepDistance", Codec.DOUBLE),
+                (o, v) -> o.beamStepDistance = v,
+                o -> o.beamStepDistance,
+                (o, p) -> o.beamStepDistance = p.beamStepDistance
         ).addValidator(Validators.greaterThan(0.05)).add();
 
         builder.appendInherited(
-            new KeyedCodec<Double>("BeamHeightOffset", Codec.DOUBLE),
-            (o, v) -> o.beamHeightOffset = v,
-            o -> o.beamHeightOffset,
-            (o, p) -> o.beamHeightOffset = p.beamHeightOffset
+                new KeyedCodec<Double>("BeamHeightOffset", Codec.DOUBLE),
+                (o, v) -> o.beamHeightOffset = v,
+                o -> o.beamHeightOffset,
+                (o, p) -> o.beamHeightOffset = p.beamHeightOffset
         ).add();
 
         builder.appendInherited(
-            new KeyedCodec<Double>("BeamForwardOffset", Codec.DOUBLE),
-            (o, v) -> o.beamForwardOffset = v,
-            o -> o.beamForwardOffset,
-            (o, p) -> o.beamForwardOffset = p.beamForwardOffset
+                new KeyedCodec<Double>("BeamForwardOffset", Codec.DOUBLE),
+                (o, v) -> o.beamForwardOffset = v,
+                o -> o.beamForwardOffset,
+                (o, p) -> o.beamForwardOffset = p.beamForwardOffset
         ).add();
 
         builder.appendInherited(
-            new KeyedCodec<Double>("BeamRightOffset", Codec.DOUBLE),
-            (o, v) -> o.beamRightOffset = v,
-            o -> o.beamRightOffset,
-            (o, p) -> o.beamRightOffset = p.beamRightOffset
+                new KeyedCodec<Double>("BeamRightOffset", Codec.DOUBLE),
+                (o, v) -> o.beamRightOffset = v,
+                o -> o.beamRightOffset,
+                (o, p) -> o.beamRightOffset = p.beamRightOffset
         ).add();
 
         builder.appendInherited(
-            new KeyedCodec<Double>("BeamParticleScale", Codec.DOUBLE),
-            (o, v) -> o.beamParticleScale = v,
-            o -> o.beamParticleScale,
-            (o, p) -> o.beamParticleScale = p.beamParticleScale
+                new KeyedCodec<Double>("BeamParticleScale", Codec.DOUBLE),
+                (o, v) -> o.beamParticleScale = v,
+                o -> o.beamParticleScale,
+                (o, p) -> o.beamParticleScale = p.beamParticleScale
         ).addValidator(Validators.greaterThan(0.05)).add();
 
         builder.appendInherited(
-            new KeyedCodec<Integer>("MaxDistance", Codec.INTEGER),
-            (o, v) -> o.maxDistance = v,
-            o -> o.maxDistance,
-            (o, p) -> o.maxDistance = p.maxDistance
+                new KeyedCodec<Integer>("MaxDistance", Codec.INTEGER),
+                (o, v) -> o.maxDistance = v,
+                o -> o.maxDistance,
+                (o, p) -> o.maxDistance = p.maxDistance
         ).addValidator(Validators.greaterThan(1)).add();
 
         builder.appendInherited(
-            new KeyedCodec<Boolean>("AimAssist", Codec.BOOLEAN),
-            (o, v) -> o.aimAssist = v,
-            o -> o.aimAssist,
-            (o, p) -> o.aimAssist = p.aimAssist
+                new KeyedCodec<Boolean>("AimAssist", Codec.BOOLEAN),
+                (o, v) -> o.aimAssist = v,
+                o -> o.aimAssist,
+                (o, p) -> o.aimAssist = p.aimAssist
         ).add();
 
         builder.appendInherited(
-            new KeyedCodec<Boolean>("UseAmmo", Codec.BOOLEAN),
-            (o, v) -> o.useAmmo = v,
-            o -> o.useAmmo,
-            (o, p) -> o.useAmmo = p.useAmmo
+                new KeyedCodec<Boolean>("UseAmmo", Codec.BOOLEAN),
+                (o, v) -> o.useAmmo = v,
+                o -> o.useAmmo,
+                (o, p) -> o.useAmmo = p.useAmmo
         ).add();
 
         builder.appendInherited(
-            new KeyedCodec<Integer>("MaxAmmo", Codec.INTEGER),
-            (o, v) -> o.maxAmmo = v,
-            o -> o.maxAmmo,
-            (o, p) -> o.maxAmmo = p.maxAmmo
+                new KeyedCodec<Integer>("MaxAmmo", Codec.INTEGER),
+                (o, v) -> o.maxAmmo = v,
+                o -> o.maxAmmo,
+                (o, p) -> o.maxAmmo = p.maxAmmo
         ).addValidator(Validators.greaterThan(0)).add();
 
         builder.appendInherited(
-            new KeyedCodec<Integer>("AmmoPerShot", Codec.INTEGER),
-            (o, v) -> o.ammoPerShot = v,
-            o -> o.ammoPerShot,
-            (o, p) -> o.ammoPerShot = p.ammoPerShot
+                new KeyedCodec<Integer>("AmmoPerShot", Codec.INTEGER),
+                (o, v) -> o.ammoPerShot = v,
+                o -> o.ammoPerShot,
+                (o, p) -> o.ammoPerShot = p.ammoPerShot
         ).addValidator(Validators.greaterThan(0)).add();
 
         CODEC = builder.build();
     }
 
+    private final Color beamColor = new Color((byte) -1, (byte) -11, (byte) -86);
     private String damageRoot = "Root_Shotcave_Taser_Chain_Damage";
     private double jumpRange = 5.0;
     private int maxTargets = 5;
@@ -180,7 +181,6 @@ public final class ChainLightningInteraction extends SimpleInstantInteraction {
     private boolean useAmmo = false;
     private int maxAmmo = 8;
     private int ammoPerShot = 1;
-    private final Color beamColor = new Color((byte)-1, (byte)-11, (byte)-86);
 
     @Override
     protected void firstRun(@Nonnull InteractionType type, @Nonnull InteractionContext context, @Nonnull CooldownHandler cooldownHandler) {
@@ -214,7 +214,7 @@ public final class ChainLightningInteraction extends SimpleInstantInteraction {
         Vector3d lookDir = getLookDirection(commandBuffer, context.getEntity());
         if (this.aimAssist) {
             Vector3d assisted = AimAssistHelper.computeAssistedDirection(
-                commandBuffer, context, from, lookDir, (double) this.maxDistance
+                    commandBuffer, context, from, lookDir, (double) this.maxDistance
             );
             if (assisted != null) {
                 lookDir = assisted;
@@ -278,9 +278,9 @@ public final class ChainLightningInteraction extends SimpleInstantInteraction {
     }
 
     private Ref<EntityStore> findNearestValidTarget(@Nonnull CommandBuffer<EntityStore> commandBuffer,
-                                                     @Nonnull InteractionContext context,
-                                                     @Nonnull Vector3d from,
-                                                     @Nonnull Set<Integer> visited) {
+                                                    @Nonnull InteractionContext context,
+                                                    @Nonnull Vector3d from,
+                                                    @Nonnull Set<Integer> visited) {
         Ref<EntityStore>[] best = new Ref[]{null};
         double[] bestDistanceSq = new double[]{Double.MAX_VALUE};
 
@@ -365,15 +365,15 @@ public final class ChainLightningInteraction extends SimpleInstantInteraction {
                                      @Nonnull InteractionContext context,
                                      @Nonnull Vector3d from,
                                      @Nonnull Vector3d direction) {
-        Vector3d missPosition = from.clone().addScaled(direction, (double)this.maxDistance);
+        Vector3d missPosition = from.clone().addScaled(direction, (double) this.maxDistance);
 
         final Vector3d[] entityHitPos = new Vector3d[]{null};
         final Ref<EntityStore>[] entityHitRef = new Ref[]{null};
         final double[] entityHitDistanceSq = new double[]{Double.MAX_VALUE};
 
         Vector2d minMax = new Vector2d();
-        Vector3d searchCenter = from.clone().addScaled(direction, (double)this.maxDistance * 0.5);
-        Selector.selectNearbyEntities(commandBuffer, searchCenter, (double)this.maxDistance * 0.6, candidate -> {
+        Vector3d searchCenter = from.clone().addScaled(direction, (double) this.maxDistance * 0.5);
+        Selector.selectNearbyEntities(commandBuffer, searchCenter, (double) this.maxDistance * 0.6, candidate -> {
             if (!candidate.isValid()) {
                 return;
             }
@@ -398,7 +398,7 @@ public final class ChainLightningInteraction extends SimpleInstantInteraction {
             }
 
             double t = minMax.x;
-            if (t < 0.0 || t > (double)this.maxDistance) {
+            if (t < 0.0 || t > (double) this.maxDistance) {
                 return;
             }
 
@@ -417,10 +417,10 @@ public final class ChainLightningInteraction extends SimpleInstantInteraction {
 
         World world = commandBuffer.getExternalData().getWorld();
         Vector3i block = TargetUtil.getTargetBlock(world, (id, fluidId) -> id != 0,
-            from.x, from.y, from.z, direction.x, direction.y, direction.z, this.maxDistance);
+                from.x, from.y, from.z, direction.x, direction.y, direction.z, this.maxDistance);
 
         if (block != null) {
-            Vector3d blockHitPos = new Vector3d((double)block.x + 0.5, (double)block.y + 0.5, (double)block.z + 0.5);
+            Vector3d blockHitPos = new Vector3d((double) block.x + 0.5, (double) block.y + 0.5, (double) block.z + 0.5);
             double blockDistanceSq = from.distanceSquaredTo(blockHitPos);
             if (entityHitRef[0] == null || blockDistanceSq < entityHitDistanceSq[0]) {
                 return new RaycastHit(blockHitPos, null);
@@ -479,13 +479,13 @@ public final class ChainLightningInteraction extends SimpleInstantInteraction {
             return;
         }
 
-        float yaw = (float)Math.atan2(delta.x, delta.z);
+        float yaw = (float) Math.atan2(delta.x, delta.z);
         double horizontalDistance = Math.sqrt(delta.x * delta.x + delta.z * delta.z);
-        float pitch = (float)-Math.atan2(delta.y, horizontalDistance);
+        float pitch = (float) -Math.atan2(delta.y, horizontalDistance);
 
-        int steps = Math.max(1, (int)Math.ceil(distance / this.beamStepDistance));
+        int steps = Math.max(1, (int) Math.ceil(distance / this.beamStepDistance));
         for (int i = 0; i <= steps; i++) {
-            double t = (double)i / (double)steps;
+            double t = (double) i / (double) steps;
             Vector3d point = from.clone().addScaled(delta, t);
             spawnLineParticle(point, yaw, pitch, 0.0f, commandBuffer);
         }
@@ -497,23 +497,23 @@ public final class ChainLightningInteraction extends SimpleInstantInteraction {
                                    float roll,
                                    @Nonnull CommandBuffer<EntityStore> commandBuffer) {
         SpatialResource<Ref<EntityStore>, EntityStore> playerSpatialResource =
-            commandBuffer.getResource(EntityModule.get().getPlayerSpatialResourceType());
+                commandBuffer.getResource(EntityModule.get().getPlayerSpatialResourceType());
         ObjectList<Ref<EntityStore>> playerRefs = SpatialResource.getThreadLocalReferenceList();
         playerSpatialResource.getSpatialStructure().collect(point, ParticleUtil.DEFAULT_PARTICLE_DISTANCE, playerRefs);
 
         ParticleUtil.spawnParticleEffect(
-            this.beamParticleId,
-            point.x,
-            point.y,
-            point.z,
-            yaw,
-            pitch,
-            roll,
-            (float)this.beamParticleScale,
-            this.beamColor,
-            null,
-            playerRefs,
-            commandBuffer
+                this.beamParticleId,
+                point.x,
+                point.y,
+                point.z,
+                yaw,
+                pitch,
+                roll,
+                (float) this.beamParticleScale,
+                this.beamColor,
+                null,
+                playerRefs,
+                commandBuffer
         );
     }
 

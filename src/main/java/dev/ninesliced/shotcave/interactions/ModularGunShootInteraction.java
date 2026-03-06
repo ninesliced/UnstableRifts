@@ -54,150 +54,150 @@ public final class ModularGunShootInteraction extends SimpleInstantInteraction {
 
     static {
         BuilderCodec.Builder<ModularGunShootInteraction> builder = BuilderCodec.builder(
-            ModularGunShootInteraction.class,
-            ModularGunShootInteraction::new,
-            SimpleInstantInteraction.CODEC
+                ModularGunShootInteraction.class,
+                ModularGunShootInteraction::new,
+                SimpleInstantInteraction.CODEC
         );
 
         builder.documentation("Configurable hitscan gun behavior with optional trail particles.");
         builder.appendInherited(
-            new KeyedCodec<String>("DamageRoot", Codec.STRING),
-            (o, v) -> o.damageRoot = v,
-            o -> o.damageRoot,
-            (o, p) -> o.damageRoot = p.damageRoot
+                new KeyedCodec<String>("DamageRoot", Codec.STRING),
+                (o, v) -> o.damageRoot = v,
+                o -> o.damageRoot,
+                (o, p) -> o.damageRoot = p.damageRoot
         ).addValidator(Validators.nonNull()).add();
 
         builder.appendInherited(
-            new KeyedCodec<Integer>("Range", Codec.INTEGER),
-            (o, v) -> o.range = v,
-            o -> o.range,
-            (o, p) -> o.range = p.range
+                new KeyedCodec<Integer>("Range", Codec.INTEGER),
+                (o, v) -> o.range = v,
+                o -> o.range,
+                (o, p) -> o.range = p.range
         ).addValidator(Validators.greaterThan(1)).add();
 
         builder.appendInherited(
-            new KeyedCodec<Integer>("Pellets", Codec.INTEGER),
-            (o, v) -> o.pellets = v,
-            o -> o.pellets,
-            (o, p) -> o.pellets = p.pellets
+                new KeyedCodec<Integer>("Pellets", Codec.INTEGER),
+                (o, v) -> o.pellets = v,
+                o -> o.pellets,
+                (o, p) -> o.pellets = p.pellets
         ).addValidator(Validators.greaterThan(0)).add();
 
         builder.appendInherited(
-            new KeyedCodec<Double>("SpreadDegrees", Codec.DOUBLE),
-            (o, v) -> o.spreadDegrees = v,
-            o -> o.spreadDegrees,
-            (o, p) -> o.spreadDegrees = p.spreadDegrees
+                new KeyedCodec<Double>("SpreadDegrees", Codec.DOUBLE),
+                (o, v) -> o.spreadDegrees = v,
+                o -> o.spreadDegrees,
+                (o, p) -> o.spreadDegrees = p.spreadDegrees
         ).addValidator((Validator<Double>) Validators.greaterThanOrEqual(0.0)).add();
 
         builder.appendInherited(
-            new KeyedCodec<String>("MissRoot", Codec.STRING),
-            (o, v) -> o.missRoot = v,
-            o -> o.missRoot,
-            (o, p) -> o.missRoot = p.missRoot
+                new KeyedCodec<String>("MissRoot", Codec.STRING),
+                (o, v) -> o.missRoot = v,
+                o -> o.missRoot,
+                (o, p) -> o.missRoot = p.missRoot
         ).add();
 
         builder.appendInherited(
-            new KeyedCodec<String>("TrailParticleId", Codec.STRING),
-            (o, v) -> o.trailParticleId = v,
-            o -> o.trailParticleId,
-            (o, p) -> o.trailParticleId = p.trailParticleId
+                new KeyedCodec<String>("TrailParticleId", Codec.STRING),
+                (o, v) -> o.trailParticleId = v,
+                o -> o.trailParticleId,
+                (o, p) -> o.trailParticleId = p.trailParticleId
         ).add();
 
         builder.appendInherited(
-            new KeyedCodec<Double>("TrailStepDistance", Codec.DOUBLE),
-            (o, v) -> o.trailStepDistance = v,
-            o -> o.trailStepDistance,
-            (o, p) -> o.trailStepDistance = p.trailStepDistance
+                new KeyedCodec<Double>("TrailStepDistance", Codec.DOUBLE),
+                (o, v) -> o.trailStepDistance = v,
+                o -> o.trailStepDistance,
+                (o, p) -> o.trailStepDistance = p.trailStepDistance
         ).addValidator(Validators.greaterThan(0.05)).add();
 
         builder.appendInherited(
-            new KeyedCodec<Double>("TrailScale", Codec.DOUBLE),
-            (o, v) -> o.trailScale = v,
-            o -> o.trailScale,
-            (o, p) -> o.trailScale = p.trailScale
+                new KeyedCodec<Double>("TrailScale", Codec.DOUBLE),
+                (o, v) -> o.trailScale = v,
+                o -> o.trailScale,
+                (o, p) -> o.trailScale = p.trailScale
         ).addValidator(Validators.greaterThan(0.05)).add();
 
         builder.appendInherited(
-            new KeyedCodec<Double>("MuzzleHeightOffset", Codec.DOUBLE),
-            (o, v) -> o.muzzleHeightOffset = v,
-            o -> o.muzzleHeightOffset,
-            (o, p) -> o.muzzleHeightOffset = p.muzzleHeightOffset
+                new KeyedCodec<Double>("MuzzleHeightOffset", Codec.DOUBLE),
+                (o, v) -> o.muzzleHeightOffset = v,
+                o -> o.muzzleHeightOffset,
+                (o, p) -> o.muzzleHeightOffset = p.muzzleHeightOffset
         ).add();
 
         builder.appendInherited(
-            new KeyedCodec<Double>("MuzzleForwardOffset", Codec.DOUBLE),
-            (o, v) -> o.muzzleForwardOffset = v,
-            o -> o.muzzleForwardOffset,
-            (o, p) -> o.muzzleForwardOffset = p.muzzleForwardOffset
+                new KeyedCodec<Double>("MuzzleForwardOffset", Codec.DOUBLE),
+                (o, v) -> o.muzzleForwardOffset = v,
+                o -> o.muzzleForwardOffset,
+                (o, p) -> o.muzzleForwardOffset = p.muzzleForwardOffset
         ).add();
 
         builder.appendInherited(
-            new KeyedCodec<Double>("MuzzleRightOffset", Codec.DOUBLE),
-            (o, v) -> o.muzzleRightOffset = v,
-            o -> o.muzzleRightOffset,
-            (o, p) -> o.muzzleRightOffset = p.muzzleRightOffset
+                new KeyedCodec<Double>("MuzzleRightOffset", Codec.DOUBLE),
+                (o, v) -> o.muzzleRightOffset = v,
+                o -> o.muzzleRightOffset,
+                (o, p) -> o.muzzleRightOffset = p.muzzleRightOffset
         ).add();
 
         builder.appendInherited(
-            new KeyedCodec<Boolean>("UseAmmo", Codec.BOOLEAN),
-            (o, v) -> o.useAmmo = v,
-            o -> o.useAmmo,
-            (o, p) -> o.useAmmo = p.useAmmo
+                new KeyedCodec<Boolean>("UseAmmo", Codec.BOOLEAN),
+                (o, v) -> o.useAmmo = v,
+                o -> o.useAmmo,
+                (o, p) -> o.useAmmo = p.useAmmo
         ).add();
 
         builder.appendInherited(
-            new KeyedCodec<Integer>("MaxAmmo", Codec.INTEGER),
-            (o, v) -> o.maxAmmo = v,
-            o -> o.maxAmmo,
-            (o, p) -> o.maxAmmo = p.maxAmmo
+                new KeyedCodec<Integer>("MaxAmmo", Codec.INTEGER),
+                (o, v) -> o.maxAmmo = v,
+                o -> o.maxAmmo,
+                (o, p) -> o.maxAmmo = p.maxAmmo
         ).addValidator(Validators.greaterThan(0)).add();
 
         builder.appendInherited(
-            new KeyedCodec<Integer>("AmmoPerShot", Codec.INTEGER),
-            (o, v) -> o.ammoPerShot = v,
-            o -> o.ammoPerShot,
-            (o, p) -> o.ammoPerShot = p.ammoPerShot
+                new KeyedCodec<Integer>("AmmoPerShot", Codec.INTEGER),
+                (o, v) -> o.ammoPerShot = v,
+                o -> o.ammoPerShot,
+                (o, p) -> o.ammoPerShot = p.ammoPerShot
         ).addValidator(Validators.greaterThan(0)).add();
 
         builder.appendInherited(
-            new KeyedCodec<Boolean>("AimAssist", Codec.BOOLEAN),
-            (o, v) -> o.aimAssist = v,
-            o -> o.aimAssist,
-            (o, p) -> o.aimAssist = p.aimAssist
+                new KeyedCodec<Boolean>("AimAssist", Codec.BOOLEAN),
+                (o, v) -> o.aimAssist = v,
+                o -> o.aimAssist,
+                (o, p) -> o.aimAssist = p.aimAssist
         ).add();
 
         builder.appendInherited(
-            new KeyedCodec<Integer>("TrailColorR", Codec.INTEGER),
-            (o, v) -> o.trailColorR = v,
-            o -> o.trailColorR,
-            (o, p) -> o.trailColorR = p.trailColorR
+                new KeyedCodec<Integer>("TrailColorR", Codec.INTEGER),
+                (o, v) -> o.trailColorR = v,
+                o -> o.trailColorR,
+                (o, p) -> o.trailColorR = p.trailColorR
         ).add();
 
         builder.appendInherited(
-            new KeyedCodec<Integer>("TrailColorG", Codec.INTEGER),
-            (o, v) -> o.trailColorG = v,
-            o -> o.trailColorG,
-            (o, p) -> o.trailColorG = p.trailColorG
+                new KeyedCodec<Integer>("TrailColorG", Codec.INTEGER),
+                (o, v) -> o.trailColorG = v,
+                o -> o.trailColorG,
+                (o, p) -> o.trailColorG = p.trailColorG
         ).add();
 
         builder.appendInherited(
-            new KeyedCodec<Integer>("TrailColorB", Codec.INTEGER),
-            (o, v) -> o.trailColorB = v,
-            o -> o.trailColorB,
-            (o, p) -> o.trailColorB = p.trailColorB
+                new KeyedCodec<Integer>("TrailColorB", Codec.INTEGER),
+                (o, v) -> o.trailColorB = v,
+                o -> o.trailColorB,
+                (o, p) -> o.trailColorB = p.trailColorB
         ).add();
 
         builder.appendInherited(
-            new KeyedCodec<String>("ImpactParticleId", Codec.STRING),
-            (o, v) -> o.impactParticleId = v,
-            o -> o.impactParticleId,
-            (o, p) -> o.impactParticleId = p.impactParticleId
+                new KeyedCodec<String>("ImpactParticleId", Codec.STRING),
+                (o, v) -> o.impactParticleId = v,
+                o -> o.impactParticleId,
+                (o, p) -> o.impactParticleId = p.impactParticleId
         ).add();
 
         builder.appendInherited(
-            new KeyedCodec<Double>("ImpactParticleScale", Codec.DOUBLE),
-            (o, v) -> o.impactParticleScale = v,
-            o -> o.impactParticleScale,
-            (o, p) -> o.impactParticleScale = p.impactParticleScale
+                new KeyedCodec<Double>("ImpactParticleScale", Codec.DOUBLE),
+                (o, v) -> o.impactParticleScale = v,
+                o -> o.impactParticleScale,
+                (o, p) -> o.impactParticleScale = p.impactParticleScale
         ).addValidator(Validators.greaterThan(0.0)).add();
 
         CODEC = builder.build();
@@ -270,7 +270,7 @@ public final class ModularGunShootInteraction extends SimpleInstantInteraction {
         if (this.aimAssist) {
             Vector3d rawLook = getShotDirection(commandBuffer, context.getEntity());
             assistedBaseDir = AimAssistHelper.computeAssistedDirection(
-                commandBuffer, context, start, rawLook, (double) this.range
+                    commandBuffer, context, start, rawLook, (double) this.range
             );
         }
 
@@ -364,8 +364,8 @@ public final class ModularGunShootInteraction extends SimpleInstantInteraction {
         final double[] entityHitDistanceSq = new double[]{Double.MAX_VALUE};
 
         Vector2d minMax = new Vector2d();
-        Vector3d searchCenter = from.clone().addScaled(direction, (double)this.range * 0.5);
-        Selector.selectNearbyEntities(commandBuffer, searchCenter, (double)this.range * 0.6, candidate -> {
+        Vector3d searchCenter = from.clone().addScaled(direction, (double) this.range * 0.5);
+        Selector.selectNearbyEntities(commandBuffer, searchCenter, (double) this.range * 0.6, candidate -> {
             if (!candidate.isValid()) {
                 return;
             }
@@ -390,7 +390,7 @@ public final class ModularGunShootInteraction extends SimpleInstantInteraction {
             }
 
             double t = minMax.x;
-            if (t < 0.0 || t > (double)this.range) {
+            if (t < 0.0 || t > (double) this.range) {
                 return;
             }
 
@@ -409,19 +409,19 @@ public final class ModularGunShootInteraction extends SimpleInstantInteraction {
 
         World world = commandBuffer.getExternalData().getWorld();
         Vector3i block = TargetUtil.getTargetBlock(
-            world,
-            (id, fluidId) -> id != 0,
-            from.x,
-            from.y,
-            from.z,
-            direction.x,
-            direction.y,
-            direction.z,
-            this.range
+                world,
+                (id, fluidId) -> id != 0,
+                from.x,
+                from.y,
+                from.z,
+                direction.x,
+                direction.y,
+                direction.z,
+                this.range
         );
 
         if (block != null) {
-            Vector3d blockHitPos = new Vector3d((double)block.x + 0.5, (double)block.y + 0.5, (double)block.z + 0.5);
+            Vector3d blockHitPos = new Vector3d((double) block.x + 0.5, (double) block.y + 0.5, (double) block.z + 0.5);
             double blockDistanceSq = from.distanceSquaredTo(blockHitPos);
             if (entityHitRef[0] == null || blockDistanceSq < entityHitDistanceSq[0]) {
                 BlockPosition raw = new BlockPosition(block.x, block.y, block.z);
@@ -433,7 +433,7 @@ public final class ModularGunShootInteraction extends SimpleInstantInteraction {
             return new ShotHit(entityHitPos[0], entityHitRef[0], null);
         }
 
-        Vector3d miss = from.clone().addScaled(direction, (double)this.range);
+        Vector3d miss = from.clone().addScaled(direction, (double) this.range);
         return new ShotHit(miss, null, null);
     }
 
@@ -475,13 +475,13 @@ public final class ModularGunShootInteraction extends SimpleInstantInteraction {
             return;
         }
 
-        float yaw = (float)Math.atan2(delta.x, delta.z);
+        float yaw = (float) Math.atan2(delta.x, delta.z);
         double horizontalDistance = Math.sqrt(delta.x * delta.x + delta.z * delta.z);
-        float pitch = (float)-Math.atan2(delta.y, horizontalDistance);
+        float pitch = (float) -Math.atan2(delta.y, horizontalDistance);
 
-        int steps = Math.max(1, (int)Math.ceil(distance / this.trailStepDistance));
+        int steps = Math.max(1, (int) Math.ceil(distance / this.trailStepDistance));
         for (int i = 0; i <= steps; i++) {
-            double t = (double)i / (double)steps;
+            double t = (double) i / (double) steps;
             Vector3d point = from.clone().addScaled(delta, t);
             spawnTrailParticle(point, yaw, pitch, commandBuffer);
         }
@@ -492,24 +492,24 @@ public final class ModularGunShootInteraction extends SimpleInstantInteraction {
                                     float pitch,
                                     @Nonnull CommandBuffer<EntityStore> commandBuffer) {
         SpatialResource<Ref<EntityStore>, EntityStore> playerSpatialResource =
-            commandBuffer.getResource(EntityModule.get().getPlayerSpatialResourceType());
+                commandBuffer.getResource(EntityModule.get().getPlayerSpatialResourceType());
         ObjectList<Ref<EntityStore>> playerRefs = SpatialResource.getThreadLocalReferenceList();
         playerSpatialResource.getSpatialStructure().collect(point, ParticleUtil.DEFAULT_PARTICLE_DISTANCE, playerRefs);
 
         Color color = new Color((byte) this.trailColorR, (byte) this.trailColorG, (byte) this.trailColorB);
         ParticleUtil.spawnParticleEffect(
-            this.trailParticleId,
-            point.x,
-            point.y,
-            point.z,
-            yaw,
-            pitch,
-            0.0f,
-            (float)this.trailScale,
-            color,
-            null,
-            playerRefs,
-            commandBuffer
+                this.trailParticleId,
+                point.x,
+                point.y,
+                point.z,
+                yaw,
+                pitch,
+                0.0f,
+                (float) this.trailScale,
+                color,
+                null,
+                playerRefs,
+                commandBuffer
         );
     }
 
@@ -519,23 +519,23 @@ public final class ModularGunShootInteraction extends SimpleInstantInteraction {
             return;
         }
         SpatialResource<Ref<EntityStore>, EntityStore> playerSpatialResource =
-            commandBuffer.getResource(EntityModule.get().getPlayerSpatialResourceType());
+                commandBuffer.getResource(EntityModule.get().getPlayerSpatialResourceType());
         ObjectList<Ref<EntityStore>> playerRefs = SpatialResource.getThreadLocalReferenceList();
         playerSpatialResource.getSpatialStructure().collect(hitPos, ParticleUtil.DEFAULT_PARTICLE_DISTANCE, playerRefs);
 
         ParticleUtil.spawnParticleEffect(
-            this.impactParticleId,
-            hitPos.x,
-            hitPos.y,
-            hitPos.z,
-            0.0f,
-            0.0f,
-            0.0f,
-            (float)this.impactParticleScale,
-            new Color((byte)-1, (byte)-1, (byte)-1),
-            null,
-            playerRefs,
-            commandBuffer
+                this.impactParticleId,
+                hitPos.x,
+                hitPos.y,
+                hitPos.z,
+                0.0f,
+                0.0f,
+                0.0f,
+                (float) this.impactParticleScale,
+                new Color((byte) -1, (byte) -1, (byte) -1),
+                null,
+                playerRefs,
+                commandBuffer
         );
     }
 

@@ -31,7 +31,6 @@ public final class AmmoHudService {
         String itemId = heldItem.getItemId();
         int defaultMaxAmmo = getDefaultMaxAmmo(itemId);
         if (defaultMaxAmmo <= 0) {
-            // Not a Shotcave weapon item -> hide ammo HUD.
             hide(player, playerRef);
             return;
         }
@@ -41,7 +40,6 @@ public final class AmmoHudService {
             maxAmmo = defaultMaxAmmo;
         }
 
-        // Metadata may not exist until first shot/reload. Show a full magazine by default.
         int ammo = GunItemMetadata.getInt(heldItem, GunItemMetadata.AMMO_KEY, maxAmmo);
         ammo = Math.max(0, Math.min(ammo, maxAmmo));
 

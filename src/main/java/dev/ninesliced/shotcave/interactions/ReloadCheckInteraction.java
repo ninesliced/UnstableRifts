@@ -20,16 +20,16 @@ public final class ReloadCheckInteraction extends SimpleInstantInteraction {
 
     static {
         BuilderCodec.Builder<ReloadCheckInteraction> builder = BuilderCodec.builder(
-            ReloadCheckInteraction.class,
-            ReloadCheckInteraction::new,
-            SimpleInstantInteraction.CODEC
+                ReloadCheckInteraction.class,
+                ReloadCheckInteraction::new,
+                SimpleInstantInteraction.CODEC
         );
 
         builder.appendInherited(
-            new KeyedCodec<Integer>("MaxAmmo", Codec.INTEGER),
-            (o, v) -> o.maxAmmo = v,
-            o -> o.maxAmmo,
-            (o, p) -> o.maxAmmo = p.maxAmmo
+                new KeyedCodec<Integer>("MaxAmmo", Codec.INTEGER),
+                (o, v) -> o.maxAmmo = v,
+                o -> o.maxAmmo,
+                (o, p) -> o.maxAmmo = p.maxAmmo
         ).addValidator(Validators.greaterThan(0)).add();
 
         CODEC = builder.build();

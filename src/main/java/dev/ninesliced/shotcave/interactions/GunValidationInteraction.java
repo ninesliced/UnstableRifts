@@ -20,23 +20,23 @@ public final class GunValidationInteraction extends SimpleInstantInteraction {
 
     static {
         BuilderCodec.Builder<GunValidationInteraction> builder = BuilderCodec.builder(
-            GunValidationInteraction.class,
-            GunValidationInteraction::new,
-            SimpleInstantInteraction.CODEC
+                GunValidationInteraction.class,
+                GunValidationInteraction::new,
+                SimpleInstantInteraction.CODEC
         );
 
         builder.appendInherited(
-            new KeyedCodec<Integer>("MaxAmmo", Codec.INTEGER),
-            (o, v) -> o.maxAmmo = v,
-            o -> o.maxAmmo,
-            (o, p) -> o.maxAmmo = p.maxAmmo
+                new KeyedCodec<Integer>("MaxAmmo", Codec.INTEGER),
+                (o, v) -> o.maxAmmo = v,
+                o -> o.maxAmmo,
+                (o, p) -> o.maxAmmo = p.maxAmmo
         ).addValidator(Validators.greaterThan(0)).add();
 
         builder.appendInherited(
-            new KeyedCodec<Boolean>("RequireAmmo", Codec.BOOLEAN),
-            (o, v) -> o.requireAmmo = v,
-            o -> o.requireAmmo,
-            (o, p) -> o.requireAmmo = p.requireAmmo
+                new KeyedCodec<Boolean>("RequireAmmo", Codec.BOOLEAN),
+                (o, v) -> o.requireAmmo = v,
+                o -> o.requireAmmo,
+                (o, p) -> o.requireAmmo = p.requireAmmo
         ).add();
 
         CODEC = builder.build();
