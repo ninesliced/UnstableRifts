@@ -1,5 +1,6 @@
 package dev.ninesliced.shotcave;
 
+import com.hypixel.hytale.server.core.event.events.ecs.SwitchActiveSlotEvent;
 import com.hypixel.hytale.server.core.event.events.player.PlayerConnectEvent;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.Interaction;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
@@ -7,6 +8,7 @@ import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import dev.ninesliced.shotcave.camera.TopCameraService;
 import dev.ninesliced.shotcave.command.ShotcaveCommand;
+import dev.ninesliced.shotcave.hud.AmmoHudRuntime;
 import dev.ninesliced.shotcave.interactions.ChainLightningInteraction;
 import dev.ninesliced.shotcave.interactions.GunValidationInteraction;
 import dev.ninesliced.shotcave.interactions.HideAmmoHudInteraction;
@@ -14,12 +16,14 @@ import dev.ninesliced.shotcave.interactions.ModularGunShootInteraction;
 import dev.ninesliced.shotcave.interactions.ReloadCheckInteraction;
 import dev.ninesliced.shotcave.interactions.ReloadInteraction;
 import dev.ninesliced.shotcave.interactions.UpdateAmmoHudInteraction;
+import dev.ninesliced.shotcave.systems.ActiveSlotHudUpdateSystem;
 
 import javax.annotation.Nonnull;
 
 public class Shotcave extends JavaPlugin {
 
     private final TopCameraService cameraService = new TopCameraService();
+    private final AmmoHudRuntime ammoHudRuntime = new AmmoHudRuntime();
 
     public Shotcave(@Nonnull JavaPluginInit init) {
         super(init);
@@ -36,13 +40,29 @@ public class Shotcave extends JavaPlugin {
             .register("UpdateAmmoHud", UpdateAmmoHudInteraction.class, UpdateAmmoHudInteraction.CODEC)
             .register("HideAmmoHud", HideAmmoHudInteraction.class, HideAmmoHudInteraction.CODEC);
 
+        try {
+            this.getEntityStoreRegistry().registerEntityEventType(SwitchActiveSlotEvent.class);
+        } catch (IllegalArgumentException ignored) {
+            // Event may already be registered by another plugin.
+        }
+        this.getEntityStoreRegistry().registerSystem(new ActiveSlotHudUpdateSystem());
+
         this.getEventRegistry().register(PlayerConnectEvent.class, this::onPlayerConnect);
         this.getCommandRegistry().registerCommand(new ShotcaveCommand(this));
+
+        this.ammoHudRuntime.start(this);
+    }
+
+    @Override
+    protected void shutdown() {
+        this.ammoHudRuntime.stop();
+        super.shutdown();
     }
 
     private void onPlayerConnect(@Nonnull PlayerConnectEvent event) {
         PlayerRef playerRef = event.getPlayerRef();
         cameraService.registerDisabledByDefault(playerRef);
+        ammoHudRuntime.onPlayerConnect(playerRef);
     }
 
     public TopCameraService getCameraService() {
