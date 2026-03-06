@@ -2,17 +2,17 @@ package dev.ninesliced.shotcave.interactions;
 
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.protocol.InteractionType;
-import com.hypixel.hytale.protocol.packets.interface_.HudComponent;
 import com.hypixel.hytale.server.core.entity.InteractionContext;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.CooldownHandler;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.SimpleInstantInteraction;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
+import dev.ninesliced.shotcave.hud.AmmoHudService;
 
 import javax.annotation.Nonnull;
 
 /**
- * Placeholder for ammo HUD hide behavior.
+ * Hides the custom ammo HUD.
  */
 public final class HideAmmoHudInteraction extends SimpleInstantInteraction {
     @Nonnull
@@ -31,7 +31,6 @@ public final class HideAmmoHudInteraction extends SimpleInstantInteraction {
             return;
         }
 
-        player.getHudManager().hideHudComponents(playerRef, HudComponent.AmmoIndicator);
-        player.getHudManager().setCustomHud(playerRef, null);
+        AmmoHudService.hide(player, playerRef);
     }
 }
