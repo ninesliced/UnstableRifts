@@ -1,0 +1,17 @@
+{
+  "Type": "Serial",
+  "Interactions": [
+    {
+      "Parent": "DamageEntityParent",
+      "DamageCalculator": {
+        "BaseDamage": {
+          "Projectile": 14
+        }
+      },
+      "DamageEffects": {
+        "WorldSoundEventId": "SFX_Blunderbuss_Hit",
+        "LocalSoundEventId": "SFX_Blunderbuss_Hit"
+      }
+    }
+  ]
+}

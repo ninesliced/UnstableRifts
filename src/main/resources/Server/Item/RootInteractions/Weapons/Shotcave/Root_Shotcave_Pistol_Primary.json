@@ -1,0 +1,10 @@
+{
+  "Cooldown": {
+    "Id": "Shoot",
+    "Cooldown": 0.2
+  },
+  "Interactions": [
+    "Shotcave_Pistol_Primary"
+  ]
+}
+

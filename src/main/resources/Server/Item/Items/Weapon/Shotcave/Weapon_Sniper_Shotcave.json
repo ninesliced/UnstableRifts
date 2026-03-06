@@ -1,0 +1,25 @@
+{
+  "TranslationProperties": {
+    "Name": "server.items.Weapon_Sniper_Shotcave.name"
+  },
+  "Categories": [
+    "Items.Weapons"
+  ],
+  "Icon": "Icons/ItemsGenerated/Weapon_Assault_Rifle.png",
+  "Model": "Items/Hypixel/Minigames/GunPvP/Weapons/Assault_Rifles/Assault_Rifle.blockymodel",
+  "Texture": "Items/Hypixel/Minigames/GunPvP/Weapons/Assault_Rifles/Assault_Rifle_Texture.png",
+  "PlayerAnimationsId": "Rifle",
+  "Interactions": {
+    "Primary": "Root_Shotcave_Sniper_Primary",
+    "Secondary": "Root_Shotcave_Sniper_Reload"
+  },
+  "Weapon": {},
+  "Tags": {
+    "Type": [
+      "Weapon"
+    ],
+    "Family": [
+      "Gun"
+    ]
+  }
+}

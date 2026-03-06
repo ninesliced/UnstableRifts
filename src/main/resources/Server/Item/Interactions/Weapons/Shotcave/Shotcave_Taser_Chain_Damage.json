@@ -1,0 +1,17 @@
+{
+  "Parent": "DamageEntityParent",
+  "DamageCalculator": {
+    "BaseDamage": {
+      "Physical": 10
+    }
+  },
+  "DamageEffects": {
+    "WorldSoundEventId": "SFX_Arrow_FullCharge_Hit",
+    "LocalSoundEventId": "SFX_Arrow_FullCharge_Hit",
+    "WorldParticles": [
+      {
+        "SystemId": "Lightning"
+      }
+    ]
+  }
+}

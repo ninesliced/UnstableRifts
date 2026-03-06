@@ -1,0 +1,17 @@
+{
+  "Type": "Serial",
+  "Interactions": [
+    {
+      "Parent": "DamageEntityParent",
+      "DamageCalculator": {
+        "BaseDamage": {
+          "Projectile": 52
+        }
+      },
+      "DamageEffects": {
+        "WorldSoundEventId": "SFX_Rifle_Fire",
+        "LocalSoundEventId": "SFX_Rifle_Fire_Local"
+      }
+    }
+  ]
+}

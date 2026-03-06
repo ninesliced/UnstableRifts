@@ -1,0 +1,13 @@
+{
+  "Spawners": [
+    {
+      "SpawnerId": "NatureBeam_Beam"
+    },
+    {
+      "SpawnerId": "NatureBeam_Beam_Overlay"
+    }
+  ],
+  "CullDistance": 60.0,
+  "IsImportant": true,
+  "LifeSpan": 0.08
+}

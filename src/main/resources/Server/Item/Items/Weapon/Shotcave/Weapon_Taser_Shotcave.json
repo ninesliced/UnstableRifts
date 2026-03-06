@@ -1,0 +1,25 @@
+{
+  "TranslationProperties": {
+    "Name": "server.items.Weapon_Taser_Shotcave.name"
+  },
+  "Categories": [
+    "Items.Weapons"
+  ],
+  "Icon": "Icons/ItemsGenerated/Weapon_Gun_Blunderbuss.png",
+  "Model": "Items/Weapons/Gun/Blunderbuss.blockymodel",
+  "Texture": "Items/Weapons/Gun/Blunderbuss_Texture.png",
+  "PlayerAnimationsId": "Rifle",
+  "Interactions": {
+    "Primary": "Root_Shotcave_Taser_Primary",
+    "Secondary": "Gun_Attack"
+  },
+  "Weapon": {},
+  "Tags": {
+    "Type": [
+      "Weapon"
+    ],
+    "Family": [
+      "Gun"
+    ]
+  }
+}

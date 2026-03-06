@@ -1,0 +1,22 @@
+{
+  "Type": "ModularGunShoot",
+  "RunTime": 0.1,
+  "Effects": {
+    "ItemAnimationId": "Shoot",
+    "WorldSoundEventId": "SFX_Rifle_Fire",
+    "LocalSoundEventId": "SFX_Rifle_Fire_Local"
+  },
+  "DamageRoot": "Root_Shotcave_Sniper_Projectile_Hit",
+  "Range": 120,
+  "Pellets": 1,
+  "SpreadDegrees": 0.05,
+  "TrailParticleId": "Shotcave_ElectricBeam",
+  "TrailStepDistance": 1.2,
+  "TrailScale": 0.2,
+  "MuzzleHeightOffset": 1.4,
+  "UseAmmo": true,
+  "MaxAmmo": 5,
+  "AmmoPerShot": 1,
+  "AimAssist": true,
+  "Next": "Shotcave_Update_Hud"
+}

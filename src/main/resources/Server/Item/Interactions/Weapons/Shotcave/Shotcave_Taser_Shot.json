@@ -1,0 +1,11 @@
+{
+  "Type": "Simple",
+  "RunTime": 0.08,
+  "Effects": {
+    "ItemAnimationId": "Shoot",
+    "WorldSoundEventId": "SFX_Blunderbuss_Fire",
+    "LocalSoundEventId": "SFX_Blunderbuss_Fire_Local",
+    "Particles": []
+  },
+  "Next": "Shotcave_Taser_Projectile_Hit"
+}

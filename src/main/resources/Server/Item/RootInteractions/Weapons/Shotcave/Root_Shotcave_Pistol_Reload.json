@@ -1,0 +1,10 @@
+{
+  "Cooldown": {
+    "Id": "Reload",
+    "Cooldown": 0.7
+  },
+  "Interactions": [
+    "Shotcave_Pistol_Reload_Check"
+  ]
+}
+

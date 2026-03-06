@@ -1,0 +1,12 @@
+{
+  "Type": "Reload",
+  "RunTime": 1.2,
+  "Effects": {
+    "WorldSoundEventId": "SFX_Rifle_Fire",
+    "LocalSoundEventId": "SFX_Rifle_Fire_Local"
+  },
+  "ReloadAmount": 5,
+  "MaxAmmo": 5,
+  "Next": "Shotcave_Update_Hud"
+}
+

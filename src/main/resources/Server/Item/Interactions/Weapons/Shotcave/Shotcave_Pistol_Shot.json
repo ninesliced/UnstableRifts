@@ -1,0 +1,23 @@
+{
+  "Type": "ModularGunShoot",
+  "RunTime": 0.05,
+  "Effects": {
+    "ItemAnimationId": "Shoot",
+    "CameraEffect": "Handgun_Shoot",
+    "WorldSoundEventId": "SFX_Handgun_Fire",
+    "LocalSoundEventId": "SFX_Handgun_Fire_Local"
+  },
+  "DamageRoot": "Root_Shotcave_Pistol_Projectile_Hit",
+  "Range": 45,
+  "Pellets": 1,
+  "SpreadDegrees": 0.35,
+  "TrailParticleId": "Shotcave_ElectricBeam",
+  "TrailStepDistance": 0.85,
+  "TrailScale": 0.18,
+  "MuzzleHeightOffset": 1.35,
+  "UseAmmo": true,
+  "MaxAmmo": 12,
+  "AmmoPerShot": 1,
+  "AimAssist": true,
+  "Next": "Shotcave_Update_Hud"
+}

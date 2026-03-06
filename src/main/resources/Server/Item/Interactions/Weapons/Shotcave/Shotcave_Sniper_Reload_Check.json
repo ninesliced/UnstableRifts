@@ -1,0 +1,6 @@
+{
+  "Type": "ReloadCheck",
+  "MaxAmmo": 5,
+  "Next": "Shotcave_Sniper_Reload"
+}
+

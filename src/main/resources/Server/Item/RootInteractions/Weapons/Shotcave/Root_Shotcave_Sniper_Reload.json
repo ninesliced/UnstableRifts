@@ -1,0 +1,10 @@
+{
+  "Cooldown": {
+    "Id": "Reload",
+    "Cooldown": 1.25
+  },
+  "Interactions": [
+    "Shotcave_Sniper_Reload_Check"
+  ]
+}
+

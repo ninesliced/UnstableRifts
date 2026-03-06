@@ -1,0 +1,8 @@
+{
+  "Parent": "GunPvP_Assault_Rifle_Bullet",
+  "MuzzleVelocity": 700,
+  "TerminalVelocity": 700,
+  "Gravity": 4,
+  "Damage": 52
+}
+

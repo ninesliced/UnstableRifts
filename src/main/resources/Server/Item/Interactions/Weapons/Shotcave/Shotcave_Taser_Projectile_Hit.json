@@ -1,0 +1,18 @@
+{
+  "Type": "Serial",
+  "Interactions": [
+    {
+      "Type": "ChainLightning",
+      "DamageRoot": "Root_Shotcave_Taser_Chain_Damage",
+      "JumpRange": 5.0,
+      "MaxTargets": 5,
+      "IncludeInitialTarget": true,
+      "BeamParticleId": "Shotcave_ElectricBeam",
+      "BeamStepDistance": 0.6,
+      "BeamHeightOffset": 1.35,
+      "BeamParticleScale": 0.35,
+      "MaxDistance": 30,
+      "AimAssist": true
+    }
+  ]
+}

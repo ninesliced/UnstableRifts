@@ -1,0 +1,19 @@
+{
+  "Type": "Simple",
+  "RunTime": 1.2,
+  "Effects": {
+    "ItemAnimationId": "Cast",
+    "WorldSoundEventId": "SFX_Skeleton_Mage_Spellbook_Impact",
+    "LocalSoundEventId": "SFX_Skeleton_Mage_Spellbook_Impact"
+  },
+  "Next": {
+    "Type": "SpawnNPC",
+    "EntityId": "Spirit_Root",
+    "SpawnOffset": {
+      "X": 0,
+      "Y": 1,
+      "Z": 0
+    }
+  }
+}
+
