@@ -43,7 +43,7 @@ public class TopCameraService {
         ServerCameraSettings cameraSettings = new ServerCameraSettings();
         cameraSettings.positionLerpSpeed = 0.2F;
         cameraSettings.rotationLerpSpeed = 0.2F;
-        cameraSettings.distance = 8.0F;
+        cameraSettings.distance = 6.0F;
         cameraSettings.allowPitchControls = false;
         cameraSettings.displayCursor = true;
         cameraSettings.displayReticle = false;
