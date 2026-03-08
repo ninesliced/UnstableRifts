@@ -16,6 +16,7 @@ import dev.ninesliced.shotcave.interactions.HideAmmoHudInteraction;
 import dev.ninesliced.shotcave.interactions.ModularGunShootInteraction;
 import dev.ninesliced.shotcave.interactions.ReloadCheckInteraction;
 import dev.ninesliced.shotcave.interactions.ReloadInteraction;
+import dev.ninesliced.shotcave.interactions.BreakSoftBlockInteraction;
 import dev.ninesliced.shotcave.interactions.SpawnNPCAtImpactInteraction;
 import dev.ninesliced.shotcave.interactions.UpdateAmmoHudInteraction;
 import dev.ninesliced.shotcave.systems.ActiveSlotHudUpdateSystem;
@@ -42,7 +43,8 @@ public class Shotcave extends JavaPlugin {
             .register("UpdateAmmoHud", UpdateAmmoHudInteraction.class, UpdateAmmoHudInteraction.CODEC)
             .register("HideAmmoHud", HideAmmoHudInteraction.class, HideAmmoHudInteraction.CODEC)
             .register("ConsumeAmmo", ConsumeAmmoInteraction.class, ConsumeAmmoInteraction.CODEC)
-            .register("SpawnNPCAtImpact", SpawnNPCAtImpactInteraction.class, SpawnNPCAtImpactInteraction.CODEC);
+            .register("SpawnNPCAtImpact", SpawnNPCAtImpactInteraction.class, SpawnNPCAtImpactInteraction.CODEC)
+                .register("BreakSoftBlock", BreakSoftBlockInteraction.class, BreakSoftBlockInteraction.CODEC);
 
         try {
             this.getEntityStoreRegistry().registerEntityEventType(SwitchActiveSlotEvent.class);
