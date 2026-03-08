@@ -5,7 +5,7 @@
   "Categories": [
     "Items.Weapons"
   ],
-  "Icon": "Icons/ItemsGenerated/Weapon_Assault_Rifle.png",
+  "Icon": "Icons/ItemsGenerated/VOID_LANCE.png",
   "Model": "Items/Weapons/Shotcave/Voidlance/VOID_LANCE_WIP_FIX.blockymodel",
   "Texture": "Items/Weapons/Shotcave/Voidlance/VOID_LANCE_WIP_TEXTURE.png",
   "PlayerAnimationsId": "Rifle",
