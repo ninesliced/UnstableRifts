@@ -1,0 +1,52 @@
+{
+  "GameMode": "Adventure",
+  "RequiredPlugins": {},
+  "ChunkStorage": {
+    "Type": "Hytale"
+  },
+  "IsPvpEnabled": false,
+  "IsSpawningNPC": true,
+  "GameTime": "0001-01-01T07:00:00Z",
+  "UUID": {
+    "$binary": "AAAAAAAAAAAAAAAAAAAAAA==",
+    "$type": "04"
+  },
+  "GameplayConfig": "Default_Instance",
+  "WorldMap": {
+    "Type": "Disabled"
+  },
+  "IsCompassUpdating": true,
+  "IsTicking": true,
+  "Seed": 0,
+  "IsGameTimePaused": false,
+  "IsObjectiveMarkersEnabled": false,
+  "IsAllNPCFrozen": false,
+  "IsSavingPlayers": true,
+  "WorldGen": {
+    "Type": "Void",
+    "Tint": "#1a2a0e",
+    "Environment": "Env_Zone1_Dungeons"
+  },
+  "SpawnProvider": {
+    "Id": "Global",
+    "SpawnPoint": {
+      "X": 0.5,
+      "Y": 66.0,
+      "Z": 0.5,
+      "Pitch": 0.0,
+      "Yaw": 180.0,
+      "Roll": 0.0
+    }
+  },
+  "IsSpawnMarkersEnabled": true,
+  "Instance": {
+    "RemovalConditions": [
+      {
+        "Type": "WorldEmpty"
+      }
+    ]
+  },
+  "DeleteOnRemove": true,
+  "Version": 4
+}
+
