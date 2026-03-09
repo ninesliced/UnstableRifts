@@ -8,6 +8,7 @@ import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import dev.ninesliced.shotcave.camera.TopCameraService;
 import dev.ninesliced.shotcave.command.ShotcaveCommand;
+import dev.ninesliced.shotcave.dungeon.DungeonConfig;
 import dev.ninesliced.shotcave.hud.AmmoHudRuntime;
 import dev.ninesliced.shotcave.interactions.ChainLightningInteraction;
 import dev.ninesliced.shotcave.interactions.ConsumeAmmoInteraction;
@@ -20,13 +21,16 @@ import dev.ninesliced.shotcave.interactions.BreakSoftBlockInteraction;
 import dev.ninesliced.shotcave.interactions.SpawnNPCAtImpactInteraction;
 import dev.ninesliced.shotcave.interactions.UpdateAmmoHudInteraction;
 import dev.ninesliced.shotcave.systems.ActiveSlotHudUpdateSystem;
+import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
 
 import javax.annotation.Nonnull;
+import java.nio.file.Path;
 
 public class Shotcave extends JavaPlugin {
 
     private final TopCameraService cameraService = new TopCameraService();
     private final AmmoHudRuntime ammoHudRuntime = new AmmoHudRuntime();
+    private Path dungeonConfigPath;
 
     public Shotcave(@Nonnull JavaPluginInit init) {
         super(init);
@@ -34,6 +38,8 @@ public class Shotcave extends JavaPlugin {
 
     @Override
     protected void setup() {
+        this.dungeonConfigPath = DungeonConfig.ensureRuntimeConfig(this.getDataDirectory());
+
         this.getCodecRegistry(Interaction.CODEC)
                 .register("ChainLightning", ChainLightningInteraction.class, ChainLightningInteraction.CODEC)
                 .register("ModularGunShoot", ModularGunShootInteraction.class, ModularGunShootInteraction.CODEC)
@@ -70,7 +76,26 @@ public class Shotcave extends JavaPlugin {
         ammoHudRuntime.onPlayerConnect(playerRef);
     }
 
+    @Nonnull
+    public Path getDungeonConfigPath() {
+        if (this.dungeonConfigPath == null) {
+            this.dungeonConfigPath = DungeonConfig.ensureRuntimeConfig(this.getDataDirectory());
+        }
+        return this.dungeonConfigPath;
+    }
+
+    @Nonnull
+    public DungeonConfig loadDungeonConfig() {
+        return DungeonConfig.load(this.getDungeonConfigPath());
+    }
+
     public TopCameraService getCameraService() {
         return cameraService;
+    }
+
+    @NonNullDecl
+    @Override
+    public Path getDataDirectory() {
+        return super.getDataDirectory().getParent().resolve("Shotcave");
     }
 }
