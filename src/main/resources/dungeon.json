@@ -1,0 +1,28 @@
+{
+  "levels": [
+    {
+      "id": "shotcave",
+      "name": "Level 1",
+      "rooms": 25,
+      "prefabs": {
+        "entrance": [
+          "start"
+        ],
+        "room": [
+          "front",
+          "left",
+          "right",
+          "front_left",
+          "front_right",
+          "3_branch"
+        ],
+        "wall": [
+          "wall"
+        ],
+        "boss": [
+          "boss"
+        ]
+      }
+    }
+  ]
+}
