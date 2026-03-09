@@ -72,6 +72,9 @@ public final class AmmoHudRuntime {
             return;
         }
         ref.getStore().getExternalData().getWorld().execute(() -> {
+            if (!ref.isValid()) {
+                return;
+            }
             Player player = ref.getStore().getComponent(ref, Player.getComponentType());
             if (player == null || player.wasRemoved()) {
                 return;

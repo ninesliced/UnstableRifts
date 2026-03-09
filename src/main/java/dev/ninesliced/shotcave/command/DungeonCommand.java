@@ -105,7 +105,13 @@ public class DungeonCommand extends AbstractCommand {
                         status -> context.sendMessage(Message.raw(status).color(status.startsWith("Dungeon ready") ? Color.GREEN : Color.YELLOW))
                 );
 
-                instanceService.sendPlayerToLoadingInstance(ref, store, readyFuture, returnPoint);
+                instanceService.sendPlayerToReadyInstance(
+                        ref,
+                        store,
+                        readyFuture,
+                        returnPoint,
+                        status -> context.sendMessage(Message.raw(status).color(Color.RED))
+                );
 
             } catch (Exception e) {
                 context.sendMessage(Message.raw("Dungeon creation failed: " + e.getMessage()).color(Color.RED));

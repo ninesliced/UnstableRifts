@@ -5,6 +5,7 @@ import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.math.vector.Transform;
 import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
+import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import dev.ninesliced.shotcave.Shotcave;
@@ -74,11 +75,41 @@ public final class DungeonInstanceService {
         });
     }
 
-    public void sendPlayerToLoadingInstance(@Nonnull Ref<EntityStore> ref,
-                                            @Nonnull Store<EntityStore> store,
-                                            @Nonnull CompletableFuture<World> readyFuture,
-                                            @Nullable Transform returnPoint) {
-        InstancesPlugin.teleportPlayerToLoadingInstance(ref, store, readyFuture, returnPoint);
+    public void sendPlayerToReadyInstance(@Nonnull Ref<EntityStore> ref,
+                                          @Nonnull Store<EntityStore> store,
+                                          @Nonnull CompletableFuture<World> readyFuture,
+                                          @Nullable Transform returnPoint,
+                                          @Nullable Consumer<String> failureConsumer) {
+        World currentWorld = store.getExternalData().getWorld();
+        readyFuture.whenComplete((targetWorld, throwable) -> {
+            if (throwable != null) {
+                LOGGER.log(Level.WARNING, "Failed to prepare dungeon instance", throwable);
+                if (failureConsumer != null) {
+                    failureConsumer.accept("Dungeon creation failed.");
+                }
+                return;
+            }
+
+            currentWorld.execute(() -> {
+                if (!ref.isValid()) {
+                    return;
+                }
+
+                PlayerRef playerRef = store.getComponent(ref, PlayerRef.getComponentType());
+                if (playerRef == null) {
+                    return;
+                }
+
+                try {
+                    InstancesPlugin.teleportPlayerToInstance(ref, store, targetWorld, returnPoint);
+                } catch (Exception exception) {
+                    LOGGER.log(Level.WARNING, "Failed to send player to ready dungeon instance", exception);
+                    if (failureConsumer != null) {
+                        failureConsumer.accept("Teleport to dungeon failed.");
+                    }
+                }
+            });
+        });
     }
 
     @Nonnull

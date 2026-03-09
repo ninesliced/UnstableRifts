@@ -281,11 +281,16 @@ public final class PartyManager {
         );
 
         for (PendingTeleport member : membersToTeleport) {
-            this.plugin.getDungeonInstanceService().sendPlayerToLoadingInstance(
+            this.plugin.getCameraService().scheduleEnableOnNextReady(member.playerRef());
+            this.plugin.getDungeonInstanceService().sendPlayerToReadyInstance(
                     member.entityRef(),
                     member.store(),
                     readyFuture,
-                    member.returnPoint()
+                    member.returnPoint(),
+                    status -> {
+                        this.plugin.getCameraService().cancelDeferredEnable(member.playerRef());
+                        member.playerRef().sendMessage(partyPrefix().insert(Message.raw(status).color("#ffb0b0")));
+                    }
             );
         }
 

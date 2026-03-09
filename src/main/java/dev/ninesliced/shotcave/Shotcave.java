@@ -3,6 +3,7 @@ package dev.ninesliced.shotcave;
 import com.hypixel.hytale.server.core.event.events.ecs.SwitchActiveSlotEvent;
 import com.hypixel.hytale.server.core.event.events.player.PlayerConnectEvent;
 import com.hypixel.hytale.server.core.event.events.player.PlayerDisconnectEvent;
+import com.hypixel.hytale.server.core.event.events.player.PlayerReadyEvent;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.Interaction;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.server.OpenCustomUIInteraction;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
@@ -71,7 +72,11 @@ public class Shotcave extends JavaPlugin {
         this.getEntityStoreRegistry().registerSystem(new ActiveSlotHudUpdateSystem());
 
         this.getEventRegistry().register(PlayerConnectEvent.class, this::onPlayerConnect);
-        this.getEventRegistry().registerGlobal(PlayerDisconnectEvent.class, event -> this.partyManager.handleDisconnect(event.getPlayerRef()));
+        this.getEventRegistry().registerGlobal(PlayerReadyEvent.class, this::onPlayerReady);
+        this.getEventRegistry().registerGlobal(PlayerDisconnectEvent.class, event -> {
+            this.partyManager.handleDisconnect(event.getPlayerRef());
+            this.cameraService.clearState(event.getPlayerRef());
+        });
         this.getCommandRegistry().registerCommand(new ShotcaveCommand(this));
         this.getCommandRegistry().registerCommand(new PartyCommand(this));
 
@@ -89,6 +94,10 @@ public class Shotcave extends JavaPlugin {
         PlayerRef playerRef = event.getPlayerRef();
         cameraService.registerDisabledByDefault(playerRef);
         ammoHudRuntime.onPlayerConnect(playerRef);
+    }
+
+    private void onPlayerReady(@Nonnull PlayerReadyEvent event) {
+        this.cameraService.handlePlayerReady(event.getPlayerRef());
     }
 
     @Nonnull
