@@ -1,0 +1,307 @@
+$C = "../../Common.ui";
+
+@TitleStyle = LabelStyle(
+  FontSize: 18,
+  TextColor: #d9c18a,
+  RenderBold: true,
+  RenderUppercase: true
+);
+
+@BodyStyle = LabelStyle(
+  FontSize: 14,
+  TextColor: #b9c7d6,
+  Wrap: true
+);
+
+@MutedStyle = LabelStyle(
+  FontSize: 13,
+  TextColor: #7c8da1,
+  Wrap: true
+);
+
+@SectionCard = Group {
+  LayoutMode: Top;
+  Padding: (Full: 12);
+  Background: #15202d(0.74);
+  OutlineColor: #3d5369(0.55);
+  OutlineSize: 1;
+};
+
+@ActionButton = TextButtonStyle(
+  Default: (Background: $C.@DefaultSquareButtonDefaultBackground, LabelStyle: (FontSize: 13, TextColor: #d5dde7, RenderBold: true, RenderUppercase: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
+  Hovered: (Background: $C.@DefaultSquareButtonHoveredBackground, LabelStyle: (FontSize: 13, TextColor: #ffffff, RenderBold: true, RenderUppercase: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
+  Pressed: (Background: $C.@DefaultSquareButtonPressedBackground, LabelStyle: (FontSize: 13, TextColor: #ffffff, RenderBold: true, RenderUppercase: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
+  Sounds: $C.@ButtonSounds
+);
+
+$C.@PageOverlay {
+  $C.@DecoratedContainer {
+    Anchor: (Width: 980, Height: 700);
+
+    #Title {
+      $C.@Title {
+        @Text = "Shotcave Party";
+      }
+
+      TextButton #CloseButton {
+        Anchor: (Left: 12, Top: 4, Width: 64, Height: 24);
+        Padding: (Left: 8, Top: 2);
+        Text: "Close";
+        Style: TextButtonStyle(
+          Default: (LabelStyle: (FontSize: 14, TextColor: #93844c, RenderBold: true)),
+          Sounds: $C.@ButtonSounds,
+        );
+        Background: #000000(0.13);
+      }
+
+      TextButton #RefreshButton {
+        Anchor: (Right: 12, Top: 4, Width: 82, Height: 24);
+        Text: "Refresh";
+        Style: @ActionButton;
+      }
+    }
+
+    #Content {
+      LayoutMode: Left;
+      Padding: (Full: 10);
+
+      Group #LeftPane {
+        Anchor: (Width: 430);
+        LayoutMode: TopScrolling;
+        ScrollbarStyle: $C.@DefaultScrollbarStyle;
+        Padding: (Right: 10);
+
+        Group {
+          LayoutMode: Top;
+
+          Group {
+            LayoutMode: Left;
+            Anchor: (Height: 34);
+            Background: #7a5b2d(0.18);
+            Padding: (Left: 12);
+
+            Label {
+              Text: "Shotcave Party";
+              Style: @TitleStyle;
+            }
+          }
+
+          Label #OverviewStatus {
+            Anchor: (Top: 8, Bottom: 10);
+            Text: "";
+            Style: @BodyStyle;
+          }
+
+          @SectionCard #CreatePartyCard {
+            Visible: true;
+
+            Label {
+              Text: "Forge your Shotcave party before entering a fresh dungeon instance. Public parties can be joined freely. Private parties require invites from the leader.";
+              Style: @BodyStyle;
+            }
+
+            Group {
+              LayoutMode: Left;
+              Anchor: (Height: 34, Top: 12);
+
+              TextButton #CreatePrivateButton {
+                FlexWeight: 1;
+                Anchor: (Height: 32);
+                Text: "Create Private Party";
+                Style: @ActionButton;
+              }
+
+              Group { Anchor: (Width: 10); }
+
+              TextButton #CreatePublicButton {
+                FlexWeight: 1;
+                Anchor: (Height: 32);
+                Text: "Create Public Party";
+                Style: @ActionButton;
+              }
+            }
+          }
+
+          @SectionCard #CurrentPartyCard {
+            Visible: false;
+
+            Label #CurrentPartyName {
+              Text: "Party";
+              Style: (FontSize: 21, TextColor: #f0e3c1, RenderBold: true);
+            }
+
+            Label #CurrentPartyMeta {
+              Anchor: (Top: 4);
+              Text: "Leader: ...";
+              Style: @MutedStyle;
+            }
+
+            Group {
+              LayoutMode: Left;
+              Anchor: (Top: 10, Height: 26);
+
+              Label {
+                Text: "Visibility:";
+                Style: @BodyStyle;
+              }
+
+              Label #CurrentPartyPrivacy {
+                Anchor: (Left: 8);
+                Text: "Private";
+                Style: (FontSize: 14, TextColor: #8ed0ff, RenderBold: true, RenderUppercase: true);
+              }
+            }
+
+            Group {
+              LayoutMode: Left;
+              Anchor: (Top: 12, Height: 34);
+
+              TextButton #PrivacyButton {
+                FlexWeight: 1;
+                Anchor: (Height: 32);
+                Text: "MAKE PUBLIC";
+                Style: @ActionButton;
+              }
+
+              Group { Anchor: (Width: 8); }
+
+              TextButton #StartButton {
+                FlexWeight: 1;
+                Anchor: (Height: 32);
+                Text: "START RUN";
+                Style: @ActionButton;
+              }
+            }
+
+            Group {
+              LayoutMode: Left;
+              Anchor: (Top: 8, Height: 34);
+
+              TextButton #LeaveButton {
+                FlexWeight: 1;
+                Anchor: (Height: 32);
+                Text: "LEAVE PARTY";
+                Style: @ActionButton;
+                Visible: false;
+              }
+
+              Group { Anchor: (Width: 8); }
+
+              TextButton #DisbandButton {
+                FlexWeight: 1;
+                Anchor: (Height: 32);
+                Text: "DISBAND PARTY";
+                Style: @ActionButton;
+                Visible: false;
+              }
+            }
+
+            Group #InviteSection {
+              Visible: true;
+              LayoutMode: Top;
+              Anchor: (Top: 12);
+
+              Label {
+                Text: "Invite Player";
+                Style: @TitleStyle;
+              }
+
+              Label {
+                Anchor: (Top: 4, Bottom: 8);
+                Text: "Choose an online player who is not already grouped, then send the invite.";
+                Style: @MutedStyle;
+              }
+
+              $C.@DropdownBox #InvitePlayerDropdown {
+                @Anchor = (Width: 392);
+                Value: "";
+              }
+
+              Label #NoInviteCandidates {
+                Visible: false;
+                Anchor: (Top: 6);
+                Text: "No online players are currently available to invite.";
+                Style: @MutedStyle;
+              }
+
+              TextButton #InviteButton {
+                Anchor: (Height: 32, Top: 8);
+                Text: "SEND INVITE";
+                Style: @ActionButton;
+              }
+            }
+
+            Label {
+              Anchor: (Top: 14, Bottom: 6);
+              Text: "Members";
+              Style: @TitleStyle;
+            }
+
+            Group #CurrentPartyMembers {
+              LayoutMode: Top;
+            }
+          }
+
+          @SectionCard #InvitesCard {
+            Visible: false;
+            Anchor: (Top: 12);
+
+            Label {
+              Text: "Pending Invites";
+              Style: @TitleStyle;
+            }
+
+            Label {
+              Anchor: (Top: 4, Bottom: 8);
+              Text: "Accepting here behaves the same as using /sc accept from chat.";
+              Style: @MutedStyle;
+            }
+
+            Group #InviteList {
+              LayoutMode: Top;
+            }
+          }
+        }
+      }
+
+      Group { Anchor: (Width: 10); }
+
+      Group #RightPane {
+        FlexWeight: 1;
+        LayoutMode: Top;
+
+        Group {
+          LayoutMode: Left;
+          Anchor: (Height: 34);
+          Background: #27506d(0.18);
+          Padding: (Left: 12);
+
+          Label {
+            Text: "Open Parties";
+            Style: @TitleStyle;
+          }
+        }
+
+        Label {
+          Anchor: (Top: 8, Bottom: 10);
+          Text: "Public parties can be joined immediately. Private parties only appear here if they change visibility.";
+          Style: @BodyStyle;
+        }
+
+        Label #EmptyPublicState {
+          Visible: false;
+          Anchor: (Bottom: 10);
+          Text: "No public parties are available right now.";
+          Style: @MutedStyle;
+        }
+
+        Group #PublicPartyList {
+          FlexWeight: 1;
+          LayoutMode: TopScrolling;
+          ScrollbarStyle: $C.@DefaultScrollbarStyle;
+          Padding: (Right: 8);
+        }
+      }
+    }
+  }
+}

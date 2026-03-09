@@ -1,34 +1,26 @@
 package dev.ninesliced.shotcave.command;
 
-import com.hypixel.hytale.builtin.instances.InstancesPlugin;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
-import com.hypixel.hytale.math.vector.Transform;
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.command.system.AbstractCommand;
 import com.hypixel.hytale.server.core.command.system.CommandContext;
 import com.hypixel.hytale.server.core.command.system.arguments.system.RequiredArg;
 import com.hypixel.hytale.server.core.command.system.arguments.types.ArgTypes;
-import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import dev.ninesliced.shotcave.Shotcave;
 import dev.ninesliced.shotcave.dungeon.DungeonConfig;
-import dev.ninesliced.shotcave.dungeon.DungeonGenerator;
+import dev.ninesliced.shotcave.dungeon.DungeonInstanceService;
 
 import javax.annotation.Nonnull;
 import java.awt.Color;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class DungeonCommand extends AbstractCommand {
-
-    private static final Logger LOGGER = Logger.getLogger(DungeonCommand.class.getName());
-    private static final String INSTANCE_TEMPLATE = "Shotcave";
 
     private final Shotcave plugin;
     private final RequiredArg<String> dungeonArg;
@@ -102,48 +94,20 @@ public class DungeonCommand extends AbstractCommand {
                     return;
                 }
 
-                TransformComponent transformComponent = store.getComponent(ref, TransformComponent.getComponentType());
-                Transform returnPoint = transformComponent != null
-                        ? transformComponent.getTransform().clone()
-                        : new Transform(0, 100, 0);
+                DungeonInstanceService instanceService = this.plugin.getDungeonInstanceService();
+                var returnPoint = DungeonInstanceService.captureReturnPoint(store, ref);
 
                 context.sendMessage(Message.raw("Creating dungeon instance: " + levelConfig.getName()).color(Color.YELLOW));
-
-                InstancesPlugin instancesPlugin = InstancesPlugin.get();
-                CompletableFuture<World> worldFuture = instancesPlugin.spawnInstance(
-                        INSTANCE_TEMPLATE,
+                CompletableFuture<World> readyFuture = instanceService.spawnGeneratedInstance(
                         currentWorld,
-                        returnPoint
+                        returnPoint,
+                        levelConfig,
+                        status -> context.sendMessage(Message.raw(status).color(status.startsWith("Dungeon ready") ? Color.GREEN : Color.YELLOW))
                 );
 
-                CompletableFuture<World> readyFuture = worldFuture.thenCompose(world -> {
-                    CompletableFuture<World> generationFuture = new CompletableFuture<>();
-                    world.execute(() -> {
-                        try {
-                            long seed = System.nanoTime();
-                            DungeonGenerator generator = new DungeonGenerator();
-                            generator.generate(world, seed, levelConfig);
-                            context.sendMessage(Message.raw("Dungeon ready: " + levelConfig.getName()).color(Color.GREEN));
-                            LOGGER.info("Dungeon instance created: " + world.getName() + " for selector " + levelConfig.getSelector());
-                            generationFuture.complete(world);
-                        } catch (Exception e) {
-                            LOGGER.log(Level.WARNING, "Dungeon generation failed", e);
-                            context.sendMessage(Message.raw("Dungeon generation had errors.").color(Color.YELLOW));
-                            generationFuture.complete(world);
-                        }
-                    });
-                    return generationFuture;
-                });
-
-                InstancesPlugin.teleportPlayerToLoadingInstance(
-                        ref,
-                        store,
-                        readyFuture,
-                        returnPoint
-                );
+                instanceService.sendPlayerToLoadingInstance(ref, store, readyFuture, returnPoint);
 
             } catch (Exception e) {
-                LOGGER.log(Level.SEVERE, "Failed to execute /shotcave dungeon", e);
                 context.sendMessage(Message.raw("Dungeon creation failed: " + e.getMessage()).color(Color.RED));
             }
         }, currentWorld);

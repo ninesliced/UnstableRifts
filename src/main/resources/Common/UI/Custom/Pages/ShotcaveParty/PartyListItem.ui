@@ -1,0 +1,43 @@
+$C = "../../Common.ui";
+
+Group {
+  LayoutMode: Left;
+  Anchor: (Height: 76, Bottom: 8);
+  Padding: (Horizontal: 14, Vertical: 10);
+  Background: #101722(0.82);
+  OutlineColor: #31475d(0.55);
+  OutlineSize: 1;
+
+  Group {
+    FlexWeight: 1;
+    LayoutMode: Top;
+
+    Label #PartyName {
+      Text: "Party";
+      Style: (FontSize: 17, TextColor: #e6dcc0, RenderBold: true);
+    }
+
+    Label #PartyMeta {
+      Anchor: (Top: 2);
+      Text: "Leader: ...";
+      Style: (FontSize: 12, TextColor: #91a7bb, RenderUppercase: true);
+    }
+
+    Label #PartyDetails {
+      Anchor: (Top: 4);
+      Text: "2 members";
+      Style: (FontSize: 13, TextColor: #b9c7d6, Wrap: true);
+    }
+  }
+
+  TextButton #JoinButton {
+    Anchor: (Width: 128, Height: 32, Top: 12);
+    Text: "Join Party";
+    Style: TextButtonStyle(
+      Default: (Background: $C.@DefaultSquareButtonDefaultBackground, LabelStyle: (FontSize: 12, TextColor: #dce6ef, RenderBold: true, RenderUppercase: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
+      Hovered: (Background: $C.@DefaultSquareButtonHoveredBackground, LabelStyle: (FontSize: 12, TextColor: #ffffff, RenderBold: true, RenderUppercase: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
+      Pressed: (Background: $C.@DefaultSquareButtonPressedBackground, LabelStyle: (FontSize: 12, TextColor: #ffffff, RenderBold: true, RenderUppercase: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
+      Sounds: $C.@ButtonSounds
+    );
+  }
+}

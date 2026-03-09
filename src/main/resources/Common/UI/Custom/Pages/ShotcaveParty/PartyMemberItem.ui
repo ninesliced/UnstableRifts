@@ -1,0 +1,38 @@
+$C = "../../Common.ui";
+
+Group {
+  LayoutMode: Left;
+  Anchor: (Height: 58, Bottom: 8);
+  Padding: (Horizontal: 12, Vertical: 10);
+  Background: #101722(0.82);
+  OutlineColor: #31475d(0.55);
+  OutlineSize: 1;
+
+  Group {
+    FlexWeight: 1;
+    LayoutMode: Top;
+
+    Label #MemberName {
+      Text: "Member";
+      Style: (FontSize: 16, TextColor: #e4ebf2, RenderBold: true);
+    }
+
+    Label #MemberMeta {
+      Anchor: (Top: 2);
+      Text: "Party Member";
+      Style: (FontSize: 12, TextColor: #8da0b4, RenderUppercase: true);
+    }
+  }
+
+  TextButton #KickButton {
+    Anchor: (Width: 96, Height: 30, Top: 4);
+    Text: "Remove";
+    Style: TextButtonStyle(
+      Default: (Background: $C.@DefaultSquareButtonDefaultBackground, LabelStyle: (FontSize: 12, TextColor: #f7d4d4, RenderBold: true, RenderUppercase: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
+      Hovered: (Background: $C.@DefaultSquareButtonHoveredBackground, LabelStyle: (FontSize: 12, TextColor: #ffffff, RenderBold: true, RenderUppercase: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
+      Pressed: (Background: $C.@DefaultSquareButtonPressedBackground, LabelStyle: (FontSize: 12, TextColor: #ffffff, RenderBold: true, RenderUppercase: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
+      Sounds: $C.@ButtonSounds
+    );
+    Visible: false;
+  }
+}

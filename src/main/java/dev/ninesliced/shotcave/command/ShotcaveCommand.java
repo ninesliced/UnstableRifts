@@ -16,6 +16,9 @@ public class ShotcaveCommand extends AbstractCommand {
         this.addAliases("sc");
         this.addSubCommand(new TopCameraCommand(plugin));
         this.addSubCommand(new DungeonCommand(plugin));
+        this.addSubCommand(new AcceptPartyInviteCommand(plugin));
+        this.addSubCommand(new GivePartyPortalCommand());
+        this.addSubCommand(new PartyCommand(plugin));
     }
 
     @Override
@@ -37,6 +40,12 @@ public class ShotcaveCommand extends AbstractCommand {
                 .insert(Message.raw(" : Create and enter a configured dungeon instance.").color(Color.GRAY)));
         context.sendMessage(Message.raw("- /shotcave topcamera").color(Color.WHITE)
                 .insert(Message.raw(" : Toggle top-down camera mode.").color(Color.GRAY)));
+        context.sendMessage(Message.raw("- /shotcave giveportal").color(Color.WHITE)
+            .insert(Message.raw(" : Admin only, gives the ancient party portal item in-hand.").color(Color.GRAY)));
+        context.sendMessage(Message.raw("- /shotcave accept").color(Color.WHITE)
+            .insert(Message.raw(" : Accept your most recent active party invite.").color(Color.GRAY)));
+        context.sendMessage(Message.raw("- /shotcave party").color(Color.WHITE)
+            .insert(Message.raw(" : Open party management commands and UI.").color(Color.GRAY)));
         context.sendMessage(Message.raw("Tip: Run /shotcave --help to view all subcommands and usage.").color(Color.CYAN));
         return CompletableFuture.completedFuture(null);
     }
