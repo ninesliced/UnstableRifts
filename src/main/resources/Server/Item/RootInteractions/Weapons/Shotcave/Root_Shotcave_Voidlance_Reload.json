@@ -1,0 +1,9 @@
+{
+  "Cooldown": {
+    "Id": "Reload",
+    "Cooldown": 1.4
+  },
+  "Interactions": [
+    "Shotcave_Voidlance_Reload_Check"
+  ]
+}
