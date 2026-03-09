@@ -5,9 +5,9 @@
   "Categories": [
     "Items.Weapons"
   ],
-  "Icon": "Icons/ItemsGenerated/Weapon_Gun_Blunderbuss.png",
-  "Model": "Items/Weapons/Gun/Blunderbuss.blockymodel",
-  "Texture": "Items/Weapons/Gun/Blunderbuss_Texture.png",
+  "Icon": "Icons/ItemsGenerated/Lightning_gun.png",
+  "Model": "Items/Weapons/Shotcave/Lightning_gun/LIGHTNING_GUN.blockymodel",
+  "Texture": "Items/Weapons/Shotcave/Lightning_gun/LIGHTNING_GUN_TEXTURE.png",
   "PlayerAnimationsId": "Rifle",
   "Interactions": {
     "Primary": "Root_Shotcave_Taser_Primary",
