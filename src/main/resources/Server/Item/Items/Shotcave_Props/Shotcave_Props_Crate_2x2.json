@@ -1,6 +1,6 @@
 {
   "TranslationProperties": {
-    "Name": "server.items.Hycrates_Crate_2x2.name"
+    "Name": "server.items.Shotcave_Props_Crate_2x2.name"
   },
   "Icon": "Icons/ItemsGenerated/Furniture_Village_Crate.png",
   "Categories": [
@@ -11,15 +11,15 @@
     "DrawType": "Model",
     "Opacity": "Transparent",
     "Group": "Props",
-    "CustomModel": "Blocks/Hycrates/Hycrates_Crate_2x2.blockymodel",
+    "CustomModel": "Blocks/Shotcave_Props/Shotcave_Props_Crate_2x2.blockymodel",
     "CustomModelTexture": [
       {
-        "Texture": "BlockTextures/Hycrates_Crate_2x2.png",
+        "Texture": "BlockTextures/Shotcave_Props_Crate_2x2.png",
         "Weight": 1
       }
     ],
     "CustomModelScale": 1,
-    "HitboxType": "Hycrates_Crate_2x2",
+    "HitboxType": "Shotcave_Props_Crate_2x2",
     "VariantRotation": "NESW",
     "Flags": {},
     "Gathering": {
@@ -27,7 +27,7 @@
         "DropList": "Empty"
       }
     },
-    "BlockParticleSetId": "Hycrates_Crate",
+    "BlockParticleSetId": "Shotcave_Props_Crate",
     "ParticleColor": "#4a4a4a",
     "BlockSoundSetId": "Metal",
     "Support": {
@@ -51,7 +51,7 @@
       "Furniture"
     ],
     "Family": [
-      "Hycrates"
+      "Shotcave_Props"
     ]
   },
   "ItemSoundSetId": "ISS_Items_Metal",

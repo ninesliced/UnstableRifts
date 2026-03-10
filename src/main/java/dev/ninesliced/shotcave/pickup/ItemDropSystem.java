@@ -133,7 +133,7 @@ public final class ItemDropSystem extends RefSystem<EntityStore> {
         int lastUnderscore = name.lastIndexOf('_');
         if (lastUnderscore > 0 && lastUnderscore < name.length() - 1) {
             if (name.startsWith("Weapon_") || name.startsWith("Ingredient_")
-                    || name.startsWith("Plant_") || name.startsWith("Hycrates_")) {
+                    || name.startsWith("Plant_") || name.startsWith("Shotcave_Props_")) {
                 name = name.substring(name.indexOf('_') + 1);
             }
         }

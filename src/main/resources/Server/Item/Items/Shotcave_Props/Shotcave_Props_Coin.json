@@ -1,6 +1,6 @@
 {
   "TranslationProperties": {
-    "Name": "server.items.Hycrates_Coin.name"
+    "Name": "server.items.Shotcave_Props_Coin.name"
   },
   "Icon": "Icons/ItemsGenerated/Ingredient_Bar_Gold.png",
   "Model": "Resources/Materials/Ingot.blockymodel",
@@ -28,7 +28,7 @@
       "Ingredient"
     ],
     "Family": [
-      "Hycrates"
+      "Shotcave_Props"
     ],
     "Pickup": [
       "ScoreCollect"

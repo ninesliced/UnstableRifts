@@ -11,7 +11,7 @@ import java.util.concurrent.ThreadLocalRandom;
 /** Placeholder loot table for crate drops. */
 public final class CrateDropGenerator {
 
-    private static final String COIN_ITEM_ID = "Hycrates_Coin";
+    private static final String COIN_ITEM_ID = "Shotcave_Props_Coin";
     private static final String WEAPON_ITEM_ID = "Weapon_Voidlance_Shotcave";
 
     // 1×1 crate loot
@@ -24,8 +24,8 @@ public final class CrateDropGenerator {
     private static final int LARGE_COIN_MAX = 7;
     private static final double LARGE_WEAPON_CHANCE = 0.25;
 
-    public static final String CRATE_1X1_BLOCK_ID = "Hycrates_Crate";
-    public static final String CRATE_2X2_BLOCK_ID = "Hycrates_Crate_2x2";
+    public static final String CRATE_1X1_BLOCK_ID = "Shotcave_Props_Crate";
+    public static final String CRATE_2X2_BLOCK_ID = "Shotcave_Props_Crate_2x2";
 
     private CrateDropGenerator() {
     }

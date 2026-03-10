@@ -5,9 +5,9 @@
       {
         "Type": "Single",
         "Item": {
-          "ItemId": "Hycrates_Coin",
-          "QuantityMin": 1,
-          "QuantityMax": 3
+          "ItemId": "Shotcave_Props_Coin",
+          "QuantityMin": 3,
+          "QuantityMax": 7
         }
       },
       {
@@ -15,7 +15,7 @@
         "Containers": [
           {
             "Type": "Single",
-            "Weight": 10,
+            "Weight": 25,
             "Item": {
               "ItemId": "Weapon_Voidlance_Shotcave",
               "QuantityMin": 1,
@@ -24,7 +24,7 @@
           },
           {
             "Type": "Empty",
-            "Weight": 90
+            "Weight": 75
           }
         ]
       }

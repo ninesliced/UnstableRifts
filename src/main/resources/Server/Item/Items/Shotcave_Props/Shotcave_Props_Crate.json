@@ -1,6 +1,6 @@
 {
   "TranslationProperties": {
-    "Name": "server.items.Hycrates_Crate.name"
+    "Name": "server.items.Shotcave_Props_Crate.name"
   },
   "Icon": "Icons/ItemsGenerated/Furniture_Village_Crate.png",
   "Categories": [
@@ -18,11 +18,11 @@
       }
     },
     "Flags": {},
-    "BlockParticleSetId": "Hycrates_Crate",
+    "BlockParticleSetId": "Shotcave_Props_Crate",
     "Textures": [
       {
         "Weight": 1,
-        "All": "BlockTextures/Hycrates_Crate.png"
+        "All": "BlockTextures/Shotcave_Props_Crate.png"
       }
     ],
     "ParticleColor": "#4a4a4a",
@@ -34,7 +34,7 @@
       "Furniture"
     ],
     "Family": [
-      "Hycrates"
+      "Shotcave_Props"
     ]
   },
   "ItemSoundSetId": "ISS_Items_Metal"

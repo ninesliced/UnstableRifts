@@ -1,6 +1,6 @@
 {
   "Particles": {
-    "Break": "Hycrates_Crate_Break",
+    "Break": "Shotcave_Props_Crate_Break",
     "Hit": "Block_Hit_Metal",
     "HardLand": "Block_Land_Hard_Metal"
   }
