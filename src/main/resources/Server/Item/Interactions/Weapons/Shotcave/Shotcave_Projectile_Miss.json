@@ -1,10 +1,18 @@
 {
-  "Type": "Simple",
-  "Effects": {
-    "Particles": [
-      {
-        "SystemId": "RifleShooting_Impact"
+  "Type": "Serial",
+  "Interactions": [
+    {
+      "Type": "Simple",
+      "Effects": {
+        "Particles": [
+          {
+            "SystemId": "RifleShooting_Impact"
+          }
+        ]
       }
-    ]
-  }
+    },
+    {
+      "Type": "BreakSoftBlock"
+    }
+  ]
 }

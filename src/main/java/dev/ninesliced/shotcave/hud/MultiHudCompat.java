@@ -10,7 +10,7 @@ import java.lang.reflect.Method;
 /**
  * Optional compatibility with Buuz135 MultipleHUD.
  */
-final class MultiHudCompat {
+public final class MultiHudCompat {
     private static final String MULTIHUD_MAIN_CLASS = "com.buuz135.mhud.MultipleHUD";
     private static final String SHOTCAVE_HUD_ID = "Shotcave";
 
@@ -22,7 +22,7 @@ final class MultiHudCompat {
     private MultiHudCompat() {
     }
 
-    static boolean setHud(@Nonnull Player player, @Nonnull PlayerRef playerRef, @Nonnull CustomUIHud hud) {
+    public static boolean setHud(@Nonnull Player player, @Nonnull PlayerRef playerRef, @Nonnull CustomUIHud hud) {
         ensureInitialized();
         if (instance == null || setCustomHudMethod == null) {
             return false;
@@ -35,7 +35,7 @@ final class MultiHudCompat {
         }
     }
 
-    static boolean hideHud(@Nonnull Player player, @Nonnull PlayerRef playerRef) {
+    public static boolean hideHud(@Nonnull Player player, @Nonnull PlayerRef playerRef) {
         ensureInitialized();
         if (instance == null || hideCustomHudMethod == null) {
             return false;
@@ -66,14 +66,12 @@ final class MultiHudCompat {
                         Player.class,
                         PlayerRef.class,
                         String.class,
-                        CustomUIHud.class
-                );
+                        CustomUIHud.class);
                 Method hideMethod = cls.getMethod(
                         "hideCustomHud",
                         Player.class,
                         PlayerRef.class,
-                        String.class
-                );
+                        String.class);
 
                 instance = multiHud;
                 setCustomHudMethod = setMethod;
