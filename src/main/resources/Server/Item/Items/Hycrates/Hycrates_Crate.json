@@ -14,7 +14,7 @@
     "RandomRotation": "YawStep1",
     "Gathering": {
       "Soft": {
-        "DropList": "Hycrates/Hycrates_Crate"
+        "DropList": "Empty"
       }
     },
     "Flags": {},

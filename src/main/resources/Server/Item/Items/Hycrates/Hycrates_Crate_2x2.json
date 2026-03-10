@@ -24,7 +24,7 @@
     "Flags": {},
     "Gathering": {
       "Soft": {
-        "DropList": "Hycrates/Hycrates_Crate_2x2"
+        "DropList": "Empty"
       }
     },
     "BlockParticleSetId": "Hycrates_Crate",

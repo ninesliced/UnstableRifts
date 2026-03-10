@@ -1,55 +1,32 @@
 {
   "Container": {
-    "Type": "Choice",
+    "Type": "Multiple",
     "Containers": [
       {
         "Type": "Single",
-        "Weight": 100,
         "Item": {
-          "ItemId": "Plant_Fruit_Apple",
-          "QuantityMin": 2,
-          "QuantityMax": 4
+          "ItemId": "Hycrates_Coin",
+          "QuantityMin": 3,
+          "QuantityMax": 7
         }
       },
       {
-        "Type": "Single",
-        "Weight": 80,
-        "Item": {
-          "ItemId": "Plant_Fruit_Berries_Red",
-          "QuantityMin": 2,
-          "QuantityMax": 5
-        }
-      },
-      {
-        "Type": "Single",
-        "Weight": 50,
-        "Item": {
-          "ItemId": "Weapon_Arrow_Crude",
-          "QuantityMin": 4,
-          "QuantityMax": 12
-        }
-      },
-      {
-        "Type": "Single",
-        "Weight": 30,
-        "Item": {
-          "ItemId": "Ingredient_Hide_Light",
-          "QuantityMin": 2,
-          "QuantityMax": 4
-        }
-      },
-      {
-        "Type": "Single",
-        "Weight": 20,
-        "Item": {
-          "ItemId": "Ingredient_Salt",
-          "QuantityMin": 1,
-          "QuantityMax": 3
-        }
-      },
-      {
-        "Type": "Empty",
-        "Weight": 300
+        "Type": "Choice",
+        "Containers": [
+          {
+            "Type": "Single",
+            "Weight": 25,
+            "Item": {
+              "ItemId": "Weapon_Voidlance_Shotcave",
+              "QuantityMin": 1,
+              "QuantityMax": 1
+            }
+          },
+          {
+            "Type": "Empty",
+            "Weight": 75
+          }
+        ]
       }
     ]
   }

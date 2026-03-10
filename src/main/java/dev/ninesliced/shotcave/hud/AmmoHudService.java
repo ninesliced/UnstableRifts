@@ -4,6 +4,7 @@ import com.hypixel.hytale.protocol.packets.interface_.HudComponent;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
+import dev.ninesliced.shotcave.pickup.ItemPickupHudService;
 import dev.ninesliced.shotcave.guns.GunItemMetadata;
 
 import javax.annotation.Nonnull;
@@ -22,7 +23,17 @@ public final class AmmoHudService {
     private AmmoHudService() {
     }
 
-    public static void updateForHeldItem(@Nonnull Player player, @Nonnull PlayerRef playerRef, @Nullable ItemStack heldItem) {
+    public static void updateForHeldItem(@Nonnull Player player, @Nonnull PlayerRef playerRef,
+            @Nullable ItemStack heldItem) {
+        // If the crate pickup HUD is currently visible for this player,
+        // skip the ammo HUD update so we don't overwrite it. The pickup
+        // HUD has higher priority. Once the player moves away from the
+        // item (or picks it up), the pickup HUD hides itself and the
+        // ammo HUD will resume on the next polling cycle.
+        if (ItemPickupHudService.isActive(playerRef.getUuid())) {
+            return;
+        }
+
         if (heldItem == null) {
             hide(player, playerRef);
             return;
