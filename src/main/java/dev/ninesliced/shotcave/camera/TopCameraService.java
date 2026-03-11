@@ -7,15 +7,18 @@ import com.hypixel.hytale.protocol.Direction;
 import com.hypixel.hytale.protocol.MouseInputTargetType;
 import com.hypixel.hytale.protocol.MouseInputType;
 import com.hypixel.hytale.protocol.MovementForceRotationType;
+import com.hypixel.hytale.protocol.MovementSettings;
 import com.hypixel.hytale.protocol.PositionDistanceOffsetType;
 import com.hypixel.hytale.protocol.RotationType;
 import com.hypixel.hytale.protocol.ServerCameraSettings;
 import com.hypixel.hytale.protocol.Vector3f;
 import com.hypixel.hytale.protocol.packets.camera.SetServerCamera;
+import com.hypixel.hytale.server.core.entity.entities.player.movement.MovementManager;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -106,9 +109,63 @@ public class TopCameraService {
         cameraSettings.mouseInputType = MouseInputType.LookAtPlane;
         cameraSettings.planeNormal = new Vector3f(0.0F, 1.0F, 0.0F);
         playerRef.getPacketHandler().writeNoCache(new SetServerCamera(ClientCameraView.Custom, true, cameraSettings));
+
+        applyEqualizedMovement(playerRef);
     }
 
     private void resetCamera(@Nonnull PlayerRef playerRef) {
         playerRef.getPacketHandler().writeNoCache(new SetServerCamera(ClientCameraView.Custom, false, null));
+
+        restoreDefaultMovement(playerRef);
+    }
+
+    private void applyEqualizedMovement(@Nonnull PlayerRef playerRef) {
+        MovementManager movementManager = getMovementManager(playerRef);
+        if (movementManager == null) {
+            return;
+        }
+
+        MovementSettings settings = movementManager.getSettings();
+        if (settings != null) {
+            float sprintSpeed = settings.forwardSprintSpeedMultiplier;
+            settings.forwardRunSpeedMultiplier = sprintSpeed;
+            settings.backwardRunSpeedMultiplier = sprintSpeed;
+            settings.strafeRunSpeedMultiplier = sprintSpeed;
+
+            float walkSpeed = settings.forwardWalkSpeedMultiplier;
+            settings.backwardWalkSpeedMultiplier = walkSpeed;
+            settings.strafeWalkSpeedMultiplier = walkSpeed;
+
+            float crouchSpeed = settings.forwardCrouchSpeedMultiplier;
+            settings.backwardCrouchSpeedMultiplier = crouchSpeed;
+            settings.strafeCrouchSpeedMultiplier = crouchSpeed;
+
+            movementManager.update(playerRef.getPacketHandler());
+        }
+    }
+
+    private void restoreDefaultMovement(@Nonnull PlayerRef playerRef) {
+        Ref<EntityStore> ref = playerRef.getReference();
+        if (ref == null || !ref.isValid()) {
+            return;
+        }
+
+        Store<EntityStore> store = ref.getStore();
+        MovementManager movementManager = store.getComponent(ref, MovementManager.getComponentType());
+        if (movementManager == null) {
+            return;
+        }
+
+        movementManager.resetDefaultsAndUpdate(ref, store);
+    }
+
+    @Nullable
+    private MovementManager getMovementManager(@Nonnull PlayerRef playerRef) {
+        Ref<EntityStore> ref = playerRef.getReference();
+        if (ref == null || !ref.isValid()) {
+            return null;
+        }
+
+        return ref.getStore().getComponent(ref, MovementManager.getComponentType());
     }
 }
