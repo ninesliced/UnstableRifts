@@ -4,7 +4,6 @@ import com.hypixel.hytale.protocol.packets.interface_.HudComponent;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
-import dev.ninesliced.shotcave.pickup.ItemPickupHudService;
 import dev.ninesliced.shotcave.guns.GunItemMetadata;
 
 import javax.annotation.Nonnull;
@@ -17,6 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public final class AmmoHudService {
 
+    private static final String HUD_IDENTIFIER = "Shotcave_Ammo";
     private static final long STATE_HIDDEN = 0L;
     private static final ConcurrentHashMap<UUID, Long> LAST_STATE = new ConcurrentHashMap<>();
 
@@ -25,14 +25,6 @@ public final class AmmoHudService {
 
     public static void updateForHeldItem(@Nonnull Player player, @Nonnull PlayerRef playerRef,
             @Nullable ItemStack heldItem) {
-        // If the crate pickup HUD is currently visible for this player,
-        // skip the ammo HUD update so we don't overwrite it. The pickup
-        // HUD has higher priority. Once the player moves away from the
-        // item (or picks it up), the pickup HUD hides itself and the
-        // ammo HUD will resume on the next polling cycle.
-        if (ItemPickupHudService.isActive(playerRef.getUuid())) {
-            return;
-        }
 
         if (heldItem == null) {
             hide(player, playerRef);
@@ -66,7 +58,7 @@ public final class AmmoHudService {
         ShotcaveHud hud = new ShotcaveHud(playerRef, ammo, maxAmmo, weaponName);
 
         player.getHudManager().showHudComponents(playerRef, HudComponent.AmmoIndicator);
-        if (!MultiHudCompat.setHud(player, playerRef, hud)) {
+        if (!MultiHudCompat.setHud(player, playerRef, HUD_IDENTIFIER, hud)) {
             player.getHudManager().setCustomHud(playerRef, hud);
         }
     }
@@ -80,7 +72,7 @@ public final class AmmoHudService {
         LAST_STATE.put(uuid, STATE_HIDDEN);
 
         player.getHudManager().hideHudComponents(playerRef, HudComponent.AmmoIndicator);
-        if (!MultiHudCompat.hideHud(player, playerRef)) {
+        if (!MultiHudCompat.hideHud(player, playerRef, HUD_IDENTIFIER)) {
             player.getHudManager().setCustomHud(playerRef, null);
         }
     }

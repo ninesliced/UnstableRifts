@@ -12,7 +12,6 @@ import java.lang.reflect.Method;
  */
 public final class MultiHudCompat {
     private static final String MULTIHUD_MAIN_CLASS = "com.buuz135.mhud.MultipleHUD";
-    private static final String SHOTCAVE_HUD_ID = "Shotcave";
 
     private static volatile boolean initialized;
     private static volatile Object instance;
@@ -22,26 +21,33 @@ public final class MultiHudCompat {
     private MultiHudCompat() {
     }
 
-    public static boolean setHud(@Nonnull Player player, @Nonnull PlayerRef playerRef, @Nonnull CustomUIHud hud) {
+    public static boolean setHud(
+            @Nonnull Player player,
+            @Nonnull PlayerRef playerRef,
+            @Nonnull String hudId,
+            @Nonnull CustomUIHud hud) {
         ensureInitialized();
         if (instance == null || setCustomHudMethod == null) {
             return false;
         }
         try {
-            setCustomHudMethod.invoke(instance, player, playerRef, SHOTCAVE_HUD_ID, hud);
+            setCustomHudMethod.invoke(instance, player, playerRef, hudId, hud);
             return true;
         } catch (ReflectiveOperationException | RuntimeException ignored) {
             return false;
         }
     }
 
-    public static boolean hideHud(@Nonnull Player player, @Nonnull PlayerRef playerRef) {
+    public static boolean hideHud(
+            @Nonnull Player player,
+            @Nonnull PlayerRef playerRef,
+            @Nonnull String hudId) {
         ensureInitialized();
         if (instance == null || hideCustomHudMethod == null) {
             return false;
         }
         try {
-            hideCustomHudMethod.invoke(instance, player, playerRef, SHOTCAVE_HUD_ID);
+            hideCustomHudMethod.invoke(instance, player, playerRef, hudId);
             return true;
         } catch (ReflectiveOperationException | RuntimeException ignored) {
             return false;

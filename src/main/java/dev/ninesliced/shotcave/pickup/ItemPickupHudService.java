@@ -1,5 +1,6 @@
 package dev.ninesliced.shotcave.pickup;
 
+import com.hypixel.hytale.protocol.packets.interface_.HudComponent;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import dev.ninesliced.shotcave.hud.MultiHudCompat;
@@ -14,6 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public final class ItemPickupHudService {
 
+    private static final String HUD_IDENTIFIER = "Shotcave_ItemPickup";
     private static final long STATE_HIDDEN = 0L;
 
     private static final ConcurrentHashMap<UUID, Long> LAST_STATE = new ConcurrentHashMap<>();
@@ -38,7 +40,7 @@ public final class ItemPickupHudService {
 
         ItemPickupHud hud = new ItemPickupHud(playerRef, itemName, itemIconPath, itemQuantity);
 
-        if (!MultiHudCompat.setHud(player, playerRef, hud)) {
+        if (!MultiHudCompat.setHud(player, playerRef, HUD_IDENTIFIER, hud)) {
             player.getHudManager().setCustomHud(playerRef, hud);
         }
     }
@@ -54,7 +56,7 @@ public final class ItemPickupHudService {
         }
         LAST_STATE.put(uuid, STATE_HIDDEN);
 
-        if (!MultiHudCompat.hideHud(player, playerRef)) {
+        if (!MultiHudCompat.hideHud(player, playerRef, HUD_IDENTIFIER)) {
             player.getHudManager().setCustomHud(playerRef, null);
         }
     }
