@@ -1,0 +1,42 @@
+{
+  "TranslationProperties": {
+    "Name": "server.items.Shotcave_Props_Coin.name"
+  },
+  "Icon": "Icons/ItemsGenerated/Ingredient_Bar_Gold.png",
+  "Model": "Resources/Materials/Ingot.blockymodel",
+  "Texture": "Resources/Materials/Ingot_Textures/Gold.png",
+  "Scale": 0.7,
+  "PlayerAnimationsId": "Item",
+  "IconProperties": {
+    "Scale": 1,
+    "Translation": [
+      0,
+      -3
+    ],
+    "Rotation": [
+      22.5,
+      45,
+      22.5
+    ]
+  },
+  "Categories": [
+    "Items.Ingredients"
+  ],
+  "MaxStack": 1,
+  "Tags": {
+    "Type": [
+      "Ingredient"
+    ],
+    "Family": [
+      "Shotcave_Props"
+    ],
+    "Pickup": [
+      "ScoreCollect"
+    ]
+  },
+  "ItemEntity": {
+    "ParticleSystemId": null
+  },
+  "ItemSoundSetId": "ISS_Items_Ingots",
+  "DropOnDeath": false
+}

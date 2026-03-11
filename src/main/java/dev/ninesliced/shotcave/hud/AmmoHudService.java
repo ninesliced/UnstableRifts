@@ -16,13 +16,16 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public final class AmmoHudService {
 
+    private static final String HUD_IDENTIFIER = "Shotcave_Ammo";
     private static final long STATE_HIDDEN = 0L;
     private static final ConcurrentHashMap<UUID, Long> LAST_STATE = new ConcurrentHashMap<>();
 
     private AmmoHudService() {
     }
 
-    public static void updateForHeldItem(@Nonnull Player player, @Nonnull PlayerRef playerRef, @Nullable ItemStack heldItem) {
+    public static void updateForHeldItem(@Nonnull Player player, @Nonnull PlayerRef playerRef,
+            @Nullable ItemStack heldItem) {
+
         if (heldItem == null) {
             hide(player, playerRef);
             return;
@@ -55,7 +58,7 @@ public final class AmmoHudService {
         ShotcaveHud hud = new ShotcaveHud(playerRef, ammo, maxAmmo, weaponName);
 
         player.getHudManager().showHudComponents(playerRef, HudComponent.AmmoIndicator);
-        if (!MultiHudCompat.setHud(player, playerRef, hud)) {
+        if (!MultiHudCompat.setHud(player, playerRef, HUD_IDENTIFIER, hud)) {
             player.getHudManager().setCustomHud(playerRef, hud);
         }
     }
@@ -69,7 +72,7 @@ public final class AmmoHudService {
         LAST_STATE.put(uuid, STATE_HIDDEN);
 
         player.getHudManager().hideHudComponents(playerRef, HudComponent.AmmoIndicator);
-        if (!MultiHudCompat.hideHud(player, playerRef)) {
+        if (!MultiHudCompat.hideHud(player, playerRef, HUD_IDENTIFIER)) {
             player.getHudManager().setCustomHud(playerRef, null);
         }
     }

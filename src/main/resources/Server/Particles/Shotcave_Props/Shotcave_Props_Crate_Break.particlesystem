@@ -1,0 +1,25 @@
+{
+  "Spawners": [
+    {
+      "SpawnerId": "Shotcave_Props_Crate_Metal_Parts",
+      "PositionOffset": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    {
+      "SpawnerId": "Shotcave_Props_Crate_Metal_Sparks",
+      "FixedRotation": true,
+      "PositionOffset": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    {
+      "SpawnerId": "Shotcave_Props_Crate_Metal_Flash"
+    }
+  ],
+  "CullDistance": 50.0
+}
