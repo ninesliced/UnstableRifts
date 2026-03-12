@@ -5,6 +5,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.hypixel.hytale.component.Store;
+import com.hypixel.hytale.math.vector.Vector3d;
 import com.hypixel.hytale.math.vector.Vector3i;
 import com.hypixel.hytale.server.core.asset.type.blocktype.config.Rotation;
 import com.hypixel.hytale.server.core.prefab.selection.buffer.impl.IPrefabBuffer;
@@ -13,6 +14,7 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.core.util.PrefabUtil;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
@@ -40,14 +42,21 @@ public class DungeonGenerator {
     private World activeWorld;
     private Random activeRandom;
 
-    private record SpawnerLocal(int x, int y, int z, int rot) {}
-    private record BlockLocal(int x, int y, int z, String name, boolean isSpawner) {}
-    private record PrefabData(List<BlockLocal> blocks, List<SpawnerLocal> spawners) {}
-    private record OpenExit(int worldX, int worldY, int worldZ, int rotation) {}
+    /**
+     * The level produced by the last generate() call, with full RoomData graph.
+     */
+    @Nullable
+    private dev.ninesliced.shotcave.dungeon.Level generatedLevel;
+
+    /**
+     * Current parent room during generation (used to build the graph).
+     */
+    @Nullable
+    private RoomData currentParentRoom;
 
     private static int rotX(int x, int z, int rot) {
         return switch (rot & 3) {
-            case 1 ->  z;
+            case 1 -> z;
             case 2 -> -x;
             case 3 -> -z;
             default -> x;
@@ -58,18 +67,48 @@ public class DungeonGenerator {
         return switch (rot & 3) {
             case 1 -> -x;
             case 2 -> -z;
-            case 3 ->  x;
+            case 3 -> x;
+            default -> z;
+        };
+    }
+
+    private static double rotX(double x, double z, int rot) {
+        return switch (rot & 3) {
+            case 1 -> z;
+            case 2 -> -x;
+            case 3 -> -z;
+            default -> x;
+        };
+    }
+
+    private static double rotZ(double x, double z, int rot) {
+        return switch (rot & 3) {
+            case 1 -> -x;
+            case 2 -> -z;
+            case 3 -> x;
             default -> z;
         };
     }
 
     private static Rotation toEngineRotation(int rot) {
         return switch (rot & 3) {
-            case 1  -> Rotation.Ninety;
-            case 2  -> Rotation.OneEighty;
-            case 3  -> Rotation.TwoSeventy;
+            case 1 -> Rotation.Ninety;
+            case 2 -> Rotation.OneEighty;
+            case 3 -> Rotation.TwoSeventy;
             default -> Rotation.None;
         };
+    }
+
+    private static long packPos(int x, int y, int z) {
+        return ((long) x & 0x3FFFFF) | (((long) y & 0xFFFFF) << 22) | (((long) z & 0x3FFFFF) << 42);
+    }
+
+    /**
+     * Returns the Level produced by the last {@link #generate} call.
+     */
+    @Nullable
+    public dev.ninesliced.shotcave.dungeon.Level getGeneratedLevel() {
+        return generatedLevel;
     }
 
     public void generate(@Nonnull World world, long seed,
@@ -80,6 +119,15 @@ public class DungeonGenerator {
 
         this.activeWorld = world;
         this.activeRandom = random;
+
+        // Create the Level object for this generation
+        dev.ninesliced.shotcave.dungeon.Level level = new dev.ninesliced.shotcave.dungeon.Level(
+                levelConfig.getName(), 0);
+        this.generatedLevel = level;
+        this.currentParentRoom = null;
+
+        // Resolve mob lists from config
+        List<String> roomMobs = levelConfig.getMobs() != null ? levelConfig.getMobs() : Collections.emptyList();
 
         LOGGER.info("Generating dungeon '" + levelConfig.getName()
                 + "' seed=" + seed + " targetRooms=" + levelConfig.getRooms());
@@ -119,6 +167,15 @@ public class DungeonGenerator {
 
         Vector3i entrancePaste = new Vector3i(0, 65, 0);
         pasteAndRegister(world, store, random, entrancePath, entranceData, entrancePaste, 0);
+
+        // Build RoomData for entrance
+        List<Vector3i> entranceSpawnerPositions = computeWorldSpawnerPositions(entranceData, entrancePaste, 0);
+        List<Vector3d> entrancePrefabMobMarkers = computeWorldPrefabMobMarkerPositions(entranceData, entrancePaste, 0);
+        RoomData entranceRoom = new RoomData(RoomType.ENTRANCE, entrancePaste, 0,
+                entranceSpawnerPositions, entrancePrefabMobMarkers, Collections.emptyList());
+        level.addRoom(entranceRoom);
+        this.currentParentRoom = entranceRoom;
+
         collectExits(entranceData, entrancePaste, 0, openExits);
 
         LOGGER.info("Entrance placed at " + entrancePaste + ", " + openExits.size() + " exit(s)");
@@ -130,7 +187,7 @@ public class DungeonGenerator {
             boolean forceOnFailure = nextRoomNumber == 5;
 
             if (tryPlaceRoom(world, store, random, roomPaths, exit, openExits,
-                    "Room_" + nextRoomNumber, forceOnFailure)) {
+                    "Room_" + nextRoomNumber, forceOnFailure, RoomType.ROOM, roomMobs, level)) {
                 roomsPlaced++;
             }
         }
@@ -142,7 +199,8 @@ public class DungeonGenerator {
             while (it.hasNext()) {
                 OpenExit exit = it.next();
                 it.remove();
-                if (tryPlaceRoom(world, store, random, bossPaths, exit, openExits, "Boss", false)) {
+                if (tryPlaceRoom(world, store, random, bossPaths, exit, openExits,
+                        "Boss", false, RoomType.BOSS, Collections.emptyList(), level)) {
                     bossPlaced = true;
                     roomsPlaced++;
                     break;
@@ -150,7 +208,8 @@ public class DungeonGenerator {
             }
             if (!bossPlaced && !openExits.isEmpty()) {
                 OpenExit forceExit = openExits.remove(random.nextInt(openExits.size()));
-                if (forcePlaceRoom(world, store, random, bossPaths, forceExit, openExits, "Boss(forced)")) {
+                if (forcePlaceRoom(world, store, random, bossPaths, forceExit, openExits,
+                        "Boss(forced)", RoomType.BOSS, Collections.emptyList(), level)) {
                     bossPlaced = true;
                     roomsPlaced++;
                 } else {
@@ -164,13 +223,43 @@ public class DungeonGenerator {
         }
         openExits.clear();
 
-        LOGGER.info("Dungeon complete: " + roomsPlaced + " rooms, boss=" + bossPlaced);
+        LOGGER.info("Dungeon complete: " + roomsPlaced + " rooms, boss=" + bossPlaced
+                + ", totalRoomData=" + level.getRooms().size());
+    }
+
+    /**
+     * Compute world-space spawner positions for a prefab placement.
+     */
+    @Nonnull
+    private List<Vector3i> computeWorldSpawnerPositions(@Nonnull PrefabData data, @Nonnull Vector3i pastePos, int rot) {
+        List<Vector3i> positions = new ArrayList<>();
+        for (SpawnerLocal sp : data.spawners) {
+            int wx = pastePos.x + rotX(sp.x, sp.z, rot);
+            int wy = pastePos.y + sp.y;
+            int wz = pastePos.z + rotZ(sp.x, sp.z, rot);
+            positions.add(new Vector3i(wx, wy, wz));
+        }
+        return positions;
+    }
+
+    @Nonnull
+    private List<Vector3d> computeWorldPrefabMobMarkerPositions(@Nonnull PrefabData data, @Nonnull Vector3i pastePos, int rot) {
+        List<Vector3d> positions = new ArrayList<>();
+        for (PrefabMobMarkerLocal marker : data.mobMarkers) {
+            double wx = pastePos.x + rotX(marker.x, marker.z, rot);
+            double wy = pastePos.y + marker.y;
+            double wz = pastePos.z + rotZ(marker.x, marker.z, rot);
+            positions.add(new Vector3d(wx, wy, wz));
+        }
+        return positions;
     }
 
     private boolean tryPlaceRoom(@Nonnull World world, @Nonnull Store<EntityStore> store,
-                                  @Nonnull Random random, @Nonnull List<Path> roomPaths,
-                                  @Nonnull OpenExit exit, @Nonnull List<OpenExit> openExits,
-                                  @Nonnull String label, boolean forceOnFailure) {
+                                 @Nonnull Random random, @Nonnull List<Path> roomPaths,
+                                 @Nonnull OpenExit exit, @Nonnull List<OpenExit> openExits,
+                                 @Nonnull String label, boolean forceOnFailure,
+                                 @Nonnull RoomType roomType, @Nonnull List<String> mobs,
+                                 @Nonnull dev.ninesliced.shotcave.dungeon.Level level) {
         List<Path> shuffled = new ArrayList<>(roomPaths);
         Collections.shuffle(shuffled, random);
 
@@ -200,6 +289,17 @@ public class DungeonGenerator {
             }
 
             int newExitCount = collectExits(data, pastePos, pasteRot, openExits);
+
+            // Build RoomData and add to level graph
+            List<Vector3i> spawnerPositions = computeWorldSpawnerPositions(data, pastePos, pasteRot);
+            List<Vector3d> prefabMobMarkerPositions = computeWorldPrefabMobMarkerPositions(data, pastePos, pasteRot);
+            RoomData roomData = new RoomData(roomType, pastePos, pasteRot, spawnerPositions, prefabMobMarkerPositions, mobs);
+            if (currentParentRoom != null) {
+                currentParentRoom.addChild(roomData);
+            }
+            level.addRoom(roomData);
+            currentParentRoom = roomData;
+
             LOGGER.info("[" + label + "] " + chosen.getFileName()
                     + " paste=" + pastePos + " rot=" + pasteRot
                     + " -> " + newExitCount + " new exit(s)");
@@ -208,7 +308,8 @@ public class DungeonGenerator {
 
         if (forceOnFailure) {
             LOGGER.warning("[" + label + "] retries exhausted, force-placing for inspection");
-            if (forcePlaceRoom(world, store, random, roomPaths, exit, openExits, label + "(forced)")) {
+            if (forcePlaceRoom(world, store, random, roomPaths, exit, openExits,
+                    label + "(forced)", roomType, mobs, level)) {
                 return true;
             }
             LOGGER.warning("[" + label + "] forced placement also failed, sealing exit");
@@ -220,9 +321,11 @@ public class DungeonGenerator {
     }
 
     private boolean forcePlaceRoom(@Nonnull World world, @Nonnull Store<EntityStore> store,
-                                 @Nonnull Random random, @Nonnull List<Path> roomPaths,
-                                 @Nonnull OpenExit exit, @Nonnull List<OpenExit> openExits,
-                                 @Nonnull String label) {
+                                   @Nonnull Random random, @Nonnull List<Path> roomPaths,
+                                   @Nonnull OpenExit exit, @Nonnull List<OpenExit> openExits,
+                                   @Nonnull String label,
+                                   @Nonnull RoomType roomType, @Nonnull List<String> mobs,
+                                   @Nonnull dev.ninesliced.shotcave.dungeon.Level level) {
         Path chosen = DungeonConfig.pickRandom(random, roomPaths);
         if (chosen == null) {
             return false;
@@ -238,6 +341,17 @@ public class DungeonGenerator {
         try {
             pasteAndRegister(world, store, random, chosen, data, pastePos, pasteRot);
             int newExitCount = collectExits(data, pastePos, pasteRot, openExits);
+
+            // Build RoomData for force-placed room
+            List<Vector3i> spawnerPositions = computeWorldSpawnerPositions(data, pastePos, pasteRot);
+            List<Vector3d> prefabMobMarkerPositions = computeWorldPrefabMobMarkerPositions(data, pastePos, pasteRot);
+            RoomData roomData = new RoomData(roomType, pastePos, pasteRot, spawnerPositions, prefabMobMarkerPositions, mobs);
+            if (currentParentRoom != null) {
+                currentParentRoom.addChild(roomData);
+            }
+            level.addRoom(roomData);
+            currentParentRoom = roomData;
+
             LOGGER.warning("[" + label + "] " + chosen.getFileName()
                     + " force-placed at " + pastePos + " rot=" + pasteRot
                     + " -> " + newExitCount + " new exit(s)");
@@ -284,7 +398,7 @@ public class DungeonGenerator {
     }
 
     private int collectExits(@Nonnull PrefabData data, @Nonnull Vector3i pastePos,
-                              int parentRot, @Nonnull List<OpenExit> openExits) {
+                             int parentRot, @Nonnull List<OpenExit> openExits) {
         int count = 0;
         for (SpawnerLocal sp : data.spawners) {
             int wx = pastePos.x + rotX(sp.x, sp.z, parentRot);
@@ -307,6 +421,7 @@ public class DungeonGenerator {
 
             List<BlockLocal> blocks = new ArrayList<>();
             List<SpawnerLocal> spawners = new ArrayList<>();
+            List<PrefabMobMarkerLocal> mobMarkers = new ArrayList<>();
             JsonArray arr = root.getAsJsonArray("blocks");
             if (arr != null) {
                 for (JsonElement el : arr) {
@@ -323,7 +438,38 @@ public class DungeonGenerator {
                     }
                 }
             }
-            return new PrefabData(blocks, spawners);
+
+            JsonArray entities = root.getAsJsonArray("entities");
+            if (entities != null) {
+                for (JsonElement entityElement : entities) {
+                    JsonObject entity = entityElement.getAsJsonObject();
+                    JsonObject components = entity.getAsJsonObject("Components");
+                    if (components == null) {
+                        continue;
+                    }
+
+                    JsonObject spawnMarkerComponent = components.getAsJsonObject("SpawnMarkerComponent");
+                    JsonObject transformComponent = components.getAsJsonObject("Transform");
+                    if (spawnMarkerComponent == null || transformComponent == null) {
+                        continue;
+                    }
+
+                    JsonObject position = transformComponent.getAsJsonObject("Position");
+                    if (position == null) {
+                        continue;
+                    }
+
+                    String mobId = spawnMarkerComponent.has("SpawnMarker")
+                            ? spawnMarkerComponent.get("SpawnMarker").getAsString()
+                            : "";
+                    double x = position.has("X") ? position.get("X").getAsDouble() - ax : 0.0;
+                    double y = position.has("Y") ? position.get("Y").getAsDouble() - ay : 0.0;
+                    double z = position.has("Z") ? position.get("Z").getAsDouble() - az : 0.0;
+                    mobMarkers.add(new PrefabMobMarkerLocal(x, y, z, mobId));
+                }
+            }
+
+            return new PrefabData(blocks, spawners, mobMarkers);
         } catch (IOException e) {
             LOGGER.log(Level.WARNING, "Failed to read prefab: " + path, e);
             return null;
@@ -331,9 +477,9 @@ public class DungeonGenerator {
     }
 
     private void pasteAndRegister(@Nonnull World world, @Nonnull Store<EntityStore> store,
-                                   @Nonnull Random random, @Nonnull Path prefabPath,
-                                   @Nonnull PrefabData data, @Nonnull Vector3i pastePos,
-                                   int rot) {
+                                  @Nonnull Random random, @Nonnull Path prefabPath,
+                                  @Nonnull PrefabData data, @Nonnull Vector3i pastePos,
+                                  int rot) {
         IPrefabBuffer buffer = DungeonConfig.loadBuffer(prefabPath);
         if (buffer == null) {
             throw new RuntimeException("Failed to load buffer: " + prefabPath);
@@ -377,7 +523,22 @@ public class DungeonGenerator {
         return false;
     }
 
-    private static long packPos(int x, int y, int z) {
-        return ((long) x & 0x3FFFFF) | (((long) y & 0xFFFFF) << 22) | (((long) z & 0x3FFFFF) << 42);
+    private record SpawnerLocal(int x, int y, int z, int rot) {
+    }
+
+    private record BlockLocal(int x, int y, int z, String name, boolean isSpawner) {
+    }
+
+    private record PrefabMobMarkerLocal(double x, double y, double z, @Nonnull String mobId) {
+    }
+
+    private record PrefabData(List<BlockLocal> blocks, List<SpawnerLocal> spawners,
+                              List<PrefabMobMarkerLocal> mobMarkers) {
+    }
+
+    private record OpenExit(int worldX, int worldY, int worldZ, int rotation) {
+    }
+
+    private record OpenExitWithParent(OpenExit exit, @Nullable RoomData parent) {
     }
 }

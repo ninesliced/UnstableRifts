@@ -1,9 +1,21 @@
 {
+  "dungeonName": "Shotcave",
+  "maxPartySize": 4,
+  "bossWallBlock": "Stone_Brick_Wall",
+  "startEquipment": [
+    "Weapon_Pistol_Shotcave"
+  ],
   "levels": [
     {
       "id": "shotcave",
       "name": "Shale",
       "rooms": 25,
+      "mobs": [
+        "Skeleton_Warrior",
+        "Skeleton_Archer"
+      ],
+      "bossMob": "Skeleton_Boss",
+      "moneyPerKill": 10,
       "prefabs": {
         "entrance": [
           "Shotcave.Shale.Entrance.*"
@@ -26,6 +38,11 @@
       "id": "test",
       "name": "Test",
       "rooms": 25,
+      "mobs": [
+        "Skeleton_Warrior"
+      ],
+      "bossMob": "Skeleton_Boss",
+      "moneyPerKill": 15,
       "prefabs": {
         "entrance": [
           "Shotcave.Test.Entrance.*"

@@ -44,6 +44,17 @@ public final class PartyUiPage extends InteractiveCustomUIPage<PartyUiPage.UiEve
         this.plugin = plugin;
     }
 
+    public static void refreshOpenPages() {
+        for (PartyUiPage page : new ArrayList<>(OPEN_PAGES.values())) {
+            page.refreshIfOpen();
+        }
+    }
+
+    @Nonnull
+    private static String safeValue(@Nullable String value) {
+        return value == null ? "" : value.trim();
+    }
+
     @Override
     public void build(@Nonnull Ref<EntityStore> ref,
                       @Nonnull UICommandBuilder ui,
@@ -51,6 +62,7 @@ public final class PartyUiPage extends InteractiveCustomUIPage<PartyUiPage.UiEve
                       @Nonnull Store<EntityStore> store) {
         OPEN_PAGES.put(this.playerRef.getUuid(), this);
         ui.append(LAYOUT_PATH);
+        Player viewer = store.getComponent(ref, Player.getComponentType());
 
         PartyManager manager = this.plugin.getPartyManager();
         PartyManager.PartySnapshot currentParty = manager.getPartySnapshot(this.playerRef.getUuid());
@@ -76,17 +88,43 @@ public final class PartyUiPage extends InteractiveCustomUIPage<PartyUiPage.UiEve
 
         if (inParty) {
             ui.set("#CurrentPartyName.Text", currentParty.name());
-            ui.set("#CurrentPartyMeta.Text", "Leader: " + currentParty.leaderName() + "  |  " + currentParty.memberCount() + " members");
+
+            // Show game status if a game is active
+            var gameManager = this.plugin.getGameManager();
+            var game = gameManager.findGameForParty(java.util.UUID.fromString(currentParty.id()));
+            boolean gameActive = game != null && game.getState() != dev.ninesliced.shotcave.dungeon.GameState.COMPLETE;
+            boolean canStart = leader && !gameActive;
+            boolean canTeleportToDungeon = gameActive
+                    && game.getInstanceWorld() != null
+                    && viewer != null
+                    && viewer.getWorld() != game.getInstanceWorld();
+
+            if (gameActive) {
+                String gameStatus = switch (game.getState()) {
+                    case GENERATING -> "Generating dungeon... " + Math.round(game.getGenerationProgress() * 100) + "%";
+                    case READY -> "Dungeon ready! Entering shortly...";
+                    case ACTIVE ->
+                            "Dungeon in progress — " + dev.ninesliced.shotcave.dungeon.Game.formatTime(game.getElapsedGameTime());
+                    case BOSS -> "⚔ Boss Fight in progress!";
+                    default -> "Game active";
+                };
+                ui.set("#CurrentPartyMeta.Text", gameStatus);
+            } else {
+                ui.set("#CurrentPartyMeta.Text", "Leader: " + currentParty.leaderName() + "  |  " + currentParty.memberCount() + " members");
+            }
+
             ui.set("#CurrentPartyPrivacy.Text", currentParty.privacy().getDisplayName());
             ui.set("#InviteSection.Visible", leader);
             ui.set("#PrivacyButton.Visible", leader);
-            ui.set("#StartButton.Visible", leader);
+            ui.set("#StartButton.Visible", canStart);
+            ui.set("#TeleportRow.Visible", canTeleportToDungeon);
             ui.set("#DisbandButton.Visible", leader);
             ui.set("#LeaveButton.Visible", !leader);
             ui.set("#PrivacyButton.Text", currentParty.privacy() == PartyPrivacy.PUBLIC ? "MAKE PRIVATE" : "MAKE PUBLIC");
 
             bindClick(events, "#PrivacyButton", Action.TOGGLE_PRIVACY);
             bindClick(events, "#StartButton", Action.START);
+            bindClick(events, "#TeleportButton", Action.TELEPORT);
             bindClick(events, "#DisbandButton", Action.DISBAND);
             bindClick(events, "#LeaveButton", Action.LEAVE);
             bindClickWithValue(events, "#InviteButton", Action.INVITE, "#InvitePlayerDropdown.Value");
@@ -142,6 +180,7 @@ public final class PartyUiPage extends InteractiveCustomUIPage<PartyUiPage.UiEve
             case LEAVE -> result = manager.leave(this.playerRef);
             case DISBAND -> result = manager.disband(this.playerRef);
             case START -> result = manager.startParty(this.playerRef);
+            case TELEPORT -> result = this.plugin.getGameManager().teleportPlayerToDungeon(this.playerRef);
             default -> {
             }
         }
@@ -164,12 +203,6 @@ public final class PartyUiPage extends InteractiveCustomUIPage<PartyUiPage.UiEve
     @Override
     public void onDismiss(@Nonnull Ref<EntityStore> ref, @Nonnull Store<EntityStore> store) {
         OPEN_PAGES.remove(this.playerRef.getUuid(), this);
-    }
-
-    public static void refreshOpenPages() {
-        for (PartyUiPage page : new ArrayList<>(OPEN_PAGES.values())) {
-            page.refreshIfOpen();
-        }
     }
 
     private void refreshIfOpen() {
@@ -303,14 +336,9 @@ public final class PartyUiPage extends InteractiveCustomUIPage<PartyUiPage.UiEve
                 elementId,
                 new EventData()
                         .put(UiEventData.KEY_ACTION, action.name())
-                    .append(UiEventData.KEY_VALUE, valueSelector),
+                        .append(UiEventData.KEY_VALUE, valueSelector),
                 false
         );
-    }
-
-    @Nonnull
-    private static String safeValue(@Nullable String value) {
-        return value == null ? "" : value.trim();
     }
 
     private enum Action {
@@ -324,6 +352,7 @@ public final class PartyUiPage extends InteractiveCustomUIPage<PartyUiPage.UiEve
         KICK,
         LEAVE,
         DISBAND,
+        TELEPORT,
         START;
 
         @Nullable
@@ -346,7 +375,7 @@ public final class PartyUiPage extends InteractiveCustomUIPage<PartyUiPage.UiEve
         static final BuilderCodec<UiEventData> CODEC = BuilderCodec.<UiEventData>builder(UiEventData.class, UiEventData::new)
                 .append(new KeyedCodec<>(KEY_ACTION, Codec.STRING), (data, value) -> data.action = value, data -> data.action).add()
                 .append(new KeyedCodec<>(KEY_TARGET_ID, Codec.STRING), (data, value) -> data.targetId = value, data -> data.targetId).add()
-            .append(new KeyedCodec<>(KEY_VALUE, Codec.STRING), (data, value) -> data.value = value, data -> data.value).add()
+                .append(new KeyedCodec<>(KEY_VALUE, Codec.STRING), (data, value) -> data.value = value, data -> data.value).add()
                 .build();
 
         private String action;

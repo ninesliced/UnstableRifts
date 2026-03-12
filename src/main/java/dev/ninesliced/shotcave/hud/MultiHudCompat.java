@@ -23,12 +23,17 @@ final class MultiHudCompat {
     }
 
     static boolean setHud(@Nonnull Player player, @Nonnull PlayerRef playerRef, @Nonnull CustomUIHud hud) {
+        return setHud(player, playerRef, SHOTCAVE_HUD_ID, hud);
+    }
+
+    static boolean setHud(@Nonnull Player player, @Nonnull PlayerRef playerRef,
+                          @Nonnull String hudId, @Nonnull CustomUIHud hud) {
         ensureInitialized();
         if (instance == null || setCustomHudMethod == null) {
             return false;
         }
         try {
-            setCustomHudMethod.invoke(instance, player, playerRef, SHOTCAVE_HUD_ID, hud);
+            setCustomHudMethod.invoke(instance, player, playerRef, hudId, hud);
             return true;
         } catch (ReflectiveOperationException | RuntimeException ignored) {
             return false;
@@ -36,12 +41,16 @@ final class MultiHudCompat {
     }
 
     static boolean hideHud(@Nonnull Player player, @Nonnull PlayerRef playerRef) {
+        return hideHud(player, playerRef, SHOTCAVE_HUD_ID);
+    }
+
+    static boolean hideHud(@Nonnull Player player, @Nonnull PlayerRef playerRef, @Nonnull String hudId) {
         ensureInitialized();
         if (instance == null || hideCustomHudMethod == null) {
             return false;
         }
         try {
-            hideCustomHudMethod.invoke(instance, player, playerRef, SHOTCAVE_HUD_ID);
+            hideCustomHudMethod.invoke(instance, player, playerRef, hudId);
             return true;
         } catch (ReflectiveOperationException | RuntimeException ignored) {
             return false;

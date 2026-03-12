@@ -68,6 +68,16 @@ public class TopCameraService {
         return enable;
     }
 
+    public void restoreDefault(@Nonnull PlayerRef playerRef) {
+        UUID playerId = playerRef.getUuid();
+        boolean wasEnabled = enabled.getOrDefault(playerId, false);
+        boolean hadPending = pendingEnable.remove(playerId);
+        enabled.put(playerId, false);
+        if (wasEnabled || hadPending) {
+            resetCamera(playerRef);
+        }
+    }
+
     public void handlePlayerReady(@Nonnull Ref<EntityStore> ref) {
         if (!ref.isValid()) {
             return;

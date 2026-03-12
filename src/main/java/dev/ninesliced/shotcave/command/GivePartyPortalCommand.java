@@ -13,6 +13,8 @@ import com.hypixel.hytale.server.core.permissions.PermissionsModule;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import com.hypixel.hytale.protocol.packets.inventory.SetActiveSlot;
+import com.hypixel.hytale.protocol.packets.inventory.UpdatePlayerInventory;
 
 import javax.annotation.Nonnull;
 import java.awt.Color;
@@ -27,6 +29,17 @@ public final class GivePartyPortalCommand extends AbstractPlayerCommand {
     public GivePartyPortalCommand() {
         super("giveportal", "Give yourself the Shotcave party portal item");
         this.addAliases("portalitem", "partyportal");
+    }
+
+    private static boolean isAdmin(@Nonnull Player player) {
+        PermissionsModule permissions = PermissionsModule.get();
+        if (permissions == null) {
+            return false;
+        }
+
+        UUID uuid = ((CommandSender) player).getUuid();
+        Set<String> groups = permissions.getGroupsForUser(uuid);
+        return groups.contains("OP") || permissions.hasPermission(uuid, ADMIN_PERMISSION);
     }
 
     @Override
@@ -61,20 +74,18 @@ public final class GivePartyPortalCommand extends AbstractPlayerCommand {
         if (activeSlot < 0) {
             activeSlot = 0;
             inventory.setActiveHotbarSlot(activeSlot);
+            playerRef.getPacketHandler().writeNoCache(new SetActiveSlot(-1, activeSlot));
         }
 
         inventory.getHotbar().setItemStackForSlot((short) activeSlot, new ItemStack(PORTAL_ITEM_ID));
+        playerRef.getPacketHandler().writeNoCache(new UpdatePlayerInventory(
+                inventory.getStorage() != null ? inventory.getStorage().toPacket() : null,
+                inventory.getArmor() != null ? inventory.getArmor().toPacket() : null,
+                inventory.getHotbar() != null ? inventory.getHotbar().toPacket() : null,
+                inventory.getUtility() != null ? inventory.getUtility().toPacket() : null,
+                inventory.getTools() != null ? inventory.getTools().toPacket() : null,
+                inventory.getBackpack() != null ? inventory.getBackpack().toPacket() : null
+        ));
         context.sendMessage(Message.raw("Placed the Ancient Party Portal in your hand.").color(Color.GREEN));
-    }
-
-    private static boolean isAdmin(@Nonnull Player player) {
-        PermissionsModule permissions = PermissionsModule.get();
-        if (permissions == null) {
-            return false;
-        }
-
-        UUID uuid = ((CommandSender) player).getUuid();
-        Set<String> groups = permissions.getGroupsForUser(uuid);
-        return groups.contains("OP") || permissions.hasPermission(uuid, ADMIN_PERMISSION);
     }
 }

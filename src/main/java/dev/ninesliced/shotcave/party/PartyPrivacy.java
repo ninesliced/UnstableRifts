@@ -7,10 +7,6 @@ public enum PartyPrivacy {
     PUBLIC,
     PRIVATE;
 
-    public String getDisplayName() {
-        return this == PUBLIC ? "Public" : "Private";
-    }
-
     @Nullable
     public static PartyPrivacy from(@Nullable String raw) {
         if (raw == null || raw.isBlank()) {
@@ -22,5 +18,9 @@ public enum PartyPrivacy {
         } catch (IllegalArgumentException ignored) {
             return null;
         }
+    }
+
+    public String getDisplayName() {
+        return this == PUBLIC ? "Public" : "Private";
     }
 }

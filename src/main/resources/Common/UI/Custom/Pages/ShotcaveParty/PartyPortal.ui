@@ -173,6 +173,19 @@ $C.@PageOverlay {
               }
             }
 
+            Group #TeleportRow {
+              Visible: false;
+              LayoutMode: Left;
+              Anchor: (Top: 8, Height: 34);
+
+              TextButton #TeleportButton {
+                FlexWeight: 1;
+                Anchor: (Height: 32);
+                Text: "TELEPORT TO DUNGEON";
+                Style: @ActionButton;
+              }
+            }
+
             Group {
               LayoutMode: Left;
               Anchor: (Top: 8, Height: 34);

@@ -43,6 +43,11 @@ public final class PartyCommand extends AbstractCommand {
         this.addSubCommand(new StartCommand(plugin));
     }
 
+    static void sendResult(@Nonnull CommandContext context, @Nonnull PartyManager.ActionResult result) {
+        Color color = result.success() ? Color.GREEN : Color.RED;
+        context.sendMessage(PartyManager.partyPrefix().insert(Message.raw(result.message()).color(color)));
+    }
+
     @Override
     protected boolean canGeneratePermission() {
         return false;
@@ -71,11 +76,6 @@ public final class PartyCommand extends AbstractCommand {
         return CompletableFuture.completedFuture(null);
     }
 
-    static void sendResult(@Nonnull CommandContext context, @Nonnull PartyManager.ActionResult result) {
-        Color color = result.success() ? Color.GREEN : Color.RED;
-        context.sendMessage(PartyManager.partyPrefix().insert(Message.raw(result.message()).color(color)));
-    }
-
     private static final class CreateCommand extends AbstractPlayerCommand {
         private final Shotcave plugin;
         private final OptionalArg<String> privacyArg = this.withOptionalArg("privacy", "public or private", ArgTypes.STRING);
@@ -86,10 +86,14 @@ public final class PartyCommand extends AbstractCommand {
         }
 
         @Override
-        protected boolean canGeneratePermission() { return false; }
+        protected boolean canGeneratePermission() {
+            return false;
+        }
 
         @Override
-        protected String generatePermissionNode() { return ""; }
+        protected String generatePermissionNode() {
+            return "";
+        }
 
         @Override
         protected void execute(@Nonnull CommandContext context, @Nonnull Store<EntityStore> store, @Nonnull Ref<EntityStore> ref, @Nonnull PlayerRef playerRef, @Nonnull World world) {
@@ -111,10 +115,14 @@ public final class PartyCommand extends AbstractCommand {
         }
 
         @Override
-        protected boolean canGeneratePermission() { return false; }
+        protected boolean canGeneratePermission() {
+            return false;
+        }
 
         @Override
-        protected String generatePermissionNode() { return ""; }
+        protected String generatePermissionNode() {
+            return "";
+        }
 
         @Override
         protected void execute(@Nonnull CommandContext context, @Nonnull Store<EntityStore> store, @Nonnull Ref<EntityStore> ref, @Nonnull PlayerRef playerRef, @Nonnull World world) {
@@ -132,10 +140,14 @@ public final class PartyCommand extends AbstractCommand {
         }
 
         @Override
-        protected boolean canGeneratePermission() { return false; }
+        protected boolean canGeneratePermission() {
+            return false;
+        }
 
         @Override
-        protected String generatePermissionNode() { return ""; }
+        protected String generatePermissionNode() {
+            return "";
+        }
 
         @Override
         protected void execute(@Nonnull CommandContext context, @Nonnull Store<EntityStore> store, @Nonnull Ref<EntityStore> ref, @Nonnull PlayerRef playerRef, @Nonnull World world) {
@@ -152,10 +164,14 @@ public final class PartyCommand extends AbstractCommand {
         }
 
         @Override
-        protected boolean canGeneratePermission() { return false; }
+        protected boolean canGeneratePermission() {
+            return false;
+        }
 
         @Override
-        protected String generatePermissionNode() { return ""; }
+        protected String generatePermissionNode() {
+            return "";
+        }
 
         @Override
         protected void execute(@Nonnull CommandContext context, @Nonnull Store<EntityStore> store, @Nonnull Ref<EntityStore> ref, @Nonnull PlayerRef playerRef, @Nonnull World world) {
@@ -173,10 +189,14 @@ public final class PartyCommand extends AbstractCommand {
         }
 
         @Override
-        protected boolean canGeneratePermission() { return false; }
+        protected boolean canGeneratePermission() {
+            return false;
+        }
 
         @Override
-        protected String generatePermissionNode() { return ""; }
+        protected String generatePermissionNode() {
+            return "";
+        }
 
         @Override
         protected void execute(@Nonnull CommandContext context, @Nonnull Store<EntityStore> store, @Nonnull Ref<EntityStore> ref, @Nonnull PlayerRef playerRef, @Nonnull World world) {
@@ -195,10 +215,14 @@ public final class PartyCommand extends AbstractCommand {
         }
 
         @Override
-        protected boolean canGeneratePermission() { return false; }
+        protected boolean canGeneratePermission() {
+            return false;
+        }
 
         @Override
-        protected String generatePermissionNode() { return ""; }
+        protected String generatePermissionNode() {
+            return "";
+        }
 
         @Override
         protected void execute(@Nonnull CommandContext context, @Nonnull Store<EntityStore> store, @Nonnull Ref<EntityStore> ref, @Nonnull PlayerRef playerRef, @Nonnull World world) {
@@ -216,10 +240,14 @@ public final class PartyCommand extends AbstractCommand {
         }
 
         @Override
-        protected boolean canGeneratePermission() { return false; }
+        protected boolean canGeneratePermission() {
+            return false;
+        }
 
         @Override
-        protected String generatePermissionNode() { return ""; }
+        protected String generatePermissionNode() {
+            return "";
+        }
 
         @Override
         protected void execute(@Nonnull CommandContext context, @Nonnull Store<EntityStore> store, @Nonnull Ref<EntityStore> ref, @Nonnull PlayerRef playerRef, @Nonnull World world) {
@@ -241,10 +269,14 @@ public final class PartyCommand extends AbstractCommand {
         }
 
         @Override
-        protected boolean canGeneratePermission() { return false; }
+        protected boolean canGeneratePermission() {
+            return false;
+        }
 
         @Override
-        protected String generatePermissionNode() { return ""; }
+        protected String generatePermissionNode() {
+            return "";
+        }
 
         @Override
         protected void execute(@Nonnull CommandContext context, @Nonnull Store<EntityStore> store, @Nonnull Ref<EntityStore> ref, @Nonnull PlayerRef playerRef, @Nonnull World world) {
@@ -283,10 +315,14 @@ public final class PartyCommand extends AbstractCommand {
         }
 
         @Override
-        protected boolean canGeneratePermission() { return false; }
+        protected boolean canGeneratePermission() {
+            return false;
+        }
 
         @Override
-        protected String generatePermissionNode() { return ""; }
+        protected String generatePermissionNode() {
+            return "";
+        }
 
         @Override
         protected void execute(@Nonnull CommandContext context, @Nonnull Store<EntityStore> store, @Nonnull Ref<EntityStore> ref, @Nonnull PlayerRef playerRef, @Nonnull World world) {
@@ -308,10 +344,14 @@ public final class PartyCommand extends AbstractCommand {
         }
 
         @Override
-        protected boolean canGeneratePermission() { return false; }
+        protected boolean canGeneratePermission() {
+            return false;
+        }
 
         @Override
-        protected String generatePermissionNode() { return ""; }
+        protected String generatePermissionNode() {
+            return "";
+        }
 
         @Override
         protected void execute(@Nonnull CommandContext context, @Nonnull Store<EntityStore> store, @Nonnull Ref<EntityStore> ref, @Nonnull PlayerRef playerRef, @Nonnull World world) {

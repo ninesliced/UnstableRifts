@@ -40,6 +40,15 @@ public class DungeonCommand extends AbstractCommand {
                 });
     }
 
+    @Nonnull
+    private static String currentToken(@Nonnull String entered) {
+        if (entered.isBlank() || Character.isWhitespace(entered.charAt(entered.length() - 1))) {
+            return "";
+        }
+        int split = entered.lastIndexOf(' ');
+        return split == -1 ? entered : entered.substring(split + 1);
+    }
+
     @Override
     protected String generatePermissionNode() {
         return "";
@@ -117,14 +126,5 @@ public class DungeonCommand extends AbstractCommand {
                 context.sendMessage(Message.raw("Dungeon creation failed: " + e.getMessage()).color(Color.RED));
             }
         }, currentWorld);
-    }
-
-    @Nonnull
-    private static String currentToken(@Nonnull String entered) {
-        if (entered.isBlank() || Character.isWhitespace(entered.charAt(entered.length() - 1))) {
-            return "";
-        }
-        int split = entered.lastIndexOf(' ');
-        return split == -1 ? entered : entered.substring(split + 1);
     }
 }

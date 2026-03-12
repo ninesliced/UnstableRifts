@@ -35,30 +35,17 @@ public class DungeonConfig {
     @SerializedName("levels")
     private List<LevelConfig> levels = new ArrayList<>();
 
-    @Nonnull
-    public List<LevelConfig> getLevels() {
-        return levels;
-    }
+    @SerializedName("startEquipment")
+    private List<String> startEquipment = new ArrayList<>();
 
-    @Nonnull
-    public List<String> getLevelSelectors() {
-        List<String> selectors = new ArrayList<>();
-        for (LevelConfig level : levels) {
-            selectors.add(level.getSelector());
-        }
-        return selectors;
-    }
+    @SerializedName("bossWallBlock")
+    private String bossWallBlock = "Stone_Brick_Wall";
 
-    @Nullable
-    public LevelConfig findLevel(@Nonnull String selection) {
-        String normalized = normalize(selection);
-        for (LevelConfig level : levels) {
-            if (level.matches(selection, normalized)) {
-                return level;
-            }
-        }
-        return null;
-    }
+    @SerializedName("maxPartySize")
+    private int maxPartySize = 4;
+
+    @SerializedName("dungeonName")
+    private String dungeonName = "Shotcave";
 
     @Nonnull
     public static Path ensureRuntimeConfig(@Nonnull Path dataDirectory) {
@@ -119,95 +106,6 @@ public class DungeonConfig {
                 .toLowerCase(Locale.ROOT)
                 .replaceAll("[^a-z0-9]+", "-")
                 .replaceAll("^-+|-+$", "");
-    }
-
-    public static class LevelConfig {
-        @SerializedName("id")
-        private String id;
-
-        @SerializedName("name")
-        private String name = "Default";
-
-        @SerializedName("rooms")
-        private int rooms = 10;
-
-        @SerializedName("prefabs")
-        private PrefabSet prefabs = new PrefabSet();
-
-        public String getId() {
-            return id;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public int getRooms() {
-            return rooms;
-        }
-
-        public PrefabSet getPrefabs() {
-            return prefabs;
-        }
-
-        @Nonnull
-        public String getSelector() {
-            if (id != null && !id.isBlank()) {
-                return id.trim();
-            }
-            String normalizedName = normalize(name);
-            return normalizedName.isBlank() ? "default" : normalizedName;
-        }
-
-        private boolean matches(@Nonnull String rawSelection, @Nonnull String normalizedSelection) {
-            if (rawSelection.equalsIgnoreCase(getSelector())) {
-                return true;
-            }
-            if (name != null && rawSelection.equalsIgnoreCase(name)) {
-                return true;
-            }
-            return normalizedSelection.equals(normalize(getSelector()))
-                    || normalizedSelection.equals(normalize(name));
-        }
-
-        private void sanitize() {
-            if (name == null || name.isBlank()) {
-                name = "Default";
-            }
-            if (rooms < 0) {
-                rooms = 0;
-            }
-            if (prefabs == null) {
-                prefabs = new PrefabSet();
-            }
-            prefabs.sanitize();
-        }
-    }
-
-    public static class PrefabSet {
-        @SerializedName("entrance")
-        private List<String> entrance = new ArrayList<>();
-
-        @SerializedName("room")
-        private List<String> room = new ArrayList<>();
-
-        @SerializedName("wall")
-        private List<String> wall = new ArrayList<>();
-
-        @SerializedName("boss")
-        private List<String> boss = new ArrayList<>();
-
-        public List<String> getEntrance() { return entrance; }
-        public List<String> getRoom() { return room; }
-        public List<String> getWall() { return wall; }
-        public List<String> getBoss() { return boss; }
-
-        private void sanitize() {
-            entrance = sanitizeGlobList(entrance);
-            room = sanitizeGlobList(room);
-            wall = sanitizeGlobList(wall);
-            boss = sanitizeGlobList(boss);
-        }
     }
 
     @Nonnull
@@ -314,6 +212,173 @@ public class DungeonConfig {
         } catch (Exception e) {
             LOGGER.log(Level.WARNING, "Failed to load prefab buffer: " + path, e);
             return null;
+        }
+    }
+
+    @Nonnull
+    public List<LevelConfig> getLevels() {
+        return levels;
+    }
+
+    @Nonnull
+    public List<String> getStartEquipment() {
+        return startEquipment != null ? startEquipment : new ArrayList<>();
+    }
+
+    @Nonnull
+    public String getBossWallBlock() {
+        return bossWallBlock != null ? bossWallBlock : "Stone_Brick_Wall";
+    }
+
+    public int getMaxPartySize() {
+        return maxPartySize;
+    }
+
+    @Nonnull
+    public String getDungeonName() {
+        return dungeonName != null ? dungeonName : "Shotcave";
+    }
+
+    @Nonnull
+    public List<String> getLevelSelectors() {
+        List<String> selectors = new ArrayList<>();
+        for (LevelConfig level : levels) {
+            selectors.add(level.getSelector());
+        }
+        return selectors;
+    }
+
+    @Nullable
+    public LevelConfig findLevel(@Nonnull String selection) {
+        String normalized = normalize(selection);
+        for (LevelConfig level : levels) {
+            if (level.matches(selection, normalized)) {
+                return level;
+            }
+        }
+        return null;
+    }
+
+    public static class LevelConfig {
+        @SerializedName("id")
+        private String id;
+
+        @SerializedName("name")
+        private String name = "Default";
+
+        @SerializedName("rooms")
+        private int rooms = 10;
+
+        @SerializedName("prefabs")
+        private PrefabSet prefabs = new PrefabSet();
+
+        @SerializedName("mobs")
+        private List<String> mobs = new ArrayList<>();
+
+        @SerializedName("bossMob")
+        private String bossMob;
+
+        @SerializedName("moneyPerKill")
+        private int moneyPerKill = 10;
+
+        public String getId() {
+            return id;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public int getRooms() {
+            return rooms;
+        }
+
+        public PrefabSet getPrefabs() {
+            return prefabs;
+        }
+
+        @Nonnull
+        public List<String> getMobs() {
+            return mobs != null ? mobs : new ArrayList<>();
+        }
+
+        @Nullable
+        public String getBossMob() {
+            return bossMob;
+        }
+
+        public int getMoneyPerKill() {
+            return moneyPerKill;
+        }
+
+        @Nonnull
+        public String getSelector() {
+            if (id != null && !id.isBlank()) {
+                return id.trim();
+            }
+            String normalizedName = normalize(name);
+            return normalizedName.isBlank() ? "default" : normalizedName;
+        }
+
+        private boolean matches(@Nonnull String rawSelection, @Nonnull String normalizedSelection) {
+            if (rawSelection.equalsIgnoreCase(getSelector())) {
+                return true;
+            }
+            if (name != null && rawSelection.equalsIgnoreCase(name)) {
+                return true;
+            }
+            return normalizedSelection.equals(normalize(getSelector()))
+                    || normalizedSelection.equals(normalize(name));
+        }
+
+        private void sanitize() {
+            if (name == null || name.isBlank()) {
+                name = "Default";
+            }
+            if (rooms < 0) {
+                rooms = 0;
+            }
+            if (prefabs == null) {
+                prefabs = new PrefabSet();
+            }
+            prefabs.sanitize();
+        }
+    }
+
+    public static class PrefabSet {
+        @SerializedName("entrance")
+        private List<String> entrance = new ArrayList<>();
+
+        @SerializedName("room")
+        private List<String> room = new ArrayList<>();
+
+        @SerializedName("wall")
+        private List<String> wall = new ArrayList<>();
+
+        @SerializedName("boss")
+        private List<String> boss = new ArrayList<>();
+
+        public List<String> getEntrance() {
+            return entrance;
+        }
+
+        public List<String> getRoom() {
+            return room;
+        }
+
+        public List<String> getWall() {
+            return wall;
+        }
+
+        public List<String> getBoss() {
+            return boss;
+        }
+
+        private void sanitize() {
+            entrance = sanitizeGlobList(entrance);
+            room = sanitizeGlobList(room);
+            wall = sanitizeGlobList(wall);
+            boss = sanitizeGlobList(boss);
         }
     }
 }

@@ -51,9 +51,9 @@ public final class SpawnNPCAtImpactInteraction extends SimpleInstantInteraction 
         CODEC = builder.build();
     }
 
-    private String entityId;
     @Nonnull
     private final Vector3d spawnOffset = new Vector3d();
+    private String entityId;
 
     @Override
     public boolean needsRemoteSync() {
@@ -78,7 +78,7 @@ public final class SpawnNPCAtImpactInteraction extends SimpleInstantInteraction 
 
         position.add(spawnOffset);
         commandBuffer.run(store ->
-            NPCPlugin.get().spawnNPC(store, entityId, null, position, Vector3f.ZERO)
+                NPCPlugin.get().spawnNPC(store, entityId, null, position, Vector3f.ZERO)
         );
     }
 

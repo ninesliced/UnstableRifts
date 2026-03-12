@@ -1,19 +1,24 @@
 package dev.ninesliced.shotcave;
 
 import com.hypixel.hytale.server.core.event.events.ecs.SwitchActiveSlotEvent;
+import com.hypixel.hytale.server.core.event.events.player.AddPlayerToWorldEvent;
 import com.hypixel.hytale.server.core.event.events.player.PlayerConnectEvent;
 import com.hypixel.hytale.server.core.event.events.player.PlayerDisconnectEvent;
 import com.hypixel.hytale.server.core.event.events.player.PlayerReadyEvent;
+import com.hypixel.hytale.server.core.event.events.player.RemovedPlayerFromWorldEvent;
+import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.Interaction;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.server.OpenCustomUIInteraction;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
+import com.hypixel.hytale.server.core.universe.world.events.RemoveWorldEvent;
 import dev.ninesliced.shotcave.camera.TopCameraService;
 import dev.ninesliced.shotcave.command.PartyCommand;
 import dev.ninesliced.shotcave.command.ShotcaveCommand;
 import dev.ninesliced.shotcave.dungeon.DungeonConfig;
 import dev.ninesliced.shotcave.dungeon.DungeonInstanceService;
+import dev.ninesliced.shotcave.dungeon.GameManager;
 import dev.ninesliced.shotcave.hud.AmmoHudRuntime;
 import dev.ninesliced.shotcave.interactions.ChainLightningInteraction;
 import dev.ninesliced.shotcave.interactions.ConsumeAmmoInteraction;
@@ -27,6 +32,8 @@ import dev.ninesliced.shotcave.interactions.UpdateAmmoHudInteraction;
 import dev.ninesliced.shotcave.party.PartyManager;
 import dev.ninesliced.shotcave.party.ShotcavePartyPageSupplier;
 import dev.ninesliced.shotcave.systems.ActiveSlotHudUpdateSystem;
+import dev.ninesliced.shotcave.systems.DungeonTickSystem;
+import dev.ninesliced.shotcave.systems.PrefabSpawnTrackingSystem;
 import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
 
 import javax.annotation.Nonnull;
@@ -40,10 +47,15 @@ public class Shotcave extends JavaPlugin {
     private final AmmoHudRuntime ammoHudRuntime = new AmmoHudRuntime();
     private final DungeonInstanceService dungeonInstanceService = new DungeonInstanceService(this);
     private final PartyManager partyManager = new PartyManager(this);
+    private final GameManager gameManager = new GameManager(this);
     private Path dungeonConfigPath;
 
     public Shotcave(@Nonnull JavaPluginInit init) {
         super(init);
+    }
+
+    public static Shotcave getInstance() {
+        return instance;
     }
 
     @Override
@@ -52,7 +64,7 @@ public class Shotcave extends JavaPlugin {
         this.dungeonConfigPath = DungeonConfig.ensureRuntimeConfig(this.getDataDirectory());
 
         this.getCodecRegistry(OpenCustomUIInteraction.PAGE_CODEC)
-            .register("ShotcavePartyPortal", ShotcavePartyPageSupplier.class, ShotcavePartyPageSupplier.CODEC);
+                .register("ShotcavePartyPortal", ShotcavePartyPageSupplier.class, ShotcavePartyPageSupplier.CODEC);
 
         this.getCodecRegistry(Interaction.CODEC)
                 .register("ChainLightning", ChainLightningInteraction.class, ChainLightningInteraction.CODEC)
@@ -70,12 +82,18 @@ public class Shotcave extends JavaPlugin {
         } catch (IllegalArgumentException ignored) {
         }
         this.getEntityStoreRegistry().registerSystem(new ActiveSlotHudUpdateSystem());
+        this.getEntityStoreRegistry().registerSystem(new DungeonTickSystem());
+        this.getEntityStoreRegistry().registerSystem(new PrefabSpawnTrackingSystem());
 
         this.getEventRegistry().register(PlayerConnectEvent.class, this::onPlayerConnect);
+        this.getEventRegistry().registerGlobal(AddPlayerToWorldEvent.class, this::onPlayerAddedToWorld);
+        this.getEventRegistry().registerGlobal(RemovedPlayerFromWorldEvent.class, this::onPlayerRemovedFromWorld);
+        this.getEventRegistry().registerGlobal(RemoveWorldEvent.class, this::onWorldRemoved);
         this.getEventRegistry().registerGlobal(PlayerReadyEvent.class, this::onPlayerReady);
         this.getEventRegistry().registerGlobal(PlayerDisconnectEvent.class, event -> {
             this.partyManager.handleDisconnect(event.getPlayerRef());
             this.cameraService.clearState(event.getPlayerRef());
+            this.gameManager.onPlayerDisconnect(event.getPlayerRef().getUuid());
         });
         this.getCommandRegistry().registerCommand(new ShotcaveCommand(this));
         this.getCommandRegistry().registerCommand(new PartyCommand(this));
@@ -86,6 +104,7 @@ public class Shotcave extends JavaPlugin {
     @Override
     protected void shutdown() {
         this.ammoHudRuntime.stop();
+        this.gameManager.shutdown();
         instance = null;
         super.shutdown();
     }
@@ -94,10 +113,35 @@ public class Shotcave extends JavaPlugin {
         PlayerRef playerRef = event.getPlayerRef();
         cameraService.registerDisabledByDefault(playerRef);
         ammoHudRuntime.onPlayerConnect(playerRef);
+        gameManager.onPlayerConnect(playerRef);
     }
 
     private void onPlayerReady(@Nonnull PlayerReadyEvent event) {
         this.cameraService.handlePlayerReady(event.getPlayerRef());
+    }
+
+    private void onPlayerAddedToWorld(@Nonnull AddPlayerToWorldEvent event) {
+        var holder = event.getHolder();
+        PlayerRef playerRef = holder.getComponent(PlayerRef.getComponentType());
+        Player player = holder.getComponent(Player.getComponentType());
+        if (playerRef == null || player == null) {
+            return;
+        }
+        this.gameManager.onPlayerAddedToWorld(playerRef, player, event.getWorld());
+    }
+
+    private void onPlayerRemovedFromWorld(@Nonnull RemovedPlayerFromWorldEvent event) {
+        var holder = event.getHolder();
+        PlayerRef playerRef = holder.getComponent(PlayerRef.getComponentType());
+        Player player = holder.getComponent(Player.getComponentType());
+        if (playerRef == null || player == null) {
+            return;
+        }
+        this.gameManager.onPlayerRemovedFromWorld(playerRef, player, event.getWorld());
+    }
+
+    private void onWorldRemoved(@Nonnull RemoveWorldEvent event) {
+        this.gameManager.onInstanceWorldRemoved(event.getWorld());
     }
 
     @Nonnull
@@ -127,8 +171,9 @@ public class Shotcave extends JavaPlugin {
         return this.partyManager;
     }
 
-    public static Shotcave getInstance() {
-        return instance;
+    @Nonnull
+    public GameManager getGameManager() {
+        return this.gameManager;
     }
 
     @NonNullDecl

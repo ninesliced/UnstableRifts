@@ -47,6 +47,45 @@ public final class PartyManager {
     }
 
     @Nonnull
+    private static Transform resolveSpawnTransform(@Nonnull World world,
+                                                   @Nonnull PlayerRef playerRef,
+                                                   @Nonnull Store<EntityStore> store,
+                                                   @Nonnull Ref<EntityStore> ref) {
+        ISpawnProvider spawnProvider = world.getWorldConfig().getSpawnProvider();
+        if (spawnProvider != null) {
+            Transform spawn = spawnProvider.getSpawnPoint(world, playerRef.getUuid());
+            if (spawn != null) {
+                return spawn;
+            }
+        }
+
+        TransformComponent transformComponent = store.getComponent(ref, TransformComponent.getComponentType());
+        return transformComponent != null ? transformComponent.getTransform().clone() : new Transform(0.5, 100.0, 0.5, 0.0f, 0.0f, 0.0f);
+    }
+
+    @Nonnull
+    private static String partyNameFor(@Nonnull PlayerRef playerRef) {
+        return partyNameFor(playerRef.getUsername());
+    }
+
+    @Nonnull
+    private static String partyNameFor(@Nonnull String leaderName) {
+        return leaderName + "'s Party";
+    }
+
+    @Nonnull
+    private static Message createInviteMessage(@Nonnull PlayerRef inviter, @Nonnull Party party) {
+        return partyPrefix()
+                .insert(Message.raw(inviter.getUsername() + " invited you to join " + party.name + ". ").color("#dce6ef"))
+                .insert(Message.raw("Use /sc accept to join, or /sc party ui to open the party menu.").color("#58a6ff"));
+    }
+
+    @Nonnull
+    public static Message partyPrefix() {
+        return Message.raw("[Shotcave Party] ").color(new Color(202, 153, 76)).bold(true);
+    }
+
+    @Nonnull
     public synchronized ActionResult createParty(@Nonnull PlayerRef leaderRef, @Nonnull PartyPrivacy privacy) {
         if (getPartyInternal(leaderRef.getUuid()) != null) {
             return ActionResult.error("You are already in a party.");
@@ -211,17 +250,16 @@ public final class PartyManager {
             return ActionResult.error("Only the party leader can disband the party.");
         }
 
-        this.parties.remove(party.id);
-        for (UUID memberId : new ArrayList<>(party.members.keySet())) {
-            this.partyByMember.remove(memberId);
-            removeInvite(memberId, party.id);
-            PlayerRef member = Universe.get().getPlayer(memberId);
-            if (member != null) {
-                member.sendMessage(partyPrefix().insert(Message.raw("The party was disbanded.").color("#ffb0b0")));
-            }
-        }
-        PartyUiPage.refreshOpenPages();
+        closePartyInternal(party, "The party was disbanded.", true);
         return ActionResult.success("Disbanded the party.");
+    }
+
+    public synchronized void closePartyForSystem(@Nonnull UUID partyId, @Nonnull String reason) {
+        Party party = this.parties.get(partyId);
+        if (party == null) {
+            return;
+        }
+        closePartyInternal(party, reason, false);
     }
 
     @Nonnull
@@ -232,6 +270,11 @@ public final class PartyManager {
         }
         if (!isLeader(party, leaderRef.getUuid())) {
             return ActionResult.error("Only the party leader can start the party.");
+        }
+
+        // Check if a game is already active for this party
+        if (this.plugin.getGameManager().hasActiveGame(party.id)) {
+            return ActionResult.error("A dungeon run is already in progress for this party.");
         }
 
         Ref<EntityStore> leaderEntity = leaderRef.getReference();
@@ -248,6 +291,10 @@ public final class PartyManager {
         World leaderWorld = leaderStore.getExternalData().getWorld();
         Transform leaderReturnPoint = DungeonInstanceService.captureReturnPoint(leaderStore, leaderEntity);
         List<PendingTeleport> membersToTeleport = new ArrayList<>();
+        List<UUID> memberIds = new ArrayList<>();
+        Map<UUID, PlayerRef> memberRefsMap = new java.util.HashMap<>();
+        Map<UUID, Ref<EntityStore>> memberEntitiesMap = new java.util.HashMap<>();
+        Map<UUID, Store<EntityStore>> memberStoresMap = new java.util.HashMap<>();
 
         for (UUID memberId : party.members.keySet()) {
             PlayerRef memberRef = Universe.get().getPlayer(memberId);
@@ -261,6 +308,10 @@ public final class PartyManager {
             }
 
             Store<EntityStore> memberStore = memberEntity.getStore();
+            memberIds.add(memberId);
+            memberRefsMap.put(memberId, memberRef);
+            memberEntitiesMap.put(memberId, memberEntity);
+            memberStoresMap.put(memberId, memberStore);
             membersToTeleport.add(new PendingTeleport(
                     memberRef,
                     memberEntity,
@@ -273,26 +324,59 @@ public final class PartyManager {
             return ActionResult.error("No online party members are available to start the run.");
         }
 
-        CompletableFuture<World> readyFuture = this.plugin.getDungeonInstanceService().spawnGeneratedInstance(
-                leaderWorld,
-                leaderReturnPoint,
-                levelConfig,
-                status -> sendStatusToPlayers(membersToTeleport, status, status.startsWith("Dungeon ready") ? "#a9f5b3" : "#ffd38a")
+        // Start the game via GameManager
+        var gameManager = this.plugin.getGameManager();
+        var gameFuture = gameManager.startGame(
+                party.id, memberIds, memberRefsMap, memberEntitiesMap, memberStoresMap,
+                leaderWorld, leaderReturnPoint
         );
 
-        for (PendingTeleport member : membersToTeleport) {
-            this.plugin.getCameraService().scheduleEnableOnNextReady(member.playerRef());
-            this.plugin.getDungeonInstanceService().sendPlayerToReadyInstance(
-                    member.entityRef(),
-                    member.store(),
-                    readyFuture,
-                    member.returnPoint(),
-                    status -> {
-                        this.plugin.getCameraService().cancelDeferredEnable(member.playerRef());
-                        member.playerRef().sendMessage(partyPrefix().insert(Message.raw(status).color("#ffb0b0")));
+        // When the game is ready, teleport all members and start the game loop
+        gameFuture.thenAccept(game -> {
+            // Transfer the generated Level to the Game if available
+            var generatedLevel = this.plugin.getDungeonInstanceService().getLastGeneratedLevel();
+            if (generatedLevel != null && game.getLevels().size() == 1) {
+                // Replace the placeholder level with the one that has full RoomData graph
+                game.getLevels(); // already has one
+                // The Level is already added, but we need to merge the room data
+                var existingLevel = game.getCurrentLevel();
+                if (existingLevel != null && existingLevel.getRooms().isEmpty()) {
+                    for (var room : generatedLevel.getRooms()) {
+                        existingLevel.addRoom(room);
                     }
+                }
+            }
+
+            World instanceWorld = game.getInstanceWorld();
+            if (instanceWorld == null) return;
+
+            for (PendingTeleport member : membersToTeleport) {
+                this.plugin.getCameraService().scheduleEnableOnNextReady(member.playerRef());
+                this.plugin.getDungeonInstanceService().sendPlayerToReadyInstance(
+                        member.entityRef(),
+                        member.store(),
+                        java.util.concurrent.CompletableFuture.completedFuture(instanceWorld),
+                        member.returnPoint(),
+                        status -> {
+                            this.plugin.getCameraService().cancelDeferredEnable(member.playerRef());
+                            member.playerRef().sendMessage(partyPrefix().insert(Message.raw(status).color("#ffb0b0")));
+                        }
+                );
+            }
+
+            // Start the game after a short delay to let players load in
+            com.hypixel.hytale.server.core.HytaleServer.SCHEDULED_EXECUTOR.schedule(
+                    () -> {
+                        if (game.getInstanceWorld() != null) {
+                            game.getInstanceWorld().execute(() -> gameManager.onGameStart(game));
+                        }
+                    },
+                    3, java.util.concurrent.TimeUnit.SECONDS
             );
-        }
+        }).exceptionally(throwable -> {
+            broadcast(party, partyPrefix().insert(Message.raw("Failed to start dungeon: " + throwable.getMessage()).color("#ffb0b0")));
+            return null;
+        });
 
         broadcast(party, partyPrefix().insert(Message.raw("Starting a fresh Shotcave dungeon instance...").color("#dce6ef")));
         return ActionResult.success("Launching a new generated dungeon instance for the party.", party);
@@ -474,6 +558,23 @@ public final class PartyManager {
         return invites != null && invites.containsKey(partyId);
     }
 
+    private void closePartyInternal(@Nonnull Party party, @Nonnull String reason, boolean endActiveGame) {
+        this.parties.remove(party.id);
+        for (UUID memberId : new ArrayList<>(party.members.keySet())) {
+            this.partyByMember.remove(memberId);
+            removeInvite(memberId, party.id);
+            PlayerRef member = Universe.get().getPlayer(memberId);
+            if (member != null) {
+                member.sendMessage(partyPrefix().insert(Message.raw(reason).color("#ffb0b0")));
+            }
+        }
+        PartyUiPage.refreshOpenPages();
+
+        if (endActiveGame) {
+            this.plugin.getGameManager().onPartyDisband(party.id);
+        }
+    }
+
     @Nullable
     private PartyInvite findLatestInvite(@Nonnull UUID inviteeId) {
         purgeExpiredInvites();
@@ -555,40 +656,6 @@ public final class PartyManager {
         return new PartySnapshot(party.id.toString(), party.name, party.leaderId.toString(), party.leaderName, party.privacy, members);
     }
 
-    @Nonnull
-    private static Transform resolveSpawnTransform(@Nonnull World world,
-                                                   @Nonnull PlayerRef playerRef,
-                                                   @Nonnull Store<EntityStore> store,
-                                                   @Nonnull Ref<EntityStore> ref) {
-        ISpawnProvider spawnProvider = world.getWorldConfig().getSpawnProvider();
-        if (spawnProvider != null) {
-            Transform spawn = spawnProvider.getSpawnPoint(world, playerRef.getUuid());
-            if (spawn != null) {
-                return spawn;
-            }
-        }
-
-        TransformComponent transformComponent = store.getComponent(ref, TransformComponent.getComponentType());
-        return transformComponent != null ? transformComponent.getTransform().clone() : new Transform(0.5, 100.0, 0.5, 0.0f, 0.0f, 0.0f);
-    }
-
-    @Nonnull
-    private static String partyNameFor(@Nonnull PlayerRef playerRef) {
-        return partyNameFor(playerRef.getUsername());
-    }
-
-    @Nonnull
-    private static String partyNameFor(@Nonnull String leaderName) {
-        return leaderName + "'s Party";
-    }
-
-    @Nonnull
-    private static Message createInviteMessage(@Nonnull PlayerRef inviter, @Nonnull Party party) {
-        return partyPrefix()
-                .insert(Message.raw(inviter.getUsername() + " invited you to join " + party.name + ". ").color("#dce6ef"))
-            .insert(Message.raw("Use /sc accept to join, or /sc party ui to open the party menu.").color("#58a6ff"));
-    }
-
     private void broadcast(@Nonnull Party party, @Nonnull Message message) {
         for (UUID memberId : party.members.keySet()) {
             PlayerRef playerRef = Universe.get().getPlayer(memberId);
@@ -607,18 +674,13 @@ public final class PartyManager {
         }
     }
 
-    @Nonnull
-    public static Message partyPrefix() {
-        return Message.raw("[Shotcave Party] ").color(new Color(202, 153, 76)).bold(true);
-    }
-
     private static final class Party {
         private final UUID id;
+        private final LinkedHashMap<UUID, String> members = new LinkedHashMap<>();
         private UUID leaderId;
         private String name;
         private String leaderName;
         private PartyPrivacy privacy;
-        private final LinkedHashMap<UUID, String> members = new LinkedHashMap<>();
 
         private Party(@Nonnull UUID id, @Nonnull UUID leaderId, @Nonnull String name, @Nonnull PartyPrivacy privacy) {
             this.id = id;
