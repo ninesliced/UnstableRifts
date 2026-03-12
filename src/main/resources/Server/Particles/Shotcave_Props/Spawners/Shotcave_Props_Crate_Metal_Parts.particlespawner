@@ -1,0 +1,71 @@
+{
+  "RenderMode": "Erosion",
+  "EmitOffset": {
+    "X": { "Min": 0.1, "Max": 0.3 },
+    "Y": { "Min": 0.1, "Max": 0.3 },
+    "Z": { "Min": 0.1, "Max": 0.3 }
+  },
+  "ParticleRotationInfluence": "Billboard",
+  "LinearFiltering": false,
+  "LightInfluence": 1,
+  "ParticleRotateWithSpawner": false,
+  "TrailSpawnerPositionMultiplier": 1,
+  "TrailSpawnerRotationMultiplier": 1,
+  "MaxConcurrentParticles": 12,
+  "ParticleLifeSpan": { "Min": 0.5, "Max": 0.7 },
+  "SpawnRate": { "Min": 20, "Max": 20 },
+  "TotalParticles": { "Min": 12, "Max": 12 },
+  "InitialVelocity": {
+    "Speed": { "Min": 3, "Max": 5 },
+    "Yaw": { "Min": 0, "Max": 360 },
+    "Pitch": { "Min": 0, "Max": 180 }
+  },
+  "Attractors": [
+    {
+      "LinearAcceleration": { "X": 0, "Y": -9, "Z": 0 },
+      "DampingMultiplier": { "X": 0.8, "Y": 0.8, "Z": 0.8 }
+    }
+  ],
+  "Particle": {
+    "Texture": "Particles/Textures/Shapes/Metal.png",
+    "FrameSize": { "Width": 32, "Height": 32 },
+    "ScaleRatioConstraint": "OneToOne",
+    "UVOption": "RandomFlipU",
+    "Animation": {
+      "0": {
+        "FrameIndex": { "Min": 0, "Max": 3 },
+        "Scale": {
+          "X": { "Min": 1, "Max": 1 }
+        },
+        "Rotation": {
+          "X": { "Min": 0, "Max": 0 },
+          "Y": { "Min": 0, "Max": 0 },
+          "Z": { "Min": 0, "Max": 0 }
+        },
+        "Opacity": 1
+      },
+      "70": {
+        "Opacity": 1
+      },
+      "100": {
+        "Opacity": 0,
+        "Scale": {
+          "X": { "Min": 0.13, "Max": 0.5 }
+        }
+      }
+    },
+    "InitialAnimationFrame": {
+      "Rotation": {
+        "X": { "Min": 0, "Max": 0 },
+        "Y": { "Min": 0, "Max": 0 },
+        "Z": { "Min": -180, "Max": 180 }
+      },
+      "Scale": {
+        "X": { "Min": 0.25, "Max": 0.4 }
+      },
+      "Opacity": 1,
+      "FrameIndex": { "Min": 0, "Max": 3 }
+    }
+  },
+  "SpawnBurst": true
+}
