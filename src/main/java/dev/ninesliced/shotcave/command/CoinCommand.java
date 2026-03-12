@@ -18,7 +18,9 @@ import javax.annotation.Nonnull;
 import java.awt.Color;
 import java.util.Map;
 import java.util.UUID;
-import java.util.logging.Logger;
+import com.hypixel.hytale.logger.HytaleLogger;
+import dev.ninesliced.shotcave.ShotcaveLog;
+import java.util.logging.Level;
 
 /** Debug commands for viewing and modifying coin scores. */
 public class CoinCommand extends AbstractCommandCollection {
@@ -54,7 +56,7 @@ public class CoinCommand extends AbstractCommandCollection {
 
     static class Set extends AbstractPlayerCommand {
 
-        private static final Logger LOGGER = Logger.getLogger(Set.class.getName());
+        private static final HytaleLogger LOGGER = ShotcaveLog.forModule("Command");
 
         @Nonnull
         private final RequiredArg<Integer> amountArg = this.withRequiredArg(
@@ -75,14 +77,14 @@ public class CoinCommand extends AbstractCommandCollection {
             int amount = this.amountArg.get(context);
             int newScore = CoinScoreService.setScore(playerRef.getUuid(), amount);
             context.sendMessage(Message.raw("Coin score set to " + newScore + ".").color(Color.GREEN));
-            LOGGER.info("[CoinCommand] " + playerRef.getUsername()
-                    + " set their coin score to " + newScore);
+            LOGGER.at(Level.INFO).log("[CoinCommand] %s set their coin score to %d",
+                    playerRef.getUsername(), newScore);
         }
     }
 
     static class Add extends AbstractPlayerCommand {
 
-        private static final Logger LOGGER = Logger.getLogger(Add.class.getName());
+        private static final HytaleLogger LOGGER = ShotcaveLog.forModule("Command");
 
         @Nonnull
         private final RequiredArg<Integer> amountArg = this.withRequiredArg(
@@ -108,14 +110,14 @@ public class CoinCommand extends AbstractCommandCollection {
             int newTotal = CoinScoreService.addCoins(playerRef.getUuid(), amount);
             context.sendMessage(Message.raw("Added " + amount + " coins. New total: " + newTotal + ".")
                     .color(Color.GREEN));
-            LOGGER.info("[CoinCommand] " + playerRef.getUsername()
-                    + " added " + amount + " coins (total: " + newTotal + ")");
+            LOGGER.at(Level.INFO).log("[CoinCommand] %s added %d coins (total: %d)",
+                    playerRef.getUsername(), amount, newTotal);
         }
     }
 
     static class Reset extends AbstractPlayerCommand {
 
-        private static final Logger LOGGER = Logger.getLogger(Reset.class.getName());
+        private static final HytaleLogger LOGGER = ShotcaveLog.forModule("Command");
 
         Reset() {
             super("reset", "Reset your coin score to 0");
@@ -131,7 +133,7 @@ public class CoinCommand extends AbstractCommandCollection {
 
             CoinScoreService.reset(playerRef.getUuid());
             context.sendMessage(Message.raw("Coin score reset to 0.").color(Color.YELLOW));
-            LOGGER.info("[CoinCommand] " + playerRef.getUsername() + " reset their coin score");
+            LOGGER.at(Level.INFO).log("[CoinCommand] %s reset their coin score", playerRef.getUsername());
         }
     }
 
