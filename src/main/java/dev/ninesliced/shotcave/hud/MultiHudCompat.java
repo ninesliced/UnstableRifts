@@ -21,15 +21,7 @@ public final class MultiHudCompat {
     private MultiHudCompat() {
     }
 
-    public static boolean setHud(
-            @Nonnull Player player,
-            @Nonnull PlayerRef playerRef,
-            @Nonnull String hudId,
-            @Nonnull CustomUIHud hud) {
-        return setHud(player, playerRef, SHOTCAVE_HUD_ID, hud);
-    }
-
-    static boolean setHud(@Nonnull Player player, @Nonnull PlayerRef playerRef,
+    public static boolean setHud(@Nonnull Player player, @Nonnull PlayerRef playerRef,
                           @Nonnull String hudId, @Nonnull CustomUIHud hud) {
         ensureInitialized();
         if (instance == null || setCustomHudMethod == null) {
@@ -43,14 +35,7 @@ public final class MultiHudCompat {
         }
     }
 
-    public static boolean hideHud(
-            @Nonnull Player player,
-            @Nonnull PlayerRef playerRef,
-            @Nonnull String hudId) {
-        return hideHud(player, playerRef, SHOTCAVE_HUD_ID);
-    }
-
-    static boolean hideHud(@Nonnull Player player, @Nonnull PlayerRef playerRef, @Nonnull String hudId) {
+    public static boolean hideHud(@Nonnull Player player, @Nonnull PlayerRef playerRef, @Nonnull String hudId) {
         ensureInitialized();
         if (instance == null || hideCustomHudMethod == null) {
             return false;
