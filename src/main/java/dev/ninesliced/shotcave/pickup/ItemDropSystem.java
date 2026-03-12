@@ -15,7 +15,10 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.logging.Logger;
+import java.util.logging.Level;
+
+import com.hypixel.hytale.logger.HytaleLogger;
+import dev.ninesliced.shotcave.ShotcaveLog;
 
 /**
  * Intercepts item entity creation/removal to apply custom pickup behavior
@@ -24,7 +27,7 @@ import java.util.logging.Logger;
  */
 public final class ItemDropSystem extends RefSystem<EntityStore> {
 
-    private static final Logger LOGGER = Logger.getLogger(ItemDropSystem.class.getName());
+    private static final HytaleLogger LOGGER = ShotcaveLog.forModule("Pickup");
 
     public ItemDropSystem() {
     }
@@ -51,7 +54,7 @@ public final class ItemDropSystem extends RefSystem<EntityStore> {
             return;
         }
 
-        LOGGER.info("[ItemDrop] onEntityAdded itemId='" + itemId + "'");
+        LOGGER.at(Level.INFO).log("[ItemDrop] onEntityAdded itemId='%s'", itemId);
 
         String displayName = resolveDisplayName(itemId);
         String iconPath = resolveIconPath(itemId);
@@ -59,14 +62,14 @@ public final class ItemDropSystem extends RefSystem<EntityStore> {
         boolean isFKey = ItemPickupConfig.isFKeyPickup(itemId);
         boolean isScoreCollect = ItemPickupConfig.isScoreCollect(itemId);
 
-        LOGGER.info("[ItemDrop]   isFKey=" + isFKey + " isScoreCollect=" + isScoreCollect);
+        LOGGER.at(Level.INFO).log("[ItemDrop]   isFKey=%s isScoreCollect=%s", isFKey, isScoreCollect);
 
         if (!isFKey && !isScoreCollect) {
-            LOGGER.info("[ItemDrop]   not tracked, skipping");
+            LOGGER.at(Level.INFO).log("[ItemDrop]   not tracked, skipping");
             return;
         }
 
-        LOGGER.info("[ItemDrop]   TRACKING item, trackerSize=" + (ItemPickupTracker.size() + 1));
+        LOGGER.at(Level.INFO).log("[ItemDrop]   TRACKING item, trackerSize=%d", ItemPickupTracker.size() + 1);
         ItemPickupTracker.track(new ItemPickupTracker.TrackedItem(
                 ref, itemId, displayName, iconPath, isFKey, isScoreCollect));
 
