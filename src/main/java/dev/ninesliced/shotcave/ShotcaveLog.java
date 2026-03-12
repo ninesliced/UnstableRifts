@@ -36,16 +36,14 @@ import java.util.logging.Level;
  *
  * <pre>
  * // In a class:
- * private static final HytaleLogger LOG = ShotcaveLog.forModule("Dungeon");
+ * private static final HytaleLogger LOG = ShotcaveLog.forClass(MyClass.class);
  *
- * // Simple log:
+ * // Simple log via the logger:
  * LOG.at(Level.INFO).log("Generation started");
  *
- * // Structured log:
- * ShotcaveLog.log(LOG, Level.INFO, "Room placed", "index", roomIndex, "pos", pastePos);
- *
- * // Structured log with exception:
- * ShotcaveLog.log(LOG, Level.WARNING, e, "Paste failed", "prefab", prefabPath);
+ * // Structured log via helpers:
+ * ShotcaveLog.info(LOG, "Connected", "uuid", uuid);
+ * ShotcaveLog.warn(LOG, e, "Failed to parse", "path", path);
  * </pre>
  */
 public final class ShotcaveLog {
@@ -97,6 +95,65 @@ public final class ShotcaveLog {
     }
 
     /**
+     * Returns a logger named after the provided class' simple name, scoped under
+     * root.
+     * Convenience replacement for repeatedly calling {@link #forModule(String)}
+     * with
+     * class simple names.
+     */
+    @Nonnull
+    public static HytaleLogger forClass(@Nonnull Class<?> cls) {
+        return forModule(cls.getSimpleName());
+    }
+
+    /**
+     * Returns whether the provided logger will accept messages for the given level.
+     * This is a tiny wrapper for convenience and to make the call site clearer.
+     */
+    public static boolean isEnabled(@Nonnull HytaleLogger logger, @Nonnull Level level) {
+        return logger.at(level).isEnabled();
+    }
+
+    // Convenience level helpers that use the structured logging formatter.
+    // These simply delegate to the more generic `log(...)` methods.
+
+    public static void info(@Nonnull HytaleLogger logger, @Nullable String message, @Nonnull Object... keyValues) {
+        log(logger, Level.INFO, message, keyValues);
+    }
+
+    public static void info(@Nonnull HytaleLogger logger, @Nonnull Throwable cause, @Nullable String message,
+            @Nonnull Object... keyValues) {
+        log(logger, Level.INFO, cause, message, keyValues);
+    }
+
+    public static void warn(@Nonnull HytaleLogger logger, @Nullable String message, @Nonnull Object... keyValues) {
+        log(logger, Level.WARNING, message, keyValues);
+    }
+
+    public static void warn(@Nonnull HytaleLogger logger, @Nonnull Throwable cause, @Nullable String message,
+            @Nonnull Object... keyValues) {
+        log(logger, Level.WARNING, cause, message, keyValues);
+    }
+
+    public static void error(@Nonnull HytaleLogger logger, @Nullable String message, @Nonnull Object... keyValues) {
+        log(logger, Level.SEVERE, message, keyValues);
+    }
+
+    public static void error(@Nonnull HytaleLogger logger, @Nonnull Throwable cause, @Nullable String message,
+            @Nonnull Object... keyValues) {
+        log(logger, Level.SEVERE, cause, message, keyValues);
+    }
+
+    public static void fine(@Nonnull HytaleLogger logger, @Nullable String message, @Nonnull Object... keyValues) {
+        log(logger, Level.FINE, message, keyValues);
+    }
+
+    public static void fine(@Nonnull HytaleLogger logger, @Nonnull Throwable cause, @Nullable String message,
+            @Nonnull Object... keyValues) {
+        log(logger, Level.FINE, cause, message, keyValues);
+    }
+
+    /**
      * Logs a structured message with key-value context fields.
      *
      * <p>
@@ -113,7 +170,7 @@ public final class ShotcaveLog {
             @Nonnull Level level,
             @Nullable String message,
             @Nonnull Object... keyValues) {
-        if (!logger.at(level).isEnabled()) {
+        if (!isEnabled(logger, level)) {
             return;
         }
         logger.at(level).log("%s", formatStructured(message, keyValues));
@@ -133,7 +190,7 @@ public final class ShotcaveLog {
             @Nonnull Throwable cause,
             @Nullable String message,
             @Nonnull Object... keyValues) {
-        if (!logger.at(level).isEnabled()) {
+        if (!isEnabled(logger, level)) {
             return;
         }
         logger.at(level).withCause(cause).log("%s", formatStructured(message, keyValues));
@@ -143,7 +200,7 @@ public final class ShotcaveLog {
             @Nonnull Level level,
             @Nullable String message,
             @Nonnull Map<String, ?> fields) {
-        if (!logger.at(level).isEnabled()) {
+        if (!isEnabled(logger, level)) {
             return;
         }
         logger.at(level).log("%s", formatStructured(message, fields));
