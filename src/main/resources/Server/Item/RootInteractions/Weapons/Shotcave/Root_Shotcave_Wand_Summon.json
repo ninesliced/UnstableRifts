@@ -1,9 +1,0 @@
-{
-  "Cooldown": {
-    "Id": "Shoot",
-    "Cooldown": 1.5
-  },
-  "Interactions": [
-    "Shotcave_Wand_Summon"
-  ]
-}

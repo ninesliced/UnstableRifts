@@ -1,0 +1,30 @@
+{
+  "primary": {
+    "id": "Shotcave_Crystal_Blunderbuss_Lightning_Primary",
+    "cooldown": 1.05,
+    "requireAmmo": true,
+    "shotId": "Shotcave_Crystal_Blunderbuss_Lightning_Shot",
+    "reloadId": "Shotcave_Crystal_Blunderbuss_Reload"
+  },
+  "reload": {
+    "id": "Shotcave_Crystal_Blunderbuss_Reload",
+    "cooldown": 1.25,
+    "runTime": 1.05,
+    "amount": 0,
+    "nextId": "Shotcave_Update_Hud",
+    "worldSfx": "SFX_Blunderbuss_Load",
+    "localSfx": "SFX_Blunderbuss_Load_Local"
+  },
+  "damage": {
+    "id": "Shotcave_Crystal_Blunderbuss_Projectile_Hit",
+    "amount": 8,
+    "type": "Projectile",
+    "worldSfx": "SFX_Blunderbuss_Hit",
+    "localSfx": "SFX_Blunderbuss_Hit",
+    "particleId": "RifleShooting_Impact",
+    "particleYOffset": 0.8
+  },
+  "extraRoots": [
+    "Shotcave_Crystal_Blunderbuss_Miss"
+  ]
+}

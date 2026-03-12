@@ -9,7 +9,6 @@ import com.hypixel.hytale.server.core.modules.interaction.interaction.config.Int
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.RootInteraction;
 import com.hypixel.hytale.server.core.event.events.player.PlayerDisconnectEvent;
 import com.hypixel.hytale.server.core.event.events.player.PlayerReadyEvent;
-import com.hypixel.hytale.server.core.modules.interaction.interaction.config.Interaction;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.server.OpenCustomUIInteraction;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
@@ -21,6 +20,7 @@ import dev.ninesliced.shotcave.command.ShotcaveCommand;
 import dev.ninesliced.shotcave.crate.CrateBreakDropSystem;
 import dev.ninesliced.shotcave.dungeon.DungeonConfig;
 import dev.ninesliced.shotcave.dungeon.DungeonInstanceService;
+import dev.ninesliced.shotcave.guns.WeaponRegistry;
 import dev.ninesliced.shotcave.hud.AmmoHudRuntime;
 import dev.ninesliced.shotcave.interactions.BreakSoftBlockInteraction;
 import dev.ninesliced.shotcave.interactions.ChainLightningInteraction;
@@ -28,7 +28,7 @@ import dev.ninesliced.shotcave.interactions.ConsumeAmmoInteraction;
 import dev.ninesliced.shotcave.interactions.GunValidationInteraction;
 import dev.ninesliced.shotcave.interactions.HideAmmoHudInteraction;
 import dev.ninesliced.shotcave.interactions.ModularGunShootInteraction;
-import dev.ninesliced.shotcave.interactions.ReloadCheckInteraction;
+
 import dev.ninesliced.shotcave.interactions.ReloadInteraction;
 import dev.ninesliced.shotcave.interactions.SpawnNPCAtImpactInteraction;
 import dev.ninesliced.shotcave.interactions.UpdateAmmoHudInteraction;
@@ -73,7 +73,6 @@ public class Shotcave extends JavaPlugin {
                 .register("ChainLightning", ChainLightningInteraction.class, ChainLightningInteraction.CODEC)
                 .register("ModularGunShoot", ModularGunShootInteraction.class, ModularGunShootInteraction.CODEC)
                 .register("GunValidate", GunValidationInteraction.class, GunValidationInteraction.CODEC)
-                .register("ReloadCheck", ReloadCheckInteraction.class, ReloadCheckInteraction.CODEC)
                 .register("Reload", ReloadInteraction.class, ReloadInteraction.CODEC)
                 .register("UpdateAmmoHud", UpdateAmmoHudInteraction.class, UpdateAmmoHudInteraction.CODEC)
                 .register("HideAmmoHud", HideAmmoHudInteraction.class, HideAmmoHudInteraction.CODEC)
@@ -89,6 +88,8 @@ public class Shotcave extends JavaPlugin {
                 "ninesliced:Shotcave",
                 List.of(ItemPickupInteraction.DEFAULT_ROOT));
 
+        WeaponRegistry.registerAll();
+
         PacketAdapters.registerInbound(new FKeyPickupPacketHandler());
 
         try {
@@ -102,8 +103,6 @@ public class Shotcave extends JavaPlugin {
 
         this.getEntityStoreRegistry().registerSystem(new ActiveSlotHudUpdateSystem());
 
-        // Item pickup: intercept item entity spawns to apply F-key / score-collect
-        // behaviour.
         this.getEntityStoreRegistry().registerSystem(new ItemDropSystem());
         this.getEntityStoreRegistry().registerSystem(new CrateBreakDropSystem());
         this.getEntityStoreRegistry().registerSystem(new CoinCollectionSystem());

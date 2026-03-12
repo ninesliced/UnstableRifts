@@ -1,0 +1,19 @@
+{
+  "primary": {
+    "id": "Shotcave_Wand_Summon",
+    "cooldown": 1.5,
+    "requireAmmo": true,
+    "shotId": "Shotcave_Wand_Summon_Shot",
+    "reloadId": "Shotcave_Wand_Reload"
+  },
+  "reload": {
+    "id": "Shotcave_Wand_Reload",
+    "cooldown": 3.0,
+    "runTime": 2.5,
+    "amount": 0,
+    "nextId": "Shotcave_Update_Hud",
+    "worldSfx": "SFX_Staff_Ice_Shoot",
+    "localSfx": "SFX_Staff_Ice_Shoot",
+    "animationId": "Reload"
+  }
+}

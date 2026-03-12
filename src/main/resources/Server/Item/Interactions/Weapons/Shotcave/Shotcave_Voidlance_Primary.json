@@ -1,7 +1,0 @@
-{
-  "Type": "GunValidate",
-  "MaxAmmo": 10,
-  "RequireAmmo": true,
-  "Next": "Shotcave_Voidlance_Shot",
-  "Failed": "Shotcave_Voidlance_Reload_Check"
-}

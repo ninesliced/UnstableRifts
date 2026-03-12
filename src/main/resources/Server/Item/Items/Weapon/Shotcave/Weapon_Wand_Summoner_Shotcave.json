@@ -6,8 +6,8 @@
     "Items.Weapons"
   ],
   "Icon": "Icons/ItemsGenerated/Weapon_Wand_Wood.png",
-  "Model": "Items/Weapons/Wand/Wood.blockymodel",
-  "Texture": "Items/Weapons/Wand/Wood_Texture.png",
+  "Model": "Items/Weapons/Shotcave/Kweebec_crystal_launcher/kweebec_crystal_launcher.blockymodel",
+  "Texture": "Items/Weapons/Shotcave/Kweebec_crystal_launcher/kweebec_crystal_launcher.png",
   "PlayerAnimationsId": "Wand",
   "Interactions": {
     "Primary": "Root_Shotcave_Wand_Summon",

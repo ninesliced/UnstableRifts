@@ -3,7 +3,6 @@ package dev.ninesliced.shotcave.interactions;
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
-import com.hypixel.hytale.codec.validation.Validators;
 import com.hypixel.hytale.protocol.InteractionState;
 import com.hypixel.hytale.protocol.InteractionType;
 import com.hypixel.hytale.server.core.entity.InteractionContext;
@@ -26,13 +25,6 @@ public final class GunValidationInteraction extends SimpleInstantInteraction {
         );
 
         builder.appendInherited(
-                new KeyedCodec<Integer>("MaxAmmo", Codec.INTEGER),
-                (o, v) -> o.maxAmmo = v,
-                o -> o.maxAmmo,
-                (o, p) -> o.maxAmmo = p.maxAmmo
-        ).addValidator(Validators.greaterThan(0)).add();
-
-        builder.appendInherited(
                 new KeyedCodec<Boolean>("RequireAmmo", Codec.BOOLEAN),
                 (o, v) -> o.requireAmmo = v,
                 o -> o.requireAmmo,
@@ -42,8 +34,18 @@ public final class GunValidationInteraction extends SimpleInstantInteraction {
         CODEC = builder.build();
     }
 
-    private int maxAmmo = 30;
     private boolean requireAmmo = true;
+
+    public GunValidationInteraction() {}
+
+
+    public GunValidationInteraction(@Nonnull String id, boolean requireAmmo,
+                                     @Nonnull String nextId, @Nonnull String failedId) {
+        super(id);
+        this.requireAmmo = requireAmmo;
+        this.next = nextId;
+        this.failed = failedId;
+    }
 
     @Override
     protected void firstRun(@Nonnull InteractionType type, @Nonnull InteractionContext context, @Nonnull CooldownHandler cooldownHandler) {
@@ -53,10 +55,11 @@ public final class GunValidationInteraction extends SimpleInstantInteraction {
             return;
         }
 
-        ItemStack updated = GunItemMetadata.ensureAmmo(heldItem, this.maxAmmo);
-        GunItemMetadata.applyHeldItem(context, updated);
+        if (!GunItemMetadata.hasInt(heldItem, GunItemMetadata.AMMO_KEY)) {
+            return;
+        }
 
-        if (this.requireAmmo && GunItemMetadata.getInt(updated, GunItemMetadata.AMMO_KEY, 0) <= 0) {
+        if (this.requireAmmo && GunItemMetadata.getInt(heldItem, GunItemMetadata.AMMO_KEY, 0) <= 0) {
             context.getState().state = InteractionState.Failed;
         }
     }
