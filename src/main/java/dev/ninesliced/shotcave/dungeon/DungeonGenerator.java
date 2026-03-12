@@ -26,11 +26,13 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import com.hypixel.hytale.logger.HytaleLogger;
+import dev.ninesliced.shotcave.ShotcaveLog;
 
 public class DungeonGenerator {
 
-    private static final Logger LOGGER = Logger.getLogger(DungeonGenerator.class.getName());
+    private static final HytaleLogger LOGGER = ShotcaveLog.forModule("Dungeon");
     private static final Gson GSON = new Gson();
     private static final int MAX_RETRIES = 5;
 
@@ -40,14 +42,21 @@ public class DungeonGenerator {
     private World activeWorld;
     private Random activeRandom;
 
-    private record SpawnerLocal(int x, int y, int z, int rot) {}
-    private record BlockLocal(int x, int y, int z, String name, boolean isSpawner) {}
-    private record PrefabData(List<BlockLocal> blocks, List<SpawnerLocal> spawners) {}
-    private record OpenExit(int worldX, int worldY, int worldZ, int rotation) {}
+    private record SpawnerLocal(int x, int y, int z, int rot) {
+    }
+
+    private record BlockLocal(int x, int y, int z, String name, boolean isSpawner) {
+    }
+
+    private record PrefabData(List<BlockLocal> blocks, List<SpawnerLocal> spawners) {
+    }
+
+    private record OpenExit(int worldX, int worldY, int worldZ, int rotation) {
+    }
 
     private static int rotX(int x, int z, int rot) {
         return switch (rot & 3) {
-            case 1 ->  z;
+            case 1 -> z;
             case 2 -> -x;
             case 3 -> -z;
             default -> x;
@@ -58,22 +67,22 @@ public class DungeonGenerator {
         return switch (rot & 3) {
             case 1 -> -x;
             case 2 -> -z;
-            case 3 ->  x;
+            case 3 -> x;
             default -> z;
         };
     }
 
     private static Rotation toEngineRotation(int rot) {
         return switch (rot & 3) {
-            case 1  -> Rotation.Ninety;
-            case 2  -> Rotation.OneEighty;
-            case 3  -> Rotation.TwoSeventy;
+            case 1 -> Rotation.Ninety;
+            case 2 -> Rotation.OneEighty;
+            case 3 -> Rotation.TwoSeventy;
             default -> Rotation.None;
         };
     }
 
     public void generate(@Nonnull World world, long seed,
-                         @Nonnull DungeonConfig.LevelConfig levelConfig) {
+            @Nonnull DungeonConfig.LevelConfig levelConfig) {
         Random random = new Random(seed);
         Store<EntityStore> store = world.getEntityStore().getStore();
         occupiedBlocks.clear();
@@ -81,25 +90,23 @@ public class DungeonGenerator {
         this.activeWorld = world;
         this.activeRandom = random;
 
-        LOGGER.info("Generating dungeon '" + levelConfig.getName()
-                + "' seed=" + seed + " targetRooms=" + levelConfig.getRooms());
+        LOGGER.at(Level.INFO).log("Generating dungeon '%s' seed=%d targetRooms=%d",
+                levelConfig.getName(), seed, levelConfig.getRooms());
 
         List<Path> entrancePaths = DungeonConfig.resolveGlobs(levelConfig.getPrefabs().getEntrance());
         List<Path> roomPaths = DungeonConfig.resolveGlobs(levelConfig.getPrefabs().getRoom());
         this.wallPaths = DungeonConfig.resolveGlobs(levelConfig.getPrefabs().getWall());
         List<Path> bossPaths = DungeonConfig.resolveGlobs(levelConfig.getPrefabs().getBoss());
 
-        LOGGER.info("Resolved: entrances=" + entrancePaths.size()
-                + " rooms=" + roomPaths.size()
-                + " walls=" + wallPaths.size()
-                + " bosses=" + bossPaths.size());
+        LOGGER.at(Level.INFO).log("Resolved: entrances=%d rooms=%d walls=%d bosses=%d",
+                entrancePaths.size(), roomPaths.size(), wallPaths.size(), bossPaths.size());
 
         if (entrancePaths.isEmpty()) {
-            LOGGER.severe("No entrance prefabs!");
+            LOGGER.at(Level.SEVERE).log("No entrance prefabs!");
             return;
         }
         if (roomPaths.isEmpty()) {
-            LOGGER.severe("No room prefabs!");
+            LOGGER.at(Level.SEVERE).log("No room prefabs!");
             return;
         }
 
@@ -109,7 +116,7 @@ public class DungeonGenerator {
         Path entrancePath = DungeonConfig.pickRandom(random, entrancePaths);
         PrefabData entranceData = readPrefabData(entrancePath);
         if (entranceData == null) {
-            LOGGER.severe("Failed to parse entrance!");
+            LOGGER.at(Level.SEVERE).log("Failed to parse entrance!");
             return;
         }
 
@@ -117,7 +124,7 @@ public class DungeonGenerator {
         pasteAndRegister(world, store, random, entrancePath, entranceData, entrancePaste, 0);
         collectExits(entranceData, entrancePaste, 0, openExits);
 
-        LOGGER.info("Entrance placed at " + entrancePaste + ", " + openExits.size() + " exit(s)");
+        LOGGER.at(Level.INFO).log("Entrance placed at %s, %d exit(s)", entrancePaste, openExits.size());
 
         while (roomsPlaced < levelConfig.getRooms() && !openExits.isEmpty()) {
             int idx = random.nextInt(openExits.size());
@@ -155,13 +162,13 @@ public class DungeonGenerator {
         }
         openExits.clear();
 
-        LOGGER.info("Dungeon complete: " + roomsPlaced + " rooms, boss=" + bossPlaced);
+        LOGGER.at(Level.INFO).log("Dungeon complete: %d rooms, boss=%s", roomsPlaced, bossPlaced);
     }
 
     private boolean tryPlaceRoom(@Nonnull World world, @Nonnull Store<EntityStore> store,
-                                  @Nonnull Random random, @Nonnull List<Path> roomPaths,
-                                  @Nonnull OpenExit exit, @Nonnull List<OpenExit> openExits,
-                                  @Nonnull String label) {
+            @Nonnull Random random, @Nonnull List<Path> roomPaths,
+            @Nonnull OpenExit exit, @Nonnull List<OpenExit> openExits,
+            @Nonnull String label) {
         List<Path> shuffled = new ArrayList<>(roomPaths);
         Collections.shuffle(shuffled, random);
 
@@ -175,35 +182,33 @@ public class DungeonGenerator {
                 continue;
             }
             if (wouldOverlap(data, pastePos, exit.rotation)) {
-                LOGGER.fine("[" + label + "] overlap retry " + (i + 1) + "/" + attempts
-                        + " " + chosen.getFileName()
-                        + " paste=" + pastePos + " rot=" + exit.rotation);
+                LOGGER.at(Level.FINE).log("[%s] overlap retry %d/%d %s paste=%s rot=%d",
+                        label, i + 1, attempts, chosen.getFileName(), pastePos, exit.rotation);
                 continue;
             }
 
             try {
                 pasteAndRegister(world, store, random, chosen, data, pastePos, exit.rotation);
             } catch (Exception e) {
-                LOGGER.log(Level.WARNING, "[" + label + "] paste failed " + chosen.getFileName(), e);
+                LOGGER.at(Level.WARNING).withCause(e).log("[%s] paste failed %s", label, chosen.getFileName());
                 continue;
             }
 
             int newExitCount = collectExits(data, pastePos, exit.rotation, openExits);
-            LOGGER.info("[" + label + "] " + chosen.getFileName()
-                    + " paste=" + pastePos + " rot=" + exit.rotation
-                    + " -> " + newExitCount + " new exit(s)");
+            LOGGER.at(Level.INFO).log("[%s] %s paste=%s rot=%d -> %d new exit(s)",
+                    label, chosen.getFileName(), pastePos, exit.rotation, newExitCount);
             return true;
         }
 
-        LOGGER.info("[" + label + "] " + attempts + " retries failed, sealing exit");
+        LOGGER.at(Level.INFO).log("[%s] %d retries failed, sealing exit", label, attempts);
         sealExit(exit);
         return false;
     }
 
     private void forcePlaceRoom(@Nonnull World world, @Nonnull Store<EntityStore> store,
-                                 @Nonnull Random random, @Nonnull List<Path> roomPaths,
-                                 @Nonnull OpenExit exit, @Nonnull List<OpenExit> openExits,
-                                 @Nonnull String label) {
+            @Nonnull Random random, @Nonnull List<Path> roomPaths,
+            @Nonnull OpenExit exit, @Nonnull List<OpenExit> openExits,
+            @Nonnull String label) {
         Path chosen = DungeonConfig.pickRandom(random, roomPaths);
         if (chosen == null) {
             return;
@@ -217,9 +222,9 @@ public class DungeonGenerator {
         try {
             pasteAndRegister(world, store, random, chosen, data, pastePos, exit.rotation);
             collectExits(data, pastePos, exit.rotation, openExits);
-            LOGGER.info("[" + label + "] " + chosen.getFileName() + " force-placed at " + pastePos);
+            LOGGER.at(Level.INFO).log("[%s] %s force-placed at %s", label, chosen.getFileName(), pastePos);
         } catch (Exception e) {
-            LOGGER.log(Level.WARNING, "[" + label + "] force-paste failed", e);
+            LOGGER.at(Level.WARNING).withCause(e).log("[%s] force-paste failed", label);
         }
     }
 
@@ -244,12 +249,11 @@ public class DungeonGenerator {
                         } catch (Exception ignored) {
                         }
                     }
-                    LOGGER.info("[Wall] sealed exit (" + px + "," + py
-                            + "," + pz + ") rot=" + exit.rotation
-                            + " " + placed + "/" + wallData.blocks.size() + " blocks");
+                    LOGGER.at(Level.INFO).log("[Wall] sealed exit (%d,%d,%d) rot=%d %d/%d blocks",
+                            px, py, pz, exit.rotation, placed, wallData.blocks.size());
                     return;
                 }
-                LOGGER.warning("[Wall] failed to read wall prefab: " + wallPath);
+                LOGGER.at(Level.WARNING).log("[Wall] failed to read wall prefab: %s", wallPath);
             }
         }
         try {
@@ -259,7 +263,7 @@ public class DungeonGenerator {
     }
 
     private int collectExits(@Nonnull PrefabData data, @Nonnull Vector3i pastePos,
-                              int parentRot, @Nonnull List<OpenExit> openExits) {
+            int parentRot, @Nonnull List<OpenExit> openExits) {
         int count = 0;
         for (SpawnerLocal sp : data.spawners) {
             int wx = pastePos.x + rotX(sp.x, sp.z, parentRot);
@@ -300,15 +304,15 @@ public class DungeonGenerator {
             }
             return new PrefabData(blocks, spawners);
         } catch (IOException e) {
-            LOGGER.log(Level.WARNING, "Failed to read prefab: " + path, e);
+            LOGGER.at(Level.WARNING).withCause(e).log("Failed to read prefab: %s", path);
             return null;
         }
     }
 
     private void pasteAndRegister(@Nonnull World world, @Nonnull Store<EntityStore> store,
-                                   @Nonnull Random random, @Nonnull Path prefabPath,
-                                   @Nonnull PrefabData data, @Nonnull Vector3i pastePos,
-                                   int rot) {
+            @Nonnull Random random, @Nonnull Path prefabPath,
+            @Nonnull PrefabData data, @Nonnull Vector3i pastePos,
+            int rot) {
         IPrefabBuffer buffer = DungeonConfig.loadBuffer(prefabPath);
         if (buffer == null) {
             throw new RuntimeException("Failed to load buffer: " + prefabPath);
