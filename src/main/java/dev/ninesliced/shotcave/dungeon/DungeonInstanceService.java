@@ -10,18 +10,20 @@ import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import dev.ninesliced.shotcave.Shotcave;
 
+import com.hypixel.hytale.logger.HytaleLogger;
+import dev.ninesliced.shotcave.ShotcaveLog;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public final class DungeonInstanceService {
 
     public static final String DEFAULT_LEVEL_SELECTOR = "shotcave";
 
-    private static final Logger LOGGER = Logger.getLogger(DungeonInstanceService.class.getName());
+    private static final HytaleLogger LOGGER = ShotcaveLog.forModule("Dungeon");
     private static final String INSTANCE_TEMPLATE = "Shotcave";
 
     private final Shotcave plugin;
@@ -57,11 +59,12 @@ public final class DungeonInstanceService {
 
     @Nonnull
     public CompletableFuture<World> spawnGeneratedInstance(@Nonnull World currentWorld,
-                                                           @Nonnull Transform returnPoint,
-                                                           @Nonnull DungeonConfig.LevelConfig levelConfig,
-                                                           @Nullable Consumer<String> statusConsumer) {
+            @Nonnull Transform returnPoint,
+            @Nonnull DungeonConfig.LevelConfig levelConfig,
+            @Nullable Consumer<String> statusConsumer) {
         InstancesPlugin instancesPlugin = InstancesPlugin.get();
-        CompletableFuture<World> worldFuture = instancesPlugin.spawnInstance(INSTANCE_TEMPLATE, currentWorld, returnPoint);
+        CompletableFuture<World> worldFuture = instancesPlugin.spawnInstance(INSTANCE_TEMPLATE, currentWorld,
+                returnPoint);
 
         return worldFuture.thenCompose(world -> {
             CompletableFuture<World> generationFuture = new CompletableFuture<>();
@@ -71,13 +74,13 @@ public final class DungeonInstanceService {
                     DungeonGenerator generator = new DungeonGenerator();
                     generator.generate(world, seed, levelConfig);
                     this.lastGenerator = generator;
-                    LOGGER.info("Dungeon instance created: " + world.getName() + " for selector " + levelConfig.getSelector());
+                    LOGGER.at(Level.INFO).log("Dungeon instance created: " + world.getName() + " for selector " + levelConfig.getSelector());
                     if (statusConsumer != null) {
                         statusConsumer.accept("Dungeon ready: " + levelConfig.getName());
                     }
                     generationFuture.complete(world);
                 } catch (Exception e) {
-                    LOGGER.log(Level.WARNING, "Dungeon generation failed", e);
+                    LOGGER.at(Level.WARNING).withCause(e).log("Dungeon generation failed");
                     if (statusConsumer != null) {
                         statusConsumer.accept("Dungeon generation had errors.");
                     }
@@ -97,14 +100,14 @@ public final class DungeonInstanceService {
     }
 
     public void sendPlayerToReadyInstance(@Nonnull Ref<EntityStore> ref,
-                                          @Nonnull Store<EntityStore> store,
-                                          @Nonnull CompletableFuture<World> readyFuture,
-                                          @Nullable Transform returnPoint,
-                                          @Nullable Consumer<String> failureConsumer) {
+            @Nonnull Store<EntityStore> store,
+            @Nonnull CompletableFuture<World> readyFuture,
+            @Nullable Transform returnPoint,
+            @Nullable Consumer<String> failureConsumer) {
         World currentWorld = store.getExternalData().getWorld();
         readyFuture.whenComplete((targetWorld, throwable) -> {
             if (throwable != null) {
-                LOGGER.log(Level.WARNING, "Failed to prepare dungeon instance", throwable);
+                LOGGER.at(Level.WARNING).withCause(throwable).log("Failed to prepare dungeon instance");
                 if (failureConsumer != null) {
                     failureConsumer.accept("Dungeon creation failed.");
                 }
@@ -124,7 +127,8 @@ public final class DungeonInstanceService {
                 try {
                     InstancesPlugin.teleportPlayerToInstance(ref, store, targetWorld, returnPoint);
                 } catch (Exception exception) {
-                    LOGGER.log(Level.WARNING, "Failed to send player to ready dungeon instance", exception);
+                    LOGGER.at(Level.WARNING).withCause(exception)
+                            .log("Failed to send player to ready dungeon instance");
                     if (failureConsumer != null) {
                         failureConsumer.accept("Teleport to dungeon failed.");
                     }

@@ -36,7 +36,6 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.core.util.TargetUtil;
 import dev.ninesliced.shotcave.guns.AimAssistHelper;
 import dev.ninesliced.shotcave.guns.GunItemMetadata;
-import it.unimi.dsi.fastutil.objects.ObjectList;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -53,114 +52,98 @@ public final class ChainLightningInteraction extends SimpleInstantInteraction {
         BuilderCodec.Builder<ChainLightningInteraction> builder = BuilderCodec.builder(
                 ChainLightningInteraction.class,
                 ChainLightningInteraction::new,
-                SimpleInstantInteraction.CODEC
-        );
+                SimpleInstantInteraction.CODEC);
 
         builder.documentation("Chains projectile damage across nearby living entities.");
         builder.appendInherited(
                 new KeyedCodec<String>("DamageRoot", Codec.STRING),
                 (o, v) -> o.damageRoot = v,
                 o -> o.damageRoot,
-                (o, p) -> o.damageRoot = p.damageRoot
-        ).addValidator(Validators.nonNull()).add();
+                (o, p) -> o.damageRoot = p.damageRoot).addValidator(Validators.nonNull()).add();
 
         builder.appendInherited(
                 new KeyedCodec<Double>("JumpRange", Codec.DOUBLE),
                 (o, v) -> o.jumpRange = v,
                 o -> o.jumpRange,
-                (o, p) -> o.jumpRange = p.jumpRange
-        ).addValidator(Validators.greaterThan(0.0)).add();
+                (o, p) -> o.jumpRange = p.jumpRange).addValidator(Validators.greaterThan(0.0)).add();
 
         builder.appendInherited(
                 new KeyedCodec<Integer>("MaxTargets", Codec.INTEGER),
                 (o, v) -> o.maxTargets = v,
                 o -> o.maxTargets,
-                (o, p) -> o.maxTargets = p.maxTargets
-        ).addValidator(Validators.greaterThan(0)).add();
+                (o, p) -> o.maxTargets = p.maxTargets).addValidator(Validators.greaterThan(0)).add();
 
         builder.appendInherited(
                 new KeyedCodec<Boolean>("IncludeInitialTarget", Codec.BOOLEAN),
                 (o, v) -> o.includeInitialTarget = v,
                 o -> o.includeInitialTarget,
-                (o, p) -> o.includeInitialTarget = p.includeInitialTarget
-        ).add();
+                (o, p) -> o.includeInitialTarget = p.includeInitialTarget).add();
 
         builder.appendInherited(
                 new KeyedCodec<String>("BeamParticleId", Codec.STRING),
                 (o, v) -> o.beamParticleId = v,
                 o -> o.beamParticleId,
-                (o, p) -> o.beamParticleId = p.beamParticleId
-        ).addValidator(Validators.nonNull()).add();
+                (o, p) -> o.beamParticleId = p.beamParticleId).addValidator(Validators.nonNull()).add();
 
         builder.appendInherited(
                 new KeyedCodec<Double>("BeamStepDistance", Codec.DOUBLE),
                 (o, v) -> o.beamStepDistance = v,
                 o -> o.beamStepDistance,
-                (o, p) -> o.beamStepDistance = p.beamStepDistance
-        ).addValidator(Validators.greaterThan(0.05)).add();
+                (o, p) -> o.beamStepDistance = p.beamStepDistance).addValidator(Validators.greaterThan(0.05)).add();
 
         builder.appendInherited(
                 new KeyedCodec<Double>("BeamHeightOffset", Codec.DOUBLE),
                 (o, v) -> o.beamHeightOffset = v,
                 o -> o.beamHeightOffset,
-                (o, p) -> o.beamHeightOffset = p.beamHeightOffset
-        ).add();
+                (o, p) -> o.beamHeightOffset = p.beamHeightOffset).add();
 
         builder.appendInherited(
                 new KeyedCodec<Double>("BeamForwardOffset", Codec.DOUBLE),
                 (o, v) -> o.beamForwardOffset = v,
                 o -> o.beamForwardOffset,
-                (o, p) -> o.beamForwardOffset = p.beamForwardOffset
-        ).add();
+                (o, p) -> o.beamForwardOffset = p.beamForwardOffset).add();
 
         builder.appendInherited(
                 new KeyedCodec<Double>("BeamRightOffset", Codec.DOUBLE),
                 (o, v) -> o.beamRightOffset = v,
                 o -> o.beamRightOffset,
-                (o, p) -> o.beamRightOffset = p.beamRightOffset
-        ).add();
+                (o, p) -> o.beamRightOffset = p.beamRightOffset).add();
 
         builder.appendInherited(
                 new KeyedCodec<Double>("BeamParticleScale", Codec.DOUBLE),
                 (o, v) -> o.beamParticleScale = v,
                 o -> o.beamParticleScale,
-                (o, p) -> o.beamParticleScale = p.beamParticleScale
-        ).addValidator(Validators.greaterThan(0.05)).add();
+                (o, p) -> o.beamParticleScale = p.beamParticleScale).addValidator(Validators.greaterThan(0.05)).add();
 
         builder.appendInherited(
                 new KeyedCodec<Integer>("MaxDistance", Codec.INTEGER),
                 (o, v) -> o.maxDistance = v,
                 o -> o.maxDistance,
-                (o, p) -> o.maxDistance = p.maxDistance
-        ).addValidator(Validators.greaterThan(1)).add();
+                (o, p) -> o.maxDistance = p.maxDistance).addValidator(Validators.greaterThan(1)).add();
 
         builder.appendInherited(
                 new KeyedCodec<Boolean>("AimAssist", Codec.BOOLEAN),
                 (o, v) -> o.aimAssist = v,
                 o -> o.aimAssist,
-                (o, p) -> o.aimAssist = p.aimAssist
-        ).add();
+                (o, p) -> o.aimAssist = p.aimAssist).add();
 
         builder.appendInherited(
                 new KeyedCodec<Boolean>("UseAmmo", Codec.BOOLEAN),
                 (o, v) -> o.useAmmo = v,
                 o -> o.useAmmo,
-                (o, p) -> o.useAmmo = p.useAmmo
-        ).add();
+                (o, p) -> o.useAmmo = p.useAmmo).add();
 
         builder.appendInherited(
                 new KeyedCodec<Integer>("MaxAmmo", Codec.INTEGER),
                 (o, v) -> o.maxAmmo = v,
                 o -> o.maxAmmo,
-                (o, p) -> o.maxAmmo = p.maxAmmo
-        ).addValidator(Validators.greaterThan(0)).add();
+                (o, p) -> o.maxAmmo = p.maxAmmo).addValidator(Validators.greaterThan(0)).add();
 
         builder.appendInherited(
                 new KeyedCodec<Integer>("AmmoPerShot", Codec.INTEGER),
                 (o, v) -> o.ammoPerShot = v,
                 o -> o.ammoPerShot,
-                (o, p) -> o.ammoPerShot = p.ammoPerShot
-        ).addValidator(Validators.greaterThan(0)).add();
+                (o, p) -> o.ammoPerShot = p.ammoPerShot).addValidator(Validators.greaterThan(0)).add();
 
         CODEC = builder.build();
     }
@@ -183,7 +166,8 @@ public final class ChainLightningInteraction extends SimpleInstantInteraction {
     private int ammoPerShot = 1;
 
     @Override
-    protected void firstRun(@Nonnull InteractionType type, @Nonnull InteractionContext context, @Nonnull CooldownHandler cooldownHandler) {
+    protected void firstRun(@Nonnull InteractionType type, @Nonnull InteractionContext context,
+            @Nonnull CooldownHandler cooldownHandler) {
         CommandBuffer<EntityStore> commandBuffer = context.getCommandBuffer();
         if (commandBuffer == null) {
             return;
@@ -214,8 +198,7 @@ public final class ChainLightningInteraction extends SimpleInstantInteraction {
         Vector3d lookDir = getLookDirection(commandBuffer, context.getEntity());
         if (this.aimAssist) {
             Vector3d assisted = AimAssistHelper.computeAssistedDirection(
-                    commandBuffer, context, from, lookDir, (double) this.maxDistance
-            );
+                    commandBuffer, context, from, lookDir, (double) this.maxDistance);
             if (assisted != null) {
                 lookDir = assisted;
             }
@@ -247,8 +230,8 @@ public final class ChainLightningInteraction extends SimpleInstantInteraction {
     }
 
     private List<Ref<EntityStore>> buildChain(@Nonnull CommandBuffer<EntityStore> commandBuffer,
-                                              @Nonnull InteractionContext context,
-                                              @Nonnull Ref<EntityStore> initialTarget) {
+            @Nonnull InteractionContext context,
+            @Nonnull Ref<EntityStore> initialTarget) {
         List<Ref<EntityStore>> out = new ArrayList<>();
         Set<Integer> visited = new HashSet<>();
 
@@ -278,11 +261,11 @@ public final class ChainLightningInteraction extends SimpleInstantInteraction {
     }
 
     private Ref<EntityStore> findNearestValidTarget(@Nonnull CommandBuffer<EntityStore> commandBuffer,
-                                                    @Nonnull InteractionContext context,
-                                                    @Nonnull Vector3d from,
-                                                    @Nonnull Set<Integer> visited) {
-        Ref<EntityStore>[] best = new Ref[]{null};
-        double[] bestDistanceSq = new double[]{Double.MAX_VALUE};
+            @Nonnull InteractionContext context,
+            @Nonnull Vector3d from,
+            @Nonnull Set<Integer> visited) {
+        Ref<EntityStore>[] best = new Ref[] { null };
+        double[] bestDistanceSq = new double[] { Double.MAX_VALUE };
 
         Selector.selectNearbyEntities(commandBuffer, from, this.jumpRange, candidate -> {
             if (!candidate.isValid() || visited.contains(candidate.getIndex())) {
@@ -312,13 +295,14 @@ public final class ChainLightningInteraction extends SimpleInstantInteraction {
     }
 
     private void forkDamageInteraction(@Nonnull InteractionContext context,
-                                       @Nonnull RootInteraction root,
-                                       @Nonnull Ref<EntityStore> target,
-                                       @Nonnull Vector3d hitPosition) {
+            @Nonnull RootInteraction root,
+            @Nonnull Ref<EntityStore> target,
+            @Nonnull Vector3d hitPosition) {
         InteractionContext forkContext = context.duplicate();
         DynamicMetaStore<InteractionContext> metaStore = forkContext.getMetaStore();
         metaStore.putMetaObject(Interaction.TARGET_ENTITY, target);
-        metaStore.putMetaObject(Interaction.HIT_LOCATION, new Vector4d(hitPosition.x, hitPosition.y, hitPosition.z, 1.0));
+        metaStore.putMetaObject(Interaction.HIT_LOCATION,
+                new Vector4d(hitPosition.x, hitPosition.y, hitPosition.z, 1.0));
         metaStore.removeMetaObject(Interaction.TARGET_BLOCK);
         metaStore.removeMetaObject(Interaction.TARGET_BLOCK_RAW);
 
@@ -335,7 +319,8 @@ public final class ChainLightningInteraction extends SimpleInstantInteraction {
     }
 
     @Nullable
-    private Vector3d getEmitterPosition(@Nonnull CommandBuffer<EntityStore> commandBuffer, @Nonnull Ref<EntityStore> ref) {
+    private Vector3d getEmitterPosition(@Nonnull CommandBuffer<EntityStore> commandBuffer,
+            @Nonnull Ref<EntityStore> ref) {
         Vector3d position = getPosition(commandBuffer, ref);
         if (position == null) {
             return null;
@@ -362,14 +347,14 @@ public final class ChainLightningInteraction extends SimpleInstantInteraction {
 
     @Nonnull
     private RaycastHit traceFirstHit(@Nonnull CommandBuffer<EntityStore> commandBuffer,
-                                     @Nonnull InteractionContext context,
-                                     @Nonnull Vector3d from,
-                                     @Nonnull Vector3d direction) {
+            @Nonnull InteractionContext context,
+            @Nonnull Vector3d from,
+            @Nonnull Vector3d direction) {
         Vector3d missPosition = from.clone().addScaled(direction, (double) this.maxDistance);
 
-        final Vector3d[] entityHitPos = new Vector3d[]{null};
-        final Ref<EntityStore>[] entityHitRef = new Ref[]{null};
-        final double[] entityHitDistanceSq = new double[]{Double.MAX_VALUE};
+        final Vector3d[] entityHitPos = new Vector3d[] { null };
+        final Ref<EntityStore>[] entityHitRef = new Ref[] { null };
+        final double[] entityHitDistanceSq = new double[] { Double.MAX_VALUE };
 
         Vector2d minMax = new Vector2d();
         Vector3d searchCenter = from.clone().addScaled(direction, (double) this.maxDistance * 0.5);
@@ -393,7 +378,8 @@ public final class ChainLightningInteraction extends SimpleInstantInteraction {
             }
 
             Vector3d ePos = transform.getPosition();
-            if (!CollisionMath.intersectRayAABB(from, direction, ePos.getX(), ePos.getY(), ePos.getZ(), boundingBox.getBoundingBox(), minMax)) {
+            if (!CollisionMath.intersectRayAABB(from, direction, ePos.getX(), ePos.getY(), ePos.getZ(),
+                    boundingBox.getBoundingBox(), minMax)) {
                 return;
             }
 
@@ -435,7 +421,8 @@ public final class ChainLightningInteraction extends SimpleInstantInteraction {
     }
 
     @Nonnull
-    private Vector3d getLookDirection(@Nonnull CommandBuffer<EntityStore> commandBuffer, @Nonnull Ref<EntityStore> ref) {
+    private Vector3d getLookDirection(@Nonnull CommandBuffer<EntityStore> commandBuffer,
+            @Nonnull Ref<EntityStore> ref) {
         HeadRotation headRotation = commandBuffer.getComponent(ref, HeadRotation.getComponentType());
         if (headRotation == null) {
             return new Vector3d(0.0, 0.0, 1.0);
@@ -449,8 +436,8 @@ public final class ChainLightningInteraction extends SimpleInstantInteraction {
     }
 
     private void renderBeamChain(@Nonnull CommandBuffer<EntityStore> commandBuffer,
-                                 @Nonnull List<Ref<EntityStore>> chainTargets,
-                                 @Nonnull Vector3d chainStart) {
+            @Nonnull List<Ref<EntityStore>> chainTargets,
+            @Nonnull Vector3d chainStart) {
         if (chainTargets.isEmpty()) {
             return;
         }
@@ -470,8 +457,8 @@ public final class ChainLightningInteraction extends SimpleInstantInteraction {
     }
 
     private void spawnBeamSegment(@Nonnull Vector3d from,
-                                  @Nonnull Vector3d to,
-                                  @Nonnull CommandBuffer<EntityStore> commandBuffer) {
+            @Nonnull Vector3d to,
+            @Nonnull CommandBuffer<EntityStore> commandBuffer) {
         Vector3d delta = to.clone().subtract(from);
         double distance = from.distanceTo(to);
         if (distance <= 0.001) {
@@ -492,13 +479,14 @@ public final class ChainLightningInteraction extends SimpleInstantInteraction {
     }
 
     private void spawnLineParticle(@Nonnull Vector3d point,
-                                   float yaw,
-                                   float pitch,
-                                   float roll,
-                                   @Nonnull CommandBuffer<EntityStore> commandBuffer) {
-        SpatialResource<Ref<EntityStore>, EntityStore> playerSpatialResource =
-                commandBuffer.getResource(EntityModule.get().getPlayerSpatialResourceType());
-        ObjectList<Ref<EntityStore>> playerRefs = SpatialResource.getThreadLocalReferenceList();
+            float yaw,
+            float pitch,
+            float roll,
+            @Nonnull CommandBuffer<EntityStore> commandBuffer) {
+
+        SpatialResource<Ref<EntityStore>, EntityStore> playerSpatialResource = commandBuffer
+                .getResource(EntityModule.get().getPlayerSpatialResourceType());
+        List<Ref<EntityStore>> playerRefs = SpatialResource.getThreadLocalReferenceList();
         playerSpatialResource.getSpatialStructure().collect(point, ParticleUtil.DEFAULT_PARTICLE_DISTANCE, playerRefs);
 
         ParticleUtil.spawnParticleEffect(
@@ -513,8 +501,7 @@ public final class ChainLightningInteraction extends SimpleInstantInteraction {
                 this.beamColor,
                 null,
                 playerRefs,
-                commandBuffer
-        );
+                commandBuffer);
     }
 
     private static final class RaycastHit {

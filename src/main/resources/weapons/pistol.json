@@ -1,0 +1,31 @@
+{
+  "primary": {
+    "id": "Shotcave_Pistol_Primary",
+    "cooldown": 0.2,
+    "requireAmmo": true,
+    "shotId": "Shotcave_Pistol_Shot",
+    "reloadId": "Shotcave_Pistol_Reload"
+  },
+  "reload": {
+    "id": "Shotcave_Pistol_Reload",
+    "cooldown": 0.7,
+    "runTime": 0.65,
+    "amount": 0,
+    "nextId": "Shotcave_Update_Hud",
+    "worldSfx": "SFX_Blunderbuss_Fire",
+    "localSfx": "SFX_Blunderbuss_Fire_Local",
+    "maxAmmo": 12
+  },
+  "damage": {
+    "id": "Shotcave_Pistol_Projectile_Hit",
+    "amount": 14,
+    "type": "Projectile",
+    "worldSfx": "SFX_Blunderbuss_Hit",
+    "localSfx": "SFX_Blunderbuss_Hit",
+    "particleId": "RifleShooting_Impact",
+    "particleYOffset": 0.8
+  },
+  "extraRoots": [
+    "Shotcave_Projectile_Miss"
+  ]
+}

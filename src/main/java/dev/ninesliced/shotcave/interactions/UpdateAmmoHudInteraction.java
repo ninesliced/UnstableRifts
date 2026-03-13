@@ -20,6 +20,12 @@ public final class UpdateAmmoHudInteraction extends SimpleInstantInteraction {
     public static final BuilderCodec<UpdateAmmoHudInteraction> CODEC =
             BuilderCodec.builder(UpdateAmmoHudInteraction.class, UpdateAmmoHudInteraction::new, SimpleInstantInteraction.CODEC).build();
 
+    public UpdateAmmoHudInteraction() {}
+
+    public UpdateAmmoHudInteraction(@Nonnull String id) {
+        super(id);
+    }
+
     @Override
     protected void firstRun(@Nonnull InteractionType type, @Nonnull InteractionContext context, @Nonnull CooldownHandler cooldownHandler) {
         if (context.getCommandBuffer() == null) {

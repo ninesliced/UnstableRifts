@@ -1,0 +1,20 @@
+{
+  "Type": "Serial",
+  "Interactions": [
+    {
+      "Type": "Simple",
+      "Effects": {
+        "WorldSoundEventId": "SFX_Blunderbuss_Miss",
+        "LocalSoundEventId": "SFX_Blunderbuss_Miss",
+        "Particles": [
+          {
+            "SystemId": "RifleShooting_Impact"
+          }
+        ]
+      }
+    },
+    {
+      "Type": "BreakSoftBlock"
+    }
+  ]
+}

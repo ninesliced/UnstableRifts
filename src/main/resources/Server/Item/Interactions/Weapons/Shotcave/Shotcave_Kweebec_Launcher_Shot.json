@@ -1,0 +1,32 @@
+{
+  "Type": "Serial",
+  "Interactions": [
+    {
+      "Type": "Projectile",
+      "RunTime": 0.6,
+      "Config": "Projectile_Config_Summon_Orb",
+      "Effects": {
+        "ItemAnimationId": "Shoot",
+        "WorldSoundEventId": "SFX_Skeleton_Mage_Spellbook_Impact",
+        "LocalSoundEventId": "SFX_Skeleton_Mage_Spellbook_Impact",
+        "Particles": [
+          {
+            "SystemId": "Effect_Poison",
+            "PositionOffset": {
+              "Z": 0.6,
+              "Y": 0.2
+            }
+          }
+        ]
+      }
+    },
+    {
+      "Type": "ConsumeAmmo",
+      "AmmoPerShot": 1,
+      "MaxAmmo": 5
+    },
+    {
+      "Type": "UpdateAmmoHud"
+    }
+  ]
+}

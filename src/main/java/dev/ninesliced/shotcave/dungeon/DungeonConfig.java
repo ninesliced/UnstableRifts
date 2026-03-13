@@ -23,11 +23,13 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Random;
 import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import com.hypixel.hytale.logger.HytaleLogger;
+import dev.ninesliced.shotcave.ShotcaveLog;
 
 public class DungeonConfig {
 
-    private static final Logger LOGGER = Logger.getLogger(DungeonConfig.class.getName());
+    private static final HytaleLogger LOGGER = ShotcaveLog.forModule("Dungeon");
     private static final String FILE_NAME = "dungeon.json";
     private static final Gson GSON = new Gson();
     private static final Gson PRETTY_GSON = new GsonBuilder().setPrettyPrinting().create();
@@ -62,9 +64,10 @@ public class DungeonConfig {
                     Files.writeString(configPath, PRETTY_GSON.toJson(new DungeonConfig()), StandardCharsets.UTF_8);
                 }
             }
-            LOGGER.info("Created default dungeon config at " + configPath.toAbsolutePath());
+            LOGGER.at(Level.INFO).log("Created default dungeon config at %s", configPath.toAbsolutePath());
         } catch (IOException e) {
-            LOGGER.log(Level.WARNING, "Failed to ensure dungeon config at " + configPath.toAbsolutePath(), e);
+            LOGGER.at(Level.WARNING).withCause(e).log("Failed to ensure dungeon config at %s",
+                    configPath.toAbsolutePath());
         }
         return configPath;
     }
@@ -73,14 +76,17 @@ public class DungeonConfig {
     public static DungeonConfig load(@Nonnull Path configPath) {
         try {
             if (!Files.exists(configPath)) {
-                LOGGER.warning("Dungeon config not found at " + configPath.toAbsolutePath() + ", using defaults");
+                LOGGER.at(Level.WARNING).log("Dungeon config not found at %s, using defaults",
+                        configPath.toAbsolutePath());
                 return sanitize(new DungeonConfig());
             }
-            try (InputStreamReader reader = new InputStreamReader(Files.newInputStream(configPath), StandardCharsets.UTF_8)) {
+            try (InputStreamReader reader = new InputStreamReader(Files.newInputStream(configPath),
+                    StandardCharsets.UTF_8)) {
                 return sanitize(GSON.fromJson(reader, DungeonConfig.class));
             }
         } catch (IOException e) {
-            LOGGER.log(Level.WARNING, "Failed to load dungeon config from " + configPath.toAbsolutePath(), e);
+            LOGGER.at(Level.WARNING).withCause(e).log("Failed to load dungeon config from %s",
+                    configPath.toAbsolutePath());
             return sanitize(new DungeonConfig());
         }
     }
@@ -131,7 +137,7 @@ public class DungeonConfig {
         List<Path> result = new ArrayList<>();
         for (String glob : globs) {
             if (glob == null || glob.isBlank()) {
-                LOGGER.warning("Skipping empty prefab glob entry");
+                LOGGER.at(Level.WARNING).log("Skipping empty prefab glob entry");
                 continue;
             }
             result.addAll(resolveGlob(glob));
@@ -143,13 +149,13 @@ public class DungeonConfig {
     public static List<Path> resolveGlob(@Nullable String glob) {
         List<Path> result = new ArrayList<>();
         if (glob == null) {
-            LOGGER.warning("Skipping null prefab glob entry");
+            LOGGER.at(Level.WARNING).log("Skipping null prefab glob entry");
             return result;
         }
 
         String trimmedGlob = glob.trim();
         if (trimmedGlob.isEmpty()) {
-            LOGGER.warning("Skipping blank prefab glob entry");
+            LOGGER.at(Level.WARNING).log("Skipping blank prefab glob entry");
             return result;
         }
 
@@ -159,7 +165,7 @@ public class DungeonConfig {
             if (folder != null && Files.isDirectory(folder)) {
                 collectPrefabFiles(folder, result);
             } else {
-                LOGGER.warning("Could not resolve prefab folder: " + folderPath);
+                LOGGER.at(Level.WARNING).log("Could not resolve prefab folder: %s", folderPath);
             }
         } else {
             String filePath = trimmedGlob.replace('.', '/') + ".prefab.json";
@@ -167,7 +173,7 @@ public class DungeonConfig {
             if (path != null) {
                 result.add(path);
             } else {
-                LOGGER.warning("Could not resolve prefab: " + filePath);
+                LOGGER.at(Level.WARNING).log("Could not resolve prefab: %s", filePath);
             }
         }
 
@@ -195,13 +201,14 @@ public class DungeonConfig {
                 }
             }
         } catch (IOException e) {
-            LOGGER.log(Level.WARNING, "Failed to list prefabs in " + directory, e);
+            LOGGER.at(Level.WARNING).withCause(e).log("Failed to list prefabs in %s", directory);
         }
     }
 
     @Nullable
     public static Path pickRandom(@Nonnull Random random, @Nonnull List<Path> paths) {
-        if (paths.isEmpty()) return null;
+        if (paths.isEmpty())
+            return null;
         return paths.get(random.nextInt(paths.size()));
     }
 
@@ -210,7 +217,7 @@ public class DungeonConfig {
         try {
             return PrefabBufferUtil.getCached(path);
         } catch (Exception e) {
-            LOGGER.log(Level.WARNING, "Failed to load prefab buffer: " + path, e);
+            LOGGER.at(Level.WARNING).withCause(e).log("Failed to load prefab buffer: %s", path);
             return null;
         }
     }

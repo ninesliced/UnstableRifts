@@ -18,7 +18,9 @@ import dev.ninesliced.shotcave.pickup.ItemPickupTracker;
 import javax.annotation.Nonnull;
 import java.awt.Color;
 import java.util.Collection;
-import java.util.logging.Logger;
+import com.hypixel.hytale.logger.HytaleLogger;
+import dev.ninesliced.shotcave.ShotcaveLog;
+import java.util.logging.Level;
 
 /** Debug commands for inspecting and managing the item pickup tracker. */
 public class PickupDebugCommand extends AbstractCommandCollection {
@@ -116,7 +118,7 @@ public class PickupDebugCommand extends AbstractCommandCollection {
 
     static class Prune extends CommandBase {
 
-        private static final Logger LOGGER = Logger.getLogger(Prune.class.getName());
+        private static final HytaleLogger LOGGER = ShotcaveLog.forModule("Command");
 
         Prune() {
             super("prune", "Force-prune stale (invalid ref) entries from the tracker");
@@ -132,8 +134,8 @@ public class PickupDebugCommand extends AbstractCommandCollection {
             if (pruned > 0) {
                 context.sendMessage(Message.raw("Pruned " + pruned + " stale entries. Remaining: " + sizeAfter + ".")
                         .color(Color.GREEN));
-                LOGGER.info("[PickupDebug] " + context.sender().getDisplayName() + " pruned " + pruned
-                        + " stale entries (remaining: " + sizeAfter + ")");
+                LOGGER.at(Level.INFO).log("[PickupDebug] %s pruned %d stale entries (remaining: %d)",
+                        context.sender().getDisplayName(), pruned, sizeAfter);
             } else {
                 context.sendMessage(Message.raw("No stale entries to prune. Total: " + sizeAfter + ".")
                         .color(Color.GRAY));
@@ -143,7 +145,7 @@ public class PickupDebugCommand extends AbstractCommandCollection {
 
     static class Clear extends CommandBase {
 
-        private static final Logger LOGGER = Logger.getLogger(Clear.class.getName());
+        private static final HytaleLogger LOGGER = ShotcaveLog.forModule("Command");
 
         Clear() {
             super("clear", "Clear all tracked entries");
@@ -154,8 +156,8 @@ public class PickupDebugCommand extends AbstractCommandCollection {
             int sizeBefore = ItemPickupTracker.size();
             ItemPickupTracker.clear();
             context.sendMessage(Message.raw("Cleared all " + sizeBefore + " tracked entries.").color(Color.YELLOW));
-            LOGGER.info("[PickupDebug] " + context.sender().getDisplayName() + " cleared all " + sizeBefore
-                    + " tracked entries");
+            LOGGER.at(Level.INFO).log("[PickupDebug] %s cleared all %d tracked entries",
+                    context.sender().getDisplayName(), sizeBefore);
         }
     }
 

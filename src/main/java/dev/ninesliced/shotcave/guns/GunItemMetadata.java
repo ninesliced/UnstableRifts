@@ -20,12 +20,17 @@ public final class GunItemMetadata {
     @Nonnull
     public static ItemStack ensureAmmo(@Nonnull ItemStack stack, int maxAmmo) {
         ItemStack out = stack;
+        int normalizedMaxAmmo = Math.max(1, maxAmmo);
+        int currentMaxAmmo = getInt(out, MAX_AMMO_KEY, normalizedMaxAmmo);
+        int currentAmmo = getInt(out, AMMO_KEY, normalizedMaxAmmo);
 
-        if (!hasInt(out, MAX_AMMO_KEY)) {
-            out = out.withMetadata(MAX_AMMO_KEY, new BsonInt32(Math.max(1, maxAmmo)));
+        if (currentMaxAmmo != normalizedMaxAmmo) {
+            out = out.withMetadata(MAX_AMMO_KEY, new BsonInt32(normalizedMaxAmmo));
+            currentMaxAmmo = normalizedMaxAmmo;
         }
-        if (!hasInt(out, AMMO_KEY)) {
-            out = out.withMetadata(AMMO_KEY, new BsonInt32(getInt(out, MAX_AMMO_KEY, maxAmmo)));
+        if (!hasInt(out, AMMO_KEY) || currentAmmo < 0 || currentAmmo > currentMaxAmmo) {
+            int clampedAmmo = Math.max(0, Math.min(currentAmmo, currentMaxAmmo));
+            out = out.withMetadata(AMMO_KEY, new BsonInt32(clampedAmmo));
         }
 
         return out;

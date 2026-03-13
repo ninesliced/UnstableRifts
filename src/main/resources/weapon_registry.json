@@ -1,0 +1,18 @@
+{
+  "sharedInteractions": [
+    { "type": "UpdateAmmoHud", "id": "Shotcave_Update_Hud" },
+    { "type": "HideAmmoHud", "id": "Shotcave_Hide_Hud" }
+  ],
+  "weapons": [
+    "weapons/pistol.json",
+    "weapons/sniper.json",
+    "weapons/taser.json",
+    "weapons/voidlance.json",
+    "weapons/kweebec_launcher.json",
+    "weapons/blunderbuss_acid.json",
+    "weapons/blunderbuss_fire.json",
+    "weapons/blunderbuss_ice.json",
+    "weapons/blunderbuss_lightning.json",
+    "weapons/blunderbuss_void.json"
+  ]
+}

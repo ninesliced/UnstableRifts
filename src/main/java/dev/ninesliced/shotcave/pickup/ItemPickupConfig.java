@@ -7,7 +7,10 @@ import javax.annotation.Nonnull;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Logger;
+import java.util.logging.Level;
+
+import com.hypixel.hytale.logger.HytaleLogger;
+import dev.ninesliced.shotcave.ShotcaveLog;
 
 /**
  * Pickup behavior config driven by item asset tags: "Pickup": ["FKey"] or
@@ -15,7 +18,7 @@ import java.util.logging.Logger;
  */
 public final class ItemPickupConfig {
 
-    private static final Logger LOGGER = Logger.getLogger(ItemPickupConfig.class.getName());
+    private static final HytaleLogger LOGGER = ShotcaveLog.forModule("Pickup");
 
     private ItemPickupConfig() {
     }
@@ -85,17 +88,18 @@ public final class ItemPickupConfig {
     private static boolean hasItemTag(@Nonnull String itemId, @Nonnull String tagValue) {
         try {
             int tagIndex = AssetRegistry.getTagIndex(tagValue);
-            LOGGER.info("[ItemPickupConfig] hasItemTag('" + itemId + "', '" + tagValue + "') tagIndex=" + tagIndex);
+            LOGGER.at(Level.INFO).log("[ItemPickupConfig] hasItemTag('%s', '%s') tagIndex=%d", itemId, tagValue,
+                    tagIndex);
             if (tagIndex < 0) {
-                LOGGER.info("[ItemPickupConfig]   tagIndex < 0 → false");
+                LOGGER.at(Level.INFO).log("[ItemPickupConfig]   tagIndex < 0 -> false");
                 return false;
             }
             Set<String> keys = Item.getAssetMap().getKeysForTag(tagIndex);
             boolean found = keys != null && keys.contains(itemId);
-            LOGGER.info("[ItemPickupConfig]   keysForTag=" + (keys != null ? keys : "null") + " → " + found);
+            LOGGER.at(Level.INFO).log("[ItemPickupConfig]   keysForTag=%s -> %s", keys != null ? keys : "null", found);
             return found;
         } catch (Exception e) {
-            LOGGER.warning("[ItemPickupConfig] hasItemTag exception: " + e);
+            LOGGER.at(Level.WARNING).withCause(e).log("[ItemPickupConfig] hasItemTag exception");
             return false;
         }
     }

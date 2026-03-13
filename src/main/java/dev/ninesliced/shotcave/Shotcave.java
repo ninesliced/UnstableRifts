@@ -26,6 +26,7 @@ import dev.ninesliced.shotcave.crate.CrateBreakDropSystem;
 import dev.ninesliced.shotcave.dungeon.DungeonConfig;
 import dev.ninesliced.shotcave.dungeon.DungeonInstanceService;
 import dev.ninesliced.shotcave.dungeon.GameManager;
+import dev.ninesliced.shotcave.guns.WeaponRegistry;
 import dev.ninesliced.shotcave.hud.AmmoHudRuntime;
 import dev.ninesliced.shotcave.interactions.BreakSoftBlockInteraction;
 import dev.ninesliced.shotcave.interactions.ChainLightningInteraction;
@@ -33,7 +34,7 @@ import dev.ninesliced.shotcave.interactions.ConsumeAmmoInteraction;
 import dev.ninesliced.shotcave.interactions.GunValidationInteraction;
 import dev.ninesliced.shotcave.interactions.HideAmmoHudInteraction;
 import dev.ninesliced.shotcave.interactions.ModularGunShootInteraction;
-import dev.ninesliced.shotcave.interactions.ReloadCheckInteraction;
+
 import dev.ninesliced.shotcave.interactions.ReloadInteraction;
 import dev.ninesliced.shotcave.interactions.SpawnNPCAtImpactInteraction;
 import dev.ninesliced.shotcave.interactions.UpdateAmmoHudInteraction;
@@ -47,6 +48,13 @@ import dev.ninesliced.shotcave.party.ShotcavePartyPageSupplier;
 import dev.ninesliced.shotcave.systems.ActiveSlotHudUpdateSystem;
 import dev.ninesliced.shotcave.systems.DungeonTickSystem;
 import dev.ninesliced.shotcave.systems.PrefabSpawnTrackingSystem;
+import dev.ninesliced.shotcave.systems.DashComponent;
+import dev.ninesliced.shotcave.systems.DashPlayerAddedSystem;
+import dev.ninesliced.shotcave.systems.DashRollSystem;
+import dev.ninesliced.shotcave.systems.DashTrailSystem;
+import com.hypixel.hytale.component.ComponentType;
+import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
+import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
 
 import javax.annotation.Nonnull;
@@ -85,7 +93,6 @@ public class Shotcave extends JavaPlugin {
                 .register("ChainLightning", ChainLightningInteraction.class, ChainLightningInteraction.CODEC)
                 .register("ModularGunShoot", ModularGunShootInteraction.class, ModularGunShootInteraction.CODEC)
                 .register("GunValidate", GunValidationInteraction.class, GunValidationInteraction.CODEC)
-                .register("ReloadCheck", ReloadCheckInteraction.class, ReloadCheckInteraction.CODEC)
                 .register("Reload", ReloadInteraction.class, ReloadInteraction.CODEC)
                 .register("UpdateAmmoHud", UpdateAmmoHudInteraction.class, UpdateAmmoHudInteraction.CODEC)
                 .register("HideAmmoHud", HideAmmoHudInteraction.class, HideAmmoHudInteraction.CODEC)
@@ -100,6 +107,8 @@ public class Shotcave extends JavaPlugin {
         RootInteraction.getAssetStore().loadAssets(
                 "ninesliced:Shotcave",
                 List.of(ItemPickupInteraction.DEFAULT_ROOT));
+
+        WeaponRegistry.registerAll();
 
         PacketAdapters.registerInbound(new FKeyPickupPacketHandler());
 
@@ -116,6 +125,21 @@ public class Shotcave extends JavaPlugin {
         this.getEntityStoreRegistry().registerSystem(new DungeonTickSystem());
         this.getEntityStoreRegistry().registerSystem(new PrefabSpawnTrackingSystem());
 
+        // Dash system — register component, then the three systems that use it.
+        ComponentType<EntityStore, DashComponent> dashComponentType =
+                this.getEntityStoreRegistry().registerComponent(DashComponent.class, DashComponent::new);
+        DashComponent.setComponentType(dashComponentType);
+
+        ComponentType<EntityStore, PlayerRef> playerRefComponentType = PlayerRef.getComponentType();
+        ComponentType<EntityStore, TransformComponent> transformComponentType = TransformComponent.getComponentType();
+
+        this.getEntityStoreRegistry().registerSystem(
+                new DashPlayerAddedSystem(playerRefComponentType, dashComponentType));
+        this.getEntityStoreRegistry().registerSystem(
+                new DashRollSystem(this.cameraService, dashComponentType));
+        this.getEntityStoreRegistry().registerSystem(
+                new DashTrailSystem(dashComponentType, transformComponentType, playerRefComponentType));
+ 
         // Item pickup: intercept item entity spawns to apply F-key / score-collect
         // behaviour.
         this.getEntityStoreRegistry().registerSystem(new ItemDropSystem());

@@ -1,56 +1,49 @@
 {
-  "Type": "ModularGunShoot",
-  "RunTime": 0.1,
-  "Effects": {
-    "ItemAnimationId": "Shoot",
-    "WorldSoundEventId": "SFX_Rifle_Fire",
-    "LocalSoundEventId": "SFX_Rifle_Fire_Local",
-    "FirstPersonParticles": [
-      {
-        "SystemId": "RifleShooting",
-        "PositionOffset": {
-          "X": -0.1,
-          "Z": 1.9,
-          "Y": 0.0
-        },
-        "RotationOffset": {
-          "Yaw": 0,
-          "Pitch": 90
-        }
+  "Type": "Serial",
+  "Interactions": [
+    {
+      "Type": "Projectile",
+      "RunTime": 0.4,
+      "Config": "Projectile_Config_Void_Orb",
+      "Effects": {
+        "ItemAnimationId": "Shoot",
+        "WorldSoundEventId": "SFX_Rifle_Fire",
+        "LocalSoundEventId": "SFX_Rifle_Fire_Local",
+        "FirstPersonParticles": [
+          {
+            "SystemId": "RifleShooting",
+            "PositionOffset": {
+              "X": -0.1,
+              "Z": 1.9,
+              "Y": 0.0
+            },
+            "RotationOffset": {
+              "Yaw": 0,
+              "Pitch": 90
+            }
+          }
+        ],
+        "Particles": [
+          {
+            "SystemId": "RifleShooting",
+            "PositionOffset": {
+              "Z": 1.1,
+              "Y": 0.1
+            },
+            "RotationOffset": {
+              "Pitch": 90
+            }
+          }
+        ]
       }
-    ],
-    "Particles": [
-      {
-        "SystemId": "RifleShooting",
-        "PositionOffset": {
-          "Z": 1.1,
-          "Y": 0.1
-        },
-        "RotationOffset": {
-          "Pitch": 90
-        }
-      }
-    ]
-  },
-  "DamageRoot": "Root_Shotcave_Voidlance_Projectile_Hit",
-  "MissRoot": "Root_Shotcave_Voidlance_Projectile_Miss",
-  "Range": 130,
-  "Pellets": 1,
-  "SpreadDegrees": 0.04,
-  "TrailParticleId": "Shotcave_ElectricBeam",
-  "TrailStepDistance": 1.2,
-  "TrailScale": 0.25,
-  "TrailColorR": 180,
-  "TrailColorG": 70,
-  "TrailColorB": 255,
-  "ImpactParticleId": "RifleShooting_Impact",
-  "ImpactParticleScale": 0.65,
-  "MuzzleHeightOffset": 1.4,
-  "MuzzleForwardOffset": -1.55,
-  "MuzzleRightOffset": 0.35,
-  "UseAmmo": true,
-  "MaxAmmo": 10,
-  "AmmoPerShot": 1,
-  "AimAssist": true,
-  "Next": "Shotcave_Update_Hud"
+    },
+    {
+      "Type": "ConsumeAmmo",
+      "AmmoPerShot": 1,
+      "MaxAmmo": 10
+    },
+    {
+      "Type": "UpdateAmmoHud"
+    }
+  ]
 }

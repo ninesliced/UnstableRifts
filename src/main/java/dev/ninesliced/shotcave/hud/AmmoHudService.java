@@ -32,15 +32,14 @@ public final class AmmoHudService {
         }
 
         String itemId = heldItem.getItemId();
-        int defaultMaxAmmo = getDefaultMaxAmmo(itemId);
-        if (defaultMaxAmmo <= 0) {
+
+        int maxAmmo = GunItemMetadata.getInt(heldItem, GunItemMetadata.MAX_AMMO_KEY, -1);
+        if (maxAmmo <= 0) {
+            maxAmmo = getDefaultMaxAmmo(itemId);
+        }
+        if (maxAmmo <= 0) {
             hide(player, playerRef);
             return;
-        }
-
-        int maxAmmo = GunItemMetadata.getInt(heldItem, GunItemMetadata.MAX_AMMO_KEY, defaultMaxAmmo);
-        if (maxAmmo <= 0) {
-            maxAmmo = defaultMaxAmmo;
         }
 
         int ammo = GunItemMetadata.getInt(heldItem, GunItemMetadata.AMMO_KEY, maxAmmo);
@@ -94,12 +93,16 @@ public final class AmmoHudService {
             return -1;
         }
 
+        if (itemId.startsWith("Weapon_Crystal_Blunderbuss_") && itemId.endsWith("_Shotcave")) {
+            return 6;
+        }
+
         return switch (itemId) {
             case "Weapon_Pistol_Shotcave" -> 12;
             case "Weapon_Sniper_Shotcave" -> 5;
             case "Weapon_Taser_Shotcave" -> 8;
             case "Weapon_Voidlance_Shotcave" -> 10;
-            case "Weapon_Wand_Summoner_Shotcave" -> 5;
+            case "Weapon_Kweebec_Launcher_Shotcave" -> 5;
             default -> -1;
         };
     }

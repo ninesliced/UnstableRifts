@@ -1,2 +1,12 @@
 server.items.Shotcave_Ancient_Party_Portal.name = Ancient Party Portal
 server.items.Shotcave_Ancient_Party_Portal.description = A dormant portal that binds adventurers into a single expedition party.
+server.items.Weapon_Crystal_Blunderbuss_Acid_Shotcave.name = Acid Crystal Blunderbuss
+server.items.Weapon_Crystal_Blunderbuss_Acid_Shotcave.description = A corrosive crystal blunderbuss that sprays close-range acid shards.
+server.items.Weapon_Crystal_Blunderbuss_Fire_Shotcave.name = Fire Crystal Blunderbuss
+server.items.Weapon_Crystal_Blunderbuss_Fire_Shotcave.description = A volatile crystal blunderbuss packed with incendiary scattershot.
+server.items.Weapon_Crystal_Blunderbuss_Ice_Shotcave.name = Ice Crystal Blunderbuss
+server.items.Weapon_Crystal_Blunderbuss_Ice_Shotcave.description = A frostbound crystal blunderbuss that bursts into freezing pellets.
+server.items.Weapon_Crystal_Blunderbuss_Lightning_Shotcave.name = Lightning Crystal Blunderbuss
+server.items.Weapon_Crystal_Blunderbuss_Lightning_Shotcave.description = A crackling crystal blunderbuss that spits ionized buckshot.
+server.items.Weapon_Crystal_Blunderbuss_Void_Shotcave.name = Void Crystal Blunderbuss
+server.items.Weapon_Crystal_Blunderbuss_Void_Shotcave.description = A void-touched crystal blunderbuss with unstable shadow pellets.

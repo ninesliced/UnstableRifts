@@ -1,0 +1,56 @@
+{
+  "Type": "ModularGunShoot",
+  "RunTime": 0.12,
+  "Effects": {
+    "ItemAnimationId": "Shoot",
+    "WorldSoundEventId": "SFX_Blunderbuss_Fire",
+    "LocalSoundEventId": "SFX_Blunderbuss_Fire_Local",
+    "FirstPersonParticles": [
+      {
+        "SystemId": "RifleShooting",
+        "PositionOffset": {
+          "X": -0.08,
+          "Z": 1.35,
+          "Y": -0.02
+        },
+        "RotationOffset": {
+          "Yaw": 0,
+          "Pitch": 90
+        }
+      }
+    ],
+    "Particles": [
+      {
+        "SystemId": "RifleShooting",
+        "PositionOffset": {
+          "Z": 0.95,
+          "Y": 0.12
+        },
+        "RotationOffset": {
+          "Pitch": 90
+        }
+      }
+    ]
+  },
+  "DamageRoot": "Root_Shotcave_Crystal_Blunderbuss_Projectile_Hit",
+  "MissRoot": "Root_Shotcave_Crystal_Blunderbuss_Miss",
+  "Range": 24,
+  "Pellets": 8,
+  "SpreadDegrees": 7.5,
+  "TrailParticleId": "Shotcave_ElectricBeam",
+  "TrailStepDistance": 0.7,
+  "TrailScale": 0.14,
+  "TrailColorR": 110,
+  "TrailColorG": 255,
+  "TrailColorB": 120,
+  "ImpactParticleId": "RifleShooting_Impact",
+  "ImpactParticleScale": 0.45,
+  "MuzzleHeightOffset": 1.35,
+  "MuzzleForwardOffset": -1.35,
+  "MuzzleRightOffset": 0.35,
+  "UseAmmo": true,
+  "MaxAmmo": 6,
+  "AmmoPerShot": 1,
+  "AimAssist": true,
+  "Next": "Shotcave_Update_Hud"
+}

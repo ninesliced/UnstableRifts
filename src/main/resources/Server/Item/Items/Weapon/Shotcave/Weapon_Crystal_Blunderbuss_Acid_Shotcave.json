@@ -1,0 +1,28 @@
+{
+  "TranslationProperties": {
+    "Name": "server.items.Weapon_Crystal_Blunderbuss_Acid_Shotcave.name"
+  },
+  "Categories": [
+    "Items.Weapons"
+  ],
+  "Icon": "Icons/ItemsGenerated/Weapon_Gun_Blunderbuss.png",
+  "Model": "Items/Weapons/Shotcave/Crystal_blunderbuss/CRYSTAL_BLUNDERBUSS.blockymodel",
+  "Texture": "Items/Weapons/Shotcave/Crystal_blunderbuss/acid/ACID_BLUNDERBUSS_TEXTURE.png",
+  "PlayerAnimationsId": "Rifle",
+  "Interactions": {
+    "Primary": "Root_Shotcave_Crystal_Blunderbuss_Acid_Primary",
+    "Secondary": "Root_Shotcave_Crystal_Blunderbuss_Reload"
+  },
+  "Weapon": {},
+  "Tags": {
+    "Type": [
+      "Weapon"
+    ],
+    "Family": [
+      "Gun"
+    ],
+    "Pickup": [
+      "FKey"
+    ]
+  }
+}

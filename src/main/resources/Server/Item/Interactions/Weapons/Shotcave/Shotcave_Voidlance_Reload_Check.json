@@ -1,5 +1,0 @@
-{
-  "Type": "ReloadCheck",
-  "MaxAmmo": 10,
-  "Next": "Shotcave_Voidlance_Reload"
-}

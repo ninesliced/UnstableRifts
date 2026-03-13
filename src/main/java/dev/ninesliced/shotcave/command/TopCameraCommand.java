@@ -14,11 +14,13 @@ import javax.annotation.Nonnull;
 import java.awt.Color;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import com.hypixel.hytale.logger.HytaleLogger;
+import dev.ninesliced.shotcave.ShotcaveLog;
 
 public class TopCameraCommand extends AbstractCommand {
 
-    private static final Logger LOGGER = Logger.getLogger(TopCameraCommand.class.getName());
+    private static final HytaleLogger LOGGER = ShotcaveLog.forModule("Command");
 
     private final Shotcave plugin;
 
@@ -73,7 +75,7 @@ public class TopCameraCommand extends AbstractCommand {
                     context.sendMessage(Message.raw("Top camera disabled and reset to default.").color(Color.YELLOW));
                 }
             } catch (Exception e) {
-                LOGGER.log(Level.SEVERE, "Failed to execute /shotcave topcamera", e);
+                LOGGER.at(Level.SEVERE).withCause(e).log("Failed to execute /shotcave topcamera");
                 context.sendMessage(Message.raw("Top camera failed: " + e.getMessage()).color(Color.RED));
             }
         }, store.getExternalData().getWorld());

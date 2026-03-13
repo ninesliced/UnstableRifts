@@ -1,0 +1,19 @@
+{
+  "primary": {
+    "id": "Shotcave_Kweebec_Launcher",
+    "cooldown": 1.5,
+    "requireAmmo": true,
+    "shotId": "Shotcave_Kweebec_Launcher_Shot",
+    "reloadId": "Shotcave_Kweebec_Launcher_Reload"
+  },
+  "reload": {
+    "id": "Shotcave_Kweebec_Launcher_Reload",
+    "cooldown": 3.0,
+    "runTime": 2.5,
+    "amount": 0,
+    "nextId": "Shotcave_Update_Hud",
+    "worldSfx": "SFX_Staff_Ice_Shoot",
+    "localSfx": "SFX_Staff_Ice_Shoot",
+    "maxAmmo": 5
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "primary": {
+    "id": "Shotcave_Taser_Primary",
+    "cooldown": 0.75,
+    "requireAmmo": true,
+    "shotId": "Shotcave_Taser_Shot",
+    "reloadId": "Shotcave_Taser_Reload"
+  },
+  "reload": {
+    "id": "Shotcave_Taser_Reload",
+    "cooldown": 1.0,
+    "runTime": 0.9,
+    "amount": 0,
+    "nextId": "Shotcave_Update_Hud",
+    "worldSfx": "SFX_Blunderbuss_Fire",
+    "localSfx": "SFX_Blunderbuss_Fire_Local",
+    "maxAmmo": 8
+  },
+  "damage": {
+    "id": "Shotcave_Taser_Chain_Damage",
+    "amount": 10,
+    "type": "Physical",
+    "worldSfx": "SFX_Arrow_FullCharge_Hit",
+    "localSfx": "SFX_Arrow_FullCharge_Hit",
+    "particleId": "Lightning",
+    "particleYOffset": 0
+  }
+}
