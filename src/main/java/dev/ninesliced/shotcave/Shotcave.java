@@ -40,6 +40,13 @@ import dev.ninesliced.shotcave.pickup.ItemPickupInteraction;
 import dev.ninesliced.shotcave.party.PartyManager;
 import dev.ninesliced.shotcave.party.ShotcavePartyPageSupplier;
 import dev.ninesliced.shotcave.systems.ActiveSlotHudUpdateSystem;
+import dev.ninesliced.shotcave.systems.DashComponent;
+import dev.ninesliced.shotcave.systems.DashPlayerAddedSystem;
+import dev.ninesliced.shotcave.systems.DashRollSystem;
+import dev.ninesliced.shotcave.systems.DashTrailSystem;
+import com.hypixel.hytale.component.ComponentType;
+import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
+import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
 
 import javax.annotation.Nonnull;
@@ -67,7 +74,7 @@ public class Shotcave extends JavaPlugin {
         this.dungeonConfigPath = DungeonConfig.ensureRuntimeConfig(this.getDataDirectory());
 
         this.getCodecRegistry(OpenCustomUIInteraction.PAGE_CODEC)
-            .register("ShotcavePartyPortal", ShotcavePartyPageSupplier.class, ShotcavePartyPageSupplier.CODEC);
+                .register("ShotcavePartyPortal", ShotcavePartyPageSupplier.class, ShotcavePartyPageSupplier.CODEC);
 
         this.getCodecRegistry(Interaction.CODEC)
                 .register("ChainLightning", ChainLightningInteraction.class, ChainLightningInteraction.CODEC)
@@ -102,6 +109,21 @@ public class Shotcave extends JavaPlugin {
 
         this.getEntityStoreRegistry().registerSystem(new ActiveSlotHudUpdateSystem());
 
+        // Dash system — register component, then the three systems that use it.
+        ComponentType<EntityStore, DashComponent> dashComponentType =
+                this.getEntityStoreRegistry().registerComponent(DashComponent.class, DashComponent::new);
+        DashComponent.setComponentType(dashComponentType);
+
+        ComponentType<EntityStore, PlayerRef> playerRefComponentType = PlayerRef.getComponentType();
+        ComponentType<EntityStore, TransformComponent> transformComponentType = TransformComponent.getComponentType();
+
+        this.getEntityStoreRegistry().registerSystem(
+                new DashPlayerAddedSystem(playerRefComponentType, dashComponentType));
+        this.getEntityStoreRegistry().registerSystem(
+                new DashRollSystem(this.cameraService, dashComponentType));
+        this.getEntityStoreRegistry().registerSystem(
+                new DashTrailSystem(dashComponentType, transformComponentType, playerRefComponentType));
+ 
         // Item pickup: intercept item entity spawns to apply F-key / score-collect
         // behaviour.
         this.getEntityStoreRegistry().registerSystem(new ItemDropSystem());

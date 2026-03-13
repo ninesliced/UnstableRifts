@@ -14,7 +14,7 @@
     }
   ],
   "Website": "https://ninesliced.com",
-  "ServerVersion": "2026.03.05-9fdc5985d",
+  "ServerVersion": "2026.03.12-b1f856309",
   "Dependencies": {},
   "OptionalDependencies": {
     "Buuz135:MultipleHUD": "*"

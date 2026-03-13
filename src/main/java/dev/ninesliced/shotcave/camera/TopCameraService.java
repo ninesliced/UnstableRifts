@@ -13,12 +13,15 @@ import com.hypixel.hytale.protocol.RotationType;
 import com.hypixel.hytale.protocol.ServerCameraSettings;
 import com.hypixel.hytale.protocol.Vector3f;
 import com.hypixel.hytale.protocol.packets.camera.SetServerCamera;
+import com.hypixel.hytale.protocol.packets.setup.ClientFeature;
+import com.hypixel.hytale.protocol.packets.setup.UpdateFeatures;
 import com.hypixel.hytale.server.core.entity.entities.player.movement.MovementManager;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.EnumMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -57,6 +60,10 @@ public class TopCameraService {
 
     public boolean toggle(@Nonnull PlayerRef playerRef) {
         return setEnabled(playerRef, !enabled.getOrDefault(playerRef.getUuid(), false));
+    }
+
+    public boolean isEnabled(@Nonnull UUID uuid) {
+        return enabled.getOrDefault(uuid, false);
     }
 
     public boolean setEnabled(@Nonnull PlayerRef playerRef, boolean enable) {
@@ -110,13 +117,27 @@ public class TopCameraService {
         cameraSettings.planeNormal = new Vector3f(0.0F, 1.0F, 0.0F);
         playerRef.getPacketHandler().writeNoCache(new SetServerCamera(ClientCameraView.Custom, true, cameraSettings));
 
+        disableSprintForce(playerRef);
         applyEqualizedMovement(playerRef);
     }
 
     private void resetCamera(@Nonnull PlayerRef playerRef) {
         playerRef.getPacketHandler().writeNoCache(new SetServerCamera(ClientCameraView.Custom, false, null));
 
+        enableSprintForce(playerRef);
         restoreDefaultMovement(playerRef);
+    }
+
+     private void disableSprintForce(@Nonnull PlayerRef playerRef) {
+        Map<ClientFeature, Boolean> features = new EnumMap<>(ClientFeature.class);
+        features.put(ClientFeature.SprintForce, false);
+        playerRef.getPacketHandler().writeNoCache(new UpdateFeatures(features));
+    }
+
+    private void enableSprintForce(@Nonnull PlayerRef playerRef) {
+        Map<ClientFeature, Boolean> features = new EnumMap<>(ClientFeature.class);
+        features.put(ClientFeature.SprintForce, true);
+        playerRef.getPacketHandler().writeNoCache(new UpdateFeatures(features));
     }
 
     private void applyEqualizedMovement(@Nonnull PlayerRef playerRef) {
