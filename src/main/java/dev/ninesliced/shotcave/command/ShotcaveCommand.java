@@ -12,10 +12,12 @@ import java.util.concurrent.CompletableFuture;
 public class ShotcaveCommand extends AbstractCommand {
 
     public ShotcaveCommand(@Nonnull Shotcave plugin) {
-        super("shotcave", "Manage Shotcave dungeon and camera tools");
+        super("shotcave", "Manage Shotcave dungeon, camera, and debug tools");
         this.addAliases("sc");
         this.addSubCommand(new TopCameraCommand(plugin));
         this.addSubCommand(new DungeonCommand(plugin));
+        this.addSubCommand(new CoinCommand());
+        this.addSubCommand(new PickupDebugCommand());
         this.addSubCommand(new AcceptPartyInviteCommand(plugin));
         this.addSubCommand(new GivePartyPortalCommand());
         this.addSubCommand(new PartyCommand(plugin));

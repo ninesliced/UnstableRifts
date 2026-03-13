@@ -20,6 +20,9 @@
     ],
     "Family": [
       "Gun"
+    ],
+    "Pickup": [
+      "FKey"
     ]
   },
   "Utility": {

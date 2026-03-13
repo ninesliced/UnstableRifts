@@ -1,0 +1,103 @@
+// ─────────────────────────────────────────────
+//  Shotcave — Crate Pickup HUD
+//  Shows nearby F-key loot: icon, name, and
+//  a collect prompt that adapts to distance.
+// ─────────────────────────────────────────────
+
+@DimText = #8a9bb0;
+@BrightText = #e8ecf0;
+@AccentGold = #f0c050;
+@PanelBg = #0c0f14(0.85);
+@KeyBg = #2a3040;
+
+Group #CratePickupHudRoot {
+  Anchor: (Left: 0, Top: 0, Right: 0, Bottom: 0);
+  HitTestVisible: false;
+
+  Group {
+    Anchor: (Bottom: 160, Left: 0, Right: 0, Height: 64);
+    LayoutMode: Center;
+
+    Group #CratePickupRoot {
+      Anchor: (Width: 280, Height: 64);
+      Background: @PanelBg;
+      LayoutMode: Left;
+      Padding: (Horizontal: 10, Vertical: 8);
+      Visible: false;
+
+      AssetImage #CratePickupIcon {
+        Anchor: (Width: 48, Height: 48, Top: 0);
+        Visible: false;
+      }
+
+      Group #CratePickupTextColumn {
+        Anchor: (Height: 48, Left: 8, Top: 0);
+        LayoutMode: Top;
+
+        Group {
+          Anchor: (Height: 22);
+          LayoutMode: Left;
+
+          Label #CratePickupItemName {
+            Text: "Item";
+            Anchor: (Height: 22);
+            Style: LabelStyle(
+              FontSize: 14,
+              TextColor: @BrightText,
+              HorizontalAlignment: Start,
+              VerticalAlignment: Center
+            );
+          }
+
+          Label #CratePickupQuantity {
+            Text: "";
+            Anchor: (Height: 22, Left: 4);
+            Visible: false;
+            Style: LabelStyle(
+              FontSize: 12,
+              TextColor: @DimText,
+              HorizontalAlignment: Start,
+              VerticalAlignment: Center
+            );
+          }
+        }
+
+        Group {
+          Anchor: (Height: 22, Top: 2);
+          LayoutMode: Left;
+
+          Group #CratePickupKeyHint {
+            Anchor: (Width: 22, Height: 20, Top: 0);
+            Background: @KeyBg;
+            Visible: false;
+            LayoutMode: Center;
+
+            Label {
+              Text: "F";
+              Anchor: (Width: 22, Height: 20);
+              Style: LabelStyle(
+                FontName: "Mono",
+                FontSize: 13,
+                TextColor: @AccentGold,
+                HorizontalAlignment: Center,
+                VerticalAlignment: Center
+              );
+            }
+          }
+
+          Label #CratePickupCollectLabel {
+            Text: "Collect";
+            Anchor: (Height: 20, Left: 6, Top: 0);
+            Visible: false;
+            Style: LabelStyle(
+              FontSize: 12,
+              TextColor: @DimText,
+              HorizontalAlignment: Start,
+              VerticalAlignment: Center
+            );
+          }
+        }
+      }
+    }
+  }
+}

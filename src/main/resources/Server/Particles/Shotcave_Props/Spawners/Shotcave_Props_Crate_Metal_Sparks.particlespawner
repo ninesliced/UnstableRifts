@@ -1,0 +1,77 @@
+{
+  "RenderMode": "Erosion",
+  "EmitOffset": {
+    "X": { "Min": 0.1, "Max": 0.2 },
+    "Y": { "Min": 0.1, "Max": 0.2 },
+    "Z": { "Min": 0.1, "Max": 0.2 }
+  },
+  "ParticleRotationInfluence": "BillboardVelocity",
+  "LinearFiltering": true,
+  "LightInfluence": 0,
+  "ParticleRotateWithSpawner": false,
+  "TrailSpawnerPositionMultiplier": 1,
+  "TrailSpawnerRotationMultiplier": 1,
+  "MaxConcurrentParticles": 20,
+  "ParticleLifeSpan": { "Min": 0.18, "Max": 0.22 },
+  "SpawnRate": { "Min": 20, "Max": 20 },
+  "TotalParticles": { "Min": 20, "Max": 20 },
+  "InitialVelocity": {
+    "Speed": { "Min": 3, "Max": 12 }
+  },
+  "Attractors": [
+    {
+      "Position": { "X": 0, "Y": 0, "Z": 0 },
+      "RadialAxis": { "X": 0, "Y": 0, "Z": 0 },
+      "RadialAcceleration": 0,
+      "RadialTangentAcceleration": 0,
+      "DampingMultiplier": { "X": 0.4, "Y": 0.4, "Z": 0.4 }
+    }
+  ],
+  "Particle": {
+    "Texture": "Particles/Textures/Basic/Spark_Direction.png",
+    "FrameSize": { "Width": 32, "Height": 32 },
+    "ScaleRatioConstraint": "None",
+    "Animation": {
+      "0": {
+        "FrameIndex": { "Min": 0, "Max": 0 },
+        "Scale": {
+          "X": { "Min": 1, "Max": 1 },
+          "Y": { "Min": 1, "Max": 1 }
+        },
+        "Rotation": {
+          "X": { "Min": 0, "Max": 0 },
+          "Y": { "Min": 0, "Max": 0 },
+          "Z": { "Min": 0, "Max": 0 }
+        },
+        "Opacity": 0,
+        "Color": "#f5f7d9"
+      },
+      "10": {
+        "Opacity": 0.5
+      },
+      "60": {
+        "Opacity": 1
+      },
+      "100": {
+        "Opacity": 0.1
+      }
+    },
+    "InitialAnimationFrame": {
+      "Rotation": {
+        "X": { "Min": 90, "Max": 90 },
+        "Y": { "Min": 0, "Max": 0 },
+        "Z": { "Min": 0, "Max": 0 }
+      },
+      "Scale": {
+        "X": { "Min": 0.1, "Max": 0.1 },
+        "Y": { "Min": 0.1, "Max": 0.3 }
+      },
+      "Opacity": 1,
+      "Color": "#f5f7d9",
+      "FrameIndex": { "Min": 0, "Max": 0 }
+    }
+  },
+  "SpawnBurst": true,
+  "UseEmitDirection": true,
+  "Shape": "Sphere"
+}

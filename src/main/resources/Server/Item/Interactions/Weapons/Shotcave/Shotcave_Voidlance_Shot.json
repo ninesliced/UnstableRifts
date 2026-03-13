@@ -33,7 +33,7 @@
     ]
   },
   "DamageRoot": "Root_Shotcave_Voidlance_Projectile_Hit",
-  "MissRoot": "Root_Shotcave_Projectile_Miss",
+  "MissRoot": "Root_Shotcave_Voidlance_Projectile_Miss",
   "Range": 130,
   "Pellets": 1,
   "SpreadDegrees": 0.04,
