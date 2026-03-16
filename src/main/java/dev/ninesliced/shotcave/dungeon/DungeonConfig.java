@@ -137,7 +137,7 @@ public class DungeonConfig {
         List<Path> result = new ArrayList<>();
         for (String glob : globs) {
             if (glob == null || glob.isBlank()) {
-                LOGGER.warning("Skipping empty prefab glob entry");
+                LOGGER.at(Level.WARNING).log("Skipping empty prefab glob entry");
                 continue;
             }
             result.addAll(resolveGlob(glob));
@@ -149,13 +149,13 @@ public class DungeonConfig {
     public static List<Path> resolveGlob(@Nullable String glob) {
         List<Path> result = new ArrayList<>();
         if (glob == null) {
-            LOGGER.warning("Skipping null prefab glob entry");
+            LOGGER.at(Level.WARNING).log("Skipping null prefab glob entry");
             return result;
         }
 
         String trimmedGlob = glob.trim();
         if (trimmedGlob.isEmpty()) {
-            LOGGER.warning("Skipping blank prefab glob entry");
+            LOGGER.at(Level.WARNING).log("Skipping blank prefab glob entry");
             return result;
         }
 
@@ -165,7 +165,7 @@ public class DungeonConfig {
             if (folder != null && Files.isDirectory(folder)) {
                 collectPrefabFiles(folder, result);
             } else {
-                LOGGER.warning("Could not resolve prefab folder: " + folderPath);
+                LOGGER.at(Level.WARNING).log("Could not resolve prefab folder: %s", folderPath);
             }
         } else {
             String filePath = trimmedGlob.replace('.', '/') + ".prefab.json";
@@ -173,7 +173,7 @@ public class DungeonConfig {
             if (path != null) {
                 result.add(path);
             } else {
-                LOGGER.warning("Could not resolve prefab: " + filePath);
+                LOGGER.at(Level.WARNING).log("Could not resolve prefab: %s", filePath);
             }
         }
 
@@ -201,7 +201,7 @@ public class DungeonConfig {
                 }
             }
         } catch (IOException e) {
-            LOGGER.log(Level.WARNING, "Failed to list prefabs in " + directory, e);
+            LOGGER.at(Level.WARNING).withCause(e).log("Failed to list prefabs in %s", directory);
         }
     }
 
@@ -216,7 +216,7 @@ public class DungeonConfig {
         try {
             return PrefabBufferUtil.getCached(path);
         } catch (Exception e) {
-            LOGGER.log(Level.WARNING, "Failed to load prefab buffer: " + path, e);
+            LOGGER.at(Level.WARNING).withCause(e).log("Failed to load prefab buffer: %s", path);
             return null;
         }
     }
@@ -388,79 +388,4 @@ public class DungeonConfig {
         }
     }
 
-    @Nonnull
-    public static List<Path> resolveGlobs(@Nonnull List<String> globs) {
-        List<Path> result = new ArrayList<>();
-        for (String glob : globs) {
-            result.addAll(resolveGlob(glob));
-        }
-        return result;
-    }
-
-    @Nonnull
-    public static List<Path> resolveGlob(@Nonnull String glob) {
-        List<Path> result = new ArrayList<>();
-
-        if (glob.endsWith(".*")) {
-            String folderPath = glob.substring(0, glob.length() - 2).replace('.', '/');
-            Path folder = findPrefabFolder(folderPath);
-            if (folder != null && Files.isDirectory(folder)) {
-                collectPrefabFiles(folder, result);
-            } else {
-                LOGGER.at(Level.WARNING).log("Could not resolve prefab folder: %s", folderPath);
-            }
-        } else {
-            String filePath = glob.replace('.', '/') + ".prefab.json";
-            Path path = PrefabStore.get().findAssetPrefabPath(filePath);
-            if (path != null) {
-                result.add(path);
-            } else {
-                LOGGER.at(Level.WARNING).log("Could not resolve prefab: %s", filePath);
-            }
-        }
-
-        return result;
-    }
-
-    @Nullable
-    private static Path findPrefabFolder(@Nonnull String relativePath) {
-        for (var packPath : PrefabStore.get().getAllAssetPrefabPaths()) {
-            Path folder = packPath.prefabsPath().resolve(relativePath);
-            if (Files.isDirectory(folder)) {
-                return folder;
-            }
-        }
-        return null;
-    }
-
-    private static void collectPrefabFiles(@Nonnull Path directory, @Nonnull List<Path> result) {
-        try (DirectoryStream<Path> stream = Files.newDirectoryStream(directory)) {
-            for (Path entry : stream) {
-                if (Files.isDirectory(entry)) {
-                    collectPrefabFiles(entry, result);
-                } else if (entry.getFileName().toString().endsWith(".prefab.json")) {
-                    result.add(entry);
-                }
-            }
-        } catch (IOException e) {
-            LOGGER.at(Level.WARNING).withCause(e).log("Failed to list prefabs in %s", directory);
-        }
-    }
-
-    @Nullable
-    public static Path pickRandom(@Nonnull Random random, @Nonnull List<Path> paths) {
-        if (paths.isEmpty())
-            return null;
-        return paths.get(random.nextInt(paths.size()));
-    }
-
-    @Nullable
-    public static IPrefabBuffer loadBuffer(@Nonnull Path path) {
-        try {
-            return PrefabBufferUtil.getCached(path);
-        } catch (Exception e) {
-            LOGGER.at(Level.WARNING).withCause(e).log("Failed to load prefab buffer: %s", path);
-            return null;
-        }
-    }
 }

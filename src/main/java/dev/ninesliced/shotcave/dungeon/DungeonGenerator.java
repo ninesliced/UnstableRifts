@@ -275,9 +275,8 @@ public class DungeonGenerator {
                 continue;
             }
             if (wouldOverlap(data, pastePos, pasteRot)) {
-                LOGGER.fine("[" + label + "] overlap retry " + (i + 1) + "/" + attempts
-                        + " " + chosen.getFileName()
-                        + " paste=" + pastePos + " rot=" + pasteRot);
+                LOGGER.at(Level.FINE).log("[%s] overlap retry %d/%d %s paste=%s rot=%d",
+                        label, i + 1, attempts, chosen.getFileName(), pastePos, pasteRot);
                 continue;
             }
 
@@ -352,9 +351,8 @@ public class DungeonGenerator {
             level.addRoom(roomData);
             currentParentRoom = roomData;
 
-            LOGGER.warning("[" + label + "] " + chosen.getFileName()
-                    + " force-placed at " + pastePos + " rot=" + pasteRot
-                    + " -> " + newExitCount + " new exit(s)");
+            LOGGER.at(Level.WARNING).log("[%s] %s force-placed at %s rot=%d -> %d new exit(s)",
+                    label, chosen.getFileName(), pastePos, pasteRot, newExitCount);
             return true;
         } catch (Exception e) {
             LOGGER.at(Level.WARNING).withCause(e).log("[%s] force-paste failed", label);
