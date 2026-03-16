@@ -88,6 +88,18 @@ public class TopCameraService {
         }
     }
 
+    public void refreshMovementProfile(@Nonnull PlayerRef playerRef) {
+        restoreDefaultMovement(playerRef);
+
+        if (enabled.getOrDefault(playerRef.getUuid(), false)) {
+            disableSprintForce(playerRef);
+            applyEqualizedMovement(playerRef);
+            return;
+        }
+
+        enableSprintForce(playerRef);
+    }
+
     public void handlePlayerReady(@Nonnull Ref<EntityStore> ref) {
         if (!ref.isValid()) {
             return;

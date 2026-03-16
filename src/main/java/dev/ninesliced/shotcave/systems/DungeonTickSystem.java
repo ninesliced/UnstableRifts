@@ -27,7 +27,9 @@ import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * ECS ticking system that drives the dungeon game logic for players in a dungeon world.
@@ -41,7 +43,11 @@ import java.util.UUID;
 public final class DungeonTickSystem extends EntityTickingSystem<EntityStore> {
 
     private static final double BOSS_ROOM_ENTER_DISTANCE = 30.0;
-    private int tickCounter = 0;
+    private static final long LOGIC_UPDATE_INTERVAL_MS = 200L;
+    private static final long HUD_UPDATE_INTERVAL_MS = 400L;
+
+    private final Map<UUID, Long> lastLogicUpdateByParty = new ConcurrentHashMap<>();
+    private final Map<UUID, Long> lastHudUpdateByPlayer = new ConcurrentHashMap<>();
 
     @Override
     public Query<EntityStore> getQuery() {
@@ -53,11 +59,6 @@ public final class DungeonTickSystem extends EntityTickingSystem<EntityStore> {
                      @Nonnull ArchetypeChunk<EntityStore> archetypeChunk,
                      @Nonnull Store<EntityStore> store,
                      @Nonnull CommandBuffer<EntityStore> commandBuffer) {
-        tickCounter++;
-
-        // Only process every 10 ticks (~200ms at 50 ticks/sec) for performance
-        if (tickCounter % 10 != 0) return;
-
         Ref<EntityStore> ref = archetypeChunk.getReferenceTo(index);
         if (!ref.isValid()) return;
 
@@ -71,6 +72,7 @@ public final class DungeonTickSystem extends EntityTickingSystem<EntityStore> {
         GameManager gameManager = shotcave.getGameManager();
         Game game = gameManager.findGameForPlayer(playerRef.getUuid());
         if (game == null) {
+            lastHudUpdateByPlayer.remove(playerRef.getUuid());
             shotcave.getCameraService().restoreDefault(playerRef);
             DungeonInfoHud.hideHud(player, playerRef);
             PartyStatusHud.hideHud(player, playerRef);
@@ -79,6 +81,7 @@ public final class DungeonTickSystem extends EntityTickingSystem<EntityStore> {
 
         // Only process if the game is in an active state
         if (game.getState() != GameState.ACTIVE && game.getState() != GameState.BOSS) {
+            lastHudUpdateByPlayer.remove(playerRef.getUuid());
             shotcave.getCameraService().restoreDefault(playerRef);
             DungeonInfoHud.hideHud(player, playerRef);
             PartyStatusHud.hideHud(player, playerRef);
@@ -86,6 +89,7 @@ public final class DungeonTickSystem extends EntityTickingSystem<EntityStore> {
         }
 
         if (game.getInstanceWorld() == null || player.getWorld() != game.getInstanceWorld()) {
+            lastHudUpdateByPlayer.remove(playerRef.getUuid());
             shotcave.getCameraService().restoreDefault(playerRef);
             DungeonInfoHud.hideHud(player, playerRef);
             PartyStatusHud.hideHud(player, playerRef);
@@ -93,13 +97,18 @@ public final class DungeonTickSystem extends EntityTickingSystem<EntityStore> {
         }
 
         DungeonConfig config = shotcave.loadDungeonConfig();
+        long now = System.currentTimeMillis();
 
-        // ── Update HUDs (every 20 ticks = ~400ms) ──
-        if (tickCounter % 20 == 0) {
+        // Update HUDs on a per-player cadence so iteration order does not starve one client.
+        if (shouldRun(lastHudUpdateByPlayer, playerRef.getUuid(), now, HUD_UPDATE_INTERVAL_MS)) {
             updateHuds(player, playerRef, game, config, shotcave);
         }
 
-        // ── Game logic ──
+        // Run shared dungeon logic once per party cadence instead of once per entity.
+        if (!shouldRun(lastLogicUpdateByParty, game.getPartyId(), now, LOGIC_UPDATE_INTERVAL_MS)) {
+            return;
+        }
+
         Level level = game.getCurrentLevel();
         if (level == null) return;
 
@@ -132,10 +141,11 @@ public final class DungeonTickSystem extends EntityTickingSystem<EntityStore> {
         PartyManager partyManager = shotcave.getPartyManager();
         PartyManager.PartySnapshot snapshot = partyManager.getPartySnapshot(playerRef.getUuid());
         if (snapshot != null && !snapshot.members().isEmpty()) {
+            Set<UUID> deadPlayers = game.getDeadPlayers();
             List<PartyStatusHud.MemberStatus> members = new ArrayList<>();
             for (PartyManager.PartyMemberSnapshot member : snapshot.members()) {
                 members.add(PartyStatusHud.MemberStatus.fromUuid(
-                        UUID.fromString(member.id()), member.name()));
+                        UUID.fromString(member.id()), member.name(), deadPlayers));
             }
             PartyStatusHud partyHud = new PartyStatusHud(playerRef, members);
             PartyStatusHud.applyHud(player, playerRef, partyHud);
@@ -202,6 +212,18 @@ public final class DungeonTickSystem extends EntityTickingSystem<EntityStore> {
         if (distSq < BOSS_ROOM_ENTER_DISTANCE * BOSS_ROOM_ENTER_DISTANCE) {
             gameManager.enterBossPhase(game);
         }
+    }
+
+    private boolean shouldRun(@Nonnull Map<UUID, Long> lastRunTimes,
+                              @Nonnull UUID key,
+                              long now,
+                              long intervalMs) {
+        Long lastRun = lastRunTimes.get(key);
+        if (lastRun != null && now - lastRun < intervalMs) {
+            return false;
+        }
+        lastRunTimes.put(key, now);
+        return true;
     }
 }
 

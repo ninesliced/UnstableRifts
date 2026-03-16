@@ -3,21 +3,43 @@ package dev.ninesliced.shotcave.dungeon;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.hypixel.hytale.builtin.instances.InstancesPlugin;
+import com.hypixel.hytale.component.AddReason;
+import com.hypixel.hytale.component.CommandBuffer;
+import com.hypixel.hytale.component.Holder;
+import com.hypixel.hytale.component.NonSerialized;
 import com.hypixel.hytale.component.Ref;
+import com.hypixel.hytale.component.RemoveReason;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.math.vector.Transform;
 import com.hypixel.hytale.math.vector.Vector3d;
 import com.hypixel.hytale.math.vector.Vector3f;
 import com.hypixel.hytale.math.vector.Vector3i;
+import com.hypixel.hytale.protocol.AnimationSlot;
 import com.hypixel.hytale.server.core.Message;
+import com.hypixel.hytale.server.core.asset.type.model.config.Model;
+import com.hypixel.hytale.server.core.asset.type.model.config.ModelAsset;
+import com.hypixel.hytale.server.core.entity.InteractionManager;
+import com.hypixel.hytale.server.core.entity.UUIDComponent;
+import com.hypixel.hytale.server.core.entity.nameplate.Nameplate;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.inventory.Inventory;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
+import com.hypixel.hytale.server.core.modules.entity.component.HiddenFromAdventurePlayers;
+import com.hypixel.hytale.server.core.modules.entity.component.Intangible;
+import com.hypixel.hytale.server.core.modules.entity.component.Invulnerable;
+import com.hypixel.hytale.server.core.modules.entity.component.ActiveAnimationComponent;
+import com.hypixel.hytale.server.core.modules.entity.component.ModelComponent;
+import com.hypixel.hytale.server.core.modules.entity.component.PersistentModel;
 import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
+import com.hypixel.hytale.server.core.modules.entity.player.PlayerSkinComponent;
+import com.hypixel.hytale.server.core.modules.entity.tracker.NetworkId;
 import com.hypixel.hytale.server.core.modules.entitystats.EntityStatMap;
 import com.hypixel.hytale.server.core.modules.entitystats.EntityStatValue;
 import com.hypixel.hytale.server.core.modules.entitystats.asset.EntityStatType;
+import com.hypixel.hytale.server.core.modules.interaction.InteractionModule;
+import com.hypixel.hytale.server.core.modules.interaction.InteractionSimulationHandler;
+import com.hypixel.hytale.server.core.cosmetics.CosmeticsModule;
 import com.hypixel.hytale.protocol.packets.inventory.SetActiveSlot;
 import com.hypixel.hytale.protocol.packets.inventory.UpdatePlayerInventory;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
@@ -28,9 +50,14 @@ import com.hypixel.hytale.server.npc.NPCPlugin;
 import com.hypixel.hytale.server.npc.util.InventoryHelper;
 import dev.ninesliced.shotcave.Shotcave;
 import dev.ninesliced.shotcave.hud.DungeonInfoHud;
+import dev.ninesliced.shotcave.hud.DeathCountdownHud;
 import dev.ninesliced.shotcave.hud.PartyStatusHud;
+import dev.ninesliced.shotcave.hud.ReviveProgressHud;
 import dev.ninesliced.shotcave.party.PartyManager;
 import dev.ninesliced.shotcave.party.PartyUiPage;
+import dev.ninesliced.shotcave.systems.DeathComponent;
+import dev.ninesliced.shotcave.systems.DeathMovementController;
+import dev.ninesliced.shotcave.systems.DeathStateController;
 import it.unimi.dsi.fastutil.Pair;
 
 import javax.annotation.Nonnull;
@@ -43,6 +70,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
@@ -57,6 +85,8 @@ public final class GameManager {
 
     private static final Logger LOGGER = Logger.getLogger(GameManager.class.getName());
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    private static final String REVIVE_MARKER_MODEL_ID = "NPC_Spawn_Marker";
+    private static final String REVIVE_MARKER_DOWN_ANIMATION = "Death";
 
     private final Shotcave plugin;
     /**
@@ -67,6 +97,10 @@ public final class GameManager {
      * Reverse lookup: player UUID → party ID for fast game resolution.
      */
     private final Map<UUID, UUID> playerToParty = new ConcurrentHashMap<>();
+    /**
+     * Revive marker entity refs keyed by the downed player's UUID.
+     */
+    private final Map<UUID, Ref<EntityStore>> reviveMarkers = new ConcurrentHashMap<>();
 
     public GameManager(@Nonnull Shotcave plugin) {
         this.plugin = plugin;
@@ -109,6 +143,7 @@ public final class GameManager {
                 Store<EntityStore> store = memberStores.get(memberId);
                 if (entityRef != null && store != null) {
                     game.getReturnPoints().put(memberId, DungeonInstanceService.captureReturnPoint(store, entityRef));
+                    game.getReturnWorlds().put(memberId, store.getExternalData().getWorld());
                 }
             }
         }
@@ -264,6 +299,9 @@ public final class GameManager {
             // Unseal the boss room
             unsealBossRoom(game, bossRoom, world);
 
+            // Revive all dead/ghost players on level completion
+            reviveAllDeadPlayers(game);
+
             if (game.hasNextLevel()) {
                 broadcastToParty(game.getPartyId(), "Boss defeated! Advancing to the next level...", "#a9f5b3");
 
@@ -299,6 +337,7 @@ public final class GameManager {
         }
 
         game.setState(GameState.COMPLETE);
+        game.clearDeadPlayers();
 
         // Restore all tracked party members and teleport them back
         List<UUID> partyMembers = playerToParty.entrySet().stream()
@@ -307,6 +346,8 @@ public final class GameManager {
                 .toList();
 
         for (UUID playerId : partyMembers) {
+            despawnReviveMarker(playerId);
+
             PlayerRef playerRef = Universe.get().getPlayer(playerId);
             if (playerRef == null) continue;
 
@@ -314,34 +355,53 @@ public final class GameManager {
             if (ref == null || !ref.isValid()) continue;
 
             Store<EntityStore> store = ref.getStore();
-            Player player = store.getComponent(ref, Player.getComponentType());
-            if (player == null) continue;
+            Transform returnPoint = game.getReturnPoints().get(playerId);
+            World trackedReturnWorld = game.getReturnWorlds().get(playerId);
 
             plugin.getCameraService().restoreDefault(playerRef);
-            hideDungeonHuds(player, playerRef);
 
             store.getExternalData().getWorld().execute(() -> {
+                if (!ref.isValid()) {
+                    return;
+                }
+
+                Player player = store.getComponent(ref, Player.getComponentType());
+                if (player == null) {
+                    game.setPlayerInInstance(playerId, false);
+                    return;
+                }
+
+                hideDungeonHuds(player, playerRef);
+
+                DeathComponent deathComponent = store.getComponent(ref, DeathComponent.getComponentType());
+                if (deathComponent != null) {
+                    deathComponent.reset();
+                }
+
+                DeathStateController.clear(store, ref);
                 if (game.isPlayerInInstance(playerId)) {
                     restorePlayerInventory(playerId, player, true);
-                    resetPlayerStatus(player, ref, store);
                 } else {
                     deleteSavedInventory(playerId);
                 }
-                game.setPlayerInInstance(playerId, false);
-            });
 
-            // Teleport back to return point
-            Transform returnPoint = game.getReturnPoints().get(playerId);
-            if (returnPoint != null) {
-                try {
-                    World returnWorld = Universe.get().getDefaultWorld();
-                    if (returnWorld != null) {
-                        InstancesPlugin.teleportPlayerToInstance(ref, store, returnWorld, returnPoint);
+                resetPlayerStatus(player, ref, store);
+                game.setPlayerInInstance(playerId, false);
+
+                if (returnPoint != null) {
+                    try {
+                        World returnWorld = trackedReturnWorld;
+                        if (returnWorld == null) {
+                            returnWorld = Universe.get().getDefaultWorld();
+                        }
+                        if (returnWorld != null && ref.isValid()) {
+                            InstancesPlugin.teleportPlayerToInstance(ref, store, returnWorld, returnPoint);
+                        }
+                    } catch (Exception e) {
+                        LOGGER.log(java.util.logging.Level.WARNING, "Failed to teleport player " + playerId + " back", e);
                     }
-                } catch (Exception e) {
-                    LOGGER.log(java.util.logging.Level.WARNING, "Failed to teleport player " + playerId + " back", e);
                 }
-            }
+            });
         }
 
         activeGames.remove(game.getPartyId());
@@ -377,21 +437,92 @@ public final class GameManager {
         }
     }
 
-    /**
-     * Handle player disconnect during an active game.
-     */
-    public void onPlayerDisconnect(@Nonnull UUID playerId) {
+    public void onPlayerLeftParty(@Nonnull UUID partyId, @Nonnull UUID playerId) {
+        Game game = activeGames.get(partyId);
+        playerToParty.remove(playerId, partyId);
+        despawnReviveMarker(playerId);
+
+        if (game == null) {
+            return;
+        }
+
+        game.removeDeadPlayer(playerId);
+        game.setPlayerInInstance(playerId, false);
+
         PlayerRef playerRef = Universe.get().getPlayer(playerId);
         if (playerRef != null) {
             plugin.getCameraService().restoreDefault(playerRef);
+
             Ref<EntityStore> ref = playerRef.getReference();
             if (ref != null && ref.isValid()) {
                 Store<EntityStore> store = ref.getStore();
                 Player player = store.getComponent(ref, Player.getComponentType());
                 if (player != null) {
+                    Transform returnPoint = game.getReturnPoints().get(playerId);
+                    World trackedReturnWorld = game.getReturnWorlds().get(playerId);
+
                     hideDungeonHuds(player, playerRef);
+
+                    store.getExternalData().getWorld().execute(() -> {
+                        if (!ref.isValid()) {
+                            return;
+                        }
+
+                        DeathComponent deathComponent = store.getComponent(ref, DeathComponent.getComponentType());
+                        if (deathComponent != null) {
+                            deathComponent.reset();
+                        }
+
+                        DeathStateController.clear(store, ref);
+                        restorePlayerInventory(playerId, player, true);
+                        resetPlayerStatus(player, ref, store);
+
+                        if (returnPoint != null) {
+                            try {
+                                World returnWorld = trackedReturnWorld;
+                                if (returnWorld == null) {
+                                    returnWorld = Universe.get().getDefaultWorld();
+                                }
+                                if (returnWorld != null && ref.isValid()) {
+                                    InstancesPlugin.teleportPlayerToInstance(ref, store, returnWorld, returnPoint);
+                                }
+                            } catch (Exception e) {
+                                LOGGER.log(java.util.logging.Level.WARNING, "Failed to teleport player " + playerId + " out of dungeon after leaving party", e);
+                            }
+                        }
+                    });
                 }
             }
+        }
+
+        game.getReturnPoints().remove(playerId);
+        game.getReturnWorlds().remove(playerId);
+        game.getSavedInventoryPaths().remove(playerId);
+        closeGameIfInstanceEmpty(game);
+    }
+
+    /**
+     * Handle player disconnect during an active game.
+     */
+    public void onPlayerDisconnect(@Nonnull PlayerRef playerRef) {
+        UUID playerId = playerRef.getUuid();
+        plugin.getCameraService().restoreDefault(playerRef);
+        despawnReviveMarker(playerId);
+
+        Ref<EntityStore> ref = playerRef.getReference();
+        if (ref != null && ref.isValid()) {
+            Store<EntityStore> store = ref.getStore();
+            World world = store.getExternalData().getWorld();
+            world.execute(() -> {
+                if (!ref.isValid()) {
+                    return;
+                }
+
+                Player player = store.getComponent(ref, Player.getComponentType());
+                if (player != null && !player.wasRemoved()) {
+                    hideDungeonHuds(player, playerRef);
+                }
+            });
         }
 
         UUID partyId = playerToParty.get(playerId);
@@ -401,6 +532,7 @@ public final class GameManager {
         if (game == null) return;
 
         game.setPlayerInInstance(playerId, false);
+        game.removeDeadPlayer(playerId);
         if (!closeGameIfInstanceEmpty(game)) {
             PartyUiPage.refreshOpenPages();
         }
@@ -540,6 +672,25 @@ public final class GameManager {
             return;
         }
 
+        if (game.isPlayerDead(playerRef.getUuid())) {
+            LOGGER.info("Ignoring dungeon removal cleanup for ghosted/dead player " + playerRef.getUuid()
+                    + " because they remain part of the active run.");
+            return;
+        }
+
+        Ref<EntityStore> ref = playerRef.getReference();
+        if (ref != null && ref.isValid()) {
+            Store<EntityStore> store = ref.getStore();
+            DeathComponent deathComponent = store.getComponent(ref, DeathComponent.getComponentType());
+            if (deathComponent != null && deathComponent.isDead()) {
+                LOGGER.info("Ignoring dungeon removal cleanup for dead player " + playerRef.getUuid()
+                        + " because they remain part of the active run.");
+                return;
+            }
+        }
+
+        despawnReviveMarker(playerRef.getUuid());
+
         // Best-effort camera / HUD cleanup
         plugin.getCameraService().restoreDefault(playerRef);
         hideDungeonHuds(player, playerRef);
@@ -548,7 +699,6 @@ public final class GameManager {
         restorePlayerInventory(playerRef.getUuid(), player, false);
 
         // Reset health/stamina only if the entity ref is still valid
-        Ref<EntityStore> ref = playerRef.getReference();
         if (ref != null && ref.isValid()) {
             Store<EntityStore> store = ref.getStore();
             resetPlayerStatus(player, ref, store);
@@ -556,6 +706,7 @@ public final class GameManager {
 
         // Always track instance membership and check for empty dungeon
         game.setPlayerInInstance(playerRef.getUuid(), false);
+        game.removeDeadPlayer(playerRef.getUuid());
         if (!closeGameIfInstanceEmpty(game)) {
             PartyUiPage.refreshOpenPages();
         }
@@ -571,6 +722,38 @@ public final class GameManager {
             game.setInstanceWorld(null);
             endGame(game, true);
         }
+    }
+
+    @Nonnull
+    public List<Ref<EntityStore>> getDeadPlayerRefsInStore(@Nonnull Store<EntityStore> store) {
+        List<Ref<EntityStore>> deadPlayerRefs = new ArrayList<>();
+
+        for (Game game : activeGames.values()) {
+            if (game.getState() != GameState.ACTIVE && game.getState() != GameState.BOSS) {
+                continue;
+            }
+
+            for (UUID deadPlayerId : game.getDeadPlayers()) {
+                PlayerRef playerRef = Universe.get().getPlayer(deadPlayerId);
+                if (playerRef == null || !playerRef.isValid()) {
+                    continue;
+                }
+
+                Ref<EntityStore> ref = playerRef.getReference();
+                if (ref == null || !ref.isValid() || ref.getStore() != store) {
+                    continue;
+                }
+
+                DeathComponent deathComponent = store.getComponent(ref, DeathComponent.getComponentType());
+                if (deathComponent == null || !deathComponent.isDead()) {
+                    continue;
+                }
+
+                deadPlayerRefs.add(ref);
+            }
+        }
+
+        return deadPlayerRefs;
     }
 
     // ────────────────────────────────────────────────
@@ -743,6 +926,13 @@ public final class GameManager {
 
     private void resetPlayerStatus(@Nonnull Player player, @Nonnull Ref<EntityStore> ref, @Nonnull Store<EntityStore> store) {
         try {
+            DeathComponent deathComponent = store.getComponent(ref, DeathComponent.getComponentType());
+            if (deathComponent != null) {
+                deathComponent.reset();
+            }
+
+            DeathStateController.clear(store, ref);
+
             EntityStatMap statMap = store.getComponent(ref, EntityStatMap.getComponentType());
             if (statMap != null) {
                 int healthIdx = EntityStatType.getAssetMap().getIndex("Health");
@@ -758,6 +948,16 @@ public final class GameManager {
                     statMap.setStatValue(staminaIdx, staminaStat.getMax());
                 }
             }
+
+            PlayerRef playerRef = store.getComponent(ref, PlayerRef.getComponentType());
+            if (playerRef != null) {
+                store.putComponent(
+                        ref,
+                        InteractionModule.get().getInteractionManagerComponent(),
+                        new InteractionManager(player, playerRef, new InteractionSimulationHandler())
+                );
+            }
+            DeathMovementController.restore(store, ref, playerRef);
         } catch (Exception e) {
             LOGGER.log(java.util.logging.Level.WARNING, "Failed to reset player status", e);
         }
@@ -957,6 +1157,8 @@ public final class GameManager {
     public void hideDungeonHuds(@Nonnull Player player, @Nonnull PlayerRef playerRef) {
         DungeonInfoHud.hideHud(player, playerRef);
         PartyStatusHud.hideHud(player, playerRef);
+        DeathCountdownHud.hideHud(player, playerRef);
+        ReviveProgressHud.hideHud(player, playerRef);
     }
 
     @Nonnull
@@ -1022,6 +1224,190 @@ public final class GameManager {
         }
         activeGames.clear();
         playerToParty.clear();
+        reviveMarkers.clear();
+    }
+
+    // ────────────────────────────────────────────────
+    //  Death / Revive
+    // ────────────────────────────────────────────────
+
+    /**
+     * Called when all players in the dungeon instance are dead or ghosts.
+     * Ends the run and closes the party.
+     */
+    public void onAllPlayersDead(@Nonnull Game game) {
+        if (game.getState() == GameState.COMPLETE) return;
+
+        broadcastToParty(game.getPartyId(),
+                "All players have fallen! The dungeon run is over.", "#ff6b6b");
+        endGame(game, true);
+    }
+
+    /**
+     * Revives all dead/ghost players in the given game, restoring health and equipment.
+     */
+    public void reviveAllDeadPlayers(@Nonnull Game game) {
+        Set<UUID> dead = new java.util.HashSet<>(game.getDeadPlayers());
+        if (dead.isEmpty()) return;
+
+        DungeonConfig config = plugin.loadDungeonConfig();
+
+        for (UUID playerId : dead) {
+            despawnReviveMarker(playerId);
+
+            PlayerRef playerRef = Universe.get().getPlayer(playerId);
+            if (playerRef == null || !playerRef.isValid()) continue;
+
+            Ref<EntityStore> ref = playerRef.getReference();
+            if (ref == null || !ref.isValid()) continue;
+
+            Store<EntityStore> store = ref.getStore();
+            Player player = store.getComponent(ref, Player.getComponentType());
+            if (player == null) continue;
+
+            // Reset DeathComponent
+            DeathComponent deathComp = store.getComponent(ref, DeathComponent.getComponentType());
+            if (deathComp != null) {
+                deathComp.revive();
+            }
+            DeathStateController.clear(store, ref);
+
+            // Restore health/stamina
+            resetPlayerStatus(player, ref, store);
+
+            // Give back start equipment
+            clearPlayerInventory(player);
+            giveStartEquipment(playerRef, player, config);
+        }
+
+        game.clearDeadPlayers();
+        broadcastToParty(game.getPartyId(),
+                "All fallen players have been revived!", "#a9f5b3");
+    }
+
+    /**
+     * Clears the player's inventory and syncs the change to the client.
+     * Called by death systems that don't have direct access to private helpers.
+     */
+    public void clearPlayerInventoryPublic(@Nonnull Player player, @Nonnull PlayerRef playerRef) {
+        clearPlayerInventory(player);
+        if (player.getInventory() != null) {
+            syncInventoryAndSelectedSlots(playerRef, player.getInventory());
+        }
+    }
+
+    /**
+     * Public accessor for {@link #broadcastToParty} used by death/revive systems.
+     */
+    public void broadcastToPartyPublic(@Nonnull UUID partyId, @Nonnull String text, @Nonnull String color) {
+        broadcastToParty(partyId, text, color);
+    }
+
+    /**
+     * Public accessor for {@link #giveStartEquipment} used by revive systems.
+     */
+    public void giveStartEquipmentPublic(@Nonnull PlayerRef playerRef, @Nonnull Player player,
+                                          @Nonnull DungeonConfig config) {
+        giveStartEquipment(playerRef, player, config);
+    }
+
+    public void spawnReviveMarker(@Nonnull CommandBuffer<EntityStore> commandBuffer,
+                                  @Nonnull Store<EntityStore> store,
+                                  @Nonnull Ref<EntityStore> deadPlayerRef,
+                                  @Nonnull UUID playerId,
+                                  @Nonnull Vector3d position) {
+        despawnReviveMarker(commandBuffer, playerId);
+
+        Holder<EntityStore> holder = store.getRegistry().newHolder();
+        PlayerSkinComponent playerSkinComponent = store.getComponent(deadPlayerRef, PlayerSkinComponent.getComponentType());
+        TransformComponent deadPlayerTransform = store.getComponent(deadPlayerRef, TransformComponent.getComponentType());
+        holder.addComponent(TransformComponent.getComponentType(),
+                new TransformComponent(position.clone(), deadPlayerTransform != null ? deadPlayerTransform.getRotation().clone() : Vector3f.ZERO));
+        holder.addComponent(UUIDComponent.getComponentType(), UUIDComponent.randomUUID());
+        holder.addComponent(NetworkId.getComponentType(), new NetworkId(store.getExternalData().takeNextNetworkId()));
+        holder.addComponent(Nameplate.getComponentType(), new Nameplate("downed"));
+        holder.addComponent(Intangible.getComponentType(), Intangible.INSTANCE);
+        holder.addComponent(Invulnerable.getComponentType(), Invulnerable.INSTANCE);
+        holder.addComponent(EntityStore.REGISTRY.getNonSerializedComponentType(), NonSerialized.get());
+        if (playerSkinComponent != null) {
+            holder.addComponent(PlayerSkinComponent.getComponentType(),
+                    new PlayerSkinComponent(playerSkinComponent.getPlayerSkin()));
+        }
+        Model markerModel = buildReviveMarkerModel(playerSkinComponent);
+        if (markerModel != null) {
+            holder.addComponent(ModelComponent.getComponentType(), new ModelComponent(markerModel));
+            holder.addComponent(PersistentModel.getComponentType(), new PersistentModel(markerModel.toReference()));
+            if (markerModel.getFirstBoundAnimationId(REVIVE_MARKER_DOWN_ANIMATION) != null) {
+                ActiveAnimationComponent activeAnimationComponent = new ActiveAnimationComponent();
+                activeAnimationComponent.setPlayingAnimation(AnimationSlot.Status, REVIVE_MARKER_DOWN_ANIMATION);
+                holder.addComponent(ActiveAnimationComponent.getComponentType(), activeAnimationComponent);
+            }
+        }
+
+        Ref<EntityStore> markerRef = commandBuffer.addEntity(holder, AddReason.SPAWN);
+        reviveMarkers.put(playerId, markerRef);
+    }
+
+    public void despawnReviveMarker(@Nonnull CommandBuffer<EntityStore> commandBuffer,
+                                    @Nonnull UUID playerId) {
+        Ref<EntityStore> markerRef = reviveMarkers.remove(playerId);
+        if (markerRef == null || !markerRef.isValid()) {
+            return;
+        }
+
+        if (markerRef.getStore() == commandBuffer.getStore()) {
+            commandBuffer.tryRemoveEntity(markerRef, RemoveReason.REMOVE);
+            return;
+        }
+
+        removeReviveMarkerOnOwningWorld(markerRef);
+    }
+
+    public void despawnReviveMarker(@Nonnull UUID playerId) {
+        Ref<EntityStore> markerRef = reviveMarkers.remove(playerId);
+        if (markerRef == null || !markerRef.isValid()) {
+            return;
+        }
+
+        removeReviveMarkerOnOwningWorld(markerRef);
+    }
+
+    @Nullable
+    public Vector3d getReviveMarkerPosition(@Nonnull UUID playerId) {
+        Ref<EntityStore> markerRef = reviveMarkers.get(playerId);
+        if (markerRef == null || !markerRef.isValid()) {
+            reviveMarkers.remove(playerId, markerRef);
+            return null;
+        }
+
+        TransformComponent transform = markerRef.getStore().getComponent(markerRef, TransformComponent.getComponentType());
+        if (transform == null) {
+            return null;
+        }
+
+        return transform.getPosition().clone();
+    }
+
+    private void removeReviveMarkerOnOwningWorld(@Nonnull Ref<EntityStore> markerRef) {
+        Store<EntityStore> markerStore = markerRef.getStore();
+        markerStore.getExternalData().getWorld().execute(() -> {
+            if (markerRef.isValid()) {
+                markerStore.removeEntity(markerRef, RemoveReason.REMOVE);
+            }
+        });
+    }
+
+    @Nullable
+    private Model buildReviveMarkerModel(@Nullable PlayerSkinComponent playerSkinComponent) {
+        if (playerSkinComponent != null) {
+            Model playerModel = CosmeticsModule.get().createModel(playerSkinComponent.getPlayerSkin());
+            if (playerModel != null) {
+                return playerModel;
+            }
+        }
+
+        ModelAsset markerModelAsset = ModelAsset.getAssetMap().getAsset(REVIVE_MARKER_MODEL_ID);
+        return markerModelAsset != null ? Model.createUnitScaleModel(markerModelAsset) : null;
     }
 
     // ────────────────────────────────────────────────

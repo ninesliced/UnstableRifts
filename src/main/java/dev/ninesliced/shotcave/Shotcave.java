@@ -52,6 +52,12 @@ import dev.ninesliced.shotcave.systems.DashComponent;
 import dev.ninesliced.shotcave.systems.DashPlayerAddedSystem;
 import dev.ninesliced.shotcave.systems.DashRollSystem;
 import dev.ninesliced.shotcave.systems.DashTrailSystem;
+import dev.ninesliced.shotcave.systems.DeathComponent;
+import dev.ninesliced.shotcave.systems.DeathAggroSuppressionSystem;
+import dev.ninesliced.shotcave.systems.DeathPlayerAddedSystem;
+import dev.ninesliced.shotcave.systems.DungeonLethalDamageSystem;
+import dev.ninesliced.shotcave.systems.PlayerDeathSystem;
+import dev.ninesliced.shotcave.systems.ReviveTickSystem;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
@@ -139,7 +145,19 @@ public class Shotcave extends JavaPlugin {
                 new DashRollSystem(this.cameraService, dashComponentType));
         this.getEntityStoreRegistry().registerSystem(
                 new DashTrailSystem(dashComponentType, transformComponentType, playerRefComponentType));
- 
+
+        // Death system — register component, then the systems that use it.
+        ComponentType<EntityStore, DeathComponent> deathComponentType =
+                this.getEntityStoreRegistry().registerComponent(DeathComponent.class, DeathComponent::new);
+        DeathComponent.setComponentType(deathComponentType);
+
+        this.getEntityStoreRegistry().registerSystem(
+                new DeathPlayerAddedSystem(playerRefComponentType, deathComponentType));
+        this.getEntityStoreRegistry().registerSystem(new DungeonLethalDamageSystem());
+        this.getEntityStoreRegistry().registerSystem(new PlayerDeathSystem());
+        this.getEntityStoreRegistry().registerSystem(new ReviveTickSystem());
+        this.getEntityStoreRegistry().registerSystem(new DeathAggroSuppressionSystem());
+
         // Item pickup: intercept item entity spawns to apply F-key / score-collect
         // behaviour.
         this.getEntityStoreRegistry().registerSystem(new ItemDropSystem());
@@ -154,7 +172,7 @@ public class Shotcave extends JavaPlugin {
         this.getEventRegistry().registerGlobal(PlayerDisconnectEvent.class, event -> {
             this.partyManager.handleDisconnect(event.getPlayerRef());
             this.cameraService.clearState(event.getPlayerRef());
-            this.gameManager.onPlayerDisconnect(event.getPlayerRef().getUuid());
+            this.gameManager.onPlayerDisconnect(event.getPlayerRef());
         });
         this.getCommandRegistry().registerCommand(new ShotcaveCommand(this));
         this.getCommandRegistry().registerCommand(new PartyCommand(this));

@@ -25,6 +25,7 @@ import java.util.logging.Level;
 
 import com.hypixel.hytale.logger.HytaleLogger;
 import dev.ninesliced.shotcave.ShotcaveLog;
+import dev.ninesliced.shotcave.systems.DeathComponent;
 
 /**
  * Observes {@link SyncInteractionChains} packets for F-key presses and
@@ -126,6 +127,12 @@ public final class FKeyPickupPacketHandler implements PlayerPacketWatcher {
         Player player = store.getComponent(playerEntityRef, Player.getComponentType());
         if (player == null || player.wasRemoved()) {
             LOGGER.at(Level.INFO).log("[FKeyPickup] player null or removed, aborting");
+            return;
+        }
+
+        DeathComponent death = store.getComponent(playerEntityRef, DeathComponent.getComponentType());
+        if (death != null && death.isDead()) {
+            LOGGER.at(Level.INFO).log("[FKeyPickup] player is dead/ghost, aborting");
             return;
         }
 

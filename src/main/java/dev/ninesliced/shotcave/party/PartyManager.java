@@ -194,6 +194,7 @@ public final class PartyManager {
         }
 
         String memberName = party.members.remove(targetId);
+        this.plugin.getGameManager().onPlayerLeftParty(party.id, targetId);
         this.partyByMember.remove(targetId);
         removeInvite(targetId, party.id);
 
@@ -233,6 +234,7 @@ public final class PartyManager {
         }
 
         String name = party.members.remove(playerRef.getUuid());
+    this.plugin.getGameManager().onPlayerLeftParty(party.id, playerRef.getUuid());
         this.partyByMember.remove(playerRef.getUuid());
         removeInvite(playerRef.getUuid(), party.id);
         broadcast(party, partyPrefix().insert(Message.raw(name + " left the party.").color("#dce6ef")));
@@ -312,11 +314,20 @@ public final class PartyManager {
             memberRefsMap.put(memberId, memberRef);
             memberEntitiesMap.put(memberId, memberEntity);
             memberStoresMap.put(memberId, memberStore);
+
+            // Only capture return point if the member is in the same world as the
+            // leader — Store.getComponent() must be called from the owning thread.
+            // Members in a different world will use the leader's return point instead.
+            World memberWorld = memberStore.getExternalData().getWorld();
+            Transform memberReturnPoint = (memberWorld == leaderWorld)
+                    ? DungeonInstanceService.captureReturnPoint(memberStore, memberEntity)
+                    : leaderReturnPoint;
+
             membersToTeleport.add(new PendingTeleport(
                     memberRef,
                     memberEntity,
                     memberStore,
-                    DungeonInstanceService.captureReturnPoint(memberStore, memberEntity)
+                    memberReturnPoint
             ));
         }
 

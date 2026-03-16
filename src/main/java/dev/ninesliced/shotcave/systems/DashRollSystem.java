@@ -24,11 +24,15 @@ import com.hypixel.hytale.server.core.modules.splitvelocity.VelocityConfig;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.ParticleUtil;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import dev.ninesliced.shotcave.Shotcave;
 import dev.ninesliced.shotcave.camera.TopCameraService;
+import dev.ninesliced.shotcave.dungeon.Game;
+import dev.ninesliced.shotcave.dungeon.GameManager;
 import it.unimi.dsi.fastutil.objects.ObjectList;
 
 import javax.annotation.Nonnull;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * Repurposes the <b>crouch</b> key as a dash ability while the player is in
@@ -164,6 +168,12 @@ public final class DashRollSystem extends EntityTickingSystem<EntityStore> {
             return;
         }
 
+        // Dead players cannot dash
+        DeathComponent death = archetypeChunk.getComponent(index, DeathComponent.getComponentType());
+        if (death != null && death.isDead()) {
+            return;
+        }
+
         MovementStatesComponent msc = archetypeChunk.getComponent(index,
                 this.movementStatesComponentType);
         if (msc == null) {
@@ -176,6 +186,15 @@ public final class DashRollSystem extends EntityTickingSystem<EntityStore> {
         if (!crouchRisingEdge) {
             return;
         }
+
+        // If near a dead player, don't dash — let ReviveTickSystem handle the revive.
+        // We only suppress the rising-edge here; ReviveTickSystem continuously
+        // suppresses crouch while holding near a dead player.
+        if (isNearDeadPlayer(playerRef, archetypeChunk, index, store)) {
+            // Don't suppress crouch here — ReviveTickSystem needs it
+            return;
+        }
+
         current.crouching = false;
 
         // TODO: Look for timers within hytale's ECS instead
@@ -225,5 +244,54 @@ public final class DashRollSystem extends EntityTickingSystem<EntityStore> {
         double dirX = -Math.sin(yaw);
         double dirZ = -Math.cos(yaw);
         return new Vector3d(dirX, 0.0, dirZ);
+    }
+
+    /**
+     * Checks if the player is within revive range of any dead (non-ghost) teammate.
+     */
+    private boolean isNearDeadPlayer(@Nonnull PlayerRef playerRef,
+                                      @Nonnull ArchetypeChunk<EntityStore> archetypeChunk,
+                                      int index,
+                                      @Nonnull Store<EntityStore> store) {
+        Shotcave shotcave = Shotcave.getInstance();
+        if (shotcave == null) return false;
+
+        Game game = shotcave.getGameManager().findGameForPlayer(playerRef.getUuid());
+        if (game == null) return false;
+
+        Set<UUID> deadPlayers = game.getDeadPlayers();
+        if (deadPlayers.isEmpty()) return false;
+
+        Ref<EntityStore> ref = archetypeChunk.getReferenceTo(index);
+        if (!ref.isValid()) return false;
+
+        TransformComponent transform = store.getComponent(ref, this.transformComponentType);
+        if (transform == null) return false;
+
+        Vector3d myPos = transform.getPosition();
+        double rangeSquared = 6.0 * 6.0;
+
+        for (UUID deadUuid : deadPlayers) {
+            PlayerRef deadRef = com.hypixel.hytale.server.core.universe.Universe.get().getPlayer(deadUuid);
+            if (deadRef == null || !deadRef.isValid()) continue;
+
+            Ref<EntityStore> deadEntityRef = deadRef.getReference();
+            if (deadEntityRef == null || !deadEntityRef.isValid()) continue;
+
+            DeathComponent deathComp = deadEntityRef.getStore().getComponent(
+                    deadEntityRef, DeathComponent.getComponentType());
+            if (deathComp == null || !deathComp.isInReviveWindow()) continue;
+
+            Vector3d deathPos = deathComp.getDeathPosition();
+            if (deathPos == null) continue;
+
+            double dx = myPos.x - deathPos.x;
+            double dy = myPos.y - deathPos.y;
+            double dz = myPos.z - deathPos.z;
+            if (dx * dx + dy * dy + dz * dz < rangeSquared) {
+                return true;
+            }
+        }
+        return false;
     }
 }

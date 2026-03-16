@@ -17,10 +17,13 @@ import com.hypixel.hytale.server.core.ui.builder.UICommandBuilder;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import dev.ninesliced.shotcave.systems.DeathComponent;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -83,10 +86,15 @@ public final class PartyStatusHud extends CustomUIHud {
                 ui.set(prefix + ".Visible", true);
                 ui.set(prefix + "Name.TextSpans", Message.raw(member.name));
                 ui.set(prefix + "Status.TextSpans", Message.raw(member.statusText()));
-                ui.set(prefix + "Status.Style.TextColor", member.online ? "#a9f5b3" : "#ff6b6b");
+                ui.set(prefix + "Status.Style.TextColor", member.statusColor());
 
                 // ── Health bar ──
-                if (member.online && member.maxHealth > 0) {
+                if (member.dead || member.ghost) {
+                    // Dead/ghost: empty health bar with appropriate color
+                    setHealthBarWidth(ui, prefix + "HealthBar", 0);
+                    ui.set(prefix + "HealthBar.Background", member.ghost ? "#9ca3af" : "#ef4444");
+                    ui.set(prefix + "Health.TextSpans", Message.raw(member.ghost ? "Ghost" : "Dead"));
+                } else if (member.online && member.maxHealth > 0) {
                     float percent = Math.max(0f, Math.min(1f, member.currentHealth / member.maxHealth));
                     int fillWidth = Math.round(HEALTH_BAR_BG_WIDTH * percent);
                     setHealthBarWidth(ui, prefix + "HealthBar", fillWidth);
@@ -128,6 +136,8 @@ public final class PartyStatusHud extends CustomUIHud {
             @Nonnull String name,
             @Nonnull UUID uuid,
             boolean online,
+            boolean dead,
+            boolean ghost,
             float currentHealth,
             float maxHealth,
             @Nullable String effectName,
@@ -140,7 +150,8 @@ public final class PartyStatusHud extends CustomUIHud {
          * and one active effect. If the player is offline, health and effect are zeroed.
          */
         @Nonnull
-        public static MemberStatus fromUuid(@Nonnull UUID uuid, @Nonnull String name) {
+        public static MemberStatus fromUuid(@Nonnull UUID uuid, @Nonnull String name,
+                                             @Nonnull Set<UUID> deadPlayers) {
             PlayerRef playerRef = Universe.get().getPlayer(uuid);
             boolean online = playerRef != null && playerRef.isValid();
 
@@ -150,11 +161,22 @@ public final class PartyStatusHud extends CustomUIHud {
             boolean effectIsDebuff = false;
             boolean effectInfinite = false;
             int effectRemaining = 0;
+            boolean isDead = false;
+            boolean isGhost = false;
 
             if (online) {
                 Ref<EntityStore> ref = playerRef.getReference();
                 if (ref != null && ref.isValid()) {
                     Store<EntityStore> store = ref.getStore();
+
+                    // ── Check death state ──
+                    if (deadPlayers.contains(uuid)) {
+                        isDead = true;
+                        DeathComponent deathComp = store.getComponent(ref, DeathComponent.getComponentType());
+                        if (deathComp != null) {
+                            isGhost = deathComp.isGhost();
+                        }
+                    }
 
                     // ── Read health ──
                     try {
@@ -196,14 +218,33 @@ public final class PartyStatusHud extends CustomUIHud {
                 }
             }
 
-            return new MemberStatus(name, uuid, online,
+            return new MemberStatus(name, uuid, online, isDead, isGhost,
                     curHealth, maxHealth,
                     effectName, effectIsDebuff, effectInfinite, effectRemaining);
         }
 
+        /**
+         * Convenience overload for contexts without death tracking.
+         */
+        @Nonnull
+        public static MemberStatus fromUuid(@Nonnull UUID uuid, @Nonnull String name) {
+            return fromUuid(uuid, name, Collections.emptySet());
+        }
+
         @Nonnull
         public String statusText() {
-            return online ? "Online" : "Offline";
+            if (!online) return "Offline";
+            if (ghost) return "Ghost";
+            if (dead) return "Dead";
+            return "Online";
+        }
+
+        @Nonnull
+        public String statusColor() {
+            if (!online) return "#ff6b6b";
+            if (ghost) return "#9ca3af";
+            if (dead) return "#ff6b6b";
+            return "#a9f5b3";
         }
     }
 }

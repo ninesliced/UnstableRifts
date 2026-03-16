@@ -31,9 +31,17 @@ public final class Game {
      */
     private final Map<UUID, Transform> returnPoints = new HashMap<>();
     /**
+     * Original worlds per player UUID for teleporting back after the run.
+     */
+    private final Map<UUID, World> returnWorlds = new HashMap<>();
+    /**
      * Players currently inside the active dungeon instance.
      */
     private final Set<UUID> playersInInstance = new HashSet<>();
+    /**
+     * Players who are currently dead (in revive window or ghost state).
+     */
+    private final Set<UUID> deadPlayers = new HashSet<>();
     private int currentLevelIndex = 0;
     private long money = 0L;
     private long startTime;
@@ -186,6 +194,11 @@ public final class Game {
         return returnPoints;
     }
 
+    @Nonnull
+    public Map<UUID, World> getReturnWorlds() {
+        return returnWorlds;
+    }
+
     public boolean isPlayerInInstance(@Nonnull UUID playerId) {
         return playersInInstance.contains(playerId);
     }
@@ -235,6 +248,36 @@ public final class Game {
 
     public void setBossRoomSealed(boolean bossRoomSealed) {
         this.bossRoomSealed = bossRoomSealed;
+    }
+
+    // ── Dead player tracking ──
+
+    public void addDeadPlayer(@Nonnull UUID playerId) {
+        deadPlayers.add(playerId);
+    }
+
+    public void removeDeadPlayer(@Nonnull UUID playerId) {
+        deadPlayers.remove(playerId);
+    }
+
+    public boolean isPlayerDead(@Nonnull UUID playerId) {
+        return deadPlayers.contains(playerId);
+    }
+
+    @Nonnull
+    public Set<UUID> getDeadPlayers() {
+        return Collections.unmodifiableSet(deadPlayers);
+    }
+
+    /**
+     * Returns {@code true} if every player currently in the instance is dead.
+     */
+    public boolean areAllPlayersDead() {
+        return !playersInInstance.isEmpty() && deadPlayers.containsAll(playersInInstance);
+    }
+
+    public void clearDeadPlayers() {
+        deadPlayers.clear();
     }
 }
 
