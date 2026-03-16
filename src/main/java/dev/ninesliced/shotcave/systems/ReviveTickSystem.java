@@ -249,7 +249,6 @@ public final class ReviveTickSystem extends EntityTickingSystem<EntityStore> {
         DeathStateController.clear(commandBuffer, deadInfo.ref);
 
         if (deadInfo.ref != null && deadInfo.ref.isValid()) {
-            DeathStateController.clear(deadInfo.ref.getStore(), deadInfo.ref);
             TransformComponent transform = deadInfo.ref.getStore().getComponent(deadInfo.ref, TransformComponent.getComponentType());
             if (revivePosition != null) {
                 Vector3f rotation = transform != null ? transform.getRotation().clone() : new Vector3f();
