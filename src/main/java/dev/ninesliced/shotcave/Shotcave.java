@@ -43,6 +43,8 @@ import dev.ninesliced.shotcave.pickup.ItemDropSystem;
 import dev.ninesliced.shotcave.pickup.ItemPickupConfig;
 import dev.ninesliced.shotcave.pickup.ItemPickupHudRuntime;
 import dev.ninesliced.shotcave.pickup.ItemPickupInteraction;
+import dev.ninesliced.shotcave.tooltip.WeaponTooltipAdapter;
+import dev.ninesliced.shotcave.tooltip.WeaponVirtualItems;
 import dev.ninesliced.shotcave.party.PartyManager;
 import dev.ninesliced.shotcave.party.ShotcavePartyPageSupplier;
 import dev.ninesliced.shotcave.systems.ActiveSlotHudUpdateSystem;
@@ -127,6 +129,13 @@ public class Shotcave extends JavaPlugin {
         PacketAdapters.registerInbound(new FKeyPickupPacketHandler());
         PacketAdapters.registerInbound(new ReviveInteractionPacketHandler());
 
+        // Weapon tooltip adapter — rewrites inventory items to virtual
+        // IDs with per-instance name/description/quality, and translates
+        // inbound interaction packets back to real IDs.
+        WeaponTooltipAdapter tooltipAdapter = new WeaponTooltipAdapter();
+        PacketAdapters.registerOutbound(tooltipAdapter);
+        PacketAdapters.registerInbound(tooltipAdapter);
+
         try {
             this.getEntityStoreRegistry().registerEntityEventType(SwitchActiveSlotEvent.class);
         } catch (IllegalArgumentException ignored) {
@@ -197,6 +206,7 @@ public class Shotcave extends JavaPlugin {
             this.partyManager.handleDisconnect(event.getPlayerRef());
             this.cameraService.clearState(event.getPlayerRef());
             this.gameManager.onPlayerDisconnect(event.getPlayerRef());
+            WeaponVirtualItems.onPlayerDisconnect(event.getPlayerRef().getUuid());
         });
         this.getCommandRegistry().registerCommand(new ShotcaveCommand(this));
         this.getCommandRegistry().registerCommand(new PartyCommand(this));

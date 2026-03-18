@@ -30,7 +30,6 @@ public final class ItemPickupHud extends CustomUIHud {
     private final int itemQuantity;
     private final boolean crouching;
 
-    // Weapon metadata (nullable for non-weapon items)
     @Nonnull private final WeaponRarity rarity;
     @Nonnull private final DamageEffect effect;
     @Nonnull private final WeaponCategory category;
@@ -78,7 +77,7 @@ public final class ItemPickupHud extends CustomUIHud {
             ui.set("#CratePickupExpandedWrapper.Visible", true);
 
             if (isWeapon) {
-                ui.set("#CratePickupAccentExpanded.Background", rarity.getColorHex());
+                ui.set("#CratePickupExpanded.Background", rarity.getColorHex());
             }
 
             if (this.itemIconPath != null && !this.itemIconPath.isBlank()) {
@@ -101,6 +100,7 @@ public final class ItemPickupHud extends CustomUIHud {
             ui.set("#CratePickupCollectLabelExpanded.Visible", true);
 
             buildDetailsPanel(ui);
+            buildModifierSlots(ui);
         } else {
             // ── COMPACT view (no details, lower position) ──
             ui.set("#CratePickupExpandedWrapper.Visible", false);
@@ -156,8 +156,8 @@ public final class ItemPickupHud extends CustomUIHud {
             buildStatRow(ui, 2, "Mob Life",
                     definition != null ? definition.getBaseMobLifetime() : 0,
                     getModBonus(WeaponModifierType.MOB_LIFETIME), true);
-            hideStatRow(ui, 3);
-            hideStatRow(ui, 4);
+            ui.set("#CratePickupStatRow3.Visible", false);
+            ui.set("#CratePickupStatRow4.Visible", false);
             {
                 int maxAmmoBonus = this.maxAmmo - this.baseMaxAmmo;
                 String prefix = "#CratePickupStat";
@@ -169,7 +169,7 @@ public final class ItemPickupHud extends CustomUIHud {
                     ui.set(prefix + "Mod5.TextSpans", Message.raw(""));
                 }
             }
-            hideStatRow(ui, 6);
+            ui.set("#CratePickupStatRow6.Visible", false);
         } else {
             buildStatRow(ui, 0, "Damage",
                     definition != null ? definition.getBaseDamage() : 0,
@@ -219,29 +219,27 @@ public final class ItemPickupHud extends CustomUIHud {
                 buildStatRow(ui, 6, "Pellets", basePellets,
                         getModBonus(WeaponModifierType.ADDITIONAL_BULLETS), false);
             } else {
-                hideStatRow(ui, 6);
+                ui.set("#CratePickupStatRow6.Visible", false);
             }
         }
+    }
 
-        // Modifiers summary with correct display (flat vs percentage)
-        if (!modifiers.isEmpty()) {
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < modifiers.size(); i++) {
+    private void buildModifierSlots(@Nonnull UICommandBuilder ui) {
+        int modCount = Math.min(modifiers.size(), 5);
+        if (modCount > 0) {
+            for (int i = 0; i < modCount; i++) {
                 WeaponModifier mod = modifiers.get(i);
-                if (i > 0) sb.append(", ");
-                sb.append(mod.type().getDisplayName()).append(' ');
-                if (mod.rolledValue() >= 1.0) {
-                    // Flat modifier (e.g. ADDITIONAL_BULLETS: +1, +2)
-                    sb.append('+').append((int) Math.round(mod.rolledValue()));
-                } else {
-                    // Percentage modifier (e.g. WEAPON_DAMAGE: +25%)
-                    sb.append('+').append((int) Math.round(mod.rolledValue() * 100)).append('%');
-                }
+                String modText = formatModifier(mod);
+                ui.set("#CratePickupMod" + i + ".TextSpans", Message.raw(modText));
             }
-            ui.set("#CratePickupModifiersLabel.TextSpans", Message.raw(sb.toString()));
-            ui.set("#CratePickupModifiersLabel.Visible", true);
+            for (int i = modCount; i < 5; i++) {
+                ui.set("#CratePickupMod" + i + ".Visible", false);
+            }
         } else {
-            ui.set("#CratePickupModifiersLabel.Visible", false);
+            ui.set("#CratePickupModSeparator.Visible", false);
+            for (int i = 0; i < 5; i++) {
+                ui.set("#CratePickupMod" + i + ".Visible", false);
+            }
         }
     }
 
@@ -262,8 +260,9 @@ public final class ItemPickupHud extends CustomUIHud {
             if (isMultiplier) {
                 double absoluteBonus = baseValue * modBonus;
                 if (label.equals("Speed")) {
+                    // Speed modifier REDUCES cooldown — show as negative
                     if (absoluteBonus > 0.005) {
-                        ui.set(prefix + "Mod" + index + ".TextSpans", Message.raw(String.format("(+%.2fs)", absoluteBonus)));
+                        ui.set(prefix + "Mod" + index + ".TextSpans", Message.raw(String.format("(-%.2fs)", absoluteBonus)));
                     } else {
                         ui.set(prefix + "Mod" + index + ".TextSpans", Message.raw(""));
                     }
@@ -276,7 +275,6 @@ public final class ItemPickupHud extends CustomUIHud {
                     }
                 }
             } else {
-                // Flat non-multiplier (e.g. Pellets (+1))
                 int bonus = (int) Math.round(modBonus);
                 if (bonus > 0) {
                     ui.set(prefix + "Mod" + index + ".TextSpans", Message.raw("(+" + bonus + ")"));
@@ -289,21 +287,23 @@ public final class ItemPickupHud extends CustomUIHud {
         }
     }
 
-    private void hideStatRow(@Nonnull UICommandBuilder ui, int index) {
-        String prefix = "#CratePickupStat";
-        ui.set(prefix + "Label" + index + ".TextSpans", Message.raw(""));
-        ui.set(prefix + "Base" + index + ".TextSpans", Message.raw(""));
-        ui.set(prefix + "Mod" + index + ".TextSpans", Message.raw(""));
+    @Nonnull
+    private static String formatModifier(@Nonnull WeaponModifier mod) {
+        StringBuilder sb = new StringBuilder("> ");
+        sb.append(mod.type().getDisplayName()).append(' ');
+        if (mod.rolledValue() >= 1.0) {
+            sb.append('+').append((int) Math.round(mod.rolledValue()));
+        } else {
+            sb.append('+').append((int) Math.round(mod.rolledValue() * 100)).append('%');
+        }
+        return sb.toString();
     }
 
     @Nonnull
     private String buildWeaponTitle() {
         StringBuilder sb = new StringBuilder();
         if (rarity != WeaponRarity.BASIC) {
-            sb.append('[').append(rarity.name()).append("] ");
-        }
-        if (effect != DamageEffect.NONE) {
-            sb.append(effect.getDisplayName()).append(' ');
+            sb.append(rarity.name()).append(' ');
         }
         String name = this.itemDisplayName;
         if ((name == null || name.isBlank()) && definition != null) {

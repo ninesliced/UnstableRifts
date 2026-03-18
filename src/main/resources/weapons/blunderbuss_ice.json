@@ -3,13 +3,14 @@
   "displayName": "Blunderbuss",
   "category": "LASER",
   "lockedEffect": "ICE",
-  "minRarity": "RARE",
-  "spawnWeight": 10,
+  "minRarity": "EPIC",
+  "spawnWeight": 5,
   "baseStats": {
     "range": 24,
     "spread": 14.0,
     "pellets": 8,
-    "knockback": 2.0
+    "knockback": 2.0,
+    "precision": 30
   },
   "primary": {
     "id": "Shotcave_Crystal_Blunderbuss_Ice_Primary",

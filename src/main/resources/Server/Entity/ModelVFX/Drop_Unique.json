@@ -1,0 +1,17 @@
+{
+      "SwitchTo": "PostColor",
+      "PostColorOpacity": 0.0,
+      "NoiseScale": {
+        "X": 1.0,
+        "Y": 1.0
+      },
+      "AnimationDuration": 1.0,
+      "EffectDirection": "BottomUp",
+      "AnimationRange": {
+        "Y": 1.0
+      },
+      "UseBloomOnHighlight": true,
+      "HighlightThickness": 5.0,
+      "HighlightColor": "#ff4040",
+      "LoopOption": "Loop"
+}

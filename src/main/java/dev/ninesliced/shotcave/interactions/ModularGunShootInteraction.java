@@ -279,6 +279,18 @@ public final class ModularGunShootInteraction extends SimpleInstantInteraction {
                     effectiveRange, this.range, effectiveSpread,
                     effectiveTrailR, effectiveTrailG, effectiveTrailB,
                     GunItemMetadata.getModifiers(heldItem).size());
+
+            // Apply ATTACK_SPEED modifier: reduce shoot cooldown
+            double speedBonus = GunItemMetadata.getModifierBonus(heldItem, WeaponModifierType.ATTACK_SPEED);
+            if (speedBonus > 0.001) {
+                CooldownHandler.Cooldown shootCooldown = cooldownHandler.getCooldown("Shoot");
+                if (shootCooldown != null) {
+                    float baseCd = shootCooldown.getCooldown();
+                    float reducedCd = (float) (baseCd * (1.0 - speedBonus));
+                    if (reducedCd < 0.05f) reducedCd = 0.05f;
+                    shootCooldown.setCooldownMax(reducedCd);
+                }
+            }
         }
 
         // Capture DoT effect for application on hit

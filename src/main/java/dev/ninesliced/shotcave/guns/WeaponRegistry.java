@@ -75,6 +75,7 @@ public final class WeaponRegistry {
         @SerializedName("spread") double spread;
         @SerializedName("pellets") int pellets;
         @SerializedName("knockback") float knockback;
+        @SerializedName("precision") @Nullable Integer precision;
     }
 
     private static final class SummoningStatsDef {
@@ -220,6 +221,7 @@ public final class WeaponRegistry {
         double baseSpread = wc.baseStats != null ? wc.baseStats.spread : 0;
         int basePellets = wc.baseStats != null ? wc.baseStats.pellets : 1;
         float baseKnockback = wc.baseStats != null ? wc.baseStats.knockback : 0;
+        int basePrecision = wc.baseStats != null && wc.baseStats.precision != null ? wc.baseStats.precision : -1;
         int baseMobHealth = wc.summoningStats != null ? wc.summoningStats.mobHealth : 0;
         int baseMobDamage = wc.summoningStats != null ? wc.summoningStats.mobDamage : 0;
         int baseMobLifetime = wc.summoningStats != null ? wc.summoningStats.mobLifetime : 0;
@@ -228,7 +230,7 @@ public final class WeaponRegistry {
                 wc.itemId, wc.displayName, category, locked, minRarity,
                 wc.spawnWeight, baseDamage, baseCooldown, baseMaxAmmo,
                 baseRange, baseSpread, basePellets, baseKnockback,
-                baseMobHealth, baseMobDamage, baseMobLifetime
+                baseMobHealth, baseMobDamage, baseMobLifetime, basePrecision
         );
         WeaponDefinitions.register(def);
     }

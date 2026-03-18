@@ -7,9 +7,7 @@ import com.hypixel.hytale.component.RemoveReason;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.RefSystem;
-import com.hypixel.hytale.server.core.asset.type.entityeffect.config.EntityEffect;
 import com.hypixel.hytale.server.core.asset.type.item.config.Item;
-import com.hypixel.hytale.server.core.entity.effect.EffectControllerComponent;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.modules.entity.item.ItemComponent;
 import com.hypixel.hytale.server.core.modules.entity.item.PreventPickup;
@@ -21,8 +19,6 @@ import java.util.logging.Level;
 
 import com.hypixel.hytale.logger.HytaleLogger;
 import dev.ninesliced.shotcave.ShotcaveLog;
-import dev.ninesliced.shotcave.guns.GunItemMetadata;
-import dev.ninesliced.shotcave.guns.WeaponRarity;
 
 /**
  * Intercepts item entity creation/removal to apply custom pickup behavior
@@ -84,9 +80,6 @@ public final class ItemDropSystem extends RefSystem<EntityStore> {
         if (isScoreCollect) {
             applyScoreCollectPickupPrevention(ref, commandBuffer);
         }
-
-        // Apply rarity glow effect for weapons with BSON rarity metadata
-        applyRarityGlow(ref, store, commandBuffer, itemStack);
     }
 
     @Override
@@ -120,43 +113,6 @@ public final class ItemDropSystem extends RefSystem<EntityStore> {
             @Nonnull CommandBuffer<EntityStore> commandBuffer) {
 
         commandBuffer.ensureComponent(ref, PreventPickup.getComponentType());
-    }
-
-    /**
-     * If the dropped item has Shotcave rarity metadata, applies the matching
-     * glow entity effect (Drop_Rare, Drop_Epic, Drop_Legendary).
-     */
-    private static void applyRarityGlow(@Nonnull Ref<EntityStore> ref,
-                                         @Nonnull Store<EntityStore> store,
-                                         @Nonnull CommandBuffer<EntityStore> commandBuffer,
-                                         @Nonnull ItemStack itemStack) {
-        if (!GunItemMetadata.hasInt(itemStack, GunItemMetadata.RARITY_KEY)) {
-            return;
-        }
-        WeaponRarity rarity = GunItemMetadata.getRarity(itemStack);
-        String glowEffectId = rarity.getGlowEffectId();
-        if (glowEffectId == null) {
-            return;
-        }
-        try {
-            EntityEffect effect = EntityEffect.getAssetMap().getAsset(glowEffectId);
-            if (effect == null) {
-                LOGGER.at(Level.WARNING).log("[ItemDrop]   Glow effect '%s' not found in asset map", glowEffectId);
-                return;
-            }
-            // ensureAndGetComponent creates the component synchronously and returns it,
-            // unlike ensureComponent which queues async (store.getComponent returns null)
-            EffectControllerComponent effectController =
-                    commandBuffer.ensureAndGetComponent(ref, EffectControllerComponent.getComponentType());
-            if (effectController != null) {
-                effectController.addInfiniteEffect(ref,
-                        EntityEffect.getAssetMap().getIndex(glowEffectId),
-                        effect, commandBuffer);
-                LOGGER.at(Level.INFO).log("[ItemDrop]   Applied glow '%s' for rarity %s", glowEffectId, rarity.name());
-            }
-        } catch (Exception e) {
-            LOGGER.at(Level.WARNING).log("[ItemDrop]   Failed to apply glow: %s", e.getMessage());
-        }
     }
 
     /**

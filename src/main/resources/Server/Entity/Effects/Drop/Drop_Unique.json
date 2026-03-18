@@ -1,0 +1,13 @@
+{
+  "ApplicationEffects": {
+    "Particles": [
+      {
+        "SystemId": "Drop_Unique"
+      }
+    ],
+    "ModelVFXId": "Drop_Unique",
+    "EntityBottomTint": "#721010"
+  },
+  "OverlapBehavior": "Extend",
+  "Infinite": true
+}

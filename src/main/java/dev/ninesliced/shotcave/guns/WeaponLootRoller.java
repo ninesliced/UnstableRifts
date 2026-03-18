@@ -3,6 +3,7 @@ package dev.ninesliced.shotcave.guns;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
@@ -21,10 +22,19 @@ public final class WeaponLootRoller {
      */
     @Nonnull
     public static ItemStack rollRandom() {
+        return rollRandom(null);
+    }
+
+    /**
+     * Rolls a random weapon. If {@code forcedRarity} is non-null the rarity is fixed
+     * instead of being rolled from the weighted table.
+     */
+    @Nonnull
+    public static ItemStack rollRandom(@Nullable WeaponRarity forcedRarity) {
         ThreadLocalRandom rng = ThreadLocalRandom.current();
 
-        // Step 1: Roll rarity
-        WeaponRarity rarity = WeaponRarity.roll(WeaponRarity.BASIC);
+        // Step 1: Roll or use forced rarity
+        WeaponRarity rarity = forcedRarity != null ? forcedRarity : WeaponRarity.roll(WeaponRarity.BASIC);
 
         // Step 2: Build weighted pool of weapons eligible for this rarity (minRarity <= rolled)
         List<WeaponDefinition> eligible = new ArrayList<>();

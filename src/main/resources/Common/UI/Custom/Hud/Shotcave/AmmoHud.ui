@@ -1,166 +1,180 @@
 // ─────────────────────────────────────────────
 //  Shotcave — Weapon Info HUD
-//  Expanded weapon card with rarity, stats, modifiers, and ammo bar
+//  Weapon card with rarity accent, stats, modifiers, and ammo bar
 // ─────────────────────────────────────────────
 
-@DimText = #6b7d94;
+@DimText = #8a9bb0;
 @BrightText = #e8ecf0;
 @AmmoFull = #7aa8d4;
 @BarTrack = #1a1f2a;
-@PanelBg = #0c0f14(0.82);
+@PanelBg = #0c0f14(0.85);
 @ModGreen = #3e9049;
 @AccentDefault = #6b7d94;
+@SepColor = #1e2535;
+
+@StatLabelStyle = LabelStyle(FontSize: 12, TextColor: @DimText, HorizontalAlignment: Start, VerticalAlignment: Center);
+@StatValueStyle = LabelStyle(FontSize: 12, TextColor: @BrightText, RenderBold: true, HorizontalAlignment: Start, VerticalAlignment: Center);
+@StatModStyle = LabelStyle(FontSize: 12, TextColor: @ModGreen, HorizontalAlignment: Start, VerticalAlignment: Center);
+@ModSlotStyle = LabelStyle(FontSize: 11, TextColor: @ModGreen, HorizontalAlignment: Start, VerticalAlignment: Center);
 
 Group #ShotcaveHudRoot {
   Anchor: (Left: 0, Top: 0, Right: 0, Bottom: 0);
   HitTestVisible: false;
 
-  // ── Main container — bottom-left ──
+  // ── Invisible wrapper — bottom-left, fixed max height ──
   Group #ShotcaveAmmoRoot {
-    Anchor: (Width: 220, Height: 310, Bottom: 74, Left: 24);
-    Background: @PanelBg;
+    Anchor: (Width: 270, Height: 420, Bottom: 74, Left: 24);
+    LayoutMode: Top;
     Visible: false;
 
-    // ── Rarity accent bar (left edge) ──
-    Group #ShotcaveRarityAccent {
-      Anchor: (Width: 3, Top: 0, Bottom: 0, Left: 0);
-      Background: @AccentDefault;
-    }
+    // ── Spacer: absorbs remaining space, pushes panel to bottom ──
+    Group { FlexWeight: 1; }
 
-    // ── Content area (to the right of accent bar) ──
-    Group {
-      Anchor: (Top: 0, Bottom: 0, Left: 3, Right: 0);
+    // ── Visible panel — accent color background, content overlaid ──
+    Group #ShotcaveAmmoPanel {
       LayoutMode: Top;
-      Padding: (Horizontal: 12, Vertical: 8);
+      Background: @AccentDefault;
+
+      // ── Content area (3px left offset reveals accent strip) ──
+      Group {
+        Anchor: (Left: 3);
+        LayoutMode: Top;
+        Padding: (Horizontal: 14, Vertical: 10);
+        Background: @PanelBg;
 
       // ── Weapon title ──
       Label #ShotcaveWeaponTitle {
         Text: "WEAPON";
-        Anchor: (Height: 18);
+        Anchor: (Height: 24);
         Style: LabelStyle(
-          FontSize: 11,
+          FontName: "Secondary",
+          FontSize: 15,
           TextColor: @BrightText,
           RenderUppercase: true,
+          RenderBold: true,
+          LetterSpacing: 0.5,
           HorizontalAlignment: Start,
-          VerticalAlignment: Center
+          VerticalAlignment: Center,
+          ShrinkTextToFit: true,
+          MinShrinkTextToFitFontSize: 11
         );
       }
 
-      // ── Category label ──
-      Label #ShotcaveCategoryLabel {
-        Text: "LASER";
-        Anchor: (Height: 14, Top: 1);
-        Style: LabelStyle(
-          FontSize: 9,
-          TextColor: @DimText,
-          RenderUppercase: true,
-          HorizontalAlignment: Start,
-          VerticalAlignment: Center
-        );
+      // ── Subtitle: rarity + category + effect ──
+      Group #ShotcaveCategoryRow {
+        Anchor: (Height: 18, Top: 1);
+        LayoutMode: Left;
+
+        Label #ShotcaveCategoryLabel {
+          Text: "LASER";
+          Anchor: (Height: 18);
+          Style: LabelStyle(
+            FontSize: 11,
+            TextColor: @DimText,
+            RenderUppercase: true,
+            HorizontalAlignment: Start,
+            VerticalAlignment: Center,
+            LetterSpacing: 0.3
+          );
+        }
+
+        Label #ShotcaveEffectLabel {
+          Text: "";
+          Anchor: (Height: 18, Left: 6);
+          Visible: false;
+          Style: LabelStyle(
+            FontSize: 11,
+            HorizontalAlignment: Start,
+            VerticalAlignment: Center
+          );
+        }
       }
 
       // ── Separator ──
-      Group {
-        Anchor: (Height: 1, Top: 6, Left: 0, Right: 0);
-        Background: #1a1f2a;
-      }
+      Group { Anchor: (Height: 1, Top: 8, Left: 0, Right: 0); Background: @SepColor; }
 
       // ── Stat rows ──
 
-      // Damage
-      Group {
-        Anchor: (Height: 16, Top: 4);
+      Group #ShotcaveStatDamageRow {
+        Anchor: (Height: 20, Top: 6);
         LayoutMode: Left;
-        Label #ShotcaveStatDamageLabel { Text: "Damage"; Anchor: (Width: 80, Height: 16); Style: LabelStyle(FontSize: 9, TextColor: @DimText, HorizontalAlignment: Start, VerticalAlignment: Center); }
-        Label #ShotcaveStatDamageBase { Text: "0"; Anchor: (Width: 40, Height: 16); Style: LabelStyle(FontSize: 9, TextColor: @BrightText, HorizontalAlignment: Start, VerticalAlignment: Center); }
-        Label #ShotcaveStatDamageMod { Text: ""; Anchor: (Height: 16); Style: LabelStyle(FontSize: 9, TextColor: @ModGreen, HorizontalAlignment: Start, VerticalAlignment: Center); }
+        Label #ShotcaveStatDamageLabel { Text: "Damage"; Anchor: (Width: 95, Height: 20); Style: @StatLabelStyle; }
+        Label #ShotcaveStatDamageBase { Text: "0"; Anchor: (Width: 55, Height: 20); Style: @StatValueStyle; }
+        Label #ShotcaveStatDamageMod { Text: ""; Anchor: (Height: 20); Style: @StatModStyle; }
       }
 
-      // Speed
-      Group {
-        Anchor: (Height: 16, Top: 1);
+      Group #ShotcaveStatSpeedRow {
+        Anchor: (Height: 20, Top: 2);
         LayoutMode: Left;
-        Label #ShotcaveStatSpeedLabel { Text: "Speed"; Anchor: (Width: 80, Height: 16); Style: LabelStyle(FontSize: 9, TextColor: @DimText, HorizontalAlignment: Start, VerticalAlignment: Center); }
-        Label #ShotcaveStatSpeedBase { Text: "0s"; Anchor: (Width: 40, Height: 16); Style: LabelStyle(FontSize: 9, TextColor: @BrightText, HorizontalAlignment: Start, VerticalAlignment: Center); }
-        Label #ShotcaveStatSpeedMod { Text: ""; Anchor: (Height: 16); Style: LabelStyle(FontSize: 9, TextColor: @ModGreen, HorizontalAlignment: Start, VerticalAlignment: Center); }
+        Label #ShotcaveStatSpeedLabel { Text: "Speed"; Anchor: (Width: 95, Height: 20); Style: @StatLabelStyle; }
+        Label #ShotcaveStatSpeedBase { Text: "0s"; Anchor: (Width: 55, Height: 20); Style: @StatValueStyle; }
+        Label #ShotcaveStatSpeedMod { Text: ""; Anchor: (Height: 20); Style: @StatModStyle; }
       }
 
-      // Range
-      Group {
-        Anchor: (Height: 16, Top: 1);
+      Group #ShotcaveStatRangeRow {
+        Anchor: (Height: 20, Top: 2);
         LayoutMode: Left;
-        Label #ShotcaveStatRangeLabel { Text: "Range"; Anchor: (Width: 80, Height: 16); Style: LabelStyle(FontSize: 9, TextColor: @DimText, HorizontalAlignment: Start, VerticalAlignment: Center); }
-        Label #ShotcaveStatRangeBase { Text: "0"; Anchor: (Width: 40, Height: 16); Style: LabelStyle(FontSize: 9, TextColor: @BrightText, HorizontalAlignment: Start, VerticalAlignment: Center); }
-        Label #ShotcaveStatRangeMod { Text: ""; Anchor: (Height: 16); Style: LabelStyle(FontSize: 9, TextColor: @ModGreen, HorizontalAlignment: Start, VerticalAlignment: Center); }
+        Label #ShotcaveStatRangeLabel { Text: "Range"; Anchor: (Width: 95, Height: 20); Style: @StatLabelStyle; }
+        Label #ShotcaveStatRangeBase { Text: "0"; Anchor: (Width: 55, Height: 20); Style: @StatValueStyle; }
+        Label #ShotcaveStatRangeMod { Text: ""; Anchor: (Height: 20); Style: @StatModStyle; }
       }
 
-      // Precision
-      Group {
-        Anchor: (Height: 16, Top: 1);
+      Group #ShotcaveStatPrecisionRow {
+        Anchor: (Height: 20, Top: 2);
         LayoutMode: Left;
-        Label #ShotcaveStatPrecisionLabel { Text: "Precision"; Anchor: (Width: 80, Height: 16); Style: LabelStyle(FontSize: 9, TextColor: @DimText, HorizontalAlignment: Start, VerticalAlignment: Center); }
-        Label #ShotcaveStatPrecisionBase { Text: "100%"; Anchor: (Width: 40, Height: 16); Style: LabelStyle(FontSize: 9, TextColor: @BrightText, HorizontalAlignment: Start, VerticalAlignment: Center); }
-        Label #ShotcaveStatPrecisionMod { Text: ""; Anchor: (Height: 16); Style: LabelStyle(FontSize: 9, TextColor: @ModGreen, HorizontalAlignment: Start, VerticalAlignment: Center); }
+        Label #ShotcaveStatPrecisionLabel { Text: "Precision"; Anchor: (Width: 95, Height: 20); Style: @StatLabelStyle; }
+        Label #ShotcaveStatPrecisionBase { Text: "100%"; Anchor: (Width: 55, Height: 20); Style: @StatValueStyle; }
+        Label #ShotcaveStatPrecisionMod { Text: ""; Anchor: (Height: 20); Style: @StatModStyle; }
       }
 
-      // Knockback
-      Group {
-        Anchor: (Height: 16, Top: 1);
+      Group #ShotcaveStatKnockbackRow {
+        Anchor: (Height: 20, Top: 2);
         LayoutMode: Left;
-        Label #ShotcaveStatKnockbackLabel { Text: "Knockback"; Anchor: (Width: 80, Height: 16); Style: LabelStyle(FontSize: 9, TextColor: @DimText, HorizontalAlignment: Start, VerticalAlignment: Center); }
-        Label #ShotcaveStatKnockbackBase { Text: "0"; Anchor: (Width: 40, Height: 16); Style: LabelStyle(FontSize: 9, TextColor: @BrightText, HorizontalAlignment: Start, VerticalAlignment: Center); }
-        Label #ShotcaveStatKnockbackMod { Text: ""; Anchor: (Height: 16); Style: LabelStyle(FontSize: 9, TextColor: @ModGreen, HorizontalAlignment: Start, VerticalAlignment: Center); }
+        Label #ShotcaveStatKnockbackLabel { Text: "Knockback"; Anchor: (Width: 95, Height: 20); Style: @StatLabelStyle; }
+        Label #ShotcaveStatKnockbackBase { Text: "0"; Anchor: (Width: 55, Height: 20); Style: @StatValueStyle; }
+        Label #ShotcaveStatKnockbackMod { Text: ""; Anchor: (Height: 20); Style: @StatModStyle; }
       }
 
-      // Max Ammo
-      Group {
-        Anchor: (Height: 16, Top: 1);
+      Group #ShotcaveStatMaxAmmoRow {
+        Anchor: (Height: 20, Top: 2);
         LayoutMode: Left;
-        Label #ShotcaveStatMaxAmmoLabel { Text: "Max Ammo"; Anchor: (Width: 80, Height: 16); Style: LabelStyle(FontSize: 9, TextColor: @DimText, HorizontalAlignment: Start, VerticalAlignment: Center); }
-        Label #ShotcaveStatMaxAmmoBase { Text: "0"; Anchor: (Width: 40, Height: 16); Style: LabelStyle(FontSize: 9, TextColor: @BrightText, HorizontalAlignment: Start, VerticalAlignment: Center); }
-        Label #ShotcaveStatMaxAmmoMod { Text: ""; Anchor: (Height: 16); Style: LabelStyle(FontSize: 9, TextColor: @ModGreen, HorizontalAlignment: Start, VerticalAlignment: Center); }
+        Label #ShotcaveStatMaxAmmoLabel { Text: "Max Ammo"; Anchor: (Width: 95, Height: 20); Style: @StatLabelStyle; }
+        Label #ShotcaveStatMaxAmmoBase { Text: "0"; Anchor: (Width: 55, Height: 20); Style: @StatValueStyle; }
+        Label #ShotcaveStatMaxAmmoMod { Text: ""; Anchor: (Height: 20); Style: @StatModStyle; }
       }
 
-      // Pellets
-      Group {
-        Anchor: (Height: 16, Top: 1);
+      Group #ShotcaveStatPelletsRow {
+        Anchor: (Height: 20, Top: 2);
         LayoutMode: Left;
-        Label #ShotcaveStatPelletsLabel { Text: "Pellets"; Anchor: (Width: 80, Height: 16); Style: LabelStyle(FontSize: 9, TextColor: @DimText, HorizontalAlignment: Start, VerticalAlignment: Center); }
-        Label #ShotcaveStatPelletsBase { Text: "1"; Anchor: (Width: 40, Height: 16); Style: LabelStyle(FontSize: 9, TextColor: @BrightText, HorizontalAlignment: Start, VerticalAlignment: Center); }
-        Label #ShotcaveStatPelletsMod { Text: ""; Anchor: (Height: 16); Style: LabelStyle(FontSize: 9, TextColor: @ModGreen, HorizontalAlignment: Start, VerticalAlignment: Center); }
+        Label #ShotcaveStatPelletsLabel { Text: "Pellets"; Anchor: (Width: 95, Height: 20); Style: @StatLabelStyle; }
+        Label #ShotcaveStatPelletsBase { Text: "1"; Anchor: (Width: 55, Height: 20); Style: @StatValueStyle; }
+        Label #ShotcaveStatPelletsMod { Text: ""; Anchor: (Height: 20); Style: @StatModStyle; }
       }
 
-      // Modifiers summary
-      Label #ShotcaveModifiersLabel {
-        Text: "";
-        Anchor: (Height: 48, Top: 4);
-        Visible: false;
-        Style: LabelStyle(
-          FontSize: 8,
-          TextColor: @ModGreen,
-          HorizontalAlignment: Start,
-          VerticalAlignment: Start
-        );
-      }
+      // ── Modifier section ──
+      Group #ShotcaveModSeparator { Anchor: (Height: 1, Top: 6, Left: 0, Right: 0); Background: @SepColor; }
+      Label #ShotcaveMod0 { Text: ""; Anchor: (Height: 18, Top: 5); Style: @ModSlotStyle; }
+      Label #ShotcaveMod1 { Text: ""; Anchor: (Height: 18, Top: 1); Style: @ModSlotStyle; }
+      Label #ShotcaveMod2 { Text: ""; Anchor: (Height: 18, Top: 1); Style: @ModSlotStyle; }
+      Label #ShotcaveMod3 { Text: ""; Anchor: (Height: 18, Top: 1); Style: @ModSlotStyle; }
+      Label #ShotcaveMod4 { Text: ""; Anchor: (Height: 18, Top: 1); Style: @ModSlotStyle; }
 
-      // ── Separator ──
-      Group {
-        Anchor: (Height: 1, Top: 6, Left: 0, Right: 0);
-        Background: #1a1f2a;
-      }
+      // ── Separator before ammo ──
+      Group { Anchor: (Height: 1, Top: 6, Left: 0, Right: 0); Background: @SepColor; }
 
       // ── Ammo counter row ──
       Group {
-        Anchor: (Height: 22, Top: 4);
+        Anchor: (Height: 28, Top: 6);
         LayoutMode: Left;
 
         Label #ShotcaveAmmoValue {
           Text: "0";
-          Anchor: (Height: 22);
+          Anchor: (Height: 28);
           Style: LabelStyle(
-            FontName: "Mono",
-            FontSize: 18,
+            FontName: "Secondary",
+            FontSize: 22,
             TextColor: @BrightText,
+            RenderBold: true,
             VerticalAlignment: Center,
             HorizontalAlignment: Start
           );
@@ -168,10 +182,9 @@ Group #ShotcaveHudRoot {
 
         Label {
           Text: "/";
-          Anchor: (Height: 22, Left: 3, Right: 2);
+          Anchor: (Height: 28, Left: 4, Right: 3);
           Style: LabelStyle(
-            FontName: "Mono",
-            FontSize: 12,
+            FontSize: 14,
             TextColor: @DimText,
             VerticalAlignment: Center,
             HorizontalAlignment: Center
@@ -180,10 +193,9 @@ Group #ShotcaveHudRoot {
 
         Label #ShotcaveMaxAmmoValue {
           Text: "0";
-          Anchor: (Height: 22);
+          Anchor: (Height: 28);
           Style: LabelStyle(
-            FontName: "Mono",
-            FontSize: 12,
+            FontSize: 14,
             TextColor: @DimText,
             VerticalAlignment: Center,
             HorizontalAlignment: Start
@@ -193,7 +205,7 @@ Group #ShotcaveHudRoot {
 
       // ── Ammo bar ──
       Group #ShotcaveAmmoBarTrack {
-        Anchor: (Height: 4, Top: 2, Left: 0, Right: 0);
+        Anchor: (Height: 5, Top: 4, Left: 0, Right: 0);
         Background: @BarTrack;
 
         Group #ShotcaveAmmoBarFill {
@@ -201,6 +213,7 @@ Group #ShotcaveHudRoot {
           Background: @AmmoFull;
         }
       }
+    }
     }
   }
 }

@@ -1,0 +1,58 @@
+{
+  "RenderMode": "BlendAdd",
+  "ParticleRotationInfluence": "BillboardY",
+  "MaxConcurrentParticles": 2,
+  "ParticleLifeSpan": {
+    "Min": 1.5,
+    "Max": 1.5
+  },
+  "TrailSpawnerPositionMultiplier": 1,
+  "TrailSpawnerRotationMultiplier": 1,
+  "SpawnRate": {
+    "Min": 1.0,
+    "Max": 1.0
+  },
+  "Particle": {
+    "Texture": "Particles/Textures/Basic/Gradient_Reflected.png",
+    "ScaleRatioConstraint": "None",
+    "UVOption": "None",
+    "Animation": {
+      "0": {
+        "Opacity": 0.1,
+        "Color": "#cc1100"
+      },
+      "40": {
+        "Opacity": 1.0
+      },
+      "75": {
+        "Opacity": 0.8,
+        "Color": "#ee1800"
+      },
+      "100": {
+        "Opacity": 0.1
+      }
+    },
+    "InitialAnimationFrame": {
+      "Scale": {
+        "X": {
+          "Min": 0.2,
+          "Max": 0.3
+        },
+        "Y": {
+          "Min": 2.0,
+          "Max": 2.0
+        }
+      },
+      "Opacity": 0.7
+    },
+    "SoftParticles": "Enable"
+  },
+  "LinearFiltering": true,
+  "UVMotion": {
+    "Texture": "Particles/Textures/UVMotion/FlowMapWave.png",
+    "Scale": 0.5,
+    "Strength": 2.0,
+    "SpeedY": 0.5
+  },
+  "CameraOffset": 0.5
+}

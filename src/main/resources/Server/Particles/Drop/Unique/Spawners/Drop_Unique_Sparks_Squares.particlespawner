@@ -1,0 +1,113 @@
+{
+  "RenderMode": "Erosion",
+  "EmitOffset": {
+    "X": {
+      "Min": 0,
+      "Max": 0.4
+    },
+    "Y": {
+      "Min": 0,
+      "Max": 0
+    },
+    "Z": {
+      "Min": 0,
+      "Max": 0.4
+    }
+  },
+  "ParticleRotationInfluence": "Billboard",
+  "MaxConcurrentParticles": 50,
+  "ParticleLifeSpan": {
+    "Min": 0.8,
+    "Max": 1.2
+  },
+  "ParticleRotateWithSpawner": false,
+  "TrailSpawnerPositionMultiplier": 1,
+  "TrailSpawnerRotationMultiplier": 1,
+  "SpawnRate": {
+    "Min": 2.0,
+    "Max": 10.0
+  },
+  "InitialVelocity": {
+    "Pitch": {
+      "Min": 90.0,
+      "Max": 90.0
+    },
+    "Speed": {
+      "Min": 1.0,
+      "Max": 1.2
+    }
+  },
+  "Particle": {
+    "Texture": "Particles/Textures/Basic/Glow_Square.png",
+    "FrameSize": {
+      "Width": 32,
+      "Height": 32
+    },
+    "ScaleRatioConstraint": "None",
+    "UVOption": "RandomFlipU",
+    "Animation": {
+      "0": {
+        "Color": "#dd0a0a",
+        "Scale": {
+          "X": {
+            "Min": 0.0,
+            "Max": 0.1
+          },
+          "Y": {
+            "Min": 0.0,
+            "Max": 0.1
+          }
+        }
+      },
+      "20": {
+        "Color": "#ff8888",
+        "Scale": {
+          "X": {
+            "Min": 1.0,
+            "Max": 1.0
+          },
+          "Y": {
+            "Min": 1.0,
+            "Max": 1.0
+          }
+        }
+      },
+      "80": {},
+      "100": {
+        "Color": "#ffbbba",
+        "Scale": {
+          "X": {
+            "Min": 0.0,
+            "Max": 0.1
+          },
+          "Y": {
+            "Min": 0.0,
+            "Max": 0.1
+          }
+        }
+      }
+    },
+    "InitialAnimationFrame": {
+      "Scale": {
+        "X": {
+          "Min": 0.02,
+          "Max": 0.08
+        },
+        "Y": {
+          "Min": 0.02,
+          "Max": 0.2
+        }
+      },
+      "Opacity": 1.0,
+      "Color": "#ffffff"
+    }
+  },
+  "LinearFiltering": true,
+  "Attractors": [
+    {
+      "LinearAcceleration": {
+        "Y": 4.0
+      }
+    }
+  ]
+}

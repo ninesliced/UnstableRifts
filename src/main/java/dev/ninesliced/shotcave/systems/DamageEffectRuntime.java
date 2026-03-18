@@ -40,19 +40,22 @@ public final class DamageEffectRuntime {
         DamageEffectComponent activeEffect = commandBuffer.getComponent(target, DamageEffectComponent.getComponentType());
         if (activeEffect != null) {
             DamageEffect previousEffect = DamageEffect.fromOrdinal(activeEffect.getEffectOrdinal());
-            if (previousEffect != DamageEffect.NONE) {
+            boolean sameEffect = previousEffect == effect;
+            if (!sameEffect && previousEffect != DamageEffect.NONE) {
                 clearVisual(commandBuffer, target, previousEffect);
             }
             activeEffect.apply(effect.ordinal(), Math.max(1, Math.round(durationSeconds * 1000.0f)), damagePerTick,
                     effect == DamageEffect.ICE);
+            if (!sameEffect) {
+                applyVisual(commandBuffer, target, effect, durationSeconds);
+            }
         } else {
             DamageEffectComponent newEffect = new DamageEffectComponent();
             newEffect.apply(effect.ordinal(), Math.max(1, Math.round(durationSeconds * 1000.0f)), damagePerTick,
                     effect == DamageEffect.ICE);
             commandBuffer.putComponent(target, DamageEffectComponent.getComponentType(), newEffect);
+            applyVisual(commandBuffer, target, effect, durationSeconds);
         }
-
-        applyVisual(commandBuffer, target, effect, durationSeconds);
     }
 
     public static void clearVisual(@Nonnull CommandBuffer<EntityStore> commandBuffer,

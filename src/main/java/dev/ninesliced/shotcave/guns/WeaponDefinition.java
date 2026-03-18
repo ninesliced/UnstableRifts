@@ -25,6 +25,7 @@ public final class WeaponDefinition {
     private final int baseMobHealth;
     private final int baseMobDamage;
     private final int baseMobLifetime;
+    private final int basePrecision;
 
     public WeaponDefinition(@Nonnull String itemId,
                             @Nonnull String displayName,
@@ -41,7 +42,8 @@ public final class WeaponDefinition {
                             float baseKnockback,
                             int baseMobHealth,
                             int baseMobDamage,
-                            int baseMobLifetime) {
+                            int baseMobLifetime,
+                            int basePrecision) {
         this.itemId = itemId;
         this.displayName = displayName;
         this.category = category;
@@ -58,6 +60,7 @@ public final class WeaponDefinition {
         this.baseMobHealth = baseMobHealth;
         this.baseMobDamage = baseMobDamage;
         this.baseMobLifetime = baseMobLifetime;
+        this.basePrecision = basePrecision;
     }
 
     @Nonnull
@@ -127,5 +130,13 @@ public final class WeaponDefinition {
 
     public int getBaseMobLifetime() {
         return baseMobLifetime;
+    }
+
+    /**
+     * Returns the explicit precision override from JSON, or -1 if not set
+     * (meaning precision should be derived from spread).
+     */
+    public int getBasePrecision() {
+        return basePrecision;
     }
 }
