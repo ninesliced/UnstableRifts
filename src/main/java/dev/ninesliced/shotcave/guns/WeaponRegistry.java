@@ -15,6 +15,7 @@ import javax.annotation.Nullable;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -55,10 +56,31 @@ public final class WeaponRegistry {
     }
 
     private static final class WeaponConfig {
+        @SerializedName("itemId") String itemId;
+        @SerializedName("displayName") String displayName;
+        @SerializedName("category") String category;
+        @SerializedName("lockedEffect") @Nullable String lockedEffect;
+        @SerializedName("minRarity") @Nullable String minRarity;
+        @SerializedName("spawnWeight") int spawnWeight;
+        @SerializedName("baseStats") @Nullable BaseStatsDef baseStats;
+        @SerializedName("summoningStats") @Nullable SummoningStatsDef summoningStats;
         @SerializedName("primary") PrimaryDef primary;
         @SerializedName("reload") @Nullable ReloadDef reload;
         @SerializedName("damage") @Nullable DamageDef damage;
         @SerializedName("extraRoots") @Nullable List<String> extraRoots;
+    }
+
+    private static final class BaseStatsDef {
+        @SerializedName("range") int range;
+        @SerializedName("spread") double spread;
+        @SerializedName("pellets") int pellets;
+        @SerializedName("knockback") float knockback;
+    }
+
+    private static final class SummoningStatsDef {
+        @SerializedName("mobHealth") int mobHealth;
+        @SerializedName("mobDamage") int mobDamage;
+        @SerializedName("mobLifetime") int mobLifetime;
     }
 
     private static final class PrimaryDef {
@@ -95,6 +117,16 @@ public final class WeaponRegistry {
 
     public static void registerAll() {
         Manifest manifest = loadResource(MANIFEST_FILE, Manifest.class);
+        List<WeaponConfig> weaponConfigs = new ArrayList<>();
+        Map<String, Integer> reloadMaxAmmoById = new HashMap<>();
+
+        for (String weaponFile : manifest.weapons) {
+            WeaponConfig wc = loadResource(weaponFile, WeaponConfig.class);
+            weaponConfigs.add(wc);
+            if (wc.reload != null && wc.reload.id != null && wc.reload.maxAmmo != null && wc.reload.maxAmmo > 0) {
+                reloadMaxAmmoById.putIfAbsent(wc.reload.id, wc.reload.maxAmmo);
+            }
+        }
 
         List<Interaction> interactions = new ArrayList<>();
         List<RootInteraction> roots = new ArrayList<>();
@@ -114,9 +146,9 @@ public final class WeaponRegistry {
         }
 
         // Per-weapon configs
-        for (String weaponFile : manifest.weapons) {
-            WeaponConfig wc = loadResource(weaponFile, WeaponConfig.class);
-            registerWeapon(wc, interactions, roots, registeredIds);
+        for (WeaponConfig wc : weaponConfigs) {
+            registerWeapon(wc, interactions, roots, registeredIds, reloadMaxAmmoById);
+            registerDefinition(wc, reloadMaxAmmoById);
         }
 
         // Register all — interactions first, then roots (roots resolve interaction IDs)
@@ -127,7 +159,8 @@ public final class WeaponRegistry {
     private static void registerWeapon(@Nonnull WeaponConfig wc,
                                        @Nonnull List<Interaction> interactions,
                                        @Nonnull List<RootInteraction> roots,
-                                       @Nonnull Set<String> registeredIds) {
+                                       @Nonnull Set<String> registeredIds,
+                                       @Nonnull Map<String, Integer> reloadMaxAmmoById) {
         PrimaryDef p = wc.primary;
 
         // GunValidate interaction + root
@@ -141,9 +174,10 @@ public final class WeaponRegistry {
         // Reload interaction + root (deduplicated for shared reloads)
         ReloadDef r = wc.reload;
         if (r != null && registeredIds.add(r.id)) {
+            int resolvedMaxAmmo = resolveReloadMaxAmmo(r, reloadMaxAmmoById);
             interactions.add(new ReloadInteraction(r.id, r.amount, r.runTime,
                     r.nextId, r.worldSfx, r.localSfx, r.animationId,
-                    r.maxAmmo != null ? r.maxAmmo : 0));
+                resolvedMaxAmmo));
             roots.add(new RootInteraction("Root_" + r.id,
                     new InteractionCooldown("Reload", r.cooldown, false, null, false, false),
                     r.id));
@@ -167,6 +201,46 @@ public final class WeaponRegistry {
                 }
             }
         }
+    }
+
+    private static void registerDefinition(@Nonnull WeaponConfig wc,
+                                           @Nonnull Map<String, Integer> reloadMaxAmmoById) {
+        WeaponCategory category = WeaponCategory.fromString(wc.category);
+        DamageEffect locked = wc.lockedEffect != null
+                ? DamageEffect.fromString(wc.lockedEffect)
+                : DamageEffect.NONE;
+        WeaponRarity minRarity = wc.minRarity != null
+                ? WeaponRarity.fromString(wc.minRarity)
+                : WeaponRarity.BASIC;
+
+        float baseDamage = wc.damage != null ? wc.damage.amount : 0;
+        float baseCooldown = wc.primary.cooldown;
+        int baseMaxAmmo = wc.reload != null ? resolveReloadMaxAmmo(wc.reload, reloadMaxAmmoById) : 0;
+        int baseRange = wc.baseStats != null ? wc.baseStats.range : 0;
+        double baseSpread = wc.baseStats != null ? wc.baseStats.spread : 0;
+        int basePellets = wc.baseStats != null ? wc.baseStats.pellets : 1;
+        float baseKnockback = wc.baseStats != null ? wc.baseStats.knockback : 0;
+        int baseMobHealth = wc.summoningStats != null ? wc.summoningStats.mobHealth : 0;
+        int baseMobDamage = wc.summoningStats != null ? wc.summoningStats.mobDamage : 0;
+        int baseMobLifetime = wc.summoningStats != null ? wc.summoningStats.mobLifetime : 0;
+
+        WeaponDefinition def = new WeaponDefinition(
+                wc.itemId, wc.displayName, category, locked, minRarity,
+                wc.spawnWeight, baseDamage, baseCooldown, baseMaxAmmo,
+                baseRange, baseSpread, basePellets, baseKnockback,
+                baseMobHealth, baseMobDamage, baseMobLifetime
+        );
+        WeaponDefinitions.register(def);
+    }
+
+    private static int resolveReloadMaxAmmo(@Nonnull ReloadDef reload,
+                                            @Nonnull Map<String, Integer> reloadMaxAmmoById) {
+        if (reload.maxAmmo != null && reload.maxAmmo > 0) {
+            return reload.maxAmmo;
+        }
+
+        Integer sharedMaxAmmo = reloadMaxAmmoById.get(reload.id);
+        return sharedMaxAmmo != null ? sharedMaxAmmo : 0;
     }
 
     @Nonnull

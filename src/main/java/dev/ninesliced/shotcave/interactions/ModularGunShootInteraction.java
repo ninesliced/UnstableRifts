@@ -13,6 +13,7 @@ import com.hypixel.hytale.math.vector.Vector3d;
 import com.hypixel.hytale.math.vector.Vector3i;
 import com.hypixel.hytale.math.vector.Vector4d;
 import com.hypixel.hytale.protocol.BlockPosition;
+import com.hypixel.hytale.protocol.ChangeVelocityType;
 import com.hypixel.hytale.protocol.Color;
 import com.hypixel.hytale.protocol.InteractionChainData;
 import com.hypixel.hytale.protocol.InteractionType;
@@ -20,6 +21,7 @@ import com.hypixel.hytale.server.core.entity.Entity;
 import com.hypixel.hytale.server.core.entity.EntityUtils;
 import com.hypixel.hytale.server.core.entity.InteractionContext;
 import com.hypixel.hytale.server.core.entity.LivingEntity;
+import com.hypixel.hytale.server.core.entity.knockback.KnockbackComponent;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.meta.DynamicMetaStore;
 import com.hypixel.hytale.server.core.modules.collision.CollisionMath;
@@ -37,8 +39,19 @@ import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.core.util.TargetUtil;
 import dev.ninesliced.shotcave.guns.AimAssistHelper;
+import dev.ninesliced.shotcave.guns.DamageEffect;
 import dev.ninesliced.shotcave.guns.GunItemMetadata;
+import dev.ninesliced.shotcave.guns.WeaponCategory;
+import dev.ninesliced.shotcave.guns.WeaponDefinition;
+import dev.ninesliced.shotcave.guns.WeaponModifierType;
+import dev.ninesliced.shotcave.guns.WeaponDefinitions;
+import dev.ninesliced.shotcave.ShotcaveLog;
+import com.hypixel.hytale.logger.HytaleLogger;
+import dev.ninesliced.shotcave.systems.DamageEffectRuntime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.logging.Level;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -51,6 +64,8 @@ import java.util.concurrent.ThreadLocalRandom;
  * Java.
  */
 public final class ModularGunShootInteraction extends SimpleInstantInteraction {
+    private static final HytaleLogger LOG = ShotcaveLog.forModule("GunShoot");
+
     @Nonnull
     public static final BuilderCodec<ModularGunShootInteraction> CODEC;
 
@@ -218,14 +233,64 @@ public final class ModularGunShootInteraction extends SimpleInstantInteraction {
             return;
         }
 
+        // Read modifier bonuses from held item BSON
+        ItemStack heldItem = context.getHeldItem();
+        int effectiveRange = this.range;
+        int effectivePellets = this.pellets;
+        double effectiveSpread = this.spreadDegrees;
+        int effectiveTrailR = this.trailColorR;
+        int effectiveTrailG = this.trailColorG;
+        int effectiveTrailB = this.trailColorB;
+        int effectiveMaxAmmo = this.maxAmmo;
+        double effectiveKnockback = 0.0;
+        WeaponDefinition weaponDefinition = null;
+
+        if (heldItem != null) {
+            weaponDefinition = WeaponDefinitions.getById(heldItem.getItemId());
+            double rangeBonus = GunItemMetadata.getModifierBonus(heldItem, WeaponModifierType.MAX_RANGE);
+            effectiveRange = (int) Math.round(this.range * (1.0 + rangeBonus));
+
+            double precisionBonus = GunItemMetadata.getModifierBonus(heldItem, WeaponModifierType.PRECISION);
+            effectiveSpread = this.spreadDegrees * Math.max(0.0, 1.0 - precisionBonus);
+
+            double pelletBonus = GunItemMetadata.getModifierBonus(heldItem, WeaponModifierType.ADDITIONAL_BULLETS);
+            effectivePellets = this.pellets + (int) pelletBonus;
+            effectiveMaxAmmo = GunItemMetadata.getEffectiveMaxAmmo(heldItem, this.maxAmmo);
+
+            // Override trail color with damage effect color
+            DamageEffect effect = GunItemMetadata.getEffect(heldItem);
+            if (effect != DamageEffect.NONE) {
+                effectiveTrailR = effect.getTrailR();
+                effectiveTrailG = effect.getTrailG();
+                effectiveTrailB = effect.getTrailB();
+            } else if (weaponDefinition != null && weaponDefinition.getCategory() == WeaponCategory.LASER) {
+                effectiveTrailR = 255;
+                effectiveTrailG = 255;
+                effectiveTrailB = 255;
+            }
+
+            if (weaponDefinition != null) {
+                double knockbackBonus = GunItemMetadata.getModifierBonus(heldItem, WeaponModifierType.KNOCKBACK);
+                effectiveKnockback = weaponDefinition.getBaseKnockback() * (1.0 + knockbackBonus);
+            }
+
+            LOG.at(Level.INFO).log("[GunShoot] itemId=%s effect=%s pellets=%d(base=%d +%.0f) range=%d(base=%d) spread=%.1f trail=(%d,%d,%d) mods=%d",
+                    heldItem.getItemId(), effect.name(), effectivePellets, this.pellets, pelletBonus,
+                    effectiveRange, this.range, effectiveSpread,
+                    effectiveTrailR, effectiveTrailG, effectiveTrailB,
+                    GunItemMetadata.getModifiers(heldItem).size());
+        }
+
+        // Capture DoT effect for application on hit
+        DamageEffect dotEffect = heldItem != null ? GunItemMetadata.getEffect(heldItem) : DamageEffect.NONE;
+
         if (this.useAmmo) {
-            ItemStack heldItem = context.getHeldItem();
             if (heldItem == null) {
                 return;
             }
 
-            ItemStack updated = GunItemMetadata.ensureAmmo(heldItem, this.maxAmmo);
-            int ammo = GunItemMetadata.getInt(updated, GunItemMetadata.AMMO_KEY, 0);
+            ItemStack updated = GunItemMetadata.ensureAmmo(heldItem, this.maxAmmo, effectiveMaxAmmo);
+            int ammo = GunItemMetadata.getInt(updated, GunItemMetadata.AMMO_KEY, effectiveMaxAmmo);
             if (ammo < this.ammoPerShot) {
                 return;
             }
@@ -254,25 +319,39 @@ public final class ModularGunShootInteraction extends SimpleInstantInteraction {
         if (this.aimAssist) {
             Vector3d rawLook = getShotDirection(commandBuffer, context.getEntity());
             assistedBaseDir = AimAssistHelper.computeAssistedDirection(
-                    commandBuffer, context, start, rawLook, (double) this.range);
+                    commandBuffer, context, start, rawLook, (double) effectiveRange);
         }
 
-        for (int i = 0; i < this.pellets; i++) {
+        // Store effective values for use in shot methods
+        final int shotRange = effectiveRange;
+        final double shotSpread = effectiveSpread;
+        final int shotTrailR = effectiveTrailR;
+        final int shotTrailG = effectiveTrailG;
+        final int shotTrailB = effectiveTrailB;
+        Set<Integer> knockedTargets = effectiveKnockback > 0.001 ? new HashSet<>() : null;
+        Set<Integer> effectedTargets = dotEffect.hasDoT() ? new HashSet<>() : null;
+
+        for (int i = 0; i < effectivePellets; i++) {
             Vector3d direction;
             if (assistedBaseDir != null) {
-                // Apply spread on top of the aim-assisted direction
-                direction = applySpread(assistedBaseDir);
+                direction = applySpread(assistedBaseDir, shotSpread);
             } else {
-                direction = getShotDirection(commandBuffer, context.getEntity());
+                direction = getShotDirection(commandBuffer, context.getEntity(), shotSpread);
             }
-            ShotHit hit = traceShot(commandBuffer, context, start, direction);
+            ShotHit hit = traceShot(commandBuffer, context, start, direction, shotRange);
 
             if (hasText(this.trailParticleId)) {
-                spawnTrail(start, hit.position, commandBuffer);
+                spawnTrail(start, hit.position, commandBuffer, shotTrailR, shotTrailG, shotTrailB);
             }
 
             if (hit.target != null) {
                 forkHitInteraction(context, damage, hit.target, hit.position);
+                if (knockedTargets != null && knockedTargets.add(hit.target.getIndex())) {
+                    applyKnockback(commandBuffer, context.getEntity(), hit.target, effectiveKnockback);
+                }
+                if (effectedTargets != null && effectedTargets.add(hit.target.getIndex())) {
+                    DamageEffectRuntime.apply(commandBuffer, hit.target, dotEffect);
+                }
                 continue;
             }
 
@@ -314,18 +393,24 @@ public final class ModularGunShootInteraction extends SimpleInstantInteraction {
     @Nonnull
     private Vector3d getShotDirection(@Nonnull CommandBuffer<EntityStore> commandBuffer,
             @Nonnull Ref<EntityStore> ref) {
+        return getShotDirection(commandBuffer, ref, this.spreadDegrees);
+    }
+
+    @Nonnull
+    private Vector3d getShotDirection(@Nonnull CommandBuffer<EntityStore> commandBuffer,
+            @Nonnull Ref<EntityStore> ref, double effectiveSpread) {
         HeadRotation headRotation = commandBuffer.getComponent(ref, HeadRotation.getComponentType());
         if (headRotation == null) {
             return new Vector3d(0.0, 0.0, 1.0);
         }
 
         Vector3d direction = new Vector3d(headRotation.getRotation().getYaw(), headRotation.getRotation().getPitch());
-        return applySpread(direction);
+        return applySpread(direction, effectiveSpread);
     }
 
     @Nonnull
-    private Vector3d applySpread(@Nonnull Vector3d direction) {
-        double spreadRadians = Math.toRadians(this.spreadDegrees);
+    private Vector3d applySpread(@Nonnull Vector3d direction, double effectiveSpread) {
+        double spreadRadians = Math.toRadians(effectiveSpread);
         if (spreadRadians > 0.000001) {
             direction = direction.clone();
             ThreadLocalRandom random = ThreadLocalRandom.current();
@@ -343,14 +428,15 @@ public final class ModularGunShootInteraction extends SimpleInstantInteraction {
     private ShotHit traceShot(@Nonnull CommandBuffer<EntityStore> commandBuffer,
             @Nonnull InteractionContext context,
             @Nonnull Vector3d from,
-            @Nonnull Vector3d direction) {
+            @Nonnull Vector3d direction,
+            int effectiveRange) {
         final Vector3d[] entityHitPos = new Vector3d[] { null };
         final Ref<EntityStore>[] entityHitRef = new Ref[] { null };
         final double[] entityHitDistanceSq = new double[] { Double.MAX_VALUE };
 
         Vector2d minMax = new Vector2d();
-        Vector3d searchCenter = from.clone().addScaled(direction, (double) this.range * 0.5);
-        Selector.selectNearbyEntities(commandBuffer, searchCenter, (double) this.range * 0.6, candidate -> {
+        Vector3d searchCenter = from.clone().addScaled(direction, (double) effectiveRange * 0.5);
+        Selector.selectNearbyEntities(commandBuffer, searchCenter, (double) effectiveRange * 0.6, candidate -> {
             if (!candidate.isValid()) {
                 return;
             }
@@ -376,7 +462,7 @@ public final class ModularGunShootInteraction extends SimpleInstantInteraction {
             }
 
             double t = minMax.x;
-            if (t < 0.0 || t > (double) this.range) {
+            if (t < 0.0 || t > (double) effectiveRange) {
                 return;
             }
 
@@ -403,7 +489,7 @@ public final class ModularGunShootInteraction extends SimpleInstantInteraction {
                 direction.x,
                 direction.y,
                 direction.z,
-                this.range);
+                effectiveRange);
 
         if (block != null) {
             Vector3d blockHitPos = new Vector3d((double) block.x + 0.5, (double) block.y + 0.5, (double) block.z + 0.5);
@@ -418,7 +504,7 @@ public final class ModularGunShootInteraction extends SimpleInstantInteraction {
             return new ShotHit(entityHitPos[0], entityHitRef[0], null);
         }
 
-        Vector3d miss = from.clone().addScaled(direction, (double) this.range);
+        Vector3d miss = from.clone().addScaled(direction, (double) effectiveRange);
         return new ShotHit(miss, null, null);
     }
 
@@ -454,11 +540,12 @@ public final class ModularGunShootInteraction extends SimpleInstantInteraction {
 
     private void spawnTrail(@Nonnull Vector3d from,
             @Nonnull Vector3d to,
-            @Nonnull CommandBuffer<EntityStore> commandBuffer) {
+            @Nonnull CommandBuffer<EntityStore> commandBuffer,
+            int trailR, int trailG, int trailB) {
         Vector3d delta = to.clone().subtract(from);
         double distance = from.distanceTo(to);
         if (distance <= 0.001) {
-            spawnTrailParticle(from.clone(), 0.0f, 0.0f, commandBuffer);
+            spawnTrailParticle(from.clone(), 0.0f, 0.0f, commandBuffer, trailR, trailG, trailB);
             return;
         }
 
@@ -470,20 +557,21 @@ public final class ModularGunShootInteraction extends SimpleInstantInteraction {
         for (int i = 0; i <= steps; i++) {
             double t = (double) i / (double) steps;
             Vector3d point = from.clone().addScaled(delta, t);
-            spawnTrailParticle(point, yaw, pitch, commandBuffer);
+            spawnTrailParticle(point, yaw, pitch, commandBuffer, trailR, trailG, trailB);
         }
     }
 
     private void spawnTrailParticle(@Nonnull Vector3d point,
             float yaw,
             float pitch,
-            @Nonnull CommandBuffer<EntityStore> commandBuffer) {
+            @Nonnull CommandBuffer<EntityStore> commandBuffer,
+            int trailR, int trailG, int trailB) {
         SpatialResource<Ref<EntityStore>, EntityStore> playerSpatialResource = commandBuffer
                 .getResource(EntityModule.get().getPlayerSpatialResourceType());
         List<Ref<EntityStore>> playerRefs = SpatialResource.getThreadLocalReferenceList();
         playerSpatialResource.getSpatialStructure().collect(point, ParticleUtil.DEFAULT_PARTICLE_DISTANCE, playerRefs);
 
-        Color color = new Color((byte) this.trailColorR, (byte) this.trailColorG, (byte) this.trailColorB);
+        Color color = new Color((byte) trailR, (byte) trailG, (byte) trailB);
         ParticleUtil.spawnParticleEffect(
                 this.trailParticleId,
                 point.x,
@@ -526,6 +614,49 @@ public final class ModularGunShootInteraction extends SimpleInstantInteraction {
 
     private boolean hasText(@Nullable String value) {
         return value != null && !value.isBlank();
+    }
+
+    private void applyKnockback(@Nonnull CommandBuffer<EntityStore> commandBuffer,
+            @Nonnull Ref<EntityStore> attacker,
+            @Nonnull Ref<EntityStore> target,
+            double force) {
+        if (force <= 0.001 || attacker.equals(target)) {
+            return;
+        }
+
+        TransformComponent attackerTransform = commandBuffer.getComponent(attacker, TransformComponent.getComponentType());
+        TransformComponent targetTransform = commandBuffer.getComponent(target, TransformComponent.getComponentType());
+        if (attackerTransform == null || targetTransform == null) {
+            return;
+        }
+
+        Vector3d direction = targetTransform.getPosition().clone().subtract(attackerTransform.getPosition());
+        direction.y = 0.0;
+        if (direction.squaredLength() <= 0.000001) {
+            HeadRotation attackerHeadRotation = commandBuffer.getComponent(attacker, HeadRotation.getComponentType());
+            if (attackerHeadRotation == null) {
+                return;
+            }
+
+            direction = new Vector3d(0.0, 0.0, -1.0);
+            direction.rotateY(attackerHeadRotation.getRotation().getYaw());
+        } else {
+            direction.normalize();
+        }
+
+        direction.scale(force);
+        direction.y = Math.min(0.45, 0.12 * force + 0.05);
+
+        KnockbackComponent knockback = commandBuffer.getComponent(target, KnockbackComponent.getComponentType());
+        if (knockback == null) {
+            knockback = new KnockbackComponent();
+            commandBuffer.putComponent(target, KnockbackComponent.getComponentType(), knockback);
+        }
+
+        knockback.setVelocity(direction);
+        knockback.setVelocityType(ChangeVelocityType.Add);
+        knockback.setDuration(0.0f);
+        knockback.setTimer(0.0f);
     }
 
     private static final class ShotHit {

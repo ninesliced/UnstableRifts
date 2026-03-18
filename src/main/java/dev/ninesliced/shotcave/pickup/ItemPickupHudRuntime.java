@@ -7,6 +7,7 @@ import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.event.events.player.PlayerDisconnectEvent;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
+import com.hypixel.hytale.server.core.entity.movement.MovementStatesComponent;
 
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.Universe;
@@ -76,7 +77,7 @@ public final class ItemPickupHudRuntime {
 
     /**
      * Finds the closest F-key item within HUD proximity radius and shows/hides the
-     * HUD.
+     * HUD. Detects crouching to expand weapon details panel.
      */
     private void pollSinglePlayer(@Nonnull PlayerRef playerRef) {
         if (!playerRef.isValid()) {
@@ -101,6 +102,14 @@ public final class ItemPickupHudRuntime {
                     return;
                 }
 
+                // Detect crouching
+                boolean crouching = false;
+                MovementStatesComponent movementStates = ref.getStore().getComponent(
+                        ref, MovementStatesComponent.getComponentType());
+                if (movementStates != null) {
+                    crouching = movementStates.getMovementStates().crouching;
+                }
+
                 Vector3d playerPos = playerTransform.getPosition();
                 double radiusSq = ItemPickupConfig.HUD_PROXIMITY_RADIUS
                         * ItemPickupConfig.HUD_PROXIMITY_RADIUS;
@@ -108,6 +117,7 @@ public final class ItemPickupHudRuntime {
                 ItemPickupTracker.TrackedItem closest = null;
                 double closestDistSq = Double.MAX_VALUE;
                 int closestQuantity = 1;
+                ItemStack closestStack = null;
 
                 for (ItemPickupTracker.TrackedItem tracked : ItemPickupTracker.getAll()) {
                     if (!tracked.isFKeyPickup()) {
@@ -132,6 +142,7 @@ public final class ItemPickupHudRuntime {
                         closest = tracked;
 
                         ItemStack stack = tracked.getItemStack(ref.getStore());
+                        closestStack = stack;
                         closestQuantity = (stack != null) ? stack.getQuantity() : 1;
                     }
                 }
@@ -142,7 +153,8 @@ public final class ItemPickupHudRuntime {
                             : closest.getItemId();
                     String icon = closest.getIconPath();
 
-                    ItemPickupHudService.show(player, playerRef, name, icon, closestQuantity);
+                    ItemPickupHudService.show(player, playerRef, name, icon,
+                            closestQuantity, crouching, closestStack);
                 } else {
                     ItemPickupHudService.hide(player, playerRef);
                 }

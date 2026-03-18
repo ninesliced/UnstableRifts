@@ -1,4 +1,16 @@
 {
+  "itemId": "Weapon_Voidlance_Shotcave",
+  "displayName": "Voidlance",
+  "category": "BULLET",
+  "lockedEffect": "VOID",
+  "minRarity": "EPIC",
+  "spawnWeight": 5,
+  "baseStats": {
+    "range": 40,
+    "spread": 0,
+    "pellets": 1,
+    "knockback": 0
+  },
   "primary": {
     "id": "Shotcave_Voidlance_Primary",
     "cooldown": 1.2,

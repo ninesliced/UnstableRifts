@@ -1,7 +1,8 @@
 // ─────────────────────────────────────────────
 //  Shotcave — Crate Pickup HUD
-//  Shows nearby F-key loot: icon, name, and
-//  a collect prompt that adapts to distance.
+//  Shows nearby F-key loot: weapon name with
+//  rarity color, effect, collect prompt, and
+//  an expandable details panel on crouch.
 // ─────────────────────────────────────────────
 
 @DimText = #8a9bb0;
@@ -9,92 +10,120 @@
 @AccentGold = #f0c050;
 @PanelBg = #0c0f14(0.85);
 @KeyBg = #2a3040;
+@ModGreen = #3e9049;
 
 Group #CratePickupHudRoot {
   Anchor: (Left: 0, Top: 0, Right: 0, Bottom: 0);
   HitTestVisible: false;
 
-  Group {
-    Anchor: (Bottom: 160, Left: 0, Right: 0, Height: 64);
+  // ── Compact wrapper (when NOT crouching) ──
+  Group #CratePickupCompactWrapper {
+    Anchor: (Bottom: 110, Left: 0, Right: 0, Height: 100);
     LayoutMode: Center;
+    Visible: false;
 
-    Group #CratePickupRoot {
-      Anchor: (Width: 280, Height: 64);
+    Group #CratePickupCompact {
+      Anchor: (Width: 280, Height: 80);
       Background: @PanelBg;
       LayoutMode: Left;
-      Padding: (Horizontal: 10, Vertical: 8);
-      Visible: false;
+      Padding: (Horizontal: 0, Vertical: 0);
 
-      AssetImage #CratePickupIcon {
-        Anchor: (Width: 48, Height: 48, Top: 0);
-        Visible: false;
+      Group #CratePickupAccentCompact {
+        Anchor: (Width: 4, Top: 0, Bottom: 0, Left: 0);
+        Background: @DimText;
       }
 
-      Group #CratePickupTextColumn {
-        Anchor: (Height: 48, Left: 8, Top: 0);
+      Group {
+        Anchor: (Left: 10, Right: 6, Top: 8, Bottom: 8);
         LayoutMode: Top;
 
         Group {
           Anchor: (Height: 22);
           LayoutMode: Left;
+          AssetImage #CratePickupIconCompact { Anchor: (Width: 20, Height: 20, Top: 0); Visible: false; }
+          Label #CratePickupItemNameCompact { Text: "Item"; Anchor: (Height: 22, Left: 4); Style: LabelStyle(FontSize: 14, TextColor: @BrightText, HorizontalAlignment: Start, VerticalAlignment: Center); }
+          Label #CratePickupQuantityCompact { Text: ""; Anchor: (Height: 22, Left: 4); Visible: false; Style: LabelStyle(FontSize: 12, TextColor: @DimText, HorizontalAlignment: Start, VerticalAlignment: Center); }
+        }
 
-          Label #CratePickupItemName {
-            Text: "Item";
-            Anchor: (Height: 22);
-            Style: LabelStyle(
-              FontSize: 14,
-              TextColor: @BrightText,
-              HorizontalAlignment: Start,
-              VerticalAlignment: Center
-            );
-          }
-
-          Label #CratePickupQuantity {
-            Text: "";
-            Anchor: (Height: 22, Left: 4);
-            Visible: false;
-            Style: LabelStyle(
-              FontSize: 12,
-              TextColor: @DimText,
-              HorizontalAlignment: Start,
-              VerticalAlignment: Center
-            );
-          }
+        Label #CratePickupEffectLabelCompact {
+          Text: ""; Anchor: (Height: 16, Top: 0); Visible: false;
+          Style: LabelStyle(FontSize: 11, TextColor: @DimText, HorizontalAlignment: Start, VerticalAlignment: Center);
         }
 
         Group {
           Anchor: (Height: 22, Top: 2);
           LayoutMode: Left;
-
-          Group #CratePickupKeyHint {
-            Anchor: (Width: 22, Height: 20, Top: 0);
-            Background: @KeyBg;
-            Visible: false;
-            LayoutMode: Center;
-
-            Label {
-              Text: "F";
-              Anchor: (Width: 22, Height: 20);
-              Style: LabelStyle(
-                FontName: "Mono",
-                FontSize: 13,
-                TextColor: @AccentGold,
-                HorizontalAlignment: Center,
-                VerticalAlignment: Center
-              );
-            }
+          Group #CratePickupKeyHintCompact {
+            Anchor: (Width: 22, Height: 20, Top: 0); Background: @KeyBg; Visible: false; LayoutMode: Center;
+            Label { Text: "F"; Anchor: (Width: 22, Height: 20); Style: LabelStyle(FontName: "Mono", FontSize: 13, TextColor: @AccentGold, HorizontalAlignment: Center, VerticalAlignment: Center); }
           }
+          Label #CratePickupCollectLabelCompact { Text: "Collect"; Anchor: (Height: 20, Left: 6, Top: 0); Visible: false; Style: LabelStyle(FontSize: 12, TextColor: @DimText, HorizontalAlignment: Start, VerticalAlignment: Center); }
+          Label #CratePickupCrouchHint { Text: ""; Anchor: (Height: 20, Left: 10, Top: 0); Visible: false; Style: LabelStyle(FontSize: 10, TextColor: @DimText, HorizontalAlignment: Start, VerticalAlignment: Center); }
+        }
+      }
+    }
+  }
 
-          Label #CratePickupCollectLabel {
-            Text: "Collect";
-            Anchor: (Height: 20, Left: 6, Top: 0);
-            Visible: false;
-            Style: LabelStyle(
-              FontSize: 12,
-              TextColor: @DimText,
-              HorizontalAlignment: Start,
-              VerticalAlignment: Center
-            );
+  // ── Expanded wrapper (when crouching: positioned higher) ──
+  Group #CratePickupExpandedWrapper {
+    Anchor: (Bottom: 160, Left: 0, Right: 0, Height: 300);
+    LayoutMode: Center;
+    Visible: false;
+
+    Group #CratePickupExpanded {
+      Anchor: (Width: 280, Height: 260);
+      Background: @PanelBg;
+      LayoutMode: Left;
+      Padding: (Horizontal: 0, Vertical: 0);
+
+      Group #CratePickupAccentExpanded {
+        Anchor: (Width: 4, Top: 0, Bottom: 0, Left: 0);
+        Background: @DimText;
+      }
+
+      Group {
+        Anchor: (Left: 10, Right: 6, Top: 8, Bottom: 8);
+        LayoutMode: Top;
+
+        Group {
+          Anchor: (Height: 22);
+          LayoutMode: Left;
+          AssetImage #CratePickupIconExpanded { Anchor: (Width: 20, Height: 20, Top: 0); Visible: false; }
+          Label #CratePickupItemNameExpanded { Text: "Item"; Anchor: (Height: 22, Left: 4); Style: LabelStyle(FontSize: 14, TextColor: @BrightText, HorizontalAlignment: Start, VerticalAlignment: Center); }
+          Label #CratePickupQuantityExpanded { Text: ""; Anchor: (Height: 22, Left: 4); Visible: false; Style: LabelStyle(FontSize: 12, TextColor: @DimText, HorizontalAlignment: Start, VerticalAlignment: Center); }
+        }
+
+        Label #CratePickupEffectLabelExpanded {
+          Text: ""; Anchor: (Height: 16, Top: 0); Visible: false;
+          Style: LabelStyle(FontSize: 11, TextColor: @DimText, HorizontalAlignment: Start, VerticalAlignment: Center);
+        }
+
+        Group {
+          Anchor: (Height: 22, Top: 2);
+          LayoutMode: Left;
+          Group #CratePickupKeyHintExpanded {
+            Anchor: (Width: 22, Height: 20, Top: 0); Background: @KeyBg; Visible: false; LayoutMode: Center;
+            Label { Text: "F"; Anchor: (Width: 22, Height: 20); Style: LabelStyle(FontName: "Mono", FontSize: 13, TextColor: @AccentGold, HorizontalAlignment: Center, VerticalAlignment: Center); }
+          }
+          Label #CratePickupCollectLabelExpanded { Text: "Collect"; Anchor: (Height: 20, Left: 6, Top: 0); Visible: false; Style: LabelStyle(FontSize: 12, TextColor: @DimText, HorizontalAlignment: Start, VerticalAlignment: Center); }
+        }
+
+        // ── Details panel ──
+        Group #CratePickupDetails {
+          Anchor: (Top: 6);
+          LayoutMode: Top;
+
+          Group #CratePickupStatRow0 { Anchor: (Height: 16); LayoutMode: Left; Label #CratePickupStatLabel0 { Text: ""; Anchor: (Width: 80, Height: 16); Style: LabelStyle(FontSize: 10, TextColor: @DimText, HorizontalAlignment: Start, VerticalAlignment: Center); } Label #CratePickupStatBase0 { Text: ""; Anchor: (Width: 40, Height: 16, Left: 4); Style: LabelStyle(FontSize: 10, TextColor: @BrightText, HorizontalAlignment: Start, VerticalAlignment: Center); } Label #CratePickupStatMod0 { Text: ""; Anchor: (Height: 16, Left: 2); Style: LabelStyle(FontSize: 10, TextColor: @ModGreen, HorizontalAlignment: Start, VerticalAlignment: Center); } }
+          Group #CratePickupStatRow1 { Anchor: (Height: 16); LayoutMode: Left; Label #CratePickupStatLabel1 { Text: ""; Anchor: (Width: 80, Height: 16); Style: LabelStyle(FontSize: 10, TextColor: @DimText, HorizontalAlignment: Start, VerticalAlignment: Center); } Label #CratePickupStatBase1 { Text: ""; Anchor: (Width: 40, Height: 16, Left: 4); Style: LabelStyle(FontSize: 10, TextColor: @BrightText, HorizontalAlignment: Start, VerticalAlignment: Center); } Label #CratePickupStatMod1 { Text: ""; Anchor: (Height: 16, Left: 2); Style: LabelStyle(FontSize: 10, TextColor: @ModGreen, HorizontalAlignment: Start, VerticalAlignment: Center); } }
+          Group #CratePickupStatRow2 { Anchor: (Height: 16); LayoutMode: Left; Label #CratePickupStatLabel2 { Text: ""; Anchor: (Width: 80, Height: 16); Style: LabelStyle(FontSize: 10, TextColor: @DimText, HorizontalAlignment: Start, VerticalAlignment: Center); } Label #CratePickupStatBase2 { Text: ""; Anchor: (Width: 40, Height: 16, Left: 4); Style: LabelStyle(FontSize: 10, TextColor: @BrightText, HorizontalAlignment: Start, VerticalAlignment: Center); } Label #CratePickupStatMod2 { Text: ""; Anchor: (Height: 16, Left: 2); Style: LabelStyle(FontSize: 10, TextColor: @ModGreen, HorizontalAlignment: Start, VerticalAlignment: Center); } }
+          Group #CratePickupStatRow3 { Anchor: (Height: 16); LayoutMode: Left; Label #CratePickupStatLabel3 { Text: ""; Anchor: (Width: 80, Height: 16); Style: LabelStyle(FontSize: 10, TextColor: @DimText, HorizontalAlignment: Start, VerticalAlignment: Center); } Label #CratePickupStatBase3 { Text: ""; Anchor: (Width: 40, Height: 16, Left: 4); Style: LabelStyle(FontSize: 10, TextColor: @BrightText, HorizontalAlignment: Start, VerticalAlignment: Center); } Label #CratePickupStatMod3 { Text: ""; Anchor: (Height: 16, Left: 2); Style: LabelStyle(FontSize: 10, TextColor: @ModGreen, HorizontalAlignment: Start, VerticalAlignment: Center); } }
+          Group #CratePickupStatRow4 { Anchor: (Height: 16); LayoutMode: Left; Label #CratePickupStatLabel4 { Text: ""; Anchor: (Width: 80, Height: 16); Style: LabelStyle(FontSize: 10, TextColor: @DimText, HorizontalAlignment: Start, VerticalAlignment: Center); } Label #CratePickupStatBase4 { Text: ""; Anchor: (Width: 40, Height: 16, Left: 4); Style: LabelStyle(FontSize: 10, TextColor: @BrightText, HorizontalAlignment: Start, VerticalAlignment: Center); } Label #CratePickupStatMod4 { Text: ""; Anchor: (Height: 16, Left: 2); Style: LabelStyle(FontSize: 10, TextColor: @ModGreen, HorizontalAlignment: Start, VerticalAlignment: Center); } }
+          Group #CratePickupStatRow5 { Anchor: (Height: 16); LayoutMode: Left; Label #CratePickupStatLabel5 { Text: ""; Anchor: (Width: 80, Height: 16); Style: LabelStyle(FontSize: 10, TextColor: @DimText, HorizontalAlignment: Start, VerticalAlignment: Center); } Label #CratePickupStatBase5 { Text: ""; Anchor: (Width: 40, Height: 16, Left: 4); Style: LabelStyle(FontSize: 10, TextColor: @BrightText, HorizontalAlignment: Start, VerticalAlignment: Center); } Label #CratePickupStatMod5 { Text: ""; Anchor: (Height: 16, Left: 2); Style: LabelStyle(FontSize: 10, TextColor: @ModGreen, HorizontalAlignment: Start, VerticalAlignment: Center); } }
+          Group #CratePickupStatRow6 { Anchor: (Height: 16); LayoutMode: Left; Label #CratePickupStatLabel6 { Text: ""; Anchor: (Width: 80, Height: 16); Style: LabelStyle(FontSize: 10, TextColor: @DimText, HorizontalAlignment: Start, VerticalAlignment: Center); } Label #CratePickupStatBase6 { Text: ""; Anchor: (Width: 40, Height: 16, Left: 4); Style: LabelStyle(FontSize: 10, TextColor: @BrightText, HorizontalAlignment: Start, VerticalAlignment: Center); } Label #CratePickupStatMod6 { Text: ""; Anchor: (Height: 16, Left: 2); Style: LabelStyle(FontSize: 10, TextColor: @ModGreen, HorizontalAlignment: Start, VerticalAlignment: Center); } }
+
+          Label #CratePickupModifiersLabel {
+            Text: ""; Anchor: (Height: 14, Top: 2); Visible: false;
+            Style: LabelStyle(FontSize: 9, TextColor: @ModGreen, HorizontalAlignment: Start, VerticalAlignment: Center);
           }
         }
       }

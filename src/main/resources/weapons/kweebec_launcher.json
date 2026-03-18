@@ -1,4 +1,20 @@
 {
+  "itemId": "Weapon_Kweebec_Launcher_Shotcave",
+  "displayName": "Kweebec Launcher",
+  "category": "SUMMONING",
+  "minRarity": "EPIC",
+  "spawnWeight": 15,
+  "baseStats": {
+    "range": 30,
+    "spread": 0,
+    "pellets": 1,
+    "knockback": 0
+  },
+  "summoningStats": {
+    "mobHealth": 36,
+    "mobDamage": 12,
+    "mobLifetime": 600
+  },
   "primary": {
     "id": "Shotcave_Kweebec_Launcher",
     "cooldown": 1.5,

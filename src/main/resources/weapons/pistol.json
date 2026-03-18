@@ -1,4 +1,15 @@
 {
+  "itemId": "Weapon_Pistol_Shotcave",
+  "displayName": "Pistol",
+  "category": "LASER",
+  "minRarity": "BASIC",
+  "spawnWeight": 20,
+  "baseStats": {
+    "range": 45,
+    "spread": 0,
+    "pellets": 1,
+    "knockback": 0
+  },
   "primary": {
     "id": "Shotcave_Pistol_Primary",
     "cooldown": 0.2,

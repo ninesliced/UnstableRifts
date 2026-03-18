@@ -1,6 +1,7 @@
 package dev.ninesliced.shotcave.crate;
 
 import com.hypixel.hytale.server.core.inventory.ItemStack;
+import dev.ninesliced.shotcave.guns.WeaponLootRoller;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
@@ -12,7 +13,6 @@ import java.util.concurrent.ThreadLocalRandom;
 public final class CrateDropGenerator {
 
     private static final String COIN_ITEM_ID = "Shotcave_Props_Coin";
-    private static final String WEAPON_ITEM_ID = "Weapon_Voidlance_Shotcave";
 
     // 1×1 crate loot
     private static final int SMALL_COIN_MIN = 1;
@@ -55,7 +55,7 @@ public final class CrateDropGenerator {
         }
 
         if (rng.nextDouble() < weaponChance) {
-            drops.add(new ItemStack(WEAPON_ITEM_ID, 1));
+            drops.add(WeaponLootRoller.rollRandom());
         }
 
         return drops;

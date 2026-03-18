@@ -1,12 +1,21 @@
 package dev.ninesliced.shotcave.pickup;
 
-import com.hypixel.hytale.protocol.packets.interface_.HudComponent;
 import com.hypixel.hytale.server.core.entity.entities.Player;
+import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
+import dev.ninesliced.shotcave.guns.DamageEffect;
+import dev.ninesliced.shotcave.guns.GunItemMetadata;
+import dev.ninesliced.shotcave.guns.WeaponCategory;
+import dev.ninesliced.shotcave.guns.WeaponDefinition;
+import dev.ninesliced.shotcave.guns.WeaponDefinitions;
+import dev.ninesliced.shotcave.guns.WeaponModifier;
+import dev.ninesliced.shotcave.guns.WeaponRarity;
 import dev.ninesliced.shotcave.hud.MultiHudCompat;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -27,9 +36,44 @@ public final class ItemPickupHudService {
             @Nonnull PlayerRef playerRef,
             @Nonnull String itemName,
             @Nullable String itemIconPath,
-            int itemQuantity) {
+            int itemQuantity,
+            boolean crouching,
+            @Nullable ItemStack itemStack) {
 
-        long state = computeState(itemName, itemIconPath, itemQuantity);
+        // Read weapon metadata from the ItemStack
+        boolean isWeapon = false;
+        WeaponRarity rarity = WeaponRarity.BASIC;
+        DamageEffect effect = DamageEffect.NONE;
+        WeaponCategory category = WeaponCategory.LASER;
+        WeaponDefinition definition = null;
+        List<WeaponModifier> modifiers = Collections.emptyList();
+        int baseMaxAmmo = 0;
+        int maxAmmo = 0;
+
+        if (itemStack != null) {
+            String itemId = itemStack.getItemId();
+            if (itemId != null) {
+                definition = WeaponDefinitions.getById(itemId);
+            }
+            if (definition != null) {
+                isWeapon = true;
+                rarity = GunItemMetadata.getRarity(itemStack);
+                effect = GunItemMetadata.getEffect(itemStack);
+                category = definition.getCategory();
+                modifiers = GunItemMetadata.getModifiers(itemStack);
+                baseMaxAmmo = definition.getBaseMaxAmmo() > 0
+                        ? definition.getBaseMaxAmmo()
+                        : GunItemMetadata.getBaseMaxAmmo(itemStack, -1);
+                maxAmmo = GunItemMetadata.getEffectiveMaxAmmo(itemStack, baseMaxAmmo);
+                // Use definition's display name if available
+                if (definition.getDisplayName() != null && !definition.getDisplayName().isBlank()) {
+                    itemName = definition.getDisplayName();
+                }
+            }
+        }
+
+        long state = computeState(itemName, itemIconPath, itemQuantity, crouching,
+            rarity.ordinal(), effect.ordinal(), baseMaxAmmo, maxAmmo, modifiers.hashCode());
         UUID uuid = playerRef.getUuid();
 
         Long previous = LAST_STATE.get(uuid);
@@ -38,7 +82,8 @@ public final class ItemPickupHudService {
         }
         LAST_STATE.put(uuid, state);
 
-        ItemPickupHud hud = new ItemPickupHud(playerRef, itemName, itemIconPath, itemQuantity);
+    ItemPickupHud hud = new ItemPickupHud(playerRef, itemName, itemIconPath, itemQuantity,
+        crouching, rarity, effect, category, definition, modifiers, isWeapon, baseMaxAmmo, maxAmmo);
 
         if (!MultiHudCompat.setHud(player, playerRef, HUD_IDENTIFIER, hud)) {
             player.getHudManager().setCustomHud(playerRef, hud);
@@ -76,11 +121,23 @@ public final class ItemPickupHudService {
 
     private static long computeState(@Nullable String itemName,
             @Nullable String itemIconPath,
-            int itemQuantity) {
+            int itemQuantity,
+            boolean crouching,
+            int rarityOrdinal,
+            int effectOrdinal,
+            int baseMaxAmmo,
+            int maxAmmo,
+            int modifiersHash) {
         long h = 7919L;
         h = 31L * h + (itemName == null ? 0 : itemName.hashCode());
         h = 31L * h + (itemIconPath == null ? 0 : itemIconPath.hashCode());
         h = 31L * h + itemQuantity;
+        h = 31L * h + (crouching ? 1 : 0);
+        h = 31L * h + rarityOrdinal;
+        h = 31L * h + effectOrdinal;
+        h = 31L * h + baseMaxAmmo;
+        h = 31L * h + maxAmmo;
+        h = 31L * h + modifiersHash;
         return h;
     }
 }

@@ -1,4 +1,16 @@
 {
+  "itemId": "Weapon_Taser_Shotcave",
+  "displayName": "Taser",
+  "category": "LASER",
+  "lockedEffect": "ELECTRICITY",
+  "minRarity": "EPIC",
+  "spawnWeight": 5,
+  "baseStats": {
+    "range": 30,
+    "spread": 0,
+    "pellets": 1,
+    "knockback": 0
+  },
   "primary": {
     "id": "Shotcave_Taser_Primary",
     "cooldown": 0.75,

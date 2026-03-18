@@ -48,6 +48,8 @@ public final class ActiveSlotHudUpdateSystem extends EntityEventSystem<EntitySto
             heldItem = player.getInventory().getItemInHand();
         }
 
+        // Force-clear cached state so the HUD always fully rebuilds on slot switch
+        AmmoHudService.clear(playerRef);
         AmmoHudService.updateForHeldItem(player, playerRef, heldItem);
     }
 }

@@ -10,7 +10,6 @@ import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.CooldownHandler;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.SimpleInstantInteraction;
 import dev.ninesliced.shotcave.guns.GunItemMetadata;
-
 import javax.annotation.Nonnull;
 
 /**
@@ -54,8 +53,10 @@ public final class ConsumeAmmoInteraction extends SimpleInstantInteraction {
             return;
         }
 
-        ItemStack updated = GunItemMetadata.ensureAmmo(heldItem, this.maxAmmo);
-        int ammo = GunItemMetadata.getInt(updated, GunItemMetadata.AMMO_KEY, 0);
+        int effectiveMaxAmmo = GunItemMetadata.getEffectiveMaxAmmo(heldItem, this.maxAmmo);
+
+        ItemStack updated = GunItemMetadata.ensureAmmo(heldItem, this.maxAmmo, effectiveMaxAmmo);
+        int ammo = GunItemMetadata.getInt(updated, GunItemMetadata.AMMO_KEY, effectiveMaxAmmo);
         int newAmmo = Math.max(0, ammo - this.ammoPerShot);
         updated = GunItemMetadata.setInt(updated, GunItemMetadata.AMMO_KEY, newAmmo);
         GunItemMetadata.applyHeldItem(context, updated);

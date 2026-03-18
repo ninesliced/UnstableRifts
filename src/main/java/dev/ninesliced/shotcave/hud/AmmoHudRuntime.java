@@ -47,7 +47,16 @@ public final class AmmoHudRuntime {
         if (!(event.getEntity() instanceof Player)) {
             return;
         }
-        refreshHeldItemHud((Player) event.getEntity());
+        Player player = (Player) event.getEntity();
+        // Force-clear cached state so the HUD fully rebuilds after pickup/drop
+        Ref<EntityStore> ref = player.getReference();
+        if (ref != null && ref.isValid()) {
+            PlayerRef playerRef = ref.getStore().getComponent(ref, PlayerRef.getComponentType());
+            if (playerRef != null && playerRef.isValid()) {
+                AmmoHudService.clear(playerRef);
+            }
+        }
+        refreshHeldItemHud(player);
     }
 
     private void startHudPoller() {

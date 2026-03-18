@@ -1,4 +1,15 @@
 {
+  "itemId": "Weapon_Sniper_Shotcave",
+  "displayName": "Sniper",
+  "category": "LASER",
+  "minRarity": "BASIC",
+  "spawnWeight": 15,
+  "baseStats": {
+    "range": 60,
+    "spread": 0,
+    "pellets": 1,
+    "knockback": 0
+  },
   "primary": {
     "id": "Shotcave_Sniper_Primary",
     "cooldown": 1.4,

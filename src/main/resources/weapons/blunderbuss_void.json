@@ -1,4 +1,16 @@
 {
+  "itemId": "Weapon_Crystal_Blunderbuss_Void_Shotcave",
+  "displayName": "Blunderbuss",
+  "category": "BULLET",
+  "lockedEffect": "VOID",
+  "minRarity": "EPIC",
+  "spawnWeight": 5,
+  "baseStats": {
+    "range": 24,
+    "spread": 14.0,
+    "pellets": 8,
+    "knockback": 2.0
+  },
   "primary": {
     "id": "Shotcave_Crystal_Blunderbuss_Void_Primary",
     "cooldown": 1.05,
@@ -13,7 +25,8 @@
     "amount": 0,
     "nextId": "Shotcave_Update_Hud",
     "worldSfx": "SFX_Blunderbuss_Load",
-    "localSfx": "SFX_Blunderbuss_Load_Local"
+    "localSfx": "SFX_Blunderbuss_Load_Local",
+    "maxAmmo": 6
   },
   "damage": {
     "id": "Shotcave_Crystal_Blunderbuss_Projectile_Hit",

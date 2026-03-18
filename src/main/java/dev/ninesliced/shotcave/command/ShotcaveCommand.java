@@ -21,6 +21,7 @@ public class ShotcaveCommand extends AbstractCommand {
         this.addSubCommand(new AcceptPartyInviteCommand(plugin));
         this.addSubCommand(new GivePartyPortalCommand());
         this.addSubCommand(new PartyCommand(plugin));
+        this.addSubCommand(new LootCommand());
     }
 
     @Override
@@ -48,6 +49,8 @@ public class ShotcaveCommand extends AbstractCommand {
                 .insert(Message.raw(" : Accept your most recent active party invite.").color(Color.GRAY)));
         context.sendMessage(Message.raw("- /shotcave party").color(Color.WHITE)
                 .insert(Message.raw(" : Open party management commands and UI.").color(Color.GRAY)));
+        context.sendMessage(Message.raw("- /shotcave loot").color(Color.WHITE)
+                .insert(Message.raw(" : Spawn a random weapon drop at your feet.").color(Color.GRAY)));
         context.sendMessage(Message.raw("Tip: Run /shotcave --help to view all subcommands and usage.").color(Color.CYAN));
         return CompletableFuture.completedFuture(null);
     }

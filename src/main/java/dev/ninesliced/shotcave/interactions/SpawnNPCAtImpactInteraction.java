@@ -11,17 +11,24 @@ import com.hypixel.hytale.protocol.InteractionChainData;
 import com.hypixel.hytale.protocol.InteractionType;
 import com.hypixel.hytale.server.core.entity.InteractionChain;
 import com.hypixel.hytale.server.core.entity.InteractionContext;
+import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.CooldownHandler;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.SimpleInstantInteraction;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.NPCPlugin;
+import dev.ninesliced.shotcave.guns.DamageEffect;
+import dev.ninesliced.shotcave.guns.GunItemMetadata;
+import dev.ninesliced.shotcave.systems.SummonedEffectComponent;
+import it.unimi.dsi.fastutil.Pair;
 
 import javax.annotation.Nonnull;
 
 /**
  * Spawns an NPC at the projectile's impact location (or the entity's current position as fallback).
  * Designed to be used inside ProjectileHit / ProjectileMiss interaction chains.
+ * If the weapon has a DamageEffect, the spawned NPC will carry a {@link SummonedEffectComponent}
+ * so its attacks apply DoT to targets.
  */
 public final class SpawnNPCAtImpactInteraction extends SimpleInstantInteraction {
     @Nonnull
@@ -76,10 +83,23 @@ public final class SpawnNPCAtImpactInteraction extends SimpleInstantInteraction 
             return;
         }
 
+        // Read damage effect from the weapon that fired this projectile
+        ItemStack heldItem = context.getHeldItem();
+        DamageEffect weaponEffect = heldItem != null ? GunItemMetadata.getEffect(heldItem) : DamageEffect.NONE;
+        int effectOrdinal = weaponEffect.ordinal();
+
         position.add(spawnOffset);
-        commandBuffer.run(store ->
-                NPCPlugin.get().spawnNPC(store, entityId, null, position, Vector3f.ZERO)
-        );
+        commandBuffer.run(store -> {
+            var result = NPCPlugin.get().spawnNPC(store, entityId, null, position, Vector3f.ZERO);
+            if (result != null && effectOrdinal > 0) {
+                Ref<EntityStore> npcRef = result.left();
+                if (npcRef != null && npcRef.isValid()) {
+                    SummonedEffectComponent comp = new SummonedEffectComponent();
+                    comp.setEffectOrdinal(effectOrdinal);
+                    commandBuffer.putComponent(npcRef, SummonedEffectComponent.getComponentType(), comp);
+                }
+            }
+        });
     }
 
     private Vector3d resolveImpactPosition(@Nonnull InteractionContext context, @Nonnull CommandBuffer<EntityStore> commandBuffer) {

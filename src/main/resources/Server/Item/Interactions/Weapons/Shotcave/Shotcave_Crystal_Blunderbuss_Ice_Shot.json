@@ -36,7 +36,7 @@
   "MissRoot": "Root_Shotcave_Crystal_Blunderbuss_Miss",
   "Range": 24,
   "Pellets": 8,
-  "SpreadDegrees": 7.5,
+  "SpreadDegrees": 14.0,
   "TrailParticleId": "Shotcave_ElectricBeam",
   "TrailStepDistance": 0.7,
   "TrailScale": 0.14,

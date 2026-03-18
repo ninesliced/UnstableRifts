@@ -53,6 +53,11 @@ import dev.ninesliced.shotcave.systems.DashPlayerAddedSystem;
 import dev.ninesliced.shotcave.systems.DashRollSystem;
 import dev.ninesliced.shotcave.systems.DashTrailSystem;
 import dev.ninesliced.shotcave.systems.DeathComponent;
+import dev.ninesliced.shotcave.systems.DamageEffectComponent;
+import dev.ninesliced.shotcave.systems.DamageEffectTickSystem;
+import dev.ninesliced.shotcave.systems.DamageEffectVisualCleanupSystem;
+import dev.ninesliced.shotcave.systems.SummonedEffectComponent;
+import dev.ninesliced.shotcave.systems.SummonedNPCDamageEffectSystem;
 import dev.ninesliced.shotcave.systems.DeathAggroSuppressionSystem;
 import dev.ninesliced.shotcave.systems.DeathPlayerAddedSystem;
 import dev.ninesliced.shotcave.systems.DungeonLethalDamageSystem;
@@ -161,6 +166,21 @@ public class Shotcave extends JavaPlugin {
         this.getEntityStoreRegistry().registerSystem(new PlayerDeathSystem());
         this.getEntityStoreRegistry().registerSystem(new ReviveTickSystem());
         this.getEntityStoreRegistry().registerSystem(new DeathAggroSuppressionSystem());
+
+        // Damage effect DoT system — register component, then system.
+        ComponentType<EntityStore, DamageEffectComponent> damageEffectComponentType =
+                this.getEntityStoreRegistry().registerComponent(DamageEffectComponent.class, DamageEffectComponent::new);
+        DamageEffectComponent.setComponentType(damageEffectComponentType);
+
+        this.getEntityStoreRegistry().registerSystem(new DamageEffectTickSystem());
+        this.getEntityStoreRegistry().registerSystem(new DamageEffectVisualCleanupSystem());
+
+        // Summoned NPC effect system — marks summoned NPCs with weapon effect, applies DoT on their hits
+        ComponentType<EntityStore, SummonedEffectComponent> summonedEffectComponentType =
+                this.getEntityStoreRegistry().registerComponent(SummonedEffectComponent.class, SummonedEffectComponent::new);
+        SummonedEffectComponent.setComponentType(summonedEffectComponentType);
+
+        this.getEntityStoreRegistry().registerSystem(new SummonedNPCDamageEffectSystem());
 
         // Item pickup: intercept item entity spawns to apply F-key / score-collect
         // behaviour.

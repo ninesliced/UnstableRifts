@@ -11,7 +11,6 @@ import com.hypixel.hytale.server.core.modules.interaction.interaction.CooldownHa
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.InteractionEffects;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.SimpleInstantInteraction;
 import dev.ninesliced.shotcave.guns.GunItemMetadata;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -78,23 +77,20 @@ public final class ReloadInteraction extends SimpleInstantInteraction {
             return;
         }
 
-        int maxAmmo = GunItemMetadata.getInt(heldItem, GunItemMetadata.MAX_AMMO_KEY, -1);
+        int baseMaxAmmo = (this.maxAmmo > 0) ? this.maxAmmo : GunItemMetadata.getBaseMaxAmmo(heldItem, 30);
+        int effectiveMaxAmmo = GunItemMetadata.getEffectiveMaxAmmo(heldItem, baseMaxAmmo);
 
-        if (maxAmmo <= 0) {
-            maxAmmo = (this.maxAmmo > 0) ? this.maxAmmo : 30;
-            heldItem = GunItemMetadata.setInt(heldItem, GunItemMetadata.MAX_AMMO_KEY, maxAmmo);
-        }
+        ItemStack updated = GunItemMetadata.ensureAmmo(heldItem, baseMaxAmmo, effectiveMaxAmmo);
+        int ammo = GunItemMetadata.getInt(updated, GunItemMetadata.AMMO_KEY, effectiveMaxAmmo);
 
-        int ammo = GunItemMetadata.getInt(heldItem, GunItemMetadata.AMMO_KEY, maxAmmo);
-
-        if (ammo >= maxAmmo) {
+        if (ammo >= effectiveMaxAmmo) {
             context.getState().state = InteractionState.Failed;
             return;
         }
 
-        int effectiveReloadAmount = (this.reloadAmount <= 0) ? maxAmmo : this.reloadAmount;
-        int newAmmo = Math.min(maxAmmo, ammo + effectiveReloadAmount);
-        ItemStack updated = GunItemMetadata.setInt(heldItem, GunItemMetadata.AMMO_KEY, newAmmo);
+        int effectiveReloadAmount = (this.reloadAmount <= 0) ? effectiveMaxAmmo : this.reloadAmount;
+        int newAmmo = Math.min(effectiveMaxAmmo, ammo + effectiveReloadAmount);
+        updated = GunItemMetadata.setInt(updated, GunItemMetadata.AMMO_KEY, newAmmo);
         GunItemMetadata.applyHeldItem(context, updated);
     }
 }

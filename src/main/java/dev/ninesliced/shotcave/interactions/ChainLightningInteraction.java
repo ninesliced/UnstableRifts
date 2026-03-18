@@ -35,7 +35,10 @@ import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.core.util.TargetUtil;
 import dev.ninesliced.shotcave.guns.AimAssistHelper;
+import dev.ninesliced.shotcave.guns.DamageEffect;
 import dev.ninesliced.shotcave.guns.GunItemMetadata;
+import dev.ninesliced.shotcave.guns.WeaponModifierType;
+import dev.ninesliced.shotcave.systems.DamageEffectRuntime;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -173,14 +176,28 @@ public final class ChainLightningInteraction extends SimpleInstantInteraction {
             return;
         }
 
+        // Read modifier bonuses from held item BSON
+        ItemStack heldItem = context.getHeldItem();
+        int effectiveMaxDistance = this.maxDistance;
+        int effectiveMaxTargets = this.maxTargets;
+        int effectiveMaxAmmo = this.maxAmmo;
+
+        if (heldItem != null) {
+            double rangeBonus = GunItemMetadata.getModifierBonus(heldItem, WeaponModifierType.MAX_RANGE);
+            effectiveMaxDistance = (int) Math.round(this.maxDistance * (1.0 + rangeBonus));
+
+            double targetBonus = GunItemMetadata.getModifierBonus(heldItem, WeaponModifierType.ADDITIONAL_BULLETS);
+            effectiveMaxTargets = this.maxTargets + (int) targetBonus;
+            effectiveMaxAmmo = GunItemMetadata.getEffectiveMaxAmmo(heldItem, this.maxAmmo);
+        }
+
         if (this.useAmmo) {
-            ItemStack heldItem = context.getHeldItem();
             if (heldItem == null) {
                 return;
             }
 
-            ItemStack updated = GunItemMetadata.ensureAmmo(heldItem, this.maxAmmo);
-            int ammo = GunItemMetadata.getInt(updated, GunItemMetadata.AMMO_KEY, 0);
+            ItemStack updated = GunItemMetadata.ensureAmmo(heldItem, this.maxAmmo, effectiveMaxAmmo);
+            int ammo = GunItemMetadata.getInt(updated, GunItemMetadata.AMMO_KEY, effectiveMaxAmmo);
             if (ammo < this.ammoPerShot) {
                 return;
             }
@@ -198,13 +215,13 @@ public final class ChainLightningInteraction extends SimpleInstantInteraction {
         Vector3d lookDir = getLookDirection(commandBuffer, context.getEntity());
         if (this.aimAssist) {
             Vector3d assisted = AimAssistHelper.computeAssistedDirection(
-                    commandBuffer, context, from, lookDir, (double) this.maxDistance);
+                    commandBuffer, context, from, lookDir, (double) effectiveMaxDistance);
             if (assisted != null) {
                 lookDir = assisted;
             }
         }
 
-        RaycastHit hit = traceFirstHit(commandBuffer, context, from, lookDir);
+        RaycastHit hit = traceFirstHit(commandBuffer, context, from, lookDir, effectiveMaxDistance);
         spawnBeamSegment(from, hit.position, commandBuffer);
 
         if (hit.target == null) {
@@ -216,7 +233,7 @@ public final class ChainLightningInteraction extends SimpleInstantInteraction {
             return;
         }
 
-        List<Ref<EntityStore>> chainTargets = buildChain(commandBuffer, context, hit.target);
+        List<Ref<EntityStore>> chainTargets = buildChain(commandBuffer, context, hit.target, effectiveMaxTargets);
         renderBeamChain(commandBuffer, chainTargets, hit.position);
 
         for (Ref<EntityStore> targetRef : chainTargets) {
@@ -226,12 +243,14 @@ public final class ChainLightningInteraction extends SimpleInstantInteraction {
             }
             hitPosition = hitPosition.clone().add(0.0, this.beamHeightOffset, 0.0);
             forkDamageInteraction(context, damageRootInteraction, targetRef, hitPosition);
+            DamageEffectRuntime.apply(commandBuffer, targetRef, DamageEffect.ELECTRICITY);
         }
     }
 
     private List<Ref<EntityStore>> buildChain(@Nonnull CommandBuffer<EntityStore> commandBuffer,
             @Nonnull InteractionContext context,
-            @Nonnull Ref<EntityStore> initialTarget) {
+            @Nonnull Ref<EntityStore> initialTarget,
+            int effectiveMaxTargets) {
         List<Ref<EntityStore>> out = new ArrayList<>();
         Set<Integer> visited = new HashSet<>();
 
@@ -241,7 +260,7 @@ public final class ChainLightningInteraction extends SimpleInstantInteraction {
             visited.add(initialTarget.getIndex());
         }
 
-        while (out.size() < this.maxTargets) {
+        while (out.size() < effectiveMaxTargets) {
             Vector3d currentPos = getPosition(commandBuffer, current);
             if (currentPos == null) {
                 break;
@@ -349,16 +368,17 @@ public final class ChainLightningInteraction extends SimpleInstantInteraction {
     private RaycastHit traceFirstHit(@Nonnull CommandBuffer<EntityStore> commandBuffer,
             @Nonnull InteractionContext context,
             @Nonnull Vector3d from,
-            @Nonnull Vector3d direction) {
-        Vector3d missPosition = from.clone().addScaled(direction, (double) this.maxDistance);
+            @Nonnull Vector3d direction,
+            int effectiveMaxDistance) {
+        Vector3d missPosition = from.clone().addScaled(direction, (double) effectiveMaxDistance);
 
         final Vector3d[] entityHitPos = new Vector3d[] { null };
         final Ref<EntityStore>[] entityHitRef = new Ref[] { null };
         final double[] entityHitDistanceSq = new double[] { Double.MAX_VALUE };
 
         Vector2d minMax = new Vector2d();
-        Vector3d searchCenter = from.clone().addScaled(direction, (double) this.maxDistance * 0.5);
-        Selector.selectNearbyEntities(commandBuffer, searchCenter, (double) this.maxDistance * 0.6, candidate -> {
+        Vector3d searchCenter = from.clone().addScaled(direction, (double) effectiveMaxDistance * 0.5);
+        Selector.selectNearbyEntities(commandBuffer, searchCenter, (double) effectiveMaxDistance * 0.6, candidate -> {
             if (!candidate.isValid()) {
                 return;
             }
@@ -384,7 +404,7 @@ public final class ChainLightningInteraction extends SimpleInstantInteraction {
             }
 
             double t = minMax.x;
-            if (t < 0.0 || t > (double) this.maxDistance) {
+            if (t < 0.0 || t > (double) effectiveMaxDistance) {
                 return;
             }
 
@@ -403,7 +423,7 @@ public final class ChainLightningInteraction extends SimpleInstantInteraction {
 
         World world = commandBuffer.getExternalData().getWorld();
         Vector3i block = TargetUtil.getTargetBlock(world, (id, fluidId) -> id != 0,
-                from.x, from.y, from.z, direction.x, direction.y, direction.z, this.maxDistance);
+                from.x, from.y, from.z, direction.x, direction.y, direction.z, effectiveMaxDistance);
 
         if (block != null) {
             Vector3d blockHitPos = new Vector3d((double) block.x + 0.5, (double) block.y + 0.5, (double) block.z + 0.5);

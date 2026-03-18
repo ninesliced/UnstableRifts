@@ -1,4 +1,16 @@
 {
+  "itemId": "Weapon_Crystal_Blunderbuss_Acid_Shotcave",
+  "displayName": "Blunderbuss",
+  "category": "LASER",
+  "lockedEffect": "ACID",
+  "minRarity": "RARE",
+  "spawnWeight": 10,
+  "baseStats": {
+    "range": 24,
+    "spread": 14.0,
+    "pellets": 8,
+    "knockback": 2.0
+  },
   "primary": {
     "id": "Shotcave_Crystal_Blunderbuss_Acid_Primary",
     "cooldown": 1.05,
