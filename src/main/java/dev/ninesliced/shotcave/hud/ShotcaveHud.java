@@ -57,15 +57,12 @@ public final class ShotcaveHud extends CustomUIHud {
         ui.append(UI_PATH);
         ui.set("#ShotcaveAmmoRoot.Visible", true);
 
-        // ── Weapon title (name only, rarity shown via color + accent) ──
         String title = buildWeaponTitle();
         ui.set("#ShotcaveWeaponTitle.TextSpans", Message.raw(title));
         ui.set("#ShotcaveWeaponTitle.Style.TextColor", rarity.getColorHex());
 
-        // ── Rarity accent (panel background color) ──
         ui.set("#ShotcaveAmmoPanel.Background", rarity.getColorHex());
 
-        // ── Subtitle: rarity + category (+ effect in its own label) ──
         StringBuilder sub = new StringBuilder();
         if (rarity != WeaponRarity.BASIC) {
             sub.append(rarity.name()).append(" \u2022 ");
@@ -79,14 +76,12 @@ public final class ShotcaveHud extends CustomUIHud {
             ui.set("#ShotcaveEffectLabel.Visible", true);
         }
 
-        // ── Stats grid (category-aware) ──
         if (category == WeaponCategory.SUMMONING) {
             buildSummoningStats(ui);
         } else {
             buildCombatStats(ui);
         }
 
-        // ── Modifiers section (individual slots) ──
         int modCount = Math.min(modifiers.size(), 5);
         if (modCount > 0) {
             for (int i = 0; i < modCount; i++) {
@@ -94,19 +89,16 @@ public final class ShotcaveHud extends CustomUIHud {
                 String modText = formatModifier(mod);
                 ui.set("#ShotcaveMod" + i + ".TextSpans", Message.raw(modText));
             }
-            // Hide unused slots
             for (int i = modCount; i < 5; i++) {
                 ui.set("#ShotcaveMod" + i + ".Visible", false);
             }
         } else {
-            // No modifiers: hide separator and all slots
             ui.set("#ShotcaveModSeparator.Visible", false);
             for (int i = 0; i < 5; i++) {
                 ui.set("#ShotcaveMod" + i + ".Visible", false);
             }
         }
 
-        // ── Ammo counter ──
         ui.set("#ShotcaveAmmoValue.TextSpans", Message.raw(Integer.toString(this.ammo)));
         ui.set("#ShotcaveMaxAmmoValue.TextSpans", Message.raw(Integer.toString(this.maxAmmo)));
 
@@ -123,8 +115,6 @@ public final class ShotcaveHud extends CustomUIHud {
         }
     }
 
-    // ── Summoning stats ─────────────────────────────────────────────
-
     private void buildSummoningStats(@Nonnull UICommandBuilder ui) {
         ui.set("#ShotcaveStatDamageLabel.TextSpans", Message.raw("Mob HP"));
         buildStatRow(ui, "Mob HP", "#ShotcaveStatDamageBase", "#ShotcaveStatDamageMod",
@@ -138,18 +128,15 @@ public final class ShotcaveHud extends CustomUIHud {
         buildStatRow(ui, "Mob Life", "#ShotcaveStatRangeBase", "#ShotcaveStatRangeMod",
                 definition != null ? definition.getBaseMobLifetime() : 0, getModBonus(WeaponModifierType.MOB_LIFETIME), true);
 
-        // Hide unused rows
         ui.set("#ShotcaveStatPrecisionRow.Visible", false);
         ui.set("#ShotcaveStatKnockbackRow.Visible", false);
 
-        // Max Ammo
         ui.set("#ShotcaveStatMaxAmmoLabel.TextSpans", Message.raw("Max Ammo"));
         buildMaxAmmoRow(ui);
 
         ui.set("#ShotcaveStatPelletsRow.Visible", false);
     }
 
-    // ── Combat stats (Laser / Bullet) ───────────────────────────────
 
     private void buildCombatStats(@Nonnull UICommandBuilder ui) {
         ui.set("#ShotcaveStatDamageLabel.TextSpans", Message.raw("Damage"));
@@ -164,7 +151,6 @@ public final class ShotcaveHud extends CustomUIHud {
         buildStatRow(ui, "Range", "#ShotcaveStatRangeBase", "#ShotcaveStatRangeMod",
                 definition != null ? definition.getBaseRange() : 0, getModBonus(WeaponModifierType.MAX_RANGE), true);
 
-        // Precision
         ui.set("#ShotcaveStatPrecisionLabel.TextSpans", Message.raw("Precision"));
         double baseSpread = definition != null ? definition.getBaseSpread() : 0;
         double basePrecision = definition != null && definition.getBasePrecision() >= 0
@@ -188,11 +174,9 @@ public final class ShotcaveHud extends CustomUIHud {
         buildStatRow(ui, "Knockback", "#ShotcaveStatKnockbackBase", "#ShotcaveStatKnockbackMod",
                 definition != null ? definition.getBaseKnockback() : 0, getModBonus(WeaponModifierType.KNOCKBACK), true);
 
-        // Max Ammo
         ui.set("#ShotcaveStatMaxAmmoLabel.TextSpans", Message.raw("Max Ammo"));
         buildMaxAmmoRow(ui);
 
-        // Pellets — only for multi-pellet weapons
         int basePellets = definition != null ? definition.getBasePellets() : 1;
         if (basePellets > 1) {
             ui.set("#ShotcaveStatPelletsLabel.TextSpans", Message.raw("Pellets"));
@@ -203,7 +187,6 @@ public final class ShotcaveHud extends CustomUIHud {
         }
     }
 
-    // ── Helpers ─────────────────────────────────────────────────────
 
     @Nonnull
     private String buildWeaponTitle() {
@@ -233,7 +216,6 @@ public final class ShotcaveHud extends CustomUIHud {
                                @Nonnull String stat,
                                @Nonnull String baseId, @Nonnull String modId,
                                double baseValue, double modBonus, boolean isMultiplier) {
-        // Base value display
         if (stat.equals("Speed")) {
             ui.set(baseId + ".TextSpans", Message.raw(String.format("%.2fs", baseValue)));
         } else {
@@ -241,7 +223,6 @@ public final class ShotcaveHud extends CustomUIHud {
                     baseValue == (int) baseValue ? Integer.toString((int) baseValue) : String.format("%.1f", baseValue)));
         }
 
-        // Modifier bonus display
         if (modBonus > 0.001) {
             if (isMultiplier) {
                 double absoluteBonus = baseValue * modBonus;

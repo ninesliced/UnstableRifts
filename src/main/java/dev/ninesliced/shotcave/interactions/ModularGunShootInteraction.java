@@ -233,7 +233,6 @@ public final class ModularGunShootInteraction extends SimpleInstantInteraction {
             return;
         }
 
-        // Read modifier bonuses from held item BSON
         ItemStack heldItem = context.getHeldItem();
         int effectiveRange = this.range;
         int effectivePellets = this.pellets;
@@ -257,7 +256,6 @@ public final class ModularGunShootInteraction extends SimpleInstantInteraction {
             effectivePellets = this.pellets + (int) pelletBonus;
             effectiveMaxAmmo = GunItemMetadata.getEffectiveMaxAmmo(heldItem, this.maxAmmo);
 
-            // Override trail color with damage effect color
             DamageEffect effect = GunItemMetadata.getEffect(heldItem);
             if (effect != DamageEffect.NONE) {
                 effectiveTrailR = effect.getTrailR();
@@ -280,7 +278,6 @@ public final class ModularGunShootInteraction extends SimpleInstantInteraction {
                     effectiveTrailR, effectiveTrailG, effectiveTrailB,
                     GunItemMetadata.getModifiers(heldItem).size());
 
-            // Apply ATTACK_SPEED modifier: reduce shoot cooldown
             double speedBonus = GunItemMetadata.getModifierBonus(heldItem, WeaponModifierType.ATTACK_SPEED);
             if (speedBonus > 0.001) {
                 CooldownHandler.Cooldown shootCooldown = cooldownHandler.getCooldown("Shoot");
@@ -293,7 +290,6 @@ public final class ModularGunShootInteraction extends SimpleInstantInteraction {
             }
         }
 
-        // Capture DoT effect for application on hit
         DamageEffect dotEffect = heldItem != null ? GunItemMetadata.getEffect(heldItem) : DamageEffect.NONE;
 
         if (this.useAmmo) {
@@ -326,7 +322,6 @@ public final class ModularGunShootInteraction extends SimpleInstantInteraction {
             miss = RootInteraction.getRootInteractionOrUnknown(this.missRoot);
         }
 
-        // Pre-compute a single aim-assist direction (used for all pellets)
         Vector3d assistedBaseDir = null;
         if (this.aimAssist) {
             Vector3d rawLook = getShotDirection(commandBuffer, context.getEntity());
@@ -334,7 +329,6 @@ public final class ModularGunShootInteraction extends SimpleInstantInteraction {
                     commandBuffer, context, start, rawLook, (double) effectiveRange);
         }
 
-        // Store effective values for use in shot methods
         final int shotRange = effectiveRange;
         final double shotSpread = effectiveSpread;
         final int shotTrailR = effectiveTrailR;

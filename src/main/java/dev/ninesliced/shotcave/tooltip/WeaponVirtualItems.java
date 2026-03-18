@@ -53,8 +53,6 @@ public final class WeaponVirtualItems {
 
     private WeaponVirtualItems() {}
 
-    // ── Virtual‑ID helpers ─────────────────────────────────────────────
-
     public static boolean isVirtual(@Nonnull String itemId) {
         return itemId.contains(SEPARATOR);
     }
@@ -65,7 +63,6 @@ public final class WeaponVirtualItems {
         return idx >= 0 ? virtualId.substring(0, idx) : virtualId;
     }
 
-    // ── Core processing ────────────────────────────────────────────────
 
     /**
      * Inspects a weapon slot from an outbound inventory packet.  If the
@@ -87,7 +84,6 @@ public final class WeaponVirtualItems {
         WeaponDefinition def = WeaponDefinitions.getById(baseItemId);
         if (def == null) return null;
 
-        // ── Parse BSON metadata from the packet ────────────────────────
         WeaponRarity rarity = WeaponRarity.BASIC;
         DamageEffect effect = DamageEffect.NONE;
         List<WeaponModifier> modifiers = Collections.emptyList();
@@ -116,11 +112,11 @@ public final class WeaponVirtualItems {
             }
         }
 
-        // ── Compute deterministic virtual ID ───────────────────────────
+
         String hash = computeHash(baseItemId, rarity, effect, modifiers);
         String virtualId = baseItemId + SEPARATOR + hash;
 
-        // ── Ensure caches (idempotent) ─────────────────────────────────
+
         final WeaponRarity fRarity = rarity;
         final DamageEffect fEffect = effect;
         final List<WeaponModifier> fMods = modifiers;
@@ -130,7 +126,7 @@ public final class WeaponVirtualItems {
         TRANSLATION_CACHE.computeIfAbsent(virtualId,
                 k -> createTranslations(k, def, fRarity, fEffect, fMods));
 
-        // ── Collect anything the player hasn't received yet ────────────
+
         Set<String> sent = SENT_PER_PLAYER.computeIfAbsent(playerUuid,
                 k -> ConcurrentHashMap.newKeySet());
 
@@ -153,7 +149,6 @@ public final class WeaponVirtualItems {
         SENT_PER_PLAYER.remove(uuid);
     }
 
-    // ── Virtual ItemBase creation ──────────────────────────────────────
 
     @Nullable
     private static ItemBase createItemBase(@Nonnull String baseItemId,
@@ -164,17 +159,14 @@ public final class WeaponVirtualItems {
 
         ItemBase clone = baseItem.toPacket().clone();
         clone.id = virtualId;
-        // Resolve the quality index at runtime from the asset map
         clone.qualityIndex = ItemQuality.getAssetMap()
                 .getIndexOrDefault(rarity.getQualityName(), 0);
         // Prevent the virtual item from appearing in the creative inventory
         clone.variant = true;
-        // Point translationProperties at our custom keys
         clone.translationProperties = new ItemTranslationProperties(
                 virtualId + ".n",
                 virtualId + ".d"
         );
-        // Set the item entity config for dropped-item particles
         String particleId = rarity.getGlowEffectId();
         if (particleId != null) {
             ItemEntityConfig entityConfig = new ItemEntityConfig();
@@ -185,7 +177,6 @@ public final class WeaponVirtualItems {
         return clone;
     }
 
-    // ── Translation creation ───────────────────────────────────────────
 
     @Nonnull
     private static Map<String, String> createTranslations(@Nonnull String virtualId,
@@ -199,7 +190,6 @@ public final class WeaponVirtualItems {
         return map;
     }
 
-    // ── Name / description builders ────────────────────────────────────
 
     @Nonnull
     static String buildName(@Nonnull WeaponDefinition def,
@@ -223,14 +213,12 @@ public final class WeaponVirtualItems {
                                     @Nonnull List<WeaponModifier> modifiers) {
         StringBuilder sb = new StringBuilder();
 
-        // Header line: RARITY | EFFECT | CATEGORY
         sb.append(rarity.name());
         if (effect != DamageEffect.NONE) {
             sb.append(" | ").append(effect.getDisplayName());
         }
         sb.append(" | ").append(def.getCategory().name());
 
-        // Stat block
         WeaponCategory cat = def.getCategory();
         if (cat == WeaponCategory.SUMMONING) {
             appendStat(sb, "Mob HP", def.getBaseMobHealth(),
@@ -269,7 +257,6 @@ public final class WeaponVirtualItems {
             }
         }
 
-        // Max ammo (shared by all categories)
         int baseMax = def.getBaseMaxAmmo();
         double bulletBonus = modBonus(modifiers, WeaponModifierType.MAX_BULLETS);
         int effectiveMax = Math.max(1, (int) Math.round(baseMax * (1.0 + bulletBonus)));
@@ -277,7 +264,6 @@ public final class WeaponVirtualItems {
         sb.append("\nMax Ammo: ").append(baseMax);
         if (ammoBonusVal > 0) sb.append(" (+").append(ammoBonusVal).append(')');
 
-        // Modifier roll breakdown
         if (!modifiers.isEmpty()) {
             sb.append("\n\nModifiers:");
             for (WeaponModifier mod : modifiers) {
@@ -293,7 +279,6 @@ public final class WeaponVirtualItems {
         return sb.toString();
     }
 
-    // ── Stat formatting helpers ────────────────────────────────────────
 
     private static void appendStat(@Nonnull StringBuilder sb, @Nonnull String label,
                                     double base, double bonus) {
@@ -328,7 +313,6 @@ public final class WeaponVirtualItems {
         return t;
     }
 
-    // ── Hashing ────────────────────────────────────────────────────────
 
     @Nonnull
     private static String computeHash(@Nonnull String baseId,

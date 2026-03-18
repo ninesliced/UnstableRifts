@@ -72,7 +72,6 @@ public final class ItemPickupHud extends CustomUIHud {
         ui.append(UI_PATH);
 
         if (isWeapon && crouching) {
-            // ── EXPANDED view (details visible, higher position) ──
             ui.set("#CratePickupCompactWrapper.Visible", false);
             ui.set("#CratePickupExpandedWrapper.Visible", true);
 
@@ -102,7 +101,6 @@ public final class ItemPickupHud extends CustomUIHud {
             buildDetailsPanel(ui);
             buildModifierSlots(ui);
         } else {
-            // ── COMPACT view (no details, lower position) ──
             ui.set("#CratePickupExpandedWrapper.Visible", false);
             ui.set("#CratePickupCompactWrapper.Visible", true);
 
@@ -181,7 +179,6 @@ public final class ItemPickupHud extends CustomUIHud {
                     definition != null ? definition.getBaseRange() : 0,
                     getModBonus(WeaponModifierType.MAX_RANGE), true);
 
-            // Precision
             double baseSpread = definition != null ? definition.getBaseSpread() : 0;
             double basePrecision = Math.max(0, 100.0 - baseSpread * 10.0);
             double precisionBonus = getModBonus(WeaponModifierType.PRECISION);
@@ -213,7 +210,6 @@ public final class ItemPickupHud extends CustomUIHud {
                 }
             }
 
-            // Only show Pellets for multi-pellet weapons (blunderbusses)
             int basePellets = definition != null ? definition.getBasePellets() : 1;
             if (basePellets > 1) {
                 buildStatRow(ui, 6, "Pellets", basePellets,
