@@ -24,12 +24,12 @@ Group #CratePickupHudRoot {
 
   // ── Compact wrapper (when NOT crouching) ──
   Group #CratePickupCompactWrapper {
-    Anchor: (Bottom: 120, Left: 0, Right: 0, Height: 120);
+    Anchor: (Bottom: 150, Left: 0, Right: 0, Height: 82);
     LayoutMode: Center;
     Visible: false;
 
     Group #CratePickupCompact {
-      Anchor: (Width: 310, Height: 100);
+      Anchor: (Width: 310, Height: 82);
       Background: @PanelBg;
       LayoutMode: Left;
       Padding: (Horizontal: 0, Vertical: 0);
