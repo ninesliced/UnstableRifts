@@ -138,6 +138,12 @@ public final class WeaponLootRoller {
         if (definition.getBaseSpread() <= 0.05d) {
             applicable.remove(WeaponModifierType.PRECISION);
         }
+        if (definition.getBasePellets() <= 1) {
+            applicable.remove(WeaponModifierType.ADDITIONAL_BULLETS);
+        }
+        if (definition.getBaseKnockback() <= 0.001d) {
+            applicable.remove(WeaponModifierType.KNOCKBACK);
+        }
         if (applicable.isEmpty()) {
             return List.of();
         }
