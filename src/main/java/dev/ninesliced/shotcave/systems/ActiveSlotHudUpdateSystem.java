@@ -7,6 +7,7 @@ import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.EntityEventSystem;
 import com.hypixel.hytale.server.core.entity.entities.Player;
+import com.hypixel.hytale.server.core.entity.movement.MovementStatesComponent;
 import com.hypixel.hytale.server.core.event.events.ecs.SwitchActiveSlotEvent;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
@@ -48,9 +49,15 @@ public final class ActiveSlotHudUpdateSystem extends EntityEventSystem<EntitySto
             heldItem = player.getInventory().getItemInHand();
         }
 
+        boolean crouching = false;
+        MovementStatesComponent movementStates = store.getComponent(ref, MovementStatesComponent.getComponentType());
+        if (movementStates != null) {
+            crouching = movementStates.getMovementStates().crouching;
+        }
+
         // Force-clear cached state so the HUD always fully rebuilds on slot switch
         AmmoHudService.clear(playerRef);
-        AmmoHudService.updateForHeldItem(player, playerRef, heldItem);
+        AmmoHudService.updateForHeldItem(player, playerRef, heldItem, crouching);
     }
 }
 

@@ -10,7 +10,7 @@ public enum WeaponModifierType {
     // General (all weapon types except summoning)
     MAX_BULLETS(0.10, 0.30, EnumSet.of(WeaponCategory.LASER, WeaponCategory.BULLET, WeaponCategory.SUMMONING), "Max Ammo"),
     ATTACK_SPEED(0.20, 0.20, null, "Speed"),
-    ADDITIONAL_BULLETS(1.0, 2.0, EnumSet.of(WeaponCategory.LASER, WeaponCategory.BULLET), "Pellets"),
+    ADDITIONAL_BULLETS(1.0, 2.0, EnumSet.of(WeaponCategory.LASER), "Pellets"),
 
     // Summoning only
     MOB_HEALTH(0.20, 0.50, EnumSet.of(WeaponCategory.SUMMONING), "Mob HP"),

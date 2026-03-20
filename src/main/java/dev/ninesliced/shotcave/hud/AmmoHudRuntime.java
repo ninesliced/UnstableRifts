@@ -3,6 +3,7 @@ package dev.ninesliced.shotcave.hud;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.server.core.HytaleServer;
 import com.hypixel.hytale.server.core.entity.entities.Player;
+import com.hypixel.hytale.server.core.entity.movement.MovementStatesComponent;
 import com.hypixel.hytale.server.core.event.events.player.PlayerDisconnectEvent;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
@@ -71,11 +72,18 @@ public final class AmmoHudRuntime {
                 return;
             }
 
+            boolean crouching = false;
+            MovementStatesComponent movementStates = ref.getStore().getComponent(
+                    ref, MovementStatesComponent.getComponentType());
+            if (movementStates != null) {
+                crouching = movementStates.getMovementStates().crouching;
+            }
+
             ItemStack heldItem = null;
             if (player.getInventory() != null) {
                 heldItem = player.getInventory().getItemInHand();
             }
-            AmmoHudService.updateForHeldItem(player, playerRef, heldItem);
+            AmmoHudService.updateForHeldItem(player, playerRef, heldItem, crouching);
         });
     }
 

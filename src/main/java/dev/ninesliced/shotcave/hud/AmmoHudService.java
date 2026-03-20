@@ -33,6 +33,11 @@ public final class AmmoHudService {
 
     public static void updateForHeldItem(@Nonnull Player player, @Nonnull PlayerRef playerRef,
             @Nullable ItemStack heldItem) {
+        updateForHeldItem(player, playerRef, heldItem, false);
+    }
+
+    public static void updateForHeldItem(@Nonnull Player player, @Nonnull PlayerRef playerRef,
+            @Nullable ItemStack heldItem, boolean crouching) {
 
         if (heldItem == null) {
             hide(player, playerRef);
@@ -66,7 +71,7 @@ public final class AmmoHudService {
         List<WeaponModifier> modifiers = GunItemMetadata.getModifiers(heldItem);
         if (category == null) category = WeaponCategory.LASER;
 
-        long state = computeState(itemId, ammo, baseMaxAmmo, maxAmmo, rarity.ordinal(), effect.ordinal(), modifiers.hashCode());
+        long state = computeState(itemId, ammo, baseMaxAmmo, maxAmmo, rarity.ordinal(), effect.ordinal(), modifiers.hashCode(), crouching);
         UUID uuid = playerRef.getUuid();
         Long previous = LAST_STATE.get(uuid);
         if (previous != null && previous == state) {
@@ -76,7 +81,7 @@ public final class AmmoHudService {
 
         String displayName = definition != null ? definition.getDisplayName() : extractWeaponName(heldItem);
         ShotcaveHud hud = new ShotcaveHud(playerRef, ammo, baseMaxAmmo, maxAmmo,
-                rarity, effect, category, definition, modifiers, displayName);
+                rarity, effect, category, definition, modifiers, displayName, crouching);
 
         player.getHudManager().showHudComponents(playerRef, HudComponent.AmmoIndicator);
         if (!MultiHudCompat.setHud(player, playerRef, HUD_IDENTIFIER, hud)) {
@@ -103,7 +108,7 @@ public final class AmmoHudService {
     }
 
     private static long computeState(@Nullable String itemId, int ammo, int baseMaxAmmo, int maxAmmo,
-                                      int rarityOrdinal, int effectOrdinal, int modifiersHash) {
+                                      int rarityOrdinal, int effectOrdinal, int modifiersHash, boolean crouching) {
         long h = 1125899906842597L;
         h = 31L * h + (itemId == null ? 0 : itemId.hashCode());
         h = 31L * h + ammo;
@@ -112,6 +117,7 @@ public final class AmmoHudService {
         h = 31L * h + rarityOrdinal;
         h = 31L * h + effectOrdinal;
         h = 31L * h + modifiersHash;
+        h = 31L * h + (crouching ? 1 : 0);
         return h;
     }
 

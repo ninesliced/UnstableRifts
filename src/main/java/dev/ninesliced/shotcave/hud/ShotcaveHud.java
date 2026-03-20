@@ -35,11 +35,13 @@ public final class ShotcaveHud extends CustomUIHud {
     @Nullable private final WeaponDefinition definition;
     @Nonnull private final List<WeaponModifier> modifiers;
     @Nullable private final String weaponName;
+    private final boolean crouching;
 
     public ShotcaveHud(@Nonnull PlayerRef playerRef, int ammo, int baseMaxAmmo, int maxAmmo,
                        @Nonnull WeaponRarity rarity, @Nonnull DamageEffect effect,
                        @Nonnull WeaponCategory category, @Nullable WeaponDefinition definition,
-                       @Nonnull List<WeaponModifier> modifiers, @Nullable String weaponName) {
+                       @Nonnull List<WeaponModifier> modifiers, @Nullable String weaponName,
+                       boolean crouching) {
         super(playerRef);
         this.ammo = Math.max(0, ammo);
         this.baseMaxAmmo = Math.max(1, baseMaxAmmo);
@@ -50,6 +52,7 @@ public final class ShotcaveHud extends CustomUIHud {
         this.definition = definition;
         this.modifiers = modifiers;
         this.weaponName = weaponName;
+        this.crouching = crouching;
     }
 
     @Override
@@ -76,27 +79,34 @@ public final class ShotcaveHud extends CustomUIHud {
             ui.set("#ShotcaveEffectLabel.Visible", true);
         }
 
-        if (category == WeaponCategory.SUMMONING) {
-            buildSummoningStats(ui);
-        } else {
-            buildCombatStats(ui);
-        }
+        if (crouching) {
+            // Expanded view: show stats + modifiers
+            ui.set("#ShotcaveStatsSection.Visible", true);
 
-        int modCount = Math.min(modifiers.size(), 5);
-        if (modCount > 0) {
-            for (int i = 0; i < modCount; i++) {
-                WeaponModifier mod = modifiers.get(i);
-                String modText = formatModifier(mod);
-                ui.set("#ShotcaveMod" + i + ".TextSpans", Message.raw(modText));
+            if (category == WeaponCategory.SUMMONING) {
+                buildSummoningStats(ui);
+            } else {
+                buildCombatStats(ui);
             }
-            for (int i = modCount; i < 5; i++) {
-                ui.set("#ShotcaveMod" + i + ".Visible", false);
+
+            int modCount = Math.min(modifiers.size(), 5);
+            if (modCount > 0) {
+                ui.set("#ShotcaveModSection.Visible", true);
+                for (int i = 0; i < modCount; i++) {
+                    WeaponModifier mod = modifiers.get(i);
+                    String modText = formatModifier(mod);
+                    ui.set("#ShotcaveMod" + i + ".TextSpans", Message.raw(modText));
+                }
+                for (int i = modCount; i < 5; i++) {
+                    ui.set("#ShotcaveMod" + i + ".Visible", false);
+                }
+            } else {
+                ui.set("#ShotcaveModSection.Visible", false);
             }
         } else {
-            ui.set("#ShotcaveModSeparator.Visible", false);
-            for (int i = 0; i < 5; i++) {
-                ui.set("#ShotcaveMod" + i + ".Visible", false);
-            }
+            // Compact view: hide stats + modifiers
+            ui.set("#ShotcaveStatsSection.Visible", false);
+            ui.set("#ShotcaveModSection.Visible", false);
         }
 
         if (category == WeaponCategory.MELEE) {

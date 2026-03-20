@@ -90,6 +90,10 @@ Group #ShotcaveHudRoot {
         }
       }
 
+      // ── Stats section (visible when crouching) ──
+      Group #ShotcaveStatsSection {
+        LayoutMode: Top;
+
       // ── Separator ──
       Group { Anchor: (Height: 1, Top: 8, Left: 0, Right: 0); Background: @SepColor; }
 
@@ -159,13 +163,20 @@ Group #ShotcaveHudRoot {
         Label #ShotcaveStatEffectTimeMod { Text: ""; Anchor: (Height: 20); Style: @StatModStyle; }
       }
 
-      // ── Modifier section ──
+      } // end #ShotcaveStatsSection
+
+      // ── Modifier section (visible when crouching) ──
+      Group #ShotcaveModSection {
+        LayoutMode: Top;
+
       Group #ShotcaveModSeparator { Anchor: (Height: 1, Top: 6, Left: 0, Right: 0); Background: @SepColor; }
       Label #ShotcaveMod0 { Text: ""; Anchor: (Height: 18, Top: 5); Style: @ModSlotStyle; }
       Label #ShotcaveMod1 { Text: ""; Anchor: (Height: 18, Top: 1); Style: @ModSlotStyle; }
       Label #ShotcaveMod2 { Text: ""; Anchor: (Height: 18, Top: 1); Style: @ModSlotStyle; }
       Label #ShotcaveMod3 { Text: ""; Anchor: (Height: 18, Top: 1); Style: @ModSlotStyle; }
       Label #ShotcaveMod4 { Text: ""; Anchor: (Height: 18, Top: 1); Style: @ModSlotStyle; }
+
+      } // end #ShotcaveModSection
 
       // ── Ammo section (hidden for melee weapons) ──
       Group #ShotcaveAmmoSection {

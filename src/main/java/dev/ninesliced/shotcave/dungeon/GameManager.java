@@ -47,7 +47,6 @@ import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.NPCPlugin;
-import com.hypixel.hytale.server.npc.util.InventoryHelper;
 import dev.ninesliced.shotcave.Shotcave;
 import dev.ninesliced.shotcave.inventory.InventoryLockService;
 import dev.ninesliced.shotcave.hud.DungeonInfoHud;
@@ -852,6 +851,7 @@ public final class GameManager {
         if (!hasSavedInventory(playerId)) {
             savePlayerInventory(playerId, player);
         }
+        plugin.getInventoryLockService().unlock(player, playerId);
         clearPlayerInventory(player);
         resetPlayerStatus(player, ref, store);
         giveStartEquipment(playerRef, player, config);
@@ -1012,14 +1012,14 @@ public final class GameManager {
             }
 
             try {
-                ItemStack item = InventoryHelper.createItem(itemId);
+                ItemStack item = createStartEquipmentItem(itemId);
                 if (item == null) {
-                    LOGGER.warning("Start equipment item not found in asset store: " + itemId);
+                    LOGGER.warning("Start equipment item creation returned null: " + itemId);
                     continue;
                 }
-                hotbar.setItemStackForSlot(targetSlot, item);
+                hotbar.setItemStackForSlot(targetSlot, item, false);
             } catch (Exception e) {
-                LOGGER.warning("Failed to give start equipment item: " + itemId);
+                LOGGER.warning("Failed to give start equipment item: " + itemId + " - " + e.getMessage());
             }
         }
 
@@ -1031,6 +1031,16 @@ public final class GameManager {
         }
 
         syncInventoryAndSelectedSlots(playerRef, inventory);
+    }
+
+    @Nullable
+    private ItemStack createStartEquipmentItem(@Nonnull String itemId) {
+        try {
+            return new ItemStack(itemId, 1);
+        } catch (IllegalArgumentException e) {
+            LOGGER.warning("Invalid start equipment item id: " + itemId);
+            return null;
+        }
     }
 
     private byte getPreferredHotbarSlot(@Nonnull Inventory inventory, @Nonnull ItemContainer hotbar) {
@@ -1297,6 +1307,7 @@ public final class GameManager {
             resetPlayerStatus(player, ref, store);
 
             // Give back start equipment
+            plugin.getInventoryLockService().unlock(player, playerId);
             clearPlayerInventory(player);
             giveStartEquipment(playerRef, player, config);
             plugin.getInventoryLockService().lock(player, playerId);
