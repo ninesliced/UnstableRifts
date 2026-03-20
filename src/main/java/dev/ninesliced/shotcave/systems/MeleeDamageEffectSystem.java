@@ -7,6 +7,7 @@ import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.SystemGroup;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.server.core.entity.entities.Player;
+import com.hypixel.hytale.server.core.entity.knockback.KnockbackComponent;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.modules.entity.damage.Damage;
 import com.hypixel.hytale.server.core.modules.entity.damage.DamageEventSystem;
@@ -88,6 +89,14 @@ public final class MeleeDamageEffectSystem extends DamageEventSystem {
         if (effect != DamageEffect.NONE && effect.hasDoT()) {
             WeaponRarity rarity = GunItemMetadata.getRarity(heldItem);
             DamageEffectRuntime.apply(commandBuffer, targetRef, effect, rarity);
+
+            // For freezing effects, strip upward knockback so entities don't float
+            if (effect == DamageEffect.ICE || effect == DamageEffect.ELECTRICITY) {
+                KnockbackComponent kb = damage.getIfPresentMetaObject(Damage.KNOCKBACK_COMPONENT);
+                if (kb != null && kb.getVelocity() != null && kb.getVelocity().y > 0.0) {
+                    kb.getVelocity().y = 0.0;
+                }
+            }
         }
     }
 }

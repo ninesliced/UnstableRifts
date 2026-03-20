@@ -125,7 +125,7 @@ public final class WeaponLootRoller {
         // Roll based on rarity's effect chance
         if (rng.nextDouble() < rarity.getEffectChance()) {
             // Pick a random rollable effect (acid, fire, ice only for random rolls)
-            DamageEffect[] rollable = { DamageEffect.ACID, DamageEffect.FIRE, DamageEffect.ICE };
+            DamageEffect[] rollable = { DamageEffect.ACID, DamageEffect.FIRE, DamageEffect.ICE, DamageEffect.ELECTRICITY, DamageEffect.VOID };
             return rollable[rng.nextInt(rollable.length)];
         }
 
