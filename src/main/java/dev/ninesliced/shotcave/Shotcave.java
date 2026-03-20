@@ -73,6 +73,9 @@ import dev.ninesliced.shotcave.systems.PlayerDeathSystem;
 import dev.ninesliced.shotcave.systems.ReviveInteractionPacketHandler;
 import dev.ninesliced.shotcave.systems.RevivePromptHudRuntime;
 import dev.ninesliced.shotcave.systems.ReviveTickSystem;
+import dev.ninesliced.shotcave.systems.RollComponent;
+import dev.ninesliced.shotcave.systems.RollPlayerAddedSystem;
+import dev.ninesliced.shotcave.systems.RollSystem;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.server.core.entity.UUIDComponent;
 import com.hypixel.hytale.server.core.inventory.Inventory;
@@ -184,6 +187,16 @@ public class Shotcave extends JavaPlugin {
         this.getEntityStoreRegistry().registerSystem(new ReviveTickSystem());
         this.getEntityStoreRegistry().registerSystem(new DeathAggroSuppressionSystem());
 
+        // Roll system — jump key becomes an invulnerable roll in dungeon mode.
+        ComponentType<EntityStore, RollComponent> rollComponentType =
+                this.getEntityStoreRegistry().registerComponent(RollComponent.class, RollComponent::new);
+        RollComponent.setComponentType(rollComponentType);
+
+        this.getEntityStoreRegistry().registerSystem(
+                new RollPlayerAddedSystem(playerRefComponentType, rollComponentType));
+        this.getEntityStoreRegistry().registerSystem(
+                new RollSystem(this.cameraService, rollComponentType));
+
         // Damage effect DoT system — register component, then system.
         ComponentType<EntityStore, DamageEffectComponent> damageEffectComponentType =
                 this.getEntityStoreRegistry().registerComponent(DamageEffectComponent.class, DamageEffectComponent::new);
@@ -222,7 +235,6 @@ public class Shotcave extends JavaPlugin {
         this.getEventRegistry().registerGlobal(PlayerDisconnectEvent.class, event -> {
             this.partyManager.handleDisconnect(event.getPlayerRef());
             this.cameraService.clearState(event.getPlayerRef());
-            this.gameManager.onPlayerDisconnect(event.getPlayerRef().getUuid());
             this.gameManager.onPlayerDisconnect(event.getPlayerRef());
             WeaponVirtualItems.onPlayerDisconnect(event.getPlayerRef().getUuid());
         });

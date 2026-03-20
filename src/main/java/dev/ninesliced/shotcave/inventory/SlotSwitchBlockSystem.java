@@ -30,6 +30,7 @@ public final class SlotSwitchBlockSystem extends EntityEventSystem<EntityStore, 
         return Query.any();
     }
 
+    @SuppressWarnings("removal")
     @Override
     public void handle(int index,
                        @Nonnull ArchetypeChunk<EntityStore> chunk,

@@ -8,55 +8,108 @@
   "levels": [
     {
       "id": "shotcave",
-      "name": "Shale",
-      "rooms": 25,
-      "mobs": [
-        "Skeleton_Warrior",
-        "Skeleton_Archer"
-      ],
+      "name": "Kweebec",
+      "rooms": {
+        "spawn":     ["Shotcave.Kweebec.Entrance.*"],
+        "corridor":  ["Shotcave.Kweebec.Room.*"],
+        "challenge": ["Shotcave.Kweebec.Challenge.*"],
+        "shop":      ["Shotcave.Kweebec.Shop.*"],
+        "wall":      ["Shotcave.Shale.Wall.*"],
+        "boss":      ["Shotcave.Kweebec.Boss.*"]
+      },
+      "main": {
+        "maxRooms": 6,
+        "challengeRooms": { "min": 1, "max": 2 },
+        "minimumCorridorLength": 1,
+        "mobsToSpawn":     { "min": 4, "max": 8 },
+        "treasureRooms":   { "min": 0, "max": 0 },
+        "shopRooms":       { "min": 1, "max": 1 }
+      },
+      "branch": {
+        "spawnProbability": {
+          "1": 0.5
+        },
+        "maxRooms": 3,
+        "challengeRooms": { "min": 0, "max": 1 },
+        "minimumCorridorLength": 1,
+        "mobsToSpawn":     { "min": 2, "max": 4 }
+      },
+      "mobs": {
+        "Skeleton_Warrior": 10,
+        "Skeleton_Archer": 4
+      },
       "bossMob": "Skeleton_Boss",
-      "moneyPerKill": 10,
-      "prefabs": {
-        "entrance": [
-          "Shotcave.Shale.Entrance.*"
-        ],
-        "room": [
-          "Shotcave.Shale.Corridor.*",
-          "Shotcave.Shale.OffGrid.*",
-          "Shotcave.Shale.Stairs.*",
-          "Shotcave.Shale.Turn.*"
-        ],
-        "wall": [
-          "Shotcave.Shale.Wall.*"
-        ],
-        "boss": [
-          "Shotcave.Shale.Boss.*"
-        ]
-      }
+      "moneyPerKill": 5
+    },
+    {
+      "id": "shale",
+      "name": "Shale",
+      "rooms": {
+        "spawn":     ["Shotcave.Shale.Entrance.*"],
+        "corridor":  ["Shotcave.Shale.Corridor.*", "Shotcave.Shale.OffGrid.*", "Shotcave.Shale.Stairs.*", "Shotcave.Shale.Turn.*"],
+        "challenge": ["Shotcave.Shale.Corridor.*", "Shotcave.Shale.Turn.*"],
+        "wall":      ["Shotcave.Shale.Wall.*"],
+        "boss":      ["Shotcave.Shale.Boss.*"]
+      },
+      "main": {
+        "maxRooms": 12,
+        "challengeRooms": { "min": 2, "max": 4 },
+        "minimumCorridorLength": 1,
+        "mobsToSpawn":     { "min": 8, "max": 15 },
+        "treasureRooms":   { "min": 0, "max": 1 },
+        "shopRooms":       { "min": 0, "max": 1 }
+      },
+      "branch": {
+        "spawnProbability": {
+          "1": 0.30,
+          "2": 0.15,
+          "3": 0.05
+        },
+        "maxRooms": 5,
+        "challengeRooms": { "min": 1, "max": 2 },
+        "minimumCorridorLength": 1,
+        "mobsToSpawn":     { "min": 3, "max": 8 }
+      },
+      "mobs": {
+        "Skeleton_Warrior": 10,
+        "Skeleton_Archer": 4
+      },
+      "bossMob": "Skeleton_Boss",
+      "moneyPerKill": 10
     },
     {
       "id": "test",
       "name": "Test",
-      "rooms": 25,
-      "mobs": [
-        "Skeleton_Warrior"
-      ],
+      "rooms": {
+        "spawn":     ["Shotcave.Test.Entrance.*"],
+        "corridor":  ["Shotcave.Test.Room.*"],
+        "challenge": ["Shotcave.Test.Room.*"],
+        "wall":      ["Shotcave.Test.Wall.*"],
+        "boss":      ["Shotcave.Test.Boss.*"]
+      },
+      "main": {
+        "maxRooms": 10,
+        "challengeRooms": { "min": 2, "max": 4 },
+        "minimumCorridorLength": 1,
+        "mobsToSpawn":     { "min": 8, "max": 15 },
+        "treasureRooms":   { "min": 0, "max": 0 },
+        "shopRooms":       { "min": 0, "max": 0 }
+      },
+      "branch": {
+        "spawnProbability": {
+          "1": 0.25,
+          "2": 0.10
+        },
+        "maxRooms": 4,
+        "challengeRooms": { "min": 1, "max": 2 },
+        "minimumCorridorLength": 1,
+        "mobsToSpawn":     { "min": 3, "max": 6 }
+      },
+      "mobs": {
+        "Skeleton_Warrior": 10
+      },
       "bossMob": "Skeleton_Boss",
-      "moneyPerKill": 15,
-      "prefabs": {
-        "entrance": [
-          "Shotcave.Test.Entrance.*"
-        ],
-        "room": [
-          "Shotcave.Test.Room.*"
-        ],
-        "wall": [
-          "Shotcave.Test.Wall.*"
-        ],
-        "boss": [
-          "Shotcave.Test.Boss.*"
-        ]
-      }
+      "moneyPerKill": 15
     }
   ]
 }

@@ -237,6 +237,7 @@ public final class FKeyPickupPacketHandler implements PlayerPacketWatcher {
      * Locked-inventory pickup: places the weapon in the first empty slot (0-2),
      * or swaps the held weapon if all 3 slots are full (dropping the old one).
      */
+    @SuppressWarnings("removal")
     private static void collectItemLocked(@Nonnull ItemPickupTracker.TrackedItem tracked,
             @Nonnull Player player,
             @Nonnull PlayerRef playerRef,

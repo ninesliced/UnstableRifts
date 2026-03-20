@@ -1,0 +1,41 @@
+{
+  "TranslationProperties": {
+    "Name": "server.items.Shotcave_Mob_Spawn_Point.name",
+    "Description": "server.items.Shotcave_Mob_Spawn_Point.description"
+  },
+  "Icon": "Icons/ItemsGenerated/Shotcave_Marker_Mob_Spawn_Point.png",
+  "Quality": "Technical",
+  "Categories": [
+    "Tool.Block"
+  ],
+  "BlockType": {
+    "DrawType": "Cube",
+    "Textures": [
+      {
+        "Weight": 1,
+        "All": "BlockTextures/Shotcave_Marker_Mob_Spawn_Point.png"
+      }
+    ],
+    "Opacity": "Transparent",
+    "Group": "@Tech",
+    "State": {
+      "Id": "shotcave_mob_spawn_point"
+    },
+    "Flags": {
+      "IsUsable": false
+    },
+    "BlockParticleSetId": "Stone",
+    "BlockSoundSetId": "Stone"
+  },
+  "PlayerAnimationsId": "Block",
+  "Tags": {
+    "Type": [
+      "DungeonMarker",
+      "Shotcave"
+    ],
+    "Marker": [
+      "MobSpawnPoint"
+    ]
+  },
+  "ItemSoundSetId": "ISS_Blocks_Stone"
+}

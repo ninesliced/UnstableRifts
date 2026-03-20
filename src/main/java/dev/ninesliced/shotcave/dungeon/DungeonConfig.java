@@ -18,8 +18,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
 import java.util.logging.Level;
@@ -48,6 +51,10 @@ public class DungeonConfig {
 
     @SerializedName("dungeonName")
     private String dungeonName = "Shotcave";
+
+    // ────────────────────────────────────────────────
+    //  Static helpers — config file management
+    // ────────────────────────────────────────────────
 
     @Nonnull
     public static Path ensureRuntimeConfig(@Nonnull Path dataDirectory) {
@@ -84,7 +91,7 @@ public class DungeonConfig {
                     StandardCharsets.UTF_8)) {
                 return sanitize(GSON.fromJson(reader, DungeonConfig.class));
             }
-        } catch (IOException e) {
+        } catch (IOException | com.google.gson.JsonSyntaxException e) {
             LOGGER.at(Level.WARNING).withCause(e).log("Failed to load dungeon config from %s",
                     configPath.toAbsolutePath());
             return sanitize(new DungeonConfig());
@@ -131,6 +138,10 @@ public class DungeonConfig {
         }
         return sanitized;
     }
+
+    // ────────────────────────────────────────────────
+    //  Static helpers — prefab resolution
+    // ────────────────────────────────────────────────
 
     @Nonnull
     public static List<Path> resolveGlobs(@Nonnull List<String> globs) {
@@ -221,6 +232,10 @@ public class DungeonConfig {
         }
     }
 
+    // ────────────────────────────────────────────────
+    //  Accessors
+    // ────────────────────────────────────────────────
+
     @Nonnull
     public List<LevelConfig> getLevels() {
         return levels;
@@ -265,6 +280,10 @@ public class DungeonConfig {
         return null;
     }
 
+    // ════════════════════════════════════════════════
+    //  LevelConfig
+    // ════════════════════════════════════════════════
+
     public static class LevelConfig {
         @SerializedName("id")
         private String id;
@@ -272,14 +291,25 @@ public class DungeonConfig {
         @SerializedName("name")
         private String name = "Default";
 
+        /** Global prefab pools — available on every branch. */
         @SerializedName("rooms")
-        private int rooms = 10;
+        private RoomPools rooms = new RoomPools();
 
-        @SerializedName("prefabs")
-        private PrefabSet prefabs = new PrefabSet();
+        /** Prefab globs that MUST appear exactly once per level. */
+        @SerializedName("importantRooms")
+        private List<String> importantRooms = new ArrayList<>();
 
+        /** Main branch generation parameters. */
+        @SerializedName("main")
+        private MainBranchConfig main = new MainBranchConfig();
+
+        /** Side branch generation parameters. */
+        @SerializedName("branch")
+        private BranchConfig branch = new BranchConfig();
+
+        /** Weighted mob pool: mobId → weight. */
         @SerializedName("mobs")
-        private List<String> mobs = new ArrayList<>();
+        private Map<String, Integer> mobs = new HashMap<>();
 
         @SerializedName("bossMob")
         private String bossMob;
@@ -295,17 +325,34 @@ public class DungeonConfig {
             return name;
         }
 
-        public int getRooms() {
-            return rooms;
-        }
-
-        public PrefabSet getPrefabs() {
-            return prefabs;
+        @Nonnull
+        public RoomPools getRoomPools() {
+            return rooms != null ? rooms : new RoomPools();
         }
 
         @Nonnull
-        public List<String> getMobs() {
-            return mobs != null ? mobs : new ArrayList<>();
+        public List<String> getImportantRooms() {
+            return importantRooms != null ? importantRooms : new ArrayList<>();
+        }
+
+        @Nonnull
+        public MainBranchConfig getMain() {
+            return main != null ? main : new MainBranchConfig();
+        }
+
+        @Nonnull
+        public BranchConfig getBranch() {
+            return branch != null ? branch : new BranchConfig();
+        }
+
+        @Nonnull
+        public Map<String, Integer> getMobs() {
+            return mobs != null ? mobs : new HashMap<>();
+        }
+
+        @Nonnull
+        public WeightedPool<String> getMobPool() {
+            return WeightedPool.of(getMobs());
         }
 
         @Nullable
@@ -341,51 +388,222 @@ public class DungeonConfig {
             if (name == null || name.isBlank()) {
                 name = "Default";
             }
-            if (rooms < 0) {
-                rooms = 0;
+            if (rooms == null) {
+                rooms = new RoomPools();
             }
-            if (prefabs == null) {
-                prefabs = new PrefabSet();
+            rooms.sanitize();
+            if (main == null) {
+                main = new MainBranchConfig();
             }
-            prefabs.sanitize();
+            main.sanitize();
+            if (branch == null) {
+                branch = new BranchConfig();
+            }
+            branch.sanitize();
+            if (importantRooms == null) {
+                importantRooms = new ArrayList<>();
+            }
+            if (mobs == null) {
+                mobs = new HashMap<>();
+            }
         }
     }
 
-    public static class PrefabSet {
-        @SerializedName("entrance")
-        private List<String> entrance = new ArrayList<>();
+    // ════════════════════════════════════════════════
+    //  RoomPools — prefab glob lists per room type
+    // ════════════════════════════════════════════════
 
-        @SerializedName("room")
-        private List<String> room = new ArrayList<>();
+    public static class RoomPools {
+        @SerializedName("spawn")
+        private List<String> spawn = new ArrayList<>();
 
-        @SerializedName("wall")
-        private List<String> wall = new ArrayList<>();
+        @SerializedName("corridor")
+        private List<String> corridor = new ArrayList<>();
+
+        @SerializedName("challenge")
+        private List<String> challenge = new ArrayList<>();
+
+        @SerializedName("treasure")
+        private List<String> treasure = new ArrayList<>();
+
+        @SerializedName("shop")
+        private List<String> shop = new ArrayList<>();
 
         @SerializedName("boss")
         private List<String> boss = new ArrayList<>();
 
-        public List<String> getEntrance() {
-            return entrance;
+        @SerializedName("wall")
+        private List<String> wall = new ArrayList<>();
+
+        @SerializedName("keyDoor")
+        private List<String> keyDoor = new ArrayList<>();
+
+        @SerializedName("lockedDoor")
+        private List<String> lockedDoor = new ArrayList<>();
+
+        @Nonnull public List<String> getSpawn()      { return spawn != null ? spawn : Collections.emptyList(); }
+        @Nonnull public List<String> getCorridor()    { return corridor != null ? corridor : Collections.emptyList(); }
+        @Nonnull public List<String> getChallenge()   { return challenge != null ? challenge : Collections.emptyList(); }
+        @Nonnull public List<String> getTreasure()    { return treasure != null ? treasure : Collections.emptyList(); }
+        @Nonnull public List<String> getShop()        { return shop != null ? shop : Collections.emptyList(); }
+        @Nonnull public List<String> getBoss()        { return boss != null ? boss : Collections.emptyList(); }
+        @Nonnull public List<String> getWall()        { return wall != null ? wall : Collections.emptyList(); }
+        @Nonnull public List<String> getKeyDoor()     { return keyDoor != null ? keyDoor : Collections.emptyList(); }
+        @Nonnull public List<String> getLockedDoor()  { return lockedDoor != null ? lockedDoor : Collections.emptyList(); }
+
+        /**
+         * Get globs for a specific room type.
+         */
+        @Nonnull
+        public List<String> getForType(@Nonnull RoomType type) {
+            return switch (type) {
+                case SPAWN     -> getSpawn();
+                case CORRIDOR  -> getCorridor();
+                case CHALLENGE -> getChallenge();
+                case TREASURE  -> getTreasure();
+                case SHOP      -> getShop();
+                case BOSS      -> getBoss();
+                case WALL      -> getWall();
+            };
         }
 
-        public List<String> getRoom() {
-            return room;
+        /**
+         * Merge another RoomPools into this one (adds entries without duplicates).
+         */
+        @Nonnull
+        public RoomPools mergedWith(@Nullable RoomPools other) {
+            if (other == null) return this;
+            RoomPools merged = new RoomPools();
+            merged.spawn     = mergeGlobs(this.getSpawn(), other.getSpawn());
+            merged.corridor  = mergeGlobs(this.getCorridor(), other.getCorridor());
+            merged.challenge = mergeGlobs(this.getChallenge(), other.getChallenge());
+            merged.treasure  = mergeGlobs(this.getTreasure(), other.getTreasure());
+            merged.shop      = mergeGlobs(this.getShop(), other.getShop());
+            merged.boss      = mergeGlobs(this.getBoss(), other.getBoss());
+            merged.wall      = mergeGlobs(this.getWall(), other.getWall());
+            merged.keyDoor   = mergeGlobs(this.getKeyDoor(), other.getKeyDoor());
+            merged.lockedDoor = mergeGlobs(this.getLockedDoor(), other.getLockedDoor());
+            return merged;
         }
 
-        public List<String> getWall() {
-            return wall;
-        }
-
-        public List<String> getBoss() {
-            return boss;
+        @Nonnull
+        private static List<String> mergeGlobs(@Nonnull List<String> a, @Nonnull List<String> b) {
+            List<String> merged = new ArrayList<>(a);
+            for (String s : b) {
+                if (!merged.contains(s)) {
+                    merged.add(s);
+                }
+            }
+            return merged;
         }
 
         private void sanitize() {
-            entrance = sanitizeGlobList(entrance);
-            room = sanitizeGlobList(room);
-            wall = sanitizeGlobList(wall);
-            boss = sanitizeGlobList(boss);
+            spawn     = sanitizeGlobList(spawn);
+            corridor  = sanitizeGlobList(corridor);
+            challenge = sanitizeGlobList(challenge);
+            treasure  = sanitizeGlobList(treasure);
+            shop      = sanitizeGlobList(shop);
+            boss      = sanitizeGlobList(boss);
+            wall      = sanitizeGlobList(wall);
+            keyDoor   = sanitizeGlobList(keyDoor);
+            lockedDoor = sanitizeGlobList(lockedDoor);
         }
     }
 
+    // ════════════════════════════════════════════════
+    //  MainBranchConfig
+    // ════════════════════════════════════════════════
+
+    public static class MainBranchConfig {
+        @SerializedName("maxRooms")
+        private int maxRooms = 10;
+
+        @SerializedName("challengeRooms")
+        private IntRange challengeRooms = new IntRange(2, 4);
+
+        @SerializedName("minimumCorridorLength")
+        private int minimumCorridorLength = 1;
+
+        @SerializedName("mobsToSpawn")
+        private IntRange mobsToSpawn = new IntRange(8, 15);
+
+        @SerializedName("treasureRooms")
+        private IntRange treasureRooms = new IntRange(0, 1);
+
+        @SerializedName("shopRooms")
+        private IntRange shopRooms = new IntRange(0, 1);
+
+        /** Additional prefab pools exclusive to the main branch. */
+        @SerializedName("rooms")
+        private RoomPools rooms;
+
+        public int getMaxRooms()                             { return maxRooms > 0 ? maxRooms : 10; }
+        public int getMinimumCorridorLength()    { return Math.max(0, minimumCorridorLength); }
+        @Nonnull public IntRange getChallengeRooms() { return challengeRooms != null ? challengeRooms : new IntRange(2, 4); }
+        @Nonnull public IntRange getMobsToSpawn()     { return mobsToSpawn != null ? mobsToSpawn : new IntRange(8, 15); }
+        @Nonnull public IntRange getTreasureRooms()   { return treasureRooms != null ? treasureRooms : new IntRange(0, 1); }
+        @Nonnull public IntRange getShopRooms()       { return shopRooms != null ? shopRooms : new IntRange(0, 1); }
+        @Nullable public RoomPools getRooms()         { return rooms; }
+
+        private void sanitize() {
+            if (maxRooms <= 0) maxRooms = 10;
+            if (minimumCorridorLength < 0) minimumCorridorLength = 1;
+            if (challengeRooms == null) challengeRooms = new IntRange(2, 4);
+            if (mobsToSpawn == null) mobsToSpawn = new IntRange(8, 15);
+            if (treasureRooms == null) treasureRooms = new IntRange(0, 1);
+            if (shopRooms == null) shopRooms = new IntRange(0, 1);
+            if (rooms != null) rooms.sanitize();
+        }
+    }
+
+    // ════════════════════════════════════════════════
+    //  BranchConfig
+    // ════════════════════════════════════════════════
+
+    public static class BranchConfig {
+        /** Probability of spawning a branch at each depth: "1" → 0.30, "2" → 0.15, etc. */
+        @SerializedName("spawnProbability")
+        private Map<String, Double> spawnProbability = new HashMap<>();
+
+        @SerializedName("maxRooms")
+        private int maxRooms = 5;
+
+        @SerializedName("challengeRooms")
+        private IntRange challengeRooms = new IntRange(1, 2);
+
+        @SerializedName("minimumCorridorLength")
+        private int minimumCorridorLength = 1;
+
+        @SerializedName("mobsToSpawn")
+        private IntRange mobsToSpawn = new IntRange(3, 8);
+
+        /** Additional prefab pools exclusive to branches. */
+        @SerializedName("rooms")
+        private RoomPools rooms;
+
+        public int getMaxRooms()                             { return maxRooms > 0 ? maxRooms : 5; }
+        public int getMinimumCorridorLength()    { return Math.max(0, minimumCorridorLength); }
+        @Nonnull public IntRange getChallengeRooms() { return challengeRooms != null ? challengeRooms : new IntRange(1, 2); }
+        @Nonnull public IntRange getMobsToSpawn()     { return mobsToSpawn != null ? mobsToSpawn : new IntRange(3, 8); }
+        @Nullable public RoomPools getRooms()         { return rooms; }
+
+        /**
+         * Get the fork probability for a given branch depth (1-based).
+         * Returns 0 if the depth is not configured.
+         */
+        public double getForkProbability(int depth) {
+            if (spawnProbability == null || spawnProbability.isEmpty()) return 0.0;
+            Double prob = spawnProbability.get(String.valueOf(depth));
+            return prob != null ? Math.max(0.0, Math.min(1.0, prob)) : 0.0;
+        }
+
+        private void sanitize() {
+            if (spawnProbability == null) spawnProbability = new HashMap<>();
+            if (maxRooms <= 0) maxRooms = 5;
+            if (minimumCorridorLength < 0) minimumCorridorLength = 1;
+            if (challengeRooms == null) challengeRooms = new IntRange(1, 2);
+            if (mobsToSpawn == null) mobsToSpawn = new IntRange(3, 8);
+            if (rooms != null) rooms.sanitize();
+        }
+    }
 }

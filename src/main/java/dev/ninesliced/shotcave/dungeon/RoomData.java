@@ -27,6 +27,15 @@ public final class RoomData {
     private final List<String> mobsToSpawn;
     private final List<Ref<EntityStore>> spawnedMobs = new ArrayList<>();
     private final List<RoomData> children = new ArrayList<>();
+
+    private int branchDepth;
+    private String branchId;
+
+    private final List<Vector3i> mobSpawnPoints = new ArrayList<>();
+    private final List<Vector3i> keySpawnerPositions = new ArrayList<>();
+    private final List<Vector3i> portalPositions = new ArrayList<>();
+    private final List<Vector3i> portalExitPositions = new ArrayList<>();
+
     @Nullable
     private RoomData parent;
     private boolean cleared = false;
@@ -37,12 +46,25 @@ public final class RoomData {
                     @Nonnull List<Vector3i> spawnerPositions,
                     @Nonnull List<Vector3d> prefabMobMarkerPositions,
                     @Nonnull List<String> mobsToSpawn) {
+        this(type, anchor, rotation, spawnerPositions, prefabMobMarkerPositions, mobsToSpawn, 0, "main");
+    }
+
+    public RoomData(@Nonnull RoomType type,
+                    @Nonnull Vector3i anchor,
+                    int rotation,
+                    @Nonnull List<Vector3i> spawnerPositions,
+                    @Nonnull List<Vector3d> prefabMobMarkerPositions,
+                    @Nonnull List<String> mobsToSpawn,
+                    int branchDepth,
+                    @Nonnull String branchId) {
         this.type = type;
         this.anchor = anchor;
         this.rotation = rotation;
         this.spawnerPositions = new ArrayList<>(spawnerPositions);
         this.prefabMobMarkerPositions = new ArrayList<>(prefabMobMarkerPositions);
         this.mobsToSpawn = new ArrayList<>(mobsToSpawn);
+        this.branchDepth = branchDepth;
+        this.branchId = branchId;
     }
 
     @Nonnull
@@ -175,10 +197,68 @@ public final class RoomData {
         return count;
     }
 
+    public int getBranchDepth() {
+        return branchDepth;
+    }
+
+    public void setBranchDepth(int branchDepth) {
+        this.branchDepth = branchDepth;
+    }
+
+    @Nonnull
+    public String getBranchId() {
+        return branchId != null ? branchId : "main";
+    }
+
+    public void setBranchId(@Nonnull String branchId) {
+        this.branchId = branchId;
+    }
+
+    public boolean isMainBranch() {
+        return branchDepth == 0;
+    }
+
+    @Nonnull
+    public List<Vector3i> getMobSpawnPoints() {
+        return mobSpawnPoints;
+    }
+
+    public void addMobSpawnPoint(@Nonnull Vector3i pos) {
+        mobSpawnPoints.add(pos);
+    }
+
+    @Nonnull
+    public List<Vector3i> getKeySpawnerPositions() {
+        return keySpawnerPositions;
+    }
+
+    public void addKeySpawnerPosition(@Nonnull Vector3i pos) {
+        keySpawnerPositions.add(pos);
+    }
+
+    @Nonnull
+    public List<Vector3i> getPortalPositions() {
+        return portalPositions;
+    }
+
+    public void addPortalPosition(@Nonnull Vector3i pos) {
+        portalPositions.add(pos);
+    }
+
+    @Nonnull
+    public List<Vector3i> getPortalExitPositions() {
+        return portalExitPositions;
+    }
+
+    public void addPortalExitPosition(@Nonnull Vector3i pos) {
+        portalExitPositions.add(pos);
+    }
+
     @Nonnull
     @Override
     public String toString() {
         return "RoomData{type=" + type + ", anchor=" + anchor
+                + ", branch=" + branchId + "(d" + branchDepth + ")"
                 + ", prefabMarkers=" + prefabMobMarkerPositions.size()
                 + ", mobs=" + mobsToSpawn.size() + "}";
     }

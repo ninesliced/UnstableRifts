@@ -1,0 +1,41 @@
+{
+  "TranslationProperties": {
+    "Name": "server.items.Shotcave_Water.name",
+    "Description": "server.items.Shotcave_Water.description"
+  },
+  "Icon": "Icons/ItemsGenerated/Shotcave_Marker_Water.png",
+  "Quality": "Technical",
+  "Categories": [
+    "Tool.Block"
+  ],
+  "BlockType": {
+    "DrawType": "Cube",
+    "Textures": [
+      {
+        "Weight": 1,
+        "All": "BlockTextures/Shotcave_Marker_Water.png"
+      }
+    ],
+    "Opacity": "Transparent",
+    "Group": "@Tech",
+    "State": {
+      "Id": "shotcave_water"
+    },
+    "Flags": {
+      "IsUsable": false
+    },
+    "BlockParticleSetId": "Stone",
+    "BlockSoundSetId": "Stone"
+  },
+  "PlayerAnimationsId": "Block",
+  "Tags": {
+    "Type": [
+      "DungeonMarker",
+      "Shotcave"
+    ],
+    "Marker": [
+      "Water"
+    ]
+  },
+  "ItemSoundSetId": "ISS_Blocks_Stone"
+}

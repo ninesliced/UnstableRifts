@@ -60,6 +60,7 @@ public final class ItemPickupInteraction extends SimpleInstantInteraction {
      * then fully or partially removes the item entity.
      * Does NOT call generatePickedUpItem() to avoid infinite re-tracking loops.
      */
+    @SuppressWarnings("removal")
     @Override
     protected final void firstRun(
             @Nonnull InteractionType type,

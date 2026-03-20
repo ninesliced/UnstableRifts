@@ -1,6 +1,7 @@
 package dev.ninesliced.shotcave.dungeon;
 
 import com.hypixel.hytale.builtin.instances.InstancesPlugin;
+import com.hypixel.hytale.builtin.weather.resources.WeatherResource;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.math.vector.Transform;
@@ -25,6 +26,7 @@ public final class DungeonInstanceService {
 
     private static final HytaleLogger LOGGER = ShotcaveLog.forModule("Dungeon");
     private static final String INSTANCE_TEMPLATE = "Shotcave";
+    public static final String DUNGEON_WEATHER = "Shotcave_Dungeon";
 
     private final Shotcave plugin;
     /**
@@ -74,6 +76,7 @@ public final class DungeonInstanceService {
                     DungeonGenerator generator = new DungeonGenerator();
                     generator.generate(world, seed, levelConfig);
                     this.lastGenerator = generator;
+                    applyDungeonWorldSettings(world);
                     LOGGER.at(Level.INFO).log("Dungeon instance created: " + world.getName() + " for selector " + levelConfig.getSelector());
                     if (statusConsumer != null) {
                         statusConsumer.accept("Dungeon ready: " + levelConfig.getName());
@@ -97,6 +100,14 @@ public final class DungeonInstanceService {
     @Nullable
     public dev.ninesliced.shotcave.dungeon.Level getLastGeneratedLevel() {
         return lastGenerator != null ? lastGenerator.getGeneratedLevel() : null;
+    }
+
+    private void applyDungeonWorldSettings(@Nonnull World world) {
+        Store<EntityStore> store = world.getEntityStore().getStore();
+        WeatherResource weatherResource = store.getResource(WeatherResource.getResourceType());
+        weatherResource.setForcedWeather(DUNGEON_WEATHER);
+        world.getWorldConfig().setForcedWeather(DUNGEON_WEATHER);
+        world.getWorldConfig().setFallDamageEnabled(false);
     }
 
     public void sendPlayerToReadyInstance(@Nonnull Ref<EntityStore> ref,

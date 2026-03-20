@@ -23,6 +23,10 @@ public enum GameState {
      */
     BOSS("Boss Fight"),
     /**
+     * Transitioning between levels (portal / staircase animation).
+     */
+    TRANSITIONING("Transitioning"),
+    /**
      * Game has ended (victory or abort).
      */
     COMPLETE("Complete");

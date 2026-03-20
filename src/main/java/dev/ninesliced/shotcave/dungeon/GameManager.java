@@ -37,11 +37,14 @@ import com.hypixel.hytale.server.core.modules.entity.tracker.NetworkId;
 import com.hypixel.hytale.server.core.modules.entitystats.EntityStatMap;
 import com.hypixel.hytale.server.core.modules.entitystats.EntityStatValue;
 import com.hypixel.hytale.server.core.modules.entitystats.asset.EntityStatType;
+import com.hypixel.hytale.protocol.MovementSettings;
+import com.hypixel.hytale.server.core.entity.entities.player.movement.MovementManager;
 import com.hypixel.hytale.server.core.modules.interaction.InteractionModule;
 import com.hypixel.hytale.server.core.modules.interaction.InteractionSimulationHandler;
 import com.hypixel.hytale.server.core.cosmetics.CosmeticsModule;
 import com.hypixel.hytale.protocol.packets.inventory.SetActiveSlot;
 import com.hypixel.hytale.protocol.packets.inventory.UpdatePlayerInventory;
+import com.hypixel.hytale.protocol.packets.worldmap.UpdateWorldMapSettings;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.World;
@@ -135,7 +138,6 @@ public final class GameManager {
         Game game = new Game(partyId);
         activeGames.put(partyId, game);
 
-        // Register all members
         for (UUID memberId : memberIds) {
             playerToParty.put(memberId, partyId);
             PlayerRef ref = memberRefs.get(memberId);
@@ -149,12 +151,10 @@ public final class GameManager {
             }
         }
 
-        // Resolve level config for the first level
         DungeonConfig.LevelConfig firstLevelConfig = config.getLevels().get(0);
         Level firstLevel = new Level(firstLevelConfig.getName(), 0);
         game.addLevel(firstLevel);
 
-        // Spawn instance and begin generation
         CompletableFuture<World> worldFuture = plugin.getDungeonInstanceService().spawnGeneratedInstance(
                 leaderWorld,
                 leaderReturnPoint,
@@ -210,7 +210,6 @@ public final class GameManager {
         world.execute(() -> {
             Store<EntityStore> store = world.getEntityStore().getStore();
 
-            // Process each party member
             for (Map.Entry<UUID, UUID> entry : playerToParty.entrySet()) {
                 if (!entry.getValue().equals(game.getPartyId())) continue;
 
@@ -228,7 +227,6 @@ public final class GameManager {
                 preparePlayerForDungeon(game, playerId, playerRef, player, ref, playerStore, config);
             }
 
-            // Spawn all mobs in the current level
             Level currentLevel = game.getCurrentLevel();
             if (currentLevel != null) {
                 spawnLevelMobs(currentLevel, store);
@@ -260,10 +258,8 @@ public final class GameManager {
         world.execute(() -> {
             Store<EntityStore> store = world.getEntityStore().getStore();
 
-            // Seal the boss room
             sealBossRoom(game, bossRoom, world);
 
-            // Spawn boss
             if (levelConfig != null && levelConfig.getBossMob() != null && !levelConfig.getBossMob().isBlank()) {
                 Vector3i anchor = bossRoom.getAnchor();
                 Vector3d bossPos = new Vector3d(anchor.x + 5, anchor.y + 1, anchor.z + 5);
@@ -297,7 +293,6 @@ public final class GameManager {
         if (world == null) return;
 
         world.execute(() -> {
-            // Unseal the boss room
             unsealBossRoom(game, bossRoom, world);
 
             // Revive all dead/ghost players on level completion
@@ -306,7 +301,6 @@ public final class GameManager {
             if (game.hasNextLevel()) {
                 broadcastToParty(game.getPartyId(), "Boss defeated! Advancing to the next level...", "#a9f5b3");
 
-                // Advance to next level
                 int nextIndex = game.getCurrentLevelIndex() + 1;
                 DungeonConfig config = plugin.loadDungeonConfig();
                 if (nextIndex < config.getLevels().size()) {
@@ -316,7 +310,6 @@ public final class GameManager {
                     game.setCurrentLevelIndex(nextIndex);
                     game.setState(GameState.ACTIVE);
 
-                    // Spawn mobs for the new level
                     Store<EntityStore> store = world.getEntityStore().getStore();
                     spawnLevelMobs(nextLevel, store);
                 }
@@ -340,7 +333,6 @@ public final class GameManager {
         game.setState(GameState.COMPLETE);
         game.clearDeadPlayers();
 
-        // Restore all tracked party members and teleport them back
         List<UUID> partyMembers = playerToParty.entrySet().stream()
                 .filter(entry -> entry.getValue().equals(game.getPartyId()))
                 .map(Map.Entry::getKey)
@@ -396,11 +388,8 @@ public final class GameManager {
 
                 if (returnPoint != null) {
                     try {
-                        World returnWorld = trackedReturnWorld;
-                        if (returnWorld == null) {
-                            returnWorld = Universe.get().getDefaultWorld();
-                        }
-                        if (returnWorld != null && ref.isValid()) {
+                        World returnWorld = Universe.get().getDefaultWorld();
+                        if (returnWorld != null) {
                             InstancesPlugin.teleportPlayerToInstance(ref, store, returnWorld, returnPoint);
                         }
                     } catch (Exception e) {
@@ -416,13 +405,11 @@ public final class GameManager {
             broadcastToParty(game.getPartyId(), "The dungeon run was cancelled.", "#ffb0b0");
         }
 
-        // Clean up instance
         World instanceWorld = game.getInstanceWorld();
         if (instanceWorld != null) {
             InstancesPlugin.safeRemoveInstance(instanceWorld);
         }
 
-        // Remove tracking
         playerToParty.entrySet().removeIf(e -> e.getValue().equals(game.getPartyId()));
         plugin.getPartyManager().closePartyForSystem(game.getPartyId(), "The dungeon run ended, so the party was closed.");
         PartyUiPage.refreshOpenPages();
@@ -545,7 +532,6 @@ public final class GameManager {
             PartyUiPage.refreshOpenPages();
         }
 
-        // Inventory is already saved to disk, so it's crash-safe
         LOGGER.info("Player " + playerId + " disconnected during dungeon run. Inventory saved on disk.");
     }
 
@@ -614,7 +600,6 @@ public final class GameManager {
             LOGGER.info("Found saved inventory for " + playerRef.getUsername() + ", scheduling restore...");
             Game activeGame = findGameForPlayer(playerId);
 
-            // Defer restore until the player is fully loaded
             Ref<EntityStore> ref = playerRef.getReference();
             if (ref != null && ref.isValid()) {
                 Store<EntityStore> store = ref.getStore();
@@ -639,7 +624,6 @@ public final class GameManager {
     public void onPlayerAddedToWorld(@Nonnull PlayerRef playerRef, @Nonnull Player player, @Nonnull World world) {
         Game game = findGameForPlayer(playerRef.getUuid());
 
-        // ── Arriving at a NON-dungeon world with a saved inventory → restore it ──
         if (game != null && game.getState() != GameState.COMPLETE && world != game.getInstanceWorld()) {
             if (hasSavedInventory(playerRef.getUuid())) {
                 restorePlayerInventory(playerRef.getUuid(), player, false);
@@ -652,7 +636,6 @@ public final class GameManager {
             return;
         }
 
-        // ── Arriving at the dungeon world → prepare for dungeon ──
         if (game == null || game.getState() == GameState.COMPLETE || world != game.getInstanceWorld()) {
             return;
         }
@@ -699,21 +682,18 @@ public final class GameManager {
 
         despawnReviveMarker(playerRef.getUuid());
 
-        // Best-effort camera / HUD cleanup
         plugin.getCameraService().restoreDefault(playerRef);
         hideDungeonHuds(player, playerRef);
 
-        // Restore inventory using the Player component from the event holder (still valid during this event).
         plugin.getInventoryLockService().unlock(player, playerRef.getUuid());
         restorePlayerInventory(playerRef.getUuid(), player, false);
 
-        // Reset health/stamina only if the entity ref is still valid
+        ref = playerRef.getReference();
         if (ref != null && ref.isValid()) {
             Store<EntityStore> store = ref.getStore();
             resetPlayerStatus(player, ref, store);
         }
 
-        // Always track instance membership and check for empty dungeon
         game.setPlayerInInstance(playerRef.getUuid(), false);
         game.removeDeadPlayer(playerRef.getUuid());
         if (!closeGameIfInstanceEmpty(game)) {
@@ -769,6 +749,7 @@ public final class GameManager {
     //  Inventory save / restore
     // ────────────────────────────────────────────────
 
+    @SuppressWarnings("removal")
     private void savePlayerInventory(@Nonnull UUID playerId, @Nonnull Player player) {
         Inventory inventory = player.getInventory();
         if (inventory == null) return;
@@ -777,7 +758,6 @@ public final class GameManager {
         try {
             Files.createDirectories(savePath.getParent());
 
-            // Serialize all containers to a simple JSON structure
             InventorySaveData saveData = new InventorySaveData();
             saveData.hotbarItems = serializeContainer(inventory.getHotbar());
             saveData.storageItems = serializeContainer(inventory.getStorage());
@@ -799,6 +779,7 @@ public final class GameManager {
         }
     }
 
+    @SuppressWarnings("removal")
     private void restorePlayerInventory(@Nonnull UUID playerId, @Nonnull Player player, boolean deleteAfterRestore) {
         Path savePath = getSaveFilePath(playerId);
         if (!Files.exists(savePath)) {
@@ -814,10 +795,8 @@ public final class GameManager {
             Inventory inventory = player.getInventory();
             if (inventory == null) return;
 
-            // Clear current inventory first
             clearPlayerInventory(player);
 
-            // Restore items
             restoreContainer(inventory.getHotbar(), saveData.hotbarItems);
             restoreContainer(inventory.getStorage(), saveData.storageItems);
             restoreContainer(inventory.getArmor(), saveData.armorItems);
@@ -857,6 +836,8 @@ public final class GameManager {
         giveStartEquipment(playerRef, player, config);
         plugin.getInventoryLockService().lock(player, playerId);
         plugin.getCameraService().setEnabled(playerRef, true);
+        applyDungeonMovementSettings(ref, store, playerRef);
+        enableMap(playerRef);
         game.setPlayerInInstance(playerId, true);
     }
 
@@ -872,6 +853,7 @@ public final class GameManager {
         }
     }
 
+    @SuppressWarnings("removal")
     private void clearPlayerInventory(@Nonnull Player player) {
         Inventory inventory = player.getInventory();
         if (inventory == null) return;
@@ -974,12 +956,96 @@ public final class GameManager {
         } catch (Exception e) {
             LOGGER.log(java.util.logging.Level.WARNING, "Failed to reset player status", e);
         }
+
+        restoreDefaultMovementSettings(ref, store);
+    }
+
+    // ────────────────────────────────────────────────
+    //  Movement settings
+    // ────────────────────────────────────────────────
+
+    private void applyDungeonMovementSettings(@Nonnull Ref<EntityStore> ref,
+                                               @Nonnull Store<EntityStore> store,
+                                               @Nonnull PlayerRef playerRef) {
+        MovementManager movementManager = store.getComponent(ref, MovementManager.getComponentType());
+        if (movementManager == null) return;
+
+        MovementSettings s = movementManager.getSettings();
+
+        // --- Core speed: ~80% faster base, fast-paced dungeon crawler ---
+        s.baseSpeed = 10.0f;                         // default 5.5
+
+        // --- Acceleration: snappy direction changes ---
+        s.acceleration = 0.22f;                      // default 0.1
+        s.velocityResistance = 0.14f;                // default 0.242 — lower = more momentum
+
+        // --- Auto-climb: seamless, no slowdown ---
+        s.autoJumpObstacleMaxAngle = 180.0f;         // all directions
+        s.autoJumpObstacleSpeedLoss = 1.0f;          // default 0.95 — 1.0 = no loss
+        s.autoJumpObstacleSprintSpeedLoss = 1.0f;    // default 0.75
+        s.autoJumpObstacleEffectDuration = 0.0f;     // default 0.2
+        s.autoJumpObstacleSprintEffectDuration = 0.0f; // default 0.1
+
+        // --- Jump: disabled — replaced by roll system ---
+        s.jumpForce = 0.0f;                          // no vertical jump
+        s.jumpBufferDuration = 0.0f;
+        s.variableJumpFallForce = 28.0f;             // default 35 — less punishing falls
+
+        // --- Air control: full authority mid-air ---
+        s.airControlMaxMultiplier = 5.0f;            // default 3.13
+        s.airControlMaxSpeed = 5.0f;                 // default 3
+        s.airFrictionMin = 0.01f;                    // default 0.02
+        s.airFrictionMax = 0.02f;                    // default 0.045
+        s.airSpeedMultiplier = 1.2f;                 // default 1.0
+
+        // --- Fall: no punishment in top-down view ---
+        s.fallEffectDuration = 0.0f;                 // default 0.0 (already fine)
+        s.fallMomentumLoss = 0.0f;                   // default 0.1 — no landing stagger
+        s.fallJumpForce = s.jumpForce;               // default 7 — allow full jump after landing
+
+        // --- Slide/roll: faster combat dodging ---
+        s.minSlideEntrySpeed = 5.5f;                 // default 6.99 — easier to trigger
+        s.slideExitSpeed = 3.5f;                     // default 2.5 — keep momentum out of slide
+        s.rollTimeToComplete = 0.2f;                 // default — roll is fully custom, not using built-in
+        s.rollStartSpeedModifier = 4.0f;             // default 3.5
+        s.rollExitSpeedModifier = 3.0f;              // default 2.2
+
+        // --- Collision: slightly stronger push-out to avoid getting stuck ---
+        s.collisionExpulsionForce = 0.04f;           // default 0.02
+
+        movementManager.update(playerRef.getPacketHandler());
+    }
+
+    private void restoreDefaultMovementSettings(@Nonnull Ref<EntityStore> ref,
+                                                 @Nonnull Store<EntityStore> store) {
+        MovementManager movementManager = store.getComponent(ref, MovementManager.getComponentType());
+        if (movementManager == null) return;
+
+        PlayerRef playerRef = store.getComponent(ref, PlayerRef.getComponentType());
+        if (playerRef == null) return;
+
+        movementManager.applyDefaultSettings();
+        movementManager.update(playerRef.getPacketHandler());
+    }
+
+    // ────────────────────────────────────────────────
+    //  Map
+    // ────────────────────────────────────────────────
+
+    private void enableMap(@Nonnull PlayerRef playerRef) {
+        UpdateWorldMapSettings mapSettings = new UpdateWorldMapSettings();
+        mapSettings.enabled = true;
+        mapSettings.defaultScale = 16.0f;
+        mapSettings.minScale = 4.0f;
+        mapSettings.maxScale = 128.0f;
+        playerRef.getPacketHandler().writeNoCache(mapSettings);
     }
 
     // ────────────────────────────────────────────────
     //  Equipment
     // ────────────────────────────────────────────────
 
+    @SuppressWarnings("removal")
     private void giveStartEquipment(@Nonnull PlayerRef playerRef, @Nonnull Player player, @Nonnull DungeonConfig config) {
         Inventory inventory = player.getInventory();
         if (inventory == null) return;
@@ -1028,6 +1094,7 @@ public final class GameManager {
         syncInventoryAndSelectedSlots(playerRef, inventory);
     }
 
+    @SuppressWarnings("removal")
     private byte getPreferredHotbarSlot(@Nonnull Inventory inventory, @Nonnull ItemContainer hotbar) {
         byte activeSlot = inventory.getActiveHotbarSlot();
         if (activeSlot >= 0 && activeSlot < InventoryLockService.MAX_WEAPON_SLOTS) {
@@ -1036,6 +1103,7 @@ public final class GameManager {
         return 0;
     }
 
+    @SuppressWarnings("removal")
     private void syncInventoryAndSelectedSlots(@Nullable PlayerRef playerRef, @Nonnull Inventory inventory) {
         if (playerRef != null && playerRef.isValid()) {
             playerRef.getPacketHandler().writeNoCache(new UpdatePlayerInventory(
@@ -1058,7 +1126,6 @@ public final class GameManager {
         int totalSpawned = 0;
         for (RoomData room : level.getRooms()) {
             if (room.getType() == RoomType.BOSS) {
-                // Boss mobs are spawned separately during boss phase
                 continue;
             }
 
@@ -1069,7 +1136,6 @@ public final class GameManager {
                 String mobId = mobs.get(i);
                 if (mobId == null || mobId.isBlank()) continue;
 
-                // Use spawner positions if available, otherwise offset from anchor
                 Vector3d spawnPos;
                 if (i < spawners.size()) {
                     Vector3i sp = spawners.get(i);
@@ -1109,7 +1175,6 @@ public final class GameManager {
         DungeonConfig config = plugin.loadDungeonConfig();
         String wallBlock = config.getBossWallBlock();
 
-        // Place wall blocks at the room entrance (approximate: a 5-wide, 4-tall wall at the entrance edge)
         for (int dx = -2; dx <= 2; dx++) {
             for (int dy = 0; dy < 4; dy++) {
                 try {
@@ -1199,7 +1264,7 @@ public final class GameManager {
 
     private boolean isDungeonJoinable(@Nonnull Game game) {
         return switch (game.getState()) {
-            case READY, ACTIVE, BOSS -> game.getInstanceWorld() != null;
+            case READY, ACTIVE, BOSS, TRANSITIONING -> game.getInstanceWorld() != null;
             default -> false;
         };
     }
@@ -1215,7 +1280,6 @@ public final class GameManager {
     }
 
     private void broadcastToParty(@Nonnull UUID partyId, @Nonnull String text, @Nonnull String color) {
-        // Find party members from our tracking map
         Message message = PartyManager.partyPrefix().insert(Message.raw(text).color(color));
         for (Map.Entry<UUID, UUID> entry : playerToParty.entrySet()) {
             if (entry.getValue().equals(partyId)) {
@@ -1234,7 +1298,6 @@ public final class GameManager {
         for (Game game : new ArrayList<>(activeGames.values())) {
             if (game.getState() != GameState.COMPLETE) {
                 LOGGER.info("Shutting down active game for party " + game.getPartyId());
-                // Inventories are already persisted to disk — they'll be restored on reconnect
                 game.setState(GameState.COMPLETE);
             }
         }

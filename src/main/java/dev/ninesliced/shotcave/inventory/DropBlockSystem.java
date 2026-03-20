@@ -32,6 +32,7 @@ public final class DropBlockSystem extends EntityEventSystem<EntityStore, DropIt
         return Query.any();
     }
 
+    @SuppressWarnings("removal")
     @Override
     public void handle(int index,
                        @Nonnull ArchetypeChunk<EntityStore> chunk,

@@ -52,6 +52,7 @@ public final class GivePartyPortalCommand extends AbstractPlayerCommand {
         return "";
     }
 
+    @SuppressWarnings("removal")
     @Override
     protected void execute(@Nonnull CommandContext context,
                            @Nonnull Store<EntityStore> store,

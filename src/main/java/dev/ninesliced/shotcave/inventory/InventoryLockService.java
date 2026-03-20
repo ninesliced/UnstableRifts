@@ -28,6 +28,7 @@ public final class InventoryLockService {
      * Locks the player's inventory: only hotbar slots 0-2 remain usable,
      * storage/armor/utility reject all input.
      */
+    @SuppressWarnings("removal")
     public void lock(@Nonnull Player player, @Nonnull UUID playerId) {
         Inventory inventory = player.getInventory();
         if (inventory == null) return;
@@ -70,6 +71,7 @@ public final class InventoryLockService {
     /**
      * Unlocks the player's inventory, restoring normal filter state.
      */
+    @SuppressWarnings("removal")
     public void unlock(@Nonnull Player player, @Nonnull UUID playerId) {
         lockedPlayers.remove(playerId);
 

@@ -1,0 +1,41 @@
+{
+  "TranslationProperties": {
+    "Name": "server.items.Shotcave_Locked_Door.name",
+    "Description": "server.items.Shotcave_Locked_Door.description"
+  },
+  "Icon": "Icons/ItemsGenerated/Shotcave_Marker_Locked_Door.png",
+  "Quality": "Technical",
+  "Categories": [
+    "Tool.Block"
+  ],
+  "BlockType": {
+    "DrawType": "Cube",
+    "Textures": [
+      {
+        "Weight": 1,
+        "All": "BlockTextures/Shotcave_Marker_Locked_Door.png"
+      }
+    ],
+    "Opacity": "Transparent",
+    "Group": "@Tech",
+    "State": {
+      "Id": "shotcave_locked_door"
+    },
+    "Flags": {
+      "IsUsable": false
+    },
+    "BlockParticleSetId": "Stone",
+    "BlockSoundSetId": "Stone"
+  },
+  "PlayerAnimationsId": "Block",
+  "Tags": {
+    "Type": [
+      "DungeonMarker",
+      "Shotcave"
+    ],
+    "Marker": [
+      "LockedDoor"
+    ]
+  },
+  "ItemSoundSetId": "ISS_Blocks_Stone"
+}

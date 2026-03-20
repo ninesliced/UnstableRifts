@@ -7,7 +7,9 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A single level (floor) within a dungeon run.
@@ -18,10 +20,18 @@ public final class Level {
     private final String name;
     private final int index;
     private final List<RoomData> rooms = new ArrayList<>();
+
+    private final Map<String, List<RoomData>> branches = new HashMap<>();
+    private final List<RoomData> mainBranchRooms = new ArrayList<>();
+
     @Nullable
     private RoomData entranceRoom;
     @Nullable
     private RoomData bossRoom;
+    @Nullable
+    private RoomData shopRoom;
+    @Nullable
+    private RoomData treasureRoom;
 
     public Level(@Nonnull String name, int index) {
         this.name = name;
@@ -39,11 +49,22 @@ public final class Level {
 
     public void addRoom(@Nonnull RoomData room) {
         rooms.add(room);
-        if (room.getType() == RoomType.ENTRANCE && entranceRoom == null) {
+        if ((room.getType() == RoomType.SPAWN) && entranceRoom == null) {
             entranceRoom = room;
         }
         if (room.getType() == RoomType.BOSS) {
             bossRoom = room;
+        }
+        if (room.getType() == RoomType.SHOP && shopRoom == null) {
+            shopRoom = room;
+        }
+        if (room.getType() == RoomType.TREASURE && treasureRoom == null) {
+            treasureRoom = room;
+        }
+        String bid = room.getBranchId();
+        branches.computeIfAbsent(bid, k -> new ArrayList<>()).add(room);
+        if (room.isMainBranch()) {
+            mainBranchRooms.add(room);
         }
     }
 
@@ -60,6 +81,35 @@ public final class Level {
     @Nullable
     public RoomData getBossRoom() {
         return bossRoom;
+    }
+
+    @Nullable
+    public RoomData getShopRoom() {
+        return shopRoom;
+    }
+
+    @Nullable
+    public RoomData getTreasureRoom() {
+        return treasureRoom;
+    }
+
+    @Nonnull
+    public List<RoomData> getMainBranchRooms() {
+        return Collections.unmodifiableList(mainBranchRooms);
+    }
+
+    @Nonnull
+    public Map<String, List<RoomData>> getBranches() {
+        return Collections.unmodifiableMap(branches);
+    }
+
+    /**
+     * Returns all rooms on a specific branch.
+     */
+    @Nonnull
+    public List<RoomData> getBranchRooms(@Nonnull String branchId) {
+        List<RoomData> branchRooms = branches.get(branchId);
+        return branchRooms != null ? Collections.unmodifiableList(branchRooms) : Collections.emptyList();
     }
 
     /**
