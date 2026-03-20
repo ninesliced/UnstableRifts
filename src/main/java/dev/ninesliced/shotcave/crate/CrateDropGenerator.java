@@ -8,54 +8,46 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
-// TODO: replace with custom logic based on difficulty of the region & other factors
-/** Placeholder loot table for crate drops. */
+/**
+ * Config-driven loot generator for crates. Reads per-crate settings from
+ * {@link CrateLootConfig} (loaded from {@code crate_loot.json}).
+ */
 public final class CrateDropGenerator {
 
     private static final String COIN_ITEM_ID = "Shotcave_Props_Coin";
 
-    // 1×1 crate loot
-    private static final int SMALL_COIN_MIN = 1;
-    private static final int SMALL_COIN_MAX = 3;
-    private static final double SMALL_WEAPON_CHANCE = 0.10;
+    private CrateDropGenerator() {}
 
-    // 2×2 crate loot
-    private static final int LARGE_COIN_MIN = 3;
-    private static final int LARGE_COIN_MAX = 7;
-    private static final double LARGE_WEAPON_CHANCE = 0.25;
-
-    public static final String CRATE_1X1_BLOCK_ID = "Shotcave_Props_Crate";
-    public static final String CRATE_2X2_BLOCK_ID = "Shotcave_Props_Crate_2x2";
-
-    private CrateDropGenerator() {
-    }
-
+    /** Returns true if the given block type ID is a configured crate. */
     public static boolean isCrate(@Nonnull String blockTypeId) {
-        return CRATE_1X1_BLOCK_ID.equals(blockTypeId)
-                || CRATE_2X2_BLOCK_ID.equals(blockTypeId);
+        return CrateLootConfig.isCrate(blockTypeId);
     }
 
+    /**
+     * Generates drops for a crate block type based on its config entry.
+     * Returns coins (always) and optionally a rolled weapon.
+     */
     @Nonnull
     public static List<ItemStack> generateDrops(@Nonnull String blockTypeId) {
-        return switch (blockTypeId) {
-            case CRATE_1X1_BLOCK_ID -> generate(SMALL_COIN_MIN, SMALL_COIN_MAX, SMALL_WEAPON_CHANCE);
-            case CRATE_2X2_BLOCK_ID -> generate(LARGE_COIN_MIN, LARGE_COIN_MAX, LARGE_WEAPON_CHANCE);
-            default -> List.of();
-        };
-    }
+        CrateLootConfig.CrateLootEntry entry = CrateLootConfig.getCrateConfig(blockTypeId);
+        if (entry == null) return List.of();
 
-    @Nonnull
-    private static List<ItemStack> generate(int coinMin, int coinMax, double weaponChance) {
         ThreadLocalRandom rng = ThreadLocalRandom.current();
         List<ItemStack> drops = new ArrayList<>(2);
 
-        int coinQuantity = rng.nextInt(coinMin, coinMax + 1);
+        int coinQuantity = rng.nextInt(entry.getCoinMin(), entry.getCoinMax() + 1);
         if (coinQuantity > 0) {
             drops.add(new ItemStack(COIN_ITEM_ID, coinQuantity));
         }
 
-        if (rng.nextDouble() < weaponChance) {
-            drops.add(WeaponLootRoller.rollRandom());
+        if (rng.nextDouble() < entry.getWeaponChance()) {
+            List<String> whitelist = entry.getWeaponWhitelist();
+            if (!whitelist.isEmpty()) {
+                drops.add(WeaponLootRoller.rollFromCrate(
+                        entry.getMinRarity(), entry.getMaxRarity(), whitelist));
+            } else {
+                drops.add(WeaponLootRoller.rollRandom());
+            }
         }
 
         return drops;

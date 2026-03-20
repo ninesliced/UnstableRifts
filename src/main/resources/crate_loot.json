@@ -1,0 +1,109 @@
+{
+  "crates": {
+    "Shotcave_Props_Crate_Level1": {
+      "minRarity": "BASIC",
+      "maxRarity": "RARE",
+      "weaponChance": 0.10,
+      "coinMin": 1,
+      "coinMax": 3,
+      "weaponWhitelist": [
+        "Weapon_Pistol_Shotcave",
+        "Weapon_Crystal_Sword_Shotcave",
+        "Weapon_Blunderbuss_Shotcave",
+        "Weapon_Assault_Rifle_Shotcave",
+        "Weapon_Crystal_Musket_Fire_Shotcave",
+        "Weapon_Crystal_Musket_Ice_Shotcave",
+        "Weapon_Crystal_Musket_Lightning_Shotcave",
+        "Weapon_Crystal_Musket_Void_Shotcave"
+      ]
+    },
+    "Shotcave_Props_Crate_Level2": {
+      "minRarity": "UNCOMMON",
+      "maxRarity": "EPIC",
+      "weaponChance": 0.20,
+      "coinMin": 2,
+      "coinMax": 5,
+      "weaponWhitelist": [
+        "Weapon_Pistol_Shotcave",
+        "Weapon_Crystal_Sword_Shotcave",
+        "Weapon_Blunderbuss_Shotcave",
+        "Weapon_Assault_Rifle_Shotcave",
+        "Weapon_Crystal_Musket_Fire_Shotcave",
+        "Weapon_Crystal_Musket_Ice_Shotcave",
+        "Weapon_Crystal_Musket_Lightning_Shotcave",
+        "Weapon_Crystal_Musket_Void_Shotcave",
+        "Weapon_Kweebec_Launcher_Shotcave",
+        "Weapon_Crystal_Blunderbuss_Acid_Shotcave",
+        "Weapon_Crystal_Blunderbuss_Fire_Shotcave",
+        "Weapon_Crystal_Blunderbuss_Ice_Shotcave",
+        "Weapon_Crystal_Blunderbuss_Lightning_Shotcave",
+        "Weapon_Crystal_Blunderbuss_Void_Shotcave"
+      ]
+    },
+    "Shotcave_Props_Crate_Level3": {
+      "minRarity": "RARE",
+      "maxRarity": "UNIQUE",
+      "weaponChance": 0.35,
+      "coinMin": 3,
+      "coinMax": 7,
+      "weaponWhitelist": [
+        "Weapon_Pistol_Shotcave",
+        "Weapon_Crystal_Sword_Shotcave",
+        "Weapon_Blunderbuss_Shotcave",
+        "Weapon_Assault_Rifle_Shotcave",
+        "Weapon_Crystal_Musket_Fire_Shotcave",
+        "Weapon_Crystal_Musket_Ice_Shotcave",
+        "Weapon_Crystal_Musket_Lightning_Shotcave",
+        "Weapon_Crystal_Musket_Void_Shotcave",
+        "Weapon_Kweebec_Launcher_Shotcave",
+        "Weapon_Crystal_Blunderbuss_Acid_Shotcave",
+        "Weapon_Crystal_Blunderbuss_Fire_Shotcave",
+        "Weapon_Crystal_Blunderbuss_Ice_Shotcave",
+        "Weapon_Crystal_Blunderbuss_Lightning_Shotcave",
+        "Weapon_Crystal_Blunderbuss_Void_Shotcave",
+        "Weapon_Taser_Shotcave",
+        "Weapon_Voidlance_Shotcave"
+      ]
+    },
+    "Shotcave_Props_Crate": {
+      "minRarity": "BASIC",
+      "maxRarity": "RARE",
+      "weaponChance": 0.10,
+      "coinMin": 1,
+      "coinMax": 3,
+      "weaponWhitelist": [
+        "Weapon_Pistol_Shotcave",
+        "Weapon_Crystal_Sword_Shotcave",
+        "Weapon_Blunderbuss_Shotcave",
+        "Weapon_Assault_Rifle_Shotcave",
+        "Weapon_Crystal_Musket_Fire_Shotcave",
+        "Weapon_Crystal_Musket_Ice_Shotcave",
+        "Weapon_Crystal_Musket_Lightning_Shotcave",
+        "Weapon_Crystal_Musket_Void_Shotcave"
+      ]
+    },
+    "Shotcave_Props_Crate_2x2": {
+      "minRarity": "BASIC",
+      "maxRarity": "EPIC",
+      "weaponChance": 0.25,
+      "coinMin": 3,
+      "coinMax": 7,
+      "weaponWhitelist": [
+        "Weapon_Pistol_Shotcave",
+        "Weapon_Crystal_Sword_Shotcave",
+        "Weapon_Blunderbuss_Shotcave",
+        "Weapon_Assault_Rifle_Shotcave",
+        "Weapon_Crystal_Musket_Fire_Shotcave",
+        "Weapon_Crystal_Musket_Ice_Shotcave",
+        "Weapon_Crystal_Musket_Lightning_Shotcave",
+        "Weapon_Crystal_Musket_Void_Shotcave",
+        "Weapon_Kweebec_Launcher_Shotcave",
+        "Weapon_Crystal_Blunderbuss_Acid_Shotcave",
+        "Weapon_Crystal_Blunderbuss_Fire_Shotcave",
+        "Weapon_Crystal_Blunderbuss_Ice_Shotcave",
+        "Weapon_Crystal_Blunderbuss_Lightning_Shotcave",
+        "Weapon_Crystal_Blunderbuss_Void_Shotcave"
+      ]
+    }
+  }
+}

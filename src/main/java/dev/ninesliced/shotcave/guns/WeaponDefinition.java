@@ -13,7 +13,9 @@ public final class WeaponDefinition {
     @Nonnull private final String displayName;
     @Nonnull private final WeaponCategory category;
     @Nonnull private final DamageEffect lockedEffect;
+    private final boolean effectLocked;
     @Nonnull private final WeaponRarity minRarity;
+    @Nonnull private final WeaponRarity maxRarity;
     private final int spawnWeight;
     private final float baseDamage;
     private final float baseCooldown;
@@ -31,7 +33,9 @@ public final class WeaponDefinition {
                             @Nonnull String displayName,
                             @Nonnull WeaponCategory category,
                             @Nonnull DamageEffect lockedEffect,
+                            boolean effectLocked,
                             @Nonnull WeaponRarity minRarity,
+                            @Nonnull WeaponRarity maxRarity,
                             int spawnWeight,
                             float baseDamage,
                             float baseCooldown,
@@ -48,7 +52,9 @@ public final class WeaponDefinition {
         this.displayName = displayName;
         this.category = category;
         this.lockedEffect = lockedEffect;
+        this.effectLocked = effectLocked;
         this.minRarity = minRarity;
+        this.maxRarity = maxRarity;
         this.spawnWeight = spawnWeight;
         this.baseDamage = baseDamage;
         this.baseCooldown = baseCooldown;
@@ -83,9 +89,18 @@ public final class WeaponDefinition {
         return lockedEffect;
     }
 
+    public boolean isEffectLocked() {
+        return effectLocked;
+    }
+
     @Nonnull
     public WeaponRarity getMinRarity() {
         return minRarity;
+    }
+
+    @Nonnull
+    public WeaponRarity getMaxRarity() {
+        return maxRarity;
     }
 
     public int getSpawnWeight() {

@@ -61,6 +61,7 @@ public final class WeaponRegistry {
         @SerializedName("category") String category;
         @SerializedName("lockedEffect") @Nullable String lockedEffect;
         @SerializedName("minRarity") @Nullable String minRarity;
+        @SerializedName("maxRarity") @Nullable String maxRarity;
         @SerializedName("spawnWeight") int spawnWeight;
         @SerializedName("baseStats") @Nullable BaseStatsDef baseStats;
         @SerializedName("summoningStats") @Nullable SummoningStatsDef summoningStats;
@@ -220,9 +221,13 @@ public final class WeaponRegistry {
         DamageEffect locked = wc.lockedEffect != null
                 ? DamageEffect.fromString(wc.lockedEffect)
                 : DamageEffect.NONE;
+        boolean effectLocked = wc.lockedEffect != null;
         WeaponRarity minRarity = wc.minRarity != null
                 ? WeaponRarity.fromString(wc.minRarity)
                 : WeaponRarity.BASIC;
+        WeaponRarity maxRarity = wc.maxRarity != null
+                ? WeaponRarity.fromString(wc.maxRarity)
+                : WeaponRarity.UNIQUE;
 
         float baseDamage = wc.damage != null ? wc.damage.amount : 0;
         float baseCooldown = wc.primary.cooldown;
@@ -237,7 +242,7 @@ public final class WeaponRegistry {
         int baseMobLifetime = wc.summoningStats != null ? wc.summoningStats.mobLifetime : 0;
 
         WeaponDefinition def = new WeaponDefinition(
-                wc.itemId, wc.displayName, category, locked, minRarity,
+                wc.itemId, wc.displayName, category, locked, effectLocked, minRarity, maxRarity,
                 wc.spawnWeight, baseDamage, baseCooldown, baseMaxAmmo,
                 baseRange, baseSpread, basePellets, baseKnockback,
                 baseMobHealth, baseMobDamage, baseMobLifetime, basePrecision

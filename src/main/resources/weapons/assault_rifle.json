@@ -1,0 +1,44 @@
+{
+  "itemId": "Weapon_Assault_Rifle_Shotcave",
+  "displayName": "Assault Rifle",
+  "category": "BULLET",
+  "minRarity": "BASIC",
+  "maxRarity": "UNIQUE",
+  "spawnWeight": 10,
+  "baseStats": {
+    "range": 35,
+    "spread": 3.0,
+    "pellets": 3,
+    "knockback": 0.5,
+    "precision": 20
+  },
+  "primary": {
+    "id": "Shotcave_Assault_Rifle_Primary",
+    "cooldown": 1.0,
+    "requireAmmo": true,
+    "shotId": "Shotcave_Assault_Rifle_Shot",
+    "reloadId": "Shotcave_Assault_Rifle_Reload"
+  },
+  "reload": {
+    "id": "Shotcave_Assault_Rifle_Reload",
+    "cooldown": 1.0,
+    "runTime": 0.9,
+    "amount": 0,
+    "nextId": "Shotcave_Update_Hud",
+    "worldSfx": "SFX_Rifle_Fire",
+    "localSfx": "SFX_Rifle_Fire_Local",
+    "maxAmmo": 18
+  },
+  "damage": {
+    "id": "Shotcave_Assault_Rifle_Projectile_Hit",
+    "amount": 8,
+    "type": "Projectile",
+    "worldSfx": "SFX_Blunderbuss_Hit",
+    "localSfx": "SFX_Blunderbuss_Hit",
+    "particleId": "RifleShooting_Impact",
+    "particleYOffset": 0.8
+  },
+  "extraRoots": [
+    "Shotcave_Projectile_Miss"
+  ]
+}
