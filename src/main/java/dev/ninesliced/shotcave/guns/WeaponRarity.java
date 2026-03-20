@@ -5,12 +5,12 @@ import javax.annotation.Nullable;
 import java.util.concurrent.ThreadLocalRandom;
 
 public enum WeaponRarity {
-    BASIC(0.45, 0.00, 0, null, "#c9d2dd", "Common"),
-    UNCOMMON(0.25, 0.05, 1, "Drop_Uncommon", "#3e9049", "Uncommon"),
-    RARE(0.15, 0.10, 2, "Drop_Rare", "#2770b7", "Rare"),
-    EPIC(0.08, 0.20, 3, "Drop_Epic", "#8b339e", "Epic"),
-    LEGENDARY(0.05, 0.50, 4, "Drop_Legendary", "#bb8a2c", "Legendary"),
-    UNIQUE(0.02, 1.00, 5, "Drop_Unique", "#bb2f2c", "Developer");
+    BASIC(0.45, 0.00, 0, null, "#c9d2dd", "Common", 0.0f),
+    UNCOMMON(0.25, 0.05, 1, "Drop_Uncommon", "#3e9049", "Uncommon", 0.05f),
+    RARE(0.15, 0.10, 2, "Drop_Rare", "#2770b7", "Rare", 0.1f),
+    EPIC(0.08, 0.20, 3, "Drop_Epic", "#8b339e", "Epic", 0.2f),
+    LEGENDARY(0.05, 0.50, 4, "Drop_Legendary", "#bb8a2c", "Legendary", 0.35f),
+    UNIQUE(0.02, 1.00, 5, "Drop_Unique", "#bb2f2c", "Developer", 0.5f);
 
     private final double spawnChance;
     private final double effectChance;
@@ -22,15 +22,19 @@ public enum WeaponRarity {
     /** Hytale ItemQuality asset name — resolved at runtime via {@code ItemQuality.getAssetMap()}. */
     @Nonnull
     private final String qualityName;
+    /** Extra seconds added to effect DoT duration for this rarity tier. */
+    private final float effectDurationBonus;
 
     WeaponRarity(double spawnChance, double effectChance, int modifierCount,
-                 @Nullable String glowEffectId, @Nonnull String colorHex, @Nonnull String qualityName) {
+                 @Nullable String glowEffectId, @Nonnull String colorHex, @Nonnull String qualityName,
+                 float effectDurationBonus) {
         this.spawnChance = spawnChance;
         this.effectChance = effectChance;
         this.modifierCount = modifierCount;
         this.glowEffectId = glowEffectId;
         this.colorHex = colorHex;
         this.qualityName = qualityName;
+        this.effectDurationBonus = effectDurationBonus;
     }
 
     public double getSpawnChance() {
@@ -63,6 +67,13 @@ public enum WeaponRarity {
     @Nonnull
     public String getQualityName() {
         return qualityName;
+    }
+
+    /**
+     * Returns the extra seconds added to effect DoT duration for this rarity tier.
+     */
+    public float getEffectDurationBonus() {
+        return effectDurationBonus;
     }
 
     /**

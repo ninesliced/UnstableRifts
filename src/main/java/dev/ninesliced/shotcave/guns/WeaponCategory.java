@@ -5,7 +5,8 @@ import javax.annotation.Nonnull;
 public enum WeaponCategory {
     LASER,
     BULLET,
-    SUMMONING;
+    SUMMONING,
+    MELEE;
 
     @Nonnull
     public static WeaponCategory fromOrdinal(int ordinal) {

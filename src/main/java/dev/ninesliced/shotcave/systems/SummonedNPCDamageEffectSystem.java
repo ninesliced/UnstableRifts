@@ -11,6 +11,7 @@ import com.hypixel.hytale.server.core.modules.entity.damage.DamageEventSystem;
 import com.hypixel.hytale.server.core.modules.entity.damage.DamageModule;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import dev.ninesliced.shotcave.guns.DamageEffect;
+import dev.ninesliced.shotcave.guns.WeaponRarity;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -53,22 +54,25 @@ public final class SummonedNPCDamageEffectSystem extends DamageEventSystem {
         DamageEffect effect = DamageEffect.fromOrdinal(summonedEffect.getEffectOrdinal());
         if (effect == DamageEffect.NONE) return;
 
+        WeaponRarity rarity = WeaponRarity.fromOrdinal(summonedEffect.getRarityOrdinal());
+
         Ref<EntityStore> targetRef = archetypeChunk.getReferenceTo(index);
         if (!targetRef.isValid()) return;
 
         // Don't apply effect back to the summoned NPC itself
         if (targetRef.equals(sourceRef)) return;
 
-        applyDoT(commandBuffer, targetRef, effect);
+        applyDoT(commandBuffer, targetRef, effect, rarity);
     }
 
     private void applyDoT(@Nonnull CommandBuffer<EntityStore> commandBuffer,
                            @Nonnull Ref<EntityStore> target,
-                           @Nonnull DamageEffect effect) {
+                           @Nonnull DamageEffect effect,
+                           @Nonnull WeaponRarity rarity) {
         if (!effect.hasDoT()) {
             return;
         }
 
-        DamageEffectRuntime.apply(commandBuffer, target, effect);
+        DamageEffectRuntime.apply(commandBuffer, target, effect, rarity);
     }
 }

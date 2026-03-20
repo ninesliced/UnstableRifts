@@ -7,20 +7,20 @@ import java.util.EnumSet;
 import java.util.List;
 
 public enum WeaponModifierType {
-    // General (all weapon types)
-    MAX_BULLETS(0.10, 0.30, null, "Max Ammo"),
+    // General (all weapon types except summoning)
+    MAX_BULLETS(0.10, 0.30, EnumSet.of(WeaponCategory.LASER, WeaponCategory.BULLET, WeaponCategory.SUMMONING), "Max Ammo"),
     ATTACK_SPEED(0.20, 0.20, null, "Speed"),
-    ADDITIONAL_BULLETS(1.0, 2.0, EnumSet.of(WeaponCategory.LASER, WeaponCategory.BULLET), "Pellets"),
+    ADDITIONAL_BULLETS(1.0, 2.0, EnumSet.of(WeaponCategory.LASER), "Pellets"),
 
     // Summoning only
     MOB_HEALTH(0.20, 0.50, EnumSet.of(WeaponCategory.SUMMONING), "Mob HP"),
     MOB_LIFETIME(0.20, 0.50, EnumSet.of(WeaponCategory.SUMMONING), "Mob Life"),
     MOB_DAMAGE(0.20, 0.50, EnumSet.of(WeaponCategory.SUMMONING), "Mob Dmg"),
 
-    // Laser + Bullet
-    WEAPON_DAMAGE(0.10, 0.30, EnumSet.of(WeaponCategory.LASER, WeaponCategory.BULLET), "Damage"),
+    // Laser + Bullet + Melee
+    WEAPON_DAMAGE(0.10, 0.30, EnumSet.of(WeaponCategory.LASER, WeaponCategory.BULLET, WeaponCategory.MELEE), "Damage"),
     PRECISION(0.30, 0.50, EnumSet.of(WeaponCategory.LASER, WeaponCategory.BULLET), "Precision"),
-    KNOCKBACK(0.10, 0.20, EnumSet.of(WeaponCategory.LASER, WeaponCategory.BULLET), "Knockback"),
+    KNOCKBACK(0.10, 0.20, EnumSet.of(WeaponCategory.LASER, WeaponCategory.BULLET, WeaponCategory.MELEE), "Knockback"),
     MAX_RANGE(0.30, 0.50, EnumSet.of(WeaponCategory.LASER, WeaponCategory.BULLET), "Range");
 
     private final double minValue;

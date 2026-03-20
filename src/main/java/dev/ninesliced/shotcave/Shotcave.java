@@ -64,6 +64,7 @@ import dev.ninesliced.shotcave.systems.DamageEffectComponent;
 import dev.ninesliced.shotcave.systems.DamageEffectTickSystem;
 import dev.ninesliced.shotcave.systems.DamageEffectVisualCleanupSystem;
 import dev.ninesliced.shotcave.systems.SummonedEffectComponent;
+import dev.ninesliced.shotcave.systems.MeleeDamageEffectSystem;
 import dev.ninesliced.shotcave.systems.SummonedNPCDamageEffectSystem;
 import dev.ninesliced.shotcave.systems.VoidSafetySystem;
 import dev.ninesliced.shotcave.systems.DeathAggroSuppressionSystem;
@@ -211,6 +212,9 @@ public class Shotcave extends JavaPlugin {
         SummonedEffectComponent.setComponentType(summonedEffectComponentType);
 
         this.getEntityStoreRegistry().registerSystem(new SummonedNPCDamageEffectSystem());
+
+        // Melee weapon effect/modifier system — applies SC_Effect DoT and WEAPON_DAMAGE scaling
+        this.getEntityStoreRegistry().registerSystem(new MeleeDamageEffectSystem());
 
         // Inventory lock: block drops and slot switches beyond slot 2 when locked
         this.getEntityStoreRegistry().registerSystem(new DropBlockSystem(this.inventoryLockService));

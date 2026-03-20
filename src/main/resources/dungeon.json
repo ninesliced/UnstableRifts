@@ -3,7 +3,8 @@
   "maxPartySize": 4,
   "bossWallBlock": "Stone_Brick_Wall",
   "startEquipment": [
-    "Weapon_Pistol_Shotcave"
+    "Weapon_Pistol_Shotcave",
+    "Weapon_Crystal_Sword_Shotcave"
   ],
   "levels": [
     {

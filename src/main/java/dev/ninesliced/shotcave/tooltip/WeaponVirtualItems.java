@@ -227,6 +227,13 @@ public final class WeaponVirtualItems {
                     modBonus(modifiers, WeaponModifierType.MOB_DAMAGE));
             appendStat(sb, "Mob Life", def.getBaseMobLifetime(),
                     modBonus(modifiers, WeaponModifierType.MOB_LIFETIME));
+        } else if (cat == WeaponCategory.MELEE) {
+            appendStat(sb, "Damage", def.getBaseDamage(),
+                    modBonus(modifiers, WeaponModifierType.WEAPON_DAMAGE));
+            appendStatTime(sb, "Speed", def.getBaseCooldown(),
+                    modBonus(modifiers, WeaponModifierType.ATTACK_SPEED));
+            appendStat(sb, "Knockback", def.getBaseKnockback(),
+                    modBonus(modifiers, WeaponModifierType.KNOCKBACK));
         } else {
             appendStat(sb, "Damage", def.getBaseDamage(),
                     modBonus(modifiers, WeaponModifierType.WEAPON_DAMAGE));
@@ -257,13 +264,14 @@ public final class WeaponVirtualItems {
             }
         }
 
-        int baseMax = def.getBaseMaxAmmo();
-        double bulletBonus = modBonus(modifiers, WeaponModifierType.MAX_BULLETS);
-        int effectiveMax = Math.max(1, (int) Math.round(baseMax * (1.0 + bulletBonus)));
-        int ammoBonusVal = effectiveMax - baseMax;
-        sb.append("\nMax Ammo: ").append(baseMax);
-        if (ammoBonusVal > 0) sb.append(" (+").append(ammoBonusVal).append(')');
-
+        if (cat != WeaponCategory.MELEE) {
+            int baseMax = def.getBaseMaxAmmo();
+            double bulletBonus = modBonus(modifiers, WeaponModifierType.MAX_BULLETS);
+            int effectiveMax = Math.max(1, (int) Math.round(baseMax * (1.0 + bulletBonus)));
+            int ammoBonusVal = effectiveMax - baseMax;
+            sb.append("\nMax Ammo: ").append(baseMax);
+            if (ammoBonusVal > 0) sb.append(" (+").append(ammoBonusVal).append(')');
+        }
         if (!modifiers.isEmpty()) {
             sb.append("\n\nModifiers:");
             for (WeaponModifier mod : modifiers) {

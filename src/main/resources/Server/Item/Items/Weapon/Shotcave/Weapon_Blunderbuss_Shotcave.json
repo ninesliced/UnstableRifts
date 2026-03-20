@@ -1,0 +1,20 @@
+{
+  "TranslationProperties": {
+    "Name": "server.items.Weapon_Blunderbuss_Shotcave.name"
+  },
+  "Categories": ["Items.Weapons"],
+  "Icon": "Icons/ItemsGenerated/Weapon_Gun_Blunderbuss.png",
+  "Model": "Items/Weapons/Gun/Blunderbuss.blockymodel",
+  "Texture": "Items/Weapons/Gun/Blunderbuss_Texture.png",
+  "PlayerAnimationsId": "Rifle",
+  "Interactions": {
+    "Primary": "Root_Shotcave_Blunderbuss_Primary",
+    "Secondary": "Root_Shotcave_Blunderbuss_Reload"
+  },
+  "Weapon": {},
+  "Tags": {
+    "Type": ["Weapon"],
+    "Family": ["Gun"],
+    "Pickup": ["FKey"]
+  }
+}

@@ -61,6 +61,7 @@ public final class WeaponRegistry {
         @SerializedName("category") String category;
         @SerializedName("lockedEffect") @Nullable String lockedEffect;
         @SerializedName("minRarity") @Nullable String minRarity;
+        @SerializedName("maxRarity") @Nullable String maxRarity;
         @SerializedName("spawnWeight") int spawnWeight;
         @SerializedName("baseStats") @Nullable BaseStatsDef baseStats;
         @SerializedName("summoningStats") @Nullable SummoningStatsDef summoningStats;
@@ -163,25 +164,35 @@ public final class WeaponRegistry {
                                        @Nonnull Set<String> registeredIds,
                                        @Nonnull Map<String, Integer> reloadMaxAmmoById) {
         PrimaryDef p = wc.primary;
+        boolean isMelee = "MELEE".equalsIgnoreCase(wc.category);
 
-        // GunValidate interaction + root
-        if (registeredIds.add(p.id)) {
-            interactions.add(new GunValidationInteraction(p.id, p.requireAmmo, p.shotId, p.reloadId));
-            roots.add(new RootInteraction("Root_" + p.id,
-                    new InteractionCooldown("Shoot", p.cooldown, false, null, false, false),
-                    p.id));
+        if (isMelee) {
+            // Melee weapons: use vanilla Template_Weapon_Sword interaction chain
+            // (Primary combo, Secondary guard, Ability1 vortexstrike).
+            // Damage is customised via InteractionVars on the item JSON.
+            // No custom Root or swing interaction needed.
+        } else {
+            // Ranged weapons: GunValidate interaction + root
+            if (registeredIds.add(p.id)) {
+                interactions.add(new GunValidationInteraction(p.id, p.requireAmmo, p.shotId, p.reloadId));
+                roots.add(new RootInteraction("Root_" + p.id,
+                        new InteractionCooldown("Shoot", p.cooldown, false, null, false, false),
+                        p.id));
+            }
         }
 
-        // Reload interaction + root (deduplicated for shared reloads)
-        ReloadDef r = wc.reload;
-        if (r != null && registeredIds.add(r.id)) {
-            int resolvedMaxAmmo = resolveReloadMaxAmmo(r, reloadMaxAmmoById);
-            interactions.add(new ReloadInteraction(r.id, r.amount, r.runTime,
-                    r.nextId, r.worldSfx, r.localSfx, r.animationId,
-                resolvedMaxAmmo));
-            roots.add(new RootInteraction("Root_" + r.id,
-                    new InteractionCooldown("Reload", r.cooldown, false, null, false, false),
-                    r.id));
+        // Reload interaction + root (deduplicated for shared reloads, ranged only)
+        if (!isMelee) {
+            ReloadDef r = wc.reload;
+            if (r != null && registeredIds.add(r.id)) {
+                int resolvedMaxAmmo = resolveReloadMaxAmmo(r, reloadMaxAmmoById);
+                interactions.add(new ReloadInteraction(r.id, r.amount, r.runTime,
+                        r.nextId, r.worldSfx, r.localSfx, r.animationId,
+                    resolvedMaxAmmo));
+                roots.add(new RootInteraction("Root_" + r.id,
+                        new InteractionCooldown("Reload", r.cooldown, false, null, false, false),
+                        r.id));
+            }
         }
 
         // Damage interaction + root (deduplicated for shared damage)
@@ -210,9 +221,13 @@ public final class WeaponRegistry {
         DamageEffect locked = wc.lockedEffect != null
                 ? DamageEffect.fromString(wc.lockedEffect)
                 : DamageEffect.NONE;
+        boolean effectLocked = wc.lockedEffect != null;
         WeaponRarity minRarity = wc.minRarity != null
                 ? WeaponRarity.fromString(wc.minRarity)
                 : WeaponRarity.BASIC;
+        WeaponRarity maxRarity = wc.maxRarity != null
+                ? WeaponRarity.fromString(wc.maxRarity)
+                : WeaponRarity.UNIQUE;
 
         float baseDamage = wc.damage != null ? wc.damage.amount : 0;
         float baseCooldown = wc.primary.cooldown;
@@ -227,7 +242,7 @@ public final class WeaponRegistry {
         int baseMobLifetime = wc.summoningStats != null ? wc.summoningStats.mobLifetime : 0;
 
         WeaponDefinition def = new WeaponDefinition(
-                wc.itemId, wc.displayName, category, locked, minRarity,
+                wc.itemId, wc.displayName, category, locked, effectLocked, minRarity, maxRarity,
                 wc.spawnWeight, baseDamage, baseCooldown, baseMaxAmmo,
                 baseRange, baseSpread, basePellets, baseKnockback,
                 baseMobHealth, baseMobDamage, baseMobLifetime, basePrecision

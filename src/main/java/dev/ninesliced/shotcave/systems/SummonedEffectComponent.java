@@ -16,6 +16,7 @@ public final class SummonedEffectComponent implements Component<EntityStore> {
     private static ComponentType<EntityStore, SummonedEffectComponent> componentType;
 
     private int effectOrdinal;
+    private int rarityOrdinal;
 
     public SummonedEffectComponent() {
     }
@@ -40,11 +41,20 @@ public final class SummonedEffectComponent implements Component<EntityStore> {
         return effectOrdinal;
     }
 
+    public void setRarityOrdinal(int rarityOrdinal) {
+        this.rarityOrdinal = rarityOrdinal;
+    }
+
+    public int getRarityOrdinal() {
+        return rarityOrdinal;
+    }
+
     @Nonnull
     @Override
     public Component<EntityStore> clone() {
         SummonedEffectComponent copy = new SummonedEffectComponent();
         copy.effectOrdinal = this.effectOrdinal;
+        copy.rarityOrdinal = this.rarityOrdinal;
         return copy;
     }
 }

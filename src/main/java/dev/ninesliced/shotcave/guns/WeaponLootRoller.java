@@ -66,6 +66,10 @@ public final class WeaponLootRoller {
     @Nonnull
     private static ItemStack rollForWithRarity(@Nonnull WeaponDefinition def, @Nonnull WeaponRarity rarity) {
         ThreadLocalRandom rng = ThreadLocalRandom.current();
+        // Clamp rarity to weapon's maximum
+        if (rarity.ordinal() > def.getMaxRarity().ordinal()) {
+            rarity = def.getMaxRarity();
+        }
         DamageEffect effect = rollEffect(def, rarity, rng);
         List<WeaponModifier> modifiers = rollModifiers(def, rarity, rng);
         return stamp(def.getItemId(), rarity, effect, modifiers);
@@ -78,8 +82,11 @@ public final class WeaponLootRoller {
     public static ItemStack rollFor(@Nonnull WeaponDefinition def) {
         ThreadLocalRandom rng = ThreadLocalRandom.current();
 
-        // Roll rarity (clamped to weapon's minimum)
+        // Roll rarity (clamped to weapon's minimum and maximum)
         WeaponRarity rarity = WeaponRarity.roll(def.getMinRarity());
+        if (rarity.ordinal() > def.getMaxRarity().ordinal()) {
+            rarity = def.getMaxRarity();
+        }
 
         // Roll damage effect
         DamageEffect effect = rollEffect(def, rarity, rng);
@@ -110,15 +117,15 @@ public final class WeaponLootRoller {
     private static DamageEffect rollEffect(@Nonnull WeaponDefinition def,
                                             @Nonnull WeaponRarity rarity,
                                             @Nonnull ThreadLocalRandom rng) {
-        // Locked effects always apply
-        if (def.getLockedEffect() != DamageEffect.NONE) {
+        // If effect is locked (including locked to NONE), always use locked value
+        if (def.isEffectLocked()) {
             return def.getLockedEffect();
         }
 
         // Roll based on rarity's effect chance
         if (rng.nextDouble() < rarity.getEffectChance()) {
             // Pick a random rollable effect (acid, fire, ice only for random rolls)
-            DamageEffect[] rollable = { DamageEffect.ACID, DamageEffect.FIRE, DamageEffect.ICE };
+            DamageEffect[] rollable = { DamageEffect.ACID, DamageEffect.FIRE, DamageEffect.ICE, DamageEffect.ELECTRICITY, DamageEffect.VOID };
             return rollable[rng.nextInt(rollable.length)];
         }
 
@@ -157,5 +164,54 @@ public final class WeaponLootRoller {
             result.add(new WeaponModifier(type, value));
         }
         return result;
+    }
+
+    /**
+     * Rolls a weapon from a crate with specific rarity bounds and weapon whitelist.
+     * The rarity is rolled within [crateMinRarity, crateMaxRarity], then clamped
+     * to each weapon's own maxRarity. Weapons must be in the whitelist AND have
+     * minRarity <= rolledRarity to be eligible.
+     */
+    @Nonnull
+    public static ItemStack rollFromCrate(@Nonnull WeaponRarity crateMinRarity,
+                                          @Nonnull WeaponRarity crateMaxRarity,
+                                          @Nonnull List<String> whitelist) {
+        ThreadLocalRandom rng = ThreadLocalRandom.current();
+
+        // Roll rarity within the crate's range
+        WeaponRarity rarity = WeaponRarity.roll(crateMinRarity);
+        if (rarity.ordinal() > crateMaxRarity.ordinal()) {
+            rarity = crateMaxRarity;
+        }
+
+        // Build weighted pool: weapon must be whitelisted AND minRarity <= rolled rarity
+        List<WeaponDefinition> eligible = new ArrayList<>();
+        for (WeaponDefinition def : WeaponDefinitions.getAll()) {
+            if (whitelist.contains(def.getItemId())
+                    && def.getMinRarity().ordinal() <= rarity.ordinal()) {
+                for (int i = 0; i < def.getSpawnWeight(); i++) {
+                    eligible.add(def);
+                }
+            }
+        }
+
+        if (eligible.isEmpty()) {
+            // Fallback: pick any whitelisted weapon
+            for (WeaponDefinition def : WeaponDefinitions.getAll()) {
+                if (whitelist.contains(def.getItemId())) {
+                    for (int i = 0; i < def.getSpawnWeight(); i++) {
+                        eligible.add(def);
+                    }
+                }
+            }
+        }
+
+        if (eligible.isEmpty()) {
+            // Last resort: use the global pool
+            return rollRandom();
+        }
+
+        WeaponDefinition def = eligible.get(rng.nextInt(eligible.size()));
+        return rollForWithRarity(def, rarity);
     }
 }

@@ -108,9 +108,15 @@ public final class DamageEffectTickSystem extends EntityTickingSystem<EntityStor
         Vector3d adjustedVelocity = velocity.getVelocity().clone();
         if (effect == DamageEffect.ELECTRICITY) {
             adjustedVelocity.x = 0.0;
+            if (adjustedVelocity.y > 0.0) {
+                adjustedVelocity.y = 0.0;
+            }
             adjustedVelocity.z = 0.0;
         } else {
             adjustedVelocity.x *= ICE_SLOW_FACTOR;
+            if (adjustedVelocity.y > 0.0) {
+                adjustedVelocity.y = 0.0;
+            }
             adjustedVelocity.z *= ICE_SLOW_FACTOR;
         }
 

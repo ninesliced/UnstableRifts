@@ -8,6 +8,7 @@ import com.hypixel.hytale.server.core.asset.type.entityeffect.config.RemovalBeha
 import com.hypixel.hytale.server.core.entity.effect.EffectControllerComponent;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import dev.ninesliced.shotcave.guns.DamageEffect;
+import dev.ninesliced.shotcave.guns.WeaponRarity;
 
 import javax.annotation.Nonnull;
 import java.util.concurrent.ThreadLocalRandom;
@@ -26,6 +27,21 @@ public final class DamageEffectRuntime {
         }
 
         apply(commandBuffer, target, effect, rollDuration(effect), DEFAULT_DAMAGE_PER_TICK);
+    }
+
+    /**
+     * Applies a damage effect with rarity-scaled duration bonus.
+     */
+    public static void apply(@Nonnull CommandBuffer<EntityStore> commandBuffer,
+                             @Nonnull Ref<EntityStore> target,
+                             @Nonnull DamageEffect effect,
+                             @Nonnull WeaponRarity rarity) {
+        if (effect == DamageEffect.NONE) {
+            return;
+        }
+
+        float duration = rollDuration(effect) + rarity.getEffectDurationBonus();
+        apply(commandBuffer, target, effect, duration, DEFAULT_DAMAGE_PER_TICK);
     }
 
     public static void apply(@Nonnull CommandBuffer<EntityStore> commandBuffer,

@@ -83,10 +83,11 @@ public final class SpawnNPCAtImpactInteraction extends SimpleInstantInteraction 
             return;
         }
 
-        // Read damage effect from the weapon that fired this projectile
+        // Read damage effect and rarity from the weapon that fired this projectile
         ItemStack heldItem = context.getHeldItem();
         DamageEffect weaponEffect = heldItem != null ? GunItemMetadata.getEffect(heldItem) : DamageEffect.NONE;
         int effectOrdinal = weaponEffect.ordinal();
+        int rarityOrdinal = heldItem != null ? GunItemMetadata.getRarity(heldItem).ordinal() : 0;
 
         position.add(spawnOffset);
         commandBuffer.run(store -> {
@@ -96,6 +97,7 @@ public final class SpawnNPCAtImpactInteraction extends SimpleInstantInteraction 
                 if (npcRef != null && npcRef.isValid()) {
                     SummonedEffectComponent comp = new SummonedEffectComponent();
                     comp.setEffectOrdinal(effectOrdinal);
+                    comp.setRarityOrdinal(rarityOrdinal);
                     commandBuffer.putComponent(npcRef, SummonedEffectComponent.getComponentType(), comp);
                 }
             }

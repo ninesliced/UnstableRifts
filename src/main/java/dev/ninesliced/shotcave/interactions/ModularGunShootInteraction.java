@@ -32,7 +32,8 @@ import com.hypixel.hytale.server.core.modules.entity.component.TransformComponen
 import com.hypixel.hytale.server.core.modules.interaction.interaction.CooldownHandler;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.Interaction;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.RootInteraction;
-import com.hypixel.hytale.server.core.modules.interaction.interaction.config.SimpleInstantInteraction;
+import com.hypixel.hytale.server.core.modules.interaction.interaction.config.SimpleInteraction;
+import com.hypixel.hytale.server.core.meta.MetaKey;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.selector.Selector;
 import com.hypixel.hytale.server.core.universe.world.ParticleUtil;
 import com.hypixel.hytale.server.core.universe.world.World;
@@ -44,6 +45,7 @@ import dev.ninesliced.shotcave.guns.GunItemMetadata;
 import dev.ninesliced.shotcave.guns.WeaponCategory;
 import dev.ninesliced.shotcave.guns.WeaponDefinition;
 import dev.ninesliced.shotcave.guns.WeaponModifierType;
+import dev.ninesliced.shotcave.guns.WeaponRarity;
 import dev.ninesliced.shotcave.guns.WeaponDefinitions;
 import dev.ninesliced.shotcave.ShotcaveLog;
 import com.hypixel.hytale.logger.HytaleLogger;
@@ -63,7 +65,7 @@ import java.util.concurrent.ThreadLocalRandom;
  * This keeps weapon behavior in JSON and avoids hardcoding per-weapon logic in
  * Java.
  */
-public final class ModularGunShootInteraction extends SimpleInstantInteraction {
+public final class ModularGunShootInteraction extends SimpleInteraction {
     private static final HytaleLogger LOG = ShotcaveLog.forModule("GunShoot");
 
     @Nonnull
@@ -73,7 +75,7 @@ public final class ModularGunShootInteraction extends SimpleInstantInteraction {
         BuilderCodec.Builder<ModularGunShootInteraction> builder = BuilderCodec.builder(
                 ModularGunShootInteraction.class,
                 ModularGunShootInteraction::new,
-                SimpleInstantInteraction.CODEC);
+                SimpleInteraction.CODEC);
 
         builder.documentation("Configurable hitscan gun behavior with optional trail particles.");
         builder.appendInherited(
@@ -198,6 +200,18 @@ public final class ModularGunShootInteraction extends SimpleInstantInteraction {
                 (o, p) -> o.impactParticleScale = p.impactParticleScale).addValidator(Validators.greaterThan(0.0))
                 .add();
 
+        builder.appendInherited(
+                new KeyedCodec<Integer>("BurstCount", Codec.INTEGER),
+                (o, v) -> o.burstCount = v,
+                o -> o.burstCount,
+                (o, p) -> o.burstCount = p.burstCount).add();
+
+        builder.appendInherited(
+                new KeyedCodec<Double>("BurstInterval", Codec.DOUBLE),
+                (o, v) -> o.burstInterval = v,
+                o -> o.burstInterval,
+                (o, p) -> o.burstInterval = p.burstInterval).add();
+
         CODEC = builder.build();
     }
 
@@ -224,23 +238,88 @@ public final class ModularGunShootInteraction extends SimpleInstantInteraction {
     @Nullable
     private String impactParticleId;
     private double impactParticleScale = 0.5;
+    private int burstCount = 1;
+    private double burstInterval = 0.0;
+
+    private static final MetaKey<int[]> BURST_SHOTS_KEY = Interaction.CONTEXT_META_REGISTRY.registerMetaObject(data -> null);
 
     @Override
-    protected void firstRun(@Nonnull InteractionType type, @Nonnull InteractionContext context,
-            @Nonnull CooldownHandler cooldownHandler) {
+    protected void tick0(boolean firstRun, float time, @Nonnull InteractionType type,
+            @Nonnull InteractionContext context, @Nonnull CooldownHandler cooldownHandler) {
         CommandBuffer<EntityStore> commandBuffer = context.getCommandBuffer();
         if (commandBuffer == null) {
+            super.tick0(firstRun, time, type, context, cooldownHandler);
             return;
         }
 
+        if (firstRun) {
+            ItemStack heldItem = context.getHeldItem();
+
+            // Apply attack speed bonus once per trigger pull
+            if (heldItem != null) {
+                double speedBonus = GunItemMetadata.getModifierBonus(heldItem, WeaponModifierType.ATTACK_SPEED);
+                if (speedBonus > 0.001) {
+                    CooldownHandler.Cooldown shootCooldown = cooldownHandler.getCooldown("Shoot");
+                    if (shootCooldown != null) {
+                        float baseCd = shootCooldown.getCooldown();
+                        float reducedCd = (float) (baseCd * (1.0 - speedBonus));
+                        if (reducedCd < 0.05f) reducedCd = 0.05f;
+                        shootCooldown.setCooldownMax(reducedCd);
+                    }
+                }
+            }
+
+            // Consume ammo once for the entire burst
+            if (this.useAmmo) {
+                if (heldItem == null) {
+                    super.tick0(firstRun, time, type, context, cooldownHandler);
+                    return;
+                }
+                int effectiveMaxAmmo = GunItemMetadata.getEffectiveMaxAmmo(heldItem, this.maxAmmo);
+                ItemStack updated = GunItemMetadata.ensureAmmo(heldItem, this.maxAmmo, effectiveMaxAmmo);
+                int ammo = GunItemMetadata.getInt(updated, GunItemMetadata.AMMO_KEY, effectiveMaxAmmo);
+                if (ammo < this.ammoPerShot) {
+                    super.tick0(firstRun, time, type, context, cooldownHandler);
+                    return;
+                }
+                updated = GunItemMetadata.setInt(updated, GunItemMetadata.AMMO_KEY, ammo - this.ammoPerShot);
+                GunItemMetadata.applyHeldItem(context, updated);
+            }
+
+            context.getMetaStore().putMetaObject(BURST_SHOTS_KEY, new int[]{0});
+        }
+
+        int[] counter = context.getMetaStore().getIfPresentMetaObject(BURST_SHOTS_KEY);
+        if (counter == null) {
+            super.tick0(firstRun, time, type, context, cooldownHandler);
+            return;
+        }
+
+        int expectedShots;
+        if (this.burstCount <= 1 || this.burstInterval <= 0.0) {
+            expectedShots = this.burstCount;
+        } else {
+            expectedShots = Math.min(this.burstCount, (int) (time / this.burstInterval) + 1);
+        }
+
+        while (counter[0] < expectedShots) {
+            fireRound(commandBuffer, context);
+            counter[0]++;
+        }
+
+        super.tick0(firstRun, time, type, context, cooldownHandler);
+    }
+
+    private void fireRound(@Nonnull CommandBuffer<EntityStore> commandBuffer,
+            @Nonnull InteractionContext context) {
         ItemStack heldItem = context.getHeldItem();
+
         int effectiveRange = this.range;
         int effectivePellets = this.pellets;
         double effectiveSpread = this.spreadDegrees;
         int effectiveTrailR = this.trailColorR;
         int effectiveTrailG = this.trailColorG;
         int effectiveTrailB = this.trailColorB;
-        int effectiveMaxAmmo = this.maxAmmo;
         double effectiveKnockback = 0.0;
         WeaponDefinition weaponDefinition = null;
 
@@ -254,7 +333,6 @@ public final class ModularGunShootInteraction extends SimpleInstantInteraction {
 
             double pelletBonus = GunItemMetadata.getModifierBonus(heldItem, WeaponModifierType.ADDITIONAL_BULLETS);
             effectivePellets = this.pellets + (int) pelletBonus;
-            effectiveMaxAmmo = GunItemMetadata.getEffectiveMaxAmmo(heldItem, this.maxAmmo);
 
             DamageEffect effect = GunItemMetadata.getEffect(heldItem);
             if (effect != DamageEffect.NONE) {
@@ -271,35 +349,10 @@ public final class ModularGunShootInteraction extends SimpleInstantInteraction {
                 double knockbackBonus = GunItemMetadata.getModifierBonus(heldItem, WeaponModifierType.KNOCKBACK);
                 effectiveKnockback = weaponDefinition.getBaseKnockback() * (1.0 + knockbackBonus);
             }
-
-            double speedBonus = GunItemMetadata.getModifierBonus(heldItem, WeaponModifierType.ATTACK_SPEED);
-            if (speedBonus > 0.001) {
-                CooldownHandler.Cooldown shootCooldown = cooldownHandler.getCooldown("Shoot");
-                if (shootCooldown != null) {
-                    float baseCd = shootCooldown.getCooldown();
-                    float reducedCd = (float) (baseCd * (1.0 - speedBonus));
-                    if (reducedCd < 0.05f) reducedCd = 0.05f;
-                    shootCooldown.setCooldownMax(reducedCd);
-                }
-            }
         }
 
         DamageEffect dotEffect = heldItem != null ? GunItemMetadata.getEffect(heldItem) : DamageEffect.NONE;
-
-        if (this.useAmmo) {
-            if (heldItem == null) {
-                return;
-            }
-
-            ItemStack updated = GunItemMetadata.ensureAmmo(heldItem, this.maxAmmo, effectiveMaxAmmo);
-            int ammo = GunItemMetadata.getInt(updated, GunItemMetadata.AMMO_KEY, effectiveMaxAmmo);
-            if (ammo < this.ammoPerShot) {
-                return;
-            }
-
-            updated = GunItemMetadata.setInt(updated, GunItemMetadata.AMMO_KEY, ammo - this.ammoPerShot);
-            GunItemMetadata.applyHeldItem(context, updated);
-        }
+        WeaponRarity weaponRarity = heldItem != null ? GunItemMetadata.getRarity(heldItem) : WeaponRarity.BASIC;
 
         Vector3d start = getMuzzlePosition(commandBuffer, context.getEntity());
         if (start == null) {
@@ -350,7 +403,7 @@ public final class ModularGunShootInteraction extends SimpleInstantInteraction {
                     applyKnockback(commandBuffer, context.getEntity(), hit.target, effectiveKnockback);
                 }
                 if (effectedTargets != null && effectedTargets.add(hit.target.getIndex())) {
-                    DamageEffectRuntime.apply(commandBuffer, hit.target, dotEffect);
+                    DamageEffectRuntime.apply(commandBuffer, hit.target, dotEffect, weaponRarity);
                 }
                 continue;
             }

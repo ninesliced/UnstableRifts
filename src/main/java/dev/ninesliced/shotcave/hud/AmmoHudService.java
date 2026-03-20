@@ -33,6 +33,11 @@ public final class AmmoHudService {
 
     public static void updateForHeldItem(@Nonnull Player player, @Nonnull PlayerRef playerRef,
             @Nullable ItemStack heldItem) {
+        updateForHeldItem(player, playerRef, heldItem, false);
+    }
+
+    public static void updateForHeldItem(@Nonnull Player player, @Nonnull PlayerRef playerRef,
+            @Nullable ItemStack heldItem, boolean crouching) {
 
         if (heldItem == null) {
             hide(player, playerRef);
@@ -44,26 +49,29 @@ public final class AmmoHudService {
         // Look up weapon definition for base stats
         WeaponDefinition definition = itemId != null ? WeaponDefinitions.getById(itemId) : null;
 
+        WeaponCategory category = definition != null ? definition.getCategory() : null;
+        boolean isMelee = category == WeaponCategory.MELEE;
+
         int baseMaxAmmo = definition != null && definition.getBaseMaxAmmo() > 0
                 ? definition.getBaseMaxAmmo()
                 : GunItemMetadata.getBaseMaxAmmo(heldItem, -1);
-        if (baseMaxAmmo <= 0) {
+        if (baseMaxAmmo <= 0 && !isMelee) {
             hide(player, playerRef);
             return;
         }
 
-        int maxAmmo = GunItemMetadata.getEffectiveMaxAmmo(heldItem, baseMaxAmmo);
+        int maxAmmo = isMelee ? 0 : GunItemMetadata.getEffectiveMaxAmmo(heldItem, baseMaxAmmo);
 
-        int ammo = GunItemMetadata.getInt(heldItem, GunItemMetadata.AMMO_KEY, maxAmmo);
+        int ammo = isMelee ? 0 : GunItemMetadata.getInt(heldItem, GunItemMetadata.AMMO_KEY, maxAmmo);
         ammo = Math.max(0, Math.min(ammo, maxAmmo));
 
         // Read weapon attributes from BSON
         WeaponRarity rarity = GunItemMetadata.getRarity(heldItem);
         DamageEffect effect = GunItemMetadata.getEffect(heldItem);
         List<WeaponModifier> modifiers = GunItemMetadata.getModifiers(heldItem);
-        WeaponCategory category = definition != null ? definition.getCategory() : WeaponCategory.LASER;
+        if (category == null) category = WeaponCategory.LASER;
 
-        long state = computeState(itemId, ammo, baseMaxAmmo, maxAmmo, rarity.ordinal(), effect.ordinal(), modifiers.hashCode());
+        long state = computeState(itemId, ammo, baseMaxAmmo, maxAmmo, rarity.ordinal(), effect.ordinal(), modifiers.hashCode(), crouching);
         UUID uuid = playerRef.getUuid();
         Long previous = LAST_STATE.get(uuid);
         if (previous != null && previous == state) {
@@ -73,7 +81,7 @@ public final class AmmoHudService {
 
         String displayName = definition != null ? definition.getDisplayName() : extractWeaponName(heldItem);
         ShotcaveHud hud = new ShotcaveHud(playerRef, ammo, baseMaxAmmo, maxAmmo,
-                rarity, effect, category, definition, modifiers, displayName);
+                rarity, effect, category, definition, modifiers, displayName, crouching);
 
         player.getHudManager().showHudComponents(playerRef, HudComponent.AmmoIndicator);
         if (!MultiHudCompat.setHud(player, playerRef, HUD_IDENTIFIER, hud)) {
@@ -100,7 +108,7 @@ public final class AmmoHudService {
     }
 
     private static long computeState(@Nullable String itemId, int ammo, int baseMaxAmmo, int maxAmmo,
-                                      int rarityOrdinal, int effectOrdinal, int modifiersHash) {
+                                      int rarityOrdinal, int effectOrdinal, int modifiersHash, boolean crouching) {
         long h = 1125899906842597L;
         h = 31L * h + (itemId == null ? 0 : itemId.hashCode());
         h = 31L * h + ammo;
@@ -109,6 +117,7 @@ public final class AmmoHudService {
         h = 31L * h + rarityOrdinal;
         h = 31L * h + effectOrdinal;
         h = 31L * h + modifiersHash;
+        h = 31L * h + (crouching ? 1 : 0);
         return h;
     }
 

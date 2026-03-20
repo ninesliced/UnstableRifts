@@ -5,11 +5,11 @@ import javax.annotation.Nullable;
 
 public enum DamageEffect {
     NONE(255, 255, 255, 0.0f, 0.0f, "", null),
-    ACID(110, 255, 120, 0.5f, 1.0f, "ACID", "Shotcave_Poison"),
-    FIRE(255, 150, 90, 2.0f, 2.0f, "FIRE", "Flame_Staff_Burn"),
-    ICE(120, 220, 255, 0.7f, 1.0f, "ICE", "Slow"),
-    ELECTRICITY(255, 235, 90, 0.4f, 0.6f, "ELECTRICITY", "Stun"),
-    VOID(210, 90, 255, 0.4f, 0.6f, "VOID", "Shotcave_Void_Portal_DOT");
+    ACID(110, 255, 120, 0.5f, 0.5f, "ACID", "Shotcave_Poison"),
+    FIRE(255, 150, 90, 0.5f, 0.5f, "FIRE", "Flame_Staff_Burn"),
+    ICE(120, 220, 255, 0.5f, 0.5f, "ICE", "Slow"),
+    ELECTRICITY(255, 235, 90, 0.5f, 0.5f, "ELECTRICITY", "Stun"),
+    VOID(210, 90, 255, 0.5f, 0.5f, "VOID", "Shotcave_Void_Portal_DOT");
 
     private final int trailR;
     private final int trailG;

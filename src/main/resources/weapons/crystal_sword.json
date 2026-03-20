@@ -1,0 +1,29 @@
+{
+  "itemId": "Weapon_Crystal_Sword_Shotcave",
+  "displayName": "Crystal Sword",
+  "category": "MELEE",
+  "minRarity": "BASIC",
+  "spawnWeight": 20,
+  "baseStats": {
+    "range": 0,
+    "spread": 0,
+    "pellets": 1,
+    "knockback": 1.5
+  },
+  "primary": {
+    "id": "Shotcave_Crystal_Sword_Primary",
+    "cooldown": 0.25,
+    "requireAmmo": false,
+    "shotId": "",
+    "reloadId": ""
+  },
+  "damage": {
+    "id": "Shotcave_Crystal_Sword_Hit",
+    "amount": 8,
+    "type": "Physical",
+    "worldSfx": "SFX_Sword_T2_Impact",
+    "localSfx": "SFX_Sword_T2_Impact",
+    "particleId": "Impact_Sword_Basic",
+    "particleYOffset": 0.8
+  }
+}

@@ -35,11 +35,13 @@ public final class ShotcaveHud extends CustomUIHud {
     @Nullable private final WeaponDefinition definition;
     @Nonnull private final List<WeaponModifier> modifiers;
     @Nullable private final String weaponName;
+    private final boolean crouching;
 
     public ShotcaveHud(@Nonnull PlayerRef playerRef, int ammo, int baseMaxAmmo, int maxAmmo,
                        @Nonnull WeaponRarity rarity, @Nonnull DamageEffect effect,
                        @Nonnull WeaponCategory category, @Nullable WeaponDefinition definition,
-                       @Nonnull List<WeaponModifier> modifiers, @Nullable String weaponName) {
+                       @Nonnull List<WeaponModifier> modifiers, @Nullable String weaponName,
+                       boolean crouching) {
         super(playerRef);
         this.ammo = Math.max(0, ammo);
         this.baseMaxAmmo = Math.max(1, baseMaxAmmo);
@@ -50,6 +52,7 @@ public final class ShotcaveHud extends CustomUIHud {
         this.definition = definition;
         this.modifiers = modifiers;
         this.weaponName = weaponName;
+        this.crouching = crouching;
     }
 
     @Override
@@ -76,42 +79,53 @@ public final class ShotcaveHud extends CustomUIHud {
             ui.set("#ShotcaveEffectLabel.Visible", true);
         }
 
-        if (category == WeaponCategory.SUMMONING) {
-            buildSummoningStats(ui);
+        if (crouching) {
+            // Expanded view: show stats + modifiers
+            ui.set("#ShotcaveStatsSection.Visible", true);
+
+            if (category == WeaponCategory.SUMMONING) {
+                buildSummoningStats(ui);
+            } else {
+                buildCombatStats(ui);
+            }
+
+            int modCount = Math.min(modifiers.size(), 5);
+            if (modCount > 0) {
+                ui.set("#ShotcaveModSection.Visible", true);
+                for (int i = 0; i < modCount; i++) {
+                    WeaponModifier mod = modifiers.get(i);
+                    String modText = formatModifier(mod);
+                    ui.set("#ShotcaveMod" + i + ".TextSpans", Message.raw(modText));
+                }
+                for (int i = modCount; i < 5; i++) {
+                    ui.set("#ShotcaveMod" + i + ".Visible", false);
+                }
+            } else {
+                ui.set("#ShotcaveModSection.Visible", false);
+            }
         } else {
-            buildCombatStats(ui);
+            // Compact view: hide stats + modifiers
+            ui.set("#ShotcaveStatsSection.Visible", false);
+            ui.set("#ShotcaveModSection.Visible", false);
         }
 
-        int modCount = Math.min(modifiers.size(), 5);
-        if (modCount > 0) {
-            for (int i = 0; i < modCount; i++) {
-                WeaponModifier mod = modifiers.get(i);
-                String modText = formatModifier(mod);
-                ui.set("#ShotcaveMod" + i + ".TextSpans", Message.raw(modText));
-            }
-            for (int i = modCount; i < 5; i++) {
-                ui.set("#ShotcaveMod" + i + ".Visible", false);
-            }
+        if (category == WeaponCategory.MELEE) {
+            ui.set("#ShotcaveAmmoSection.Visible", false);
         } else {
-            ui.set("#ShotcaveModSeparator.Visible", false);
-            for (int i = 0; i < 5; i++) {
-                ui.set("#ShotcaveMod" + i + ".Visible", false);
+            ui.set("#ShotcaveAmmoValue.TextSpans", Message.raw(Integer.toString(this.ammo)));
+            ui.set("#ShotcaveMaxAmmoValue.TextSpans", Message.raw(Integer.toString(this.maxAmmo)));
+
+            double ratio = (double) this.ammo / (double) this.maxAmmo;
+            boolean isLow = ratio <= LOW_AMMO_THRESHOLD && this.ammo > 0;
+            boolean isEmpty = this.ammo <= 0;
+
+            int fillRight = BAR_WIDTH - (int) Math.round(ratio * BAR_WIDTH);
+            ui.set("#ShotcaveAmmoBarFill.Anchor.Right", fillRight);
+
+            if (isEmpty || isLow) {
+                ui.set("#ShotcaveAmmoValue.Style.TextColor", COLOR_LOW);
+                ui.set("#ShotcaveAmmoBarFill.Background", BAR_LOW);
             }
-        }
-
-        ui.set("#ShotcaveAmmoValue.TextSpans", Message.raw(Integer.toString(this.ammo)));
-        ui.set("#ShotcaveMaxAmmoValue.TextSpans", Message.raw(Integer.toString(this.maxAmmo)));
-
-        double ratio = (double) this.ammo / (double) this.maxAmmo;
-        boolean isLow = ratio <= LOW_AMMO_THRESHOLD && this.ammo > 0;
-        boolean isEmpty = this.ammo <= 0;
-
-        int fillRight = BAR_WIDTH - (int) Math.round(ratio * BAR_WIDTH);
-        ui.set("#ShotcaveAmmoBarFill.Anchor.Right", fillRight);
-
-        if (isEmpty || isLow) {
-            ui.set("#ShotcaveAmmoValue.Style.TextColor", COLOR_LOW);
-            ui.set("#ShotcaveAmmoBarFill.Background", BAR_LOW);
         }
     }
 
@@ -135,6 +149,8 @@ public final class ShotcaveHud extends CustomUIHud {
         buildMaxAmmoRow(ui);
 
         ui.set("#ShotcaveStatPelletsRow.Visible", false);
+
+        buildEffectTimeRow(ui);
     }
 
 
@@ -147,44 +163,59 @@ public final class ShotcaveHud extends CustomUIHud {
         buildStatRow(ui, "Speed", "#ShotcaveStatSpeedBase", "#ShotcaveStatSpeedMod",
                 definition != null ? definition.getBaseCooldown() : 0, getModBonus(WeaponModifierType.ATTACK_SPEED), true);
 
-        ui.set("#ShotcaveStatRangeLabel.TextSpans", Message.raw("Range"));
-        buildStatRow(ui, "Range", "#ShotcaveStatRangeBase", "#ShotcaveStatRangeMod",
-                definition != null ? definition.getBaseRange() : 0, getModBonus(WeaponModifierType.MAX_RANGE), true);
+        if (category == WeaponCategory.MELEE) {
+            // Melee: show knockback but hide range, precision, max ammo, pellets
+            ui.set("#ShotcaveStatRangeRow.Visible", false);
+            ui.set("#ShotcaveStatPrecisionRow.Visible", false);
 
-        ui.set("#ShotcaveStatPrecisionLabel.TextSpans", Message.raw("Precision"));
-        double baseSpread = definition != null ? definition.getBaseSpread() : 0;
-        double basePrecision = definition != null && definition.getBasePrecision() >= 0
-                ? definition.getBasePrecision()
-                : Math.max(0, 100.0 - baseSpread * 10.0);
-        double precisionBonus = getModBonus(WeaponModifierType.PRECISION);
-        ui.set("#ShotcaveStatPrecisionBase.TextSpans", Message.raw(
-                String.format("%.0f%%", basePrecision)));
-        if (precisionBonus > 0.001) {
-            int bonusPoints = (int) Math.round(baseSpread * precisionBonus * 10.0);
-            if (bonusPoints > 0) {
-                ui.set("#ShotcaveStatPrecisionMod.TextSpans", Message.raw("(+" + bonusPoints + ")"));
+            ui.set("#ShotcaveStatKnockbackLabel.TextSpans", Message.raw("Knockback"));
+            buildStatRow(ui, "Knockback", "#ShotcaveStatKnockbackBase", "#ShotcaveStatKnockbackMod",
+                    definition != null ? definition.getBaseKnockback() : 0, getModBonus(WeaponModifierType.KNOCKBACK), true);
+
+            ui.set("#ShotcaveStatMaxAmmoRow.Visible", false);
+            ui.set("#ShotcaveStatPelletsRow.Visible", false);
+        } else {
+            ui.set("#ShotcaveStatRangeLabel.TextSpans", Message.raw("Range"));
+            buildStatRow(ui, "Range", "#ShotcaveStatRangeBase", "#ShotcaveStatRangeMod",
+                    definition != null ? definition.getBaseRange() : 0, getModBonus(WeaponModifierType.MAX_RANGE), true);
+
+            ui.set("#ShotcaveStatPrecisionLabel.TextSpans", Message.raw("Precision"));
+            double baseSpread = definition != null ? definition.getBaseSpread() : 0;
+            double basePrecision = definition != null && definition.getBasePrecision() >= 0
+                    ? definition.getBasePrecision()
+                    : Math.max(0, 100.0 - baseSpread * 10.0);
+            double precisionBonus = getModBonus(WeaponModifierType.PRECISION);
+            ui.set("#ShotcaveStatPrecisionBase.TextSpans", Message.raw(
+                    String.format("%.0f%%", basePrecision)));
+            if (precisionBonus > 0.001) {
+                int bonusPoints = (int) Math.round(baseSpread * precisionBonus * 10.0);
+                if (bonusPoints > 0) {
+                    ui.set("#ShotcaveStatPrecisionMod.TextSpans", Message.raw("(+" + bonusPoints + ")"));
+                } else {
+                    ui.set("#ShotcaveStatPrecisionMod.TextSpans", Message.raw(""));
+                }
             } else {
                 ui.set("#ShotcaveStatPrecisionMod.TextSpans", Message.raw(""));
             }
-        } else {
-            ui.set("#ShotcaveStatPrecisionMod.TextSpans", Message.raw(""));
+
+            ui.set("#ShotcaveStatKnockbackLabel.TextSpans", Message.raw("Knockback"));
+            buildStatRow(ui, "Knockback", "#ShotcaveStatKnockbackBase", "#ShotcaveStatKnockbackMod",
+                    definition != null ? definition.getBaseKnockback() : 0, getModBonus(WeaponModifierType.KNOCKBACK), true);
+
+            ui.set("#ShotcaveStatMaxAmmoLabel.TextSpans", Message.raw("Max Ammo"));
+            buildMaxAmmoRow(ui);
+
+            int basePellets = definition != null ? definition.getBasePellets() : 1;
+            if (basePellets > 1) {
+                ui.set("#ShotcaveStatPelletsLabel.TextSpans", Message.raw("Pellets"));
+                buildStatRow(ui, "Pellets", "#ShotcaveStatPelletsBase", "#ShotcaveStatPelletsMod",
+                        basePellets, getModBonus(WeaponModifierType.ADDITIONAL_BULLETS), false);
+            } else {
+                ui.set("#ShotcaveStatPelletsRow.Visible", false);
+            }
         }
 
-        ui.set("#ShotcaveStatKnockbackLabel.TextSpans", Message.raw("Knockback"));
-        buildStatRow(ui, "Knockback", "#ShotcaveStatKnockbackBase", "#ShotcaveStatKnockbackMod",
-                definition != null ? definition.getBaseKnockback() : 0, getModBonus(WeaponModifierType.KNOCKBACK), true);
-
-        ui.set("#ShotcaveStatMaxAmmoLabel.TextSpans", Message.raw("Max Ammo"));
-        buildMaxAmmoRow(ui);
-
-        int basePellets = definition != null ? definition.getBasePellets() : 1;
-        if (basePellets > 1) {
-            ui.set("#ShotcaveStatPelletsLabel.TextSpans", Message.raw("Pellets"));
-            buildStatRow(ui, "Pellets", "#ShotcaveStatPelletsBase", "#ShotcaveStatPelletsMod",
-                    basePellets, getModBonus(WeaponModifierType.ADDITIONAL_BULLETS), false);
-        } else {
-            ui.set("#ShotcaveStatPelletsRow.Visible", false);
-        }
+        buildEffectTimeRow(ui);
     }
 
 
@@ -209,6 +240,35 @@ public final class ShotcaveHud extends CustomUIHud {
             ui.set("#ShotcaveStatMaxAmmoMod.TextSpans", Message.raw("(+" + maxAmmoBonus + ")"));
         } else {
             ui.set("#ShotcaveStatMaxAmmoMod.TextSpans", Message.raw(""));
+        }
+    }
+
+    private void buildEffectTimeRow(@Nonnull UICommandBuilder ui) {
+        if (effect == DamageEffect.NONE || !effect.hasDoT()) {
+            ui.set("#ShotcaveStatEffectTimeRow.Visible", false);
+            return;
+        }
+
+        float baseMin = effect.getDotDurationMin();
+        float baseMax = effect.getDotDurationMax();
+        float bonus = rarity.getEffectDurationBonus();
+
+        ui.set("#ShotcaveStatEffectTimeLabel.TextSpans", Message.raw("Effect Time"));
+        ui.set("#ShotcaveStatEffectTimeLabel.Style.TextColor", effectColorHex(effect));
+
+        if (baseMin >= baseMax) {
+            ui.set("#ShotcaveStatEffectTimeBase.TextSpans",
+                    Message.raw(String.format("%.1fs", baseMin)));
+        } else {
+            ui.set("#ShotcaveStatEffectTimeBase.TextSpans",
+                    Message.raw(String.format("%.1f-%.1fs", baseMin, baseMax)));
+        }
+
+        if (bonus > 0.001f) {
+            ui.set("#ShotcaveStatEffectTimeMod.TextSpans",
+                    Message.raw(String.format("(+%.1fs)", bonus)));
+        } else {
+            ui.set("#ShotcaveStatEffectTimeMod.TextSpans", Message.raw(""));
         }
     }
 

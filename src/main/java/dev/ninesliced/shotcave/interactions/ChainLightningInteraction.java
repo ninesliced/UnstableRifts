@@ -37,6 +37,7 @@ import com.hypixel.hytale.server.core.util.TargetUtil;
 import dev.ninesliced.shotcave.guns.AimAssistHelper;
 import dev.ninesliced.shotcave.guns.DamageEffect;
 import dev.ninesliced.shotcave.guns.GunItemMetadata;
+import dev.ninesliced.shotcave.guns.WeaponRarity;
 import dev.ninesliced.shotcave.guns.WeaponModifierType;
 import dev.ninesliced.shotcave.systems.DamageEffectRuntime;
 
@@ -233,6 +234,8 @@ public final class ChainLightningInteraction extends SimpleInstantInteraction {
             return;
         }
 
+        WeaponRarity chainRarity = heldItem != null ? GunItemMetadata.getRarity(heldItem) : WeaponRarity.BASIC;
+
         List<Ref<EntityStore>> chainTargets = buildChain(commandBuffer, context, hit.target, effectiveMaxTargets);
         renderBeamChain(commandBuffer, chainTargets, hit.position);
 
@@ -243,7 +246,7 @@ public final class ChainLightningInteraction extends SimpleInstantInteraction {
             }
             hitPosition = hitPosition.clone().add(0.0, this.beamHeightOffset, 0.0);
             forkDamageInteraction(context, damageRootInteraction, targetRef, hitPosition);
-            DamageEffectRuntime.apply(commandBuffer, targetRef, DamageEffect.ELECTRICITY);
+            DamageEffectRuntime.apply(commandBuffer, targetRef, DamageEffect.ELECTRICITY, chainRarity);
         }
     }
 
