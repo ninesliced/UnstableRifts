@@ -166,7 +166,6 @@ public final class DungeonTickSystem extends EntityTickingSystem<EntityStore> {
             if (room.isCleared() || room.getType() == RoomType.BOSS) continue;
 
             int prevAlive = room.getAliveMobCount();
-            // Count invalid refs to detect newly dead mobs
             int newlyDead = 0;
             for (var mob : room.getSpawnedMobs()) {
                 if (!mob.isValid()) {
@@ -174,15 +173,15 @@ public final class DungeonTickSystem extends EntityTickingSystem<EntityStore> {
                 }
             }
 
-            // Simple approach: if all mobs are dead, mark cleared and award remaining money
             if (room.areAllMobsDead() && !room.getSpawnedMobs().isEmpty() && !room.isCleared()) {
                 room.setCleared(true);
-                // Money was already awarded per-kill via tracking
+                Shotcave instance = Shotcave.getInstance();
+                if (instance != null) {
+                    instance.getDungeonMapService().onRoomCleared(game, room);
+                }
             }
         }
 
-        // Award money for overall kill tracking
-        // We track via the total alive count change
         int currentAlive = level.getAliveMobCount();
         int totalSpawned = level.getTotalSpawnedMobs();
         int killed = totalSpawned - currentAlive;

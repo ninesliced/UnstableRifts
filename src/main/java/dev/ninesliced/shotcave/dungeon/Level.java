@@ -24,6 +24,8 @@ public final class Level {
     private final Map<String, List<RoomData>> branches = new HashMap<>();
     private final List<RoomData> mainBranchRooms = new ArrayList<>();
 
+    private final Map<Long, RoomData> blockOwnership = new HashMap<>();
+
     @Nullable
     private RoomData entranceRoom;
     @Nullable
@@ -157,5 +159,24 @@ public final class Level {
         }
         return count;
     }
+
+    private static long packXZ(int x, int z) {
+        return ((long) x << 32) | (z & 0xFFFFFFFFL);
+    }
+
+    public void setBlockOwner(int x, int z, @Nonnull RoomData room) {
+        blockOwnership.put(packXZ(x, z), room);
+    }
+
+    @Nullable
+    public RoomData getBlockOwner(int x, int z) {
+        return blockOwnership.get(packXZ(x, z));
+    }
+
+    @Nonnull
+    public Map<Long, RoomData> getBlockOwnership() {
+        return Collections.unmodifiableMap(blockOwnership);
+    }
+
 }
 

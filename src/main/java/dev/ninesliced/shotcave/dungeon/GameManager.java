@@ -173,6 +173,7 @@ public final class GameManager {
 
             game.setGenerationProgress(1.0f);
             game.setState(GameState.READY);
+            plugin.getDungeonMapService().buildMap(game);
             PartyUiPage.refreshOpenPages();
             LOGGER.info("Game ready for party " + partyId + " in world " + world.getName());
             return game;
@@ -394,6 +395,7 @@ public final class GameManager {
             });
         }
 
+        plugin.getDungeonMapService().cleanup(game.getPartyId());
         activeGames.remove(game.getPartyId());
 
         if (forced) {
@@ -842,6 +844,7 @@ public final class GameManager {
         plugin.getCameraService().setEnabled(playerRef, true);
         applyDungeonMovementSettings(ref, store, playerRef);
         enableMap(playerRef);
+        plugin.getDungeonMapService().sendMapToPlayer(playerRef, game);
         game.setPlayerInInstance(playerId, true);
     }
 

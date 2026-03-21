@@ -36,6 +36,10 @@ public final class RoomData {
     private final List<Vector3i> portalPositions = new ArrayList<>();
     private final List<Vector3i> portalExitPositions = new ArrayList<>();
 
+    // XZ bounding box for map rendering (world coordinates)
+    private int boundsMinX, boundsMinZ, boundsMaxX, boundsMaxZ;
+    private boolean hasBounds = false;
+
     @Nullable
     private RoomData parent;
     private boolean cleared = false;
@@ -254,6 +258,36 @@ public final class RoomData {
 
     public void addPortalExitPosition(@Nonnull Vector3i pos) {
         portalExitPositions.add(pos);
+    }
+
+    // ── Map bounds ──
+
+    public boolean hasBounds() {
+        return hasBounds;
+    }
+
+    public int getBoundsMinX() {
+        return boundsMinX;
+    }
+
+    public int getBoundsMinZ() {
+        return boundsMinZ;
+    }
+
+    public int getBoundsMaxX() {
+        return boundsMaxX;
+    }
+
+    public int getBoundsMaxZ() {
+        return boundsMaxZ;
+    }
+
+    public void setBounds(int minX, int minZ, int maxX, int maxZ) {
+        this.boundsMinX = minX;
+        this.boundsMinZ = minZ;
+        this.boundsMaxX = maxX;
+        this.boundsMaxZ = maxZ;
+        this.hasBounds = true;
     }
 
     @Nonnull

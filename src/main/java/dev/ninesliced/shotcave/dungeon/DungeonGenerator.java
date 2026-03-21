@@ -658,6 +658,24 @@ public class DungeonGenerator {
             }
         }
 
+        int minX = Integer.MAX_VALUE, maxX = Integer.MIN_VALUE;
+        int minZ = Integer.MAX_VALUE, maxZ = Integer.MIN_VALUE;
+        for (BlockLocal block : data.blocks) {
+            if (block.isMarker) continue;
+            int wx = pastePos.x + rotX(block.x, block.z, rot);
+            int wz = pastePos.z + rotZ(block.x, block.z, rot);
+            minX = Math.min(minX, wx);
+            maxX = Math.max(maxX, wx);
+            minZ = Math.min(minZ, wz);
+            maxZ = Math.max(maxZ, wz);
+            if (generatedLevel != null) {
+                generatedLevel.setBlockOwner(wx, wz, roomData);
+            }
+        }
+        if (minX <= maxX && minZ <= maxZ) {
+            roomData.setBounds(minX, minZ, maxX, maxZ);
+        }
+
         return roomData;
     }
 
