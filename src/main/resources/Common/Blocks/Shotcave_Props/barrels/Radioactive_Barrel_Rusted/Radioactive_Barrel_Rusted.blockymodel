@@ -2011,7 +2011,7 @@
               "orientation": {"x": 0.70711, "y": 0, "z": 0, "w": 0.70711},
               "shape": {
                 "type": "quad",
-                "offset": {"x": -1.5, "y": 0.0165, "z": 0.26038},
+                "offset": {"x": -1.5, "y": 0.0365, "z": 0.26038},
                 "stretch": {"x": 0.6875, "y": 1, "z": 0.69375},
                 "settings": {
                   "isPiece": false,

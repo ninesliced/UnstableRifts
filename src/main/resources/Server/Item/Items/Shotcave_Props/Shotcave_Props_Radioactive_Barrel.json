@@ -2,7 +2,7 @@
   "TranslationProperties": {
     "Name": "server.items.Shotcave_Props_Radioactive_Barrel.name"
   },
-  "Icon": "Icons/ItemsGenerated/Furniture_Tavern_Barrel.png",
+  "Icon": "Icons/ItemsGenerated/Radioactive_Barrel.png",
   "Categories": [
     "Furniture.Containers"
   ],

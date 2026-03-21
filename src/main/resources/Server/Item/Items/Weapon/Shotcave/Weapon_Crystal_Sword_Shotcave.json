@@ -6,7 +6,7 @@
   "Categories": [
     "Items.Weapons"
   ],
-  "Icon": "Icons/ItemsGenerated/Weapon_Sword_Iron.png",
+  "Icon": "Icons/ItemsGenerated/Crystal_sword.png",
   "Model": "Items/Weapons/Shotcave/Crystal_Sword/Crystal_Power_Sword.blockymodel",
   "Texture": "Items/Weapons/Shotcave/Crystal_Sword/Crystal_Power_Sword_Blue.png",
   "PlayerAnimationsId": "Sword",
