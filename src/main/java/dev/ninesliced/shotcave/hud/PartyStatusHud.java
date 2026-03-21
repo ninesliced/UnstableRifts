@@ -189,7 +189,8 @@ public final class PartyStatusHud extends CustomUIHud {
                                 maxHealth = Math.max(1f, healthStat.getMax());
                             }
                         }
-                    } catch (Exception ignored) {
+                    } catch (Exception e) {
+                        // Health stat may not be available for all entity types
                     }
 
                     // ── Read first active effect ──
@@ -213,7 +214,8 @@ public final class PartyStatusHud extends CustomUIHud {
                                 effectRemaining = Math.max(0, Math.round(first.getRemainingDuration()));
                             }
                         }
-                    } catch (Exception ignored) {
+                    } catch (Exception e) {
+                        // Effect controller may not be available
                     }
                 }
             }

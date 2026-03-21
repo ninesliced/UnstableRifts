@@ -8,7 +8,7 @@ import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.EntityEventSystem;
 import com.hypixel.hytale.server.core.entity.UUIDComponent;
 import com.hypixel.hytale.server.core.event.events.ecs.SwitchActiveSlotEvent;
-import com.hypixel.hytale.server.core.inventory.Inventory;
+import com.hypixel.hytale.server.core.inventory.InventoryComponent;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 
 import javax.annotation.Nonnull;
@@ -30,14 +30,13 @@ public final class SlotSwitchBlockSystem extends EntityEventSystem<EntityStore, 
         return Query.any();
     }
 
-    @SuppressWarnings("removal")
     @Override
     public void handle(int index,
                        @Nonnull ArchetypeChunk<EntityStore> chunk,
                        @Nonnull Store<EntityStore> store,
                        @Nonnull CommandBuffer<EntityStore> commandBuffer,
                        @Nonnull SwitchActiveSlotEvent event) {
-        if (event.getInventorySectionId() != Inventory.HOTBAR_SECTION_ID) return;
+        if (event.getInventorySectionId() != InventoryComponent.HOTBAR_SECTION_ID) return;
         if (event.getNewSlot() < InventoryLockService.MAX_WEAPON_SLOTS) return;
 
         Ref<EntityStore> ref = chunk.getReferenceTo(index);

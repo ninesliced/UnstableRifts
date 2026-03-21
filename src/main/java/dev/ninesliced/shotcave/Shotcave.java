@@ -13,7 +13,6 @@ import com.hypixel.hytale.server.core.event.events.player.PlayerDisconnectEvent;
 import com.hypixel.hytale.server.core.event.events.player.PlayerReadyEvent;
 import com.hypixel.hytale.server.core.event.events.player.RemovedPlayerFromWorldEvent;
 import com.hypixel.hytale.server.core.entity.entities.Player;
-import com.hypixel.hytale.server.core.modules.interaction.interaction.config.Interaction;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.server.OpenCustomUIInteraction;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
@@ -26,7 +25,6 @@ import dev.ninesliced.shotcave.command.ShotcaveCommand;
 import dev.ninesliced.shotcave.crate.CrateBreakDropSystem;
 import dev.ninesliced.shotcave.dungeon.DungeonConfig;
 import dev.ninesliced.shotcave.dungeon.DungeonInstanceService;
-import dev.ninesliced.shotcave.dungeon.GameManager;
 import dev.ninesliced.shotcave.dungeon.GameManager;
 import dev.ninesliced.shotcave.inventory.InventoryLockService;
 import dev.ninesliced.shotcave.inventory.DropBlockSystem;
@@ -78,8 +76,6 @@ import dev.ninesliced.shotcave.systems.RollComponent;
 import dev.ninesliced.shotcave.systems.RollPlayerAddedSystem;
 import dev.ninesliced.shotcave.systems.RollSystem;
 import com.hypixel.hytale.component.ComponentType;
-import com.hypixel.hytale.server.core.entity.UUIDComponent;
-import com.hypixel.hytale.server.core.inventory.Inventory;
 import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
@@ -151,11 +147,13 @@ public class Shotcave extends JavaPlugin {
 
         try {
             this.getEntityStoreRegistry().registerEntityEventType(SwitchActiveSlotEvent.class);
-        } catch (IllegalArgumentException ignored) {
+        } catch (IllegalArgumentException e) {
+            // Already registered by another plugin
         }
         try {
             this.getEntityStoreRegistry().registerEntityEventType(BreakBlockEvent.class);
-        } catch (IllegalArgumentException ignored) {
+        } catch (IllegalArgumentException e) {
+            // Already registered by another plugin
         }
 
         this.getEntityStoreRegistry().registerSystem(new ActiveSlotHudUpdateSystem());
@@ -176,7 +174,8 @@ public class Shotcave extends JavaPlugin {
                 new DashRollSystem(this.cameraService, dashComponentType));
         this.getEntityStoreRegistry().registerSystem(
                 new DashTrailSystem(dashComponentType, transformComponentType, playerRefComponentType));
-// Death system — register component, then the systems that use it.
+
+        // Death system — register component, then the systems that use it.
         ComponentType<EntityStore, DeathComponent> deathComponentType =
                 this.getEntityStoreRegistry().registerComponent(DeathComponent.class, DeathComponent::new);
         DeathComponent.setComponentType(deathComponentType);
@@ -228,7 +227,8 @@ public class Shotcave extends JavaPlugin {
 
         try {
             this.getEntityStoreRegistry().registerEntityEventType(DropItemEvent.PlayerRequest.class);
-        } catch (IllegalArgumentException ignored) {
+        } catch (IllegalArgumentException e) {
+            // Already registered by another plugin
         }
 
         this.getEventRegistry().register(PlayerConnectEvent.class, this::onPlayerConnect);

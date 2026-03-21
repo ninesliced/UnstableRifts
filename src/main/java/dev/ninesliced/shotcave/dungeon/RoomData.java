@@ -109,7 +109,8 @@ public final class RoomData {
                 if (uuidComponent != null) {
                     refUuid = uuidComponent.getUuid();
                 }
-            } catch (Exception ignored) {
+            } catch (Exception e) {
+                // Ref may have become invalid between check and access
             }
         }
 
@@ -123,7 +124,8 @@ public final class RoomData {
                     if (existingUuidComponent != null && refUuid.equals(existingUuidComponent.getUuid())) {
                         return;
                     }
-                } catch (Exception ignored) {
+                } catch (Exception e) {
+                    // Existing ref may have become invalid during iteration
                 }
             }
         }

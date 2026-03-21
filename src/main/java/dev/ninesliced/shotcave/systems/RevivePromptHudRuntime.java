@@ -1,6 +1,7 @@
 package dev.ninesliced.shotcave.systems;
 
 import com.hypixel.hytale.component.Ref;
+import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.math.vector.Vector3d;
 import com.hypixel.hytale.server.core.HytaleServer;
 import com.hypixel.hytale.server.core.entity.entities.Player;
@@ -10,6 +11,7 @@ import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import dev.ninesliced.shotcave.Shotcave;
+import dev.ninesliced.shotcave.ShotcaveLog;
 import dev.ninesliced.shotcave.dungeon.Game;
 import dev.ninesliced.shotcave.dungeon.GameManager;
 import dev.ninesliced.shotcave.dungeon.GameState;
@@ -22,6 +24,7 @@ import java.util.concurrent.TimeUnit;
 
 public final class RevivePromptHudRuntime {
 
+    private static final HytaleLogger LOGGER = ShotcaveLog.forModule("Revive");
     private static final long POLL_INTERVAL_MS = 150L;
     private static final double REVIVE_RANGE = 2.0;
     private static final double REVIVE_RANGE_SQ = REVIVE_RANGE * REVIVE_RANGE;
@@ -66,7 +69,8 @@ public final class RevivePromptHudRuntime {
             for (PlayerRef playerRef : Universe.get().getPlayers()) {
                 pollSinglePlayer(playerRef);
             }
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            LOGGER.at(java.util.logging.Level.WARNING).withCause(e).log("Revive HUD poll failed");
         }
     }
 
@@ -167,7 +171,8 @@ public final class RevivePromptHudRuntime {
                 } else {
                     RevivePromptHudService.hide(player, playerRef);
                 }
-            } catch (Exception ignored) {
+            } catch (Exception e) {
+                LOGGER.at(java.util.logging.Level.FINE).withCause(e).log("Error polling revive HUD for player");
             }
         });
     }

@@ -11,7 +11,7 @@ import com.hypixel.hytale.protocol.packets.interaction.SyncInteractionChains;
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.entity.ItemUtils;
-import com.hypixel.hytale.server.core.inventory.Inventory;
+import com.hypixel.hytale.server.core.inventory.InventoryComponent;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
 import com.hypixel.hytale.server.core.inventory.transaction.ItemStackTransaction;
@@ -27,6 +27,7 @@ import com.hypixel.hytale.server.core.util.NotificationUtil;
 import javax.annotation.Nonnull;
 
 import dev.ninesliced.shotcave.Shotcave;
+import dev.ninesliced.shotcave.ShotcavePacketIds;
 import dev.ninesliced.shotcave.inventory.InventoryLockService;
 import dev.ninesliced.shotcave.systems.DeathComponent;
 
@@ -36,14 +37,12 @@ import dev.ninesliced.shotcave.systems.DeathComponent;
  */
 public final class FKeyPickupPacketHandler implements PlayerPacketWatcher {
 
-    private static final int SYNC_INTERACTION_CHAINS_PACKET_ID = 290;
-
     public FKeyPickupPacketHandler() {
     }
 
     @Override
     public void accept(@Nonnull PlayerRef playerRef, @Nonnull Packet packet) {
-        if (packet.getId() != SYNC_INTERACTION_CHAINS_PACKET_ID) {
+        if (packet.getId() != ShotcavePacketIds.SYNC_INTERACTION_CHAINS) {
             return;
         }
 
@@ -237,7 +236,6 @@ public final class FKeyPickupPacketHandler implements PlayerPacketWatcher {
      * Locked-inventory pickup: places the weapon in the first empty slot (0-2),
      * or swaps the held weapon if all 3 slots are full (dropping the old one).
      */
-    @SuppressWarnings("removal")
     private static void collectItemLocked(@Nonnull ItemPickupTracker.TrackedItem tracked,
             @Nonnull Player player,
             @Nonnull PlayerRef playerRef,
@@ -247,18 +245,13 @@ public final class FKeyPickupPacketHandler implements PlayerPacketWatcher {
             @Nonnull ItemComponent itemComponent,
             @Nonnull ItemStack newWeapon) {
 
-        Inventory inventory = player.getInventory();
-        if (inventory == null) {
+        InventoryComponent.Hotbar hotbarComp = store.getComponent(playerEntityRef, InventoryComponent.Hotbar.getComponentType());
+        if (hotbarComp == null) {
             ItemPickupTracker.track(tracked);
             return;
         }
 
-        ItemContainer hotbar = inventory.getHotbar();
-        if (hotbar == null) {
-            ItemPickupTracker.track(tracked);
-            return;
-        }
-
+        ItemContainer hotbar = hotbarComp.getInventory();
         short emptySlot = InventoryLockService.findEmptyWeaponSlot(hotbar);
 
         if (emptySlot >= 0) {
@@ -266,7 +259,7 @@ public final class FKeyPickupPacketHandler implements PlayerPacketWatcher {
             hotbar.setItemStackForSlot(emptySlot, newWeapon);
         } else {
             // All 3 weapon slots full — swap with held slot.
-            byte activeSlot = inventory.getActiveHotbarSlot();
+            byte activeSlot = hotbarComp.getActiveSlot();
             if (activeSlot < 0 || activeSlot >= InventoryLockService.MAX_WEAPON_SLOTS) {
                 activeSlot = 0;
             }
@@ -281,13 +274,19 @@ public final class FKeyPickupPacketHandler implements PlayerPacketWatcher {
         }
 
         // Sync inventory to client.
+        InventoryComponent.Storage storageComp = store.getComponent(playerEntityRef, InventoryComponent.Storage.getComponentType());
+        InventoryComponent.Armor armorComp = store.getComponent(playerEntityRef, InventoryComponent.Armor.getComponentType());
+        InventoryComponent.Utility utilityComp = store.getComponent(playerEntityRef, InventoryComponent.Utility.getComponentType());
+        InventoryComponent.Tool toolComp = store.getComponent(playerEntityRef, InventoryComponent.Tool.getComponentType());
+        InventoryComponent.Backpack backpackComp = store.getComponent(playerEntityRef, InventoryComponent.Backpack.getComponentType());
+
         playerRef.getPacketHandler().writeNoCache(new UpdatePlayerInventory(
-                inventory.getStorage() != null ? inventory.getStorage().toPacket() : null,
-                inventory.getArmor() != null ? inventory.getArmor().toPacket() : null,
-                inventory.getHotbar() != null ? inventory.getHotbar().toPacket() : null,
-                inventory.getUtility() != null ? inventory.getUtility().toPacket() : null,
-                inventory.getTools() != null ? inventory.getTools().toPacket() : null,
-                inventory.getBackpack() != null ? inventory.getBackpack().toPacket() : null
+                storageComp != null ? storageComp.getInventory().toPacket() : null,
+                armorComp != null ? armorComp.getInventory().toPacket() : null,
+                hotbar.toPacket(),
+                utilityComp != null ? utilityComp.getInventory().toPacket() : null,
+                toolComp != null ? toolComp.getInventory().toPacket() : null,
+                backpackComp != null ? backpackComp.getInventory().toPacket() : null
         ));
 
         // Remove the picked-up entity from the world.
@@ -317,7 +316,8 @@ public final class FKeyPickupPacketHandler implements PlayerPacketWatcher {
                     Message.raw(text),
                     null,
                     "crate_item_pickup");
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            // Best-effort notification — player still received the item
         }
     }
 }

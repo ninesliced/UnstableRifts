@@ -16,6 +16,7 @@ import com.hypixel.hytale.protocol.packets.interaction.SyncInteractionChains;
 import com.hypixel.hytale.protocol.packets.inventory.UpdatePlayerInventory;
 import com.hypixel.hytale.server.core.io.adapter.PlayerPacketFilter;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
+import dev.ninesliced.shotcave.ShotcavePacketIds;
 import dev.ninesliced.shotcave.guns.WeaponDefinitions;
 
 import javax.annotation.Nonnull;
@@ -52,18 +53,14 @@ import java.util.UUID;
  */
 public final class WeaponTooltipAdapter implements PlayerPacketFilter {
 
-    private static final int UPDATE_INVENTORY_ID = 170;
-    private static final int ENTITY_UPDATES_ID   = 161;
-    private static final int SYNC_CHAINS_ID      = 290;
-
     @Override
     public boolean test(@Nonnull PlayerRef playerRef, @Nonnull Packet packet) {
         int id = packet.getId();
-        if (id == UPDATE_INVENTORY_ID) {
+        if (id == ShotcavePacketIds.UPDATE_INVENTORY) {
             processOutboundInventory(playerRef, (UpdatePlayerInventory) packet);
-        } else if (id == ENTITY_UPDATES_ID) {
+        } else if (id == ShotcavePacketIds.ENTITY_UPDATES) {
             processEntityUpdates(playerRef, (EntityUpdates) packet);
-        } else if (id == SYNC_CHAINS_ID) {
+        } else if (id == ShotcavePacketIds.SYNC_INTERACTION_CHAINS) {
             processInboundChains((SyncInteractionChains) packet);
         }
         return false; // never block packets

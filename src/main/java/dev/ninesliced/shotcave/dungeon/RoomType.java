@@ -17,14 +17,6 @@ public enum RoomType {
     /** Final room of a level — defeat the boss to advance. */
     BOSS,
     /** A wall prefab used to seal exits. */
-    WALL;
-
-    /** @deprecated Use {@link #SPAWN} instead. */
-    @Deprecated
-    public static final RoomType ENTRANCE = SPAWN;
-
-    /** @deprecated Use {@link #CORRIDOR} instead. */
-    @Deprecated
-    public static final RoomType ROOM = CORRIDOR;
+    WALL
 }
 

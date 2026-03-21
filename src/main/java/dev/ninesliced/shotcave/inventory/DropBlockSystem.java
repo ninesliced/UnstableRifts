@@ -8,7 +8,7 @@ import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.EntityEventSystem;
 import com.hypixel.hytale.server.core.entity.UUIDComponent;
 import com.hypixel.hytale.server.core.event.events.ecs.DropItemEvent;
-import com.hypixel.hytale.server.core.inventory.Inventory;
+import com.hypixel.hytale.server.core.inventory.InventoryComponent;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 
 import javax.annotation.Nonnull;
@@ -32,7 +32,6 @@ public final class DropBlockSystem extends EntityEventSystem<EntityStore, DropIt
         return Query.any();
     }
 
-    @SuppressWarnings("removal")
     @Override
     public void handle(int index,
                        @Nonnull ArchetypeChunk<EntityStore> chunk,
@@ -45,7 +44,7 @@ public final class DropBlockSystem extends EntityEventSystem<EntityStore, DropIt
 
         if (lockService.isLocked(uuidComponent.getUuid())) {
             // Allow drops from the 3 weapon hotbar slots.
-            if (event.getInventorySectionId() == Inventory.HOTBAR_SECTION_ID
+            if (event.getInventorySectionId() == InventoryComponent.HOTBAR_SECTION_ID
                     && event.getSlotId() >= 0
                     && event.getSlotId() < InventoryLockService.MAX_WEAPON_SLOTS) {
                 return;

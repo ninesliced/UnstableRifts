@@ -22,10 +22,9 @@ import com.hypixel.hytale.server.core.entity.InteractionManager;
 import com.hypixel.hytale.server.core.entity.UUIDComponent;
 import com.hypixel.hytale.server.core.entity.nameplate.Nameplate;
 import com.hypixel.hytale.server.core.entity.entities.Player;
-import com.hypixel.hytale.server.core.inventory.Inventory;
+import com.hypixel.hytale.server.core.inventory.InventoryComponent;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
-import com.hypixel.hytale.server.core.modules.entity.component.HiddenFromAdventurePlayers;
 import com.hypixel.hytale.server.core.modules.entity.component.Intangible;
 import com.hypixel.hytale.server.core.modules.entity.component.Invulnerable;
 import com.hypixel.hytale.server.core.modules.entity.component.ActiveAnimationComponent;
@@ -61,11 +60,8 @@ import dev.ninesliced.shotcave.party.PartyUiPage;
 import dev.ninesliced.shotcave.systems.DeathComponent;
 import dev.ninesliced.shotcave.systems.DeathMovementController;
 import dev.ninesliced.shotcave.systems.DeathStateController;
-import it.unimi.dsi.fastutil.Pair;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.awt.Color;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -748,21 +744,26 @@ public final class GameManager {
     //  Inventory save / restore
     // ────────────────────────────────────────────────
 
-    @SuppressWarnings("removal")
     private void savePlayerInventory(@Nonnull UUID playerId, @Nonnull Player player) {
-        Inventory inventory = player.getInventory();
-        if (inventory == null) return;
+        Ref<EntityStore> ref = player.getReference();
+        if (ref == null) return;
+        Store<EntityStore> store = ref.getStore();
 
         Path savePath = getSaveFilePath(playerId);
         try {
             Files.createDirectories(savePath.getParent());
 
+            InventoryComponent.Hotbar hotbarComp = store.getComponent(ref, InventoryComponent.Hotbar.getComponentType());
+            InventoryComponent.Storage storageComp = store.getComponent(ref, InventoryComponent.Storage.getComponentType());
+            InventoryComponent.Armor armorComp = store.getComponent(ref, InventoryComponent.Armor.getComponentType());
+            InventoryComponent.Utility utilityComp = store.getComponent(ref, InventoryComponent.Utility.getComponentType());
+
             InventorySaveData saveData = new InventorySaveData();
-            saveData.hotbarItems = serializeContainer(inventory.getHotbar());
-            saveData.storageItems = serializeContainer(inventory.getStorage());
-            saveData.armorItems = serializeContainer(inventory.getArmor());
-            saveData.utilityItems = serializeContainer(inventory.getUtility());
-            saveData.activeHotbarSlot = inventory.getActiveHotbarSlot();
+            saveData.hotbarItems = hotbarComp != null ? serializeContainer(hotbarComp.getInventory()) : null;
+            saveData.storageItems = storageComp != null ? serializeContainer(storageComp.getInventory()) : null;
+            saveData.armorItems = armorComp != null ? serializeContainer(armorComp.getInventory()) : null;
+            saveData.utilityItems = utilityComp != null ? serializeContainer(utilityComp.getInventory()) : null;
+            saveData.activeHotbarSlot = hotbarComp != null ? hotbarComp.getActiveSlot() : 0;
 
             String json = GSON.toJson(saveData);
             Files.writeString(savePath, json, StandardCharsets.UTF_8);
@@ -778,7 +779,6 @@ public final class GameManager {
         }
     }
 
-    @SuppressWarnings("removal")
     private void restorePlayerInventory(@Nonnull UUID playerId, @Nonnull Player player, boolean deleteAfterRestore) {
         Path savePath = getSaveFilePath(playerId);
         if (!Files.exists(savePath)) {
@@ -791,24 +791,28 @@ public final class GameManager {
             InventorySaveData saveData = GSON.fromJson(json, InventorySaveData.class);
             PlayerRef playerRef = Universe.get().getPlayer(playerId);
 
-            Inventory inventory = player.getInventory();
-            if (inventory == null) return;
+            Ref<EntityStore> ref = player.getReference();
+            if (ref == null) return;
+            Store<EntityStore> store = ref.getStore();
 
             clearPlayerInventory(player);
 
-            restoreContainer(inventory.getHotbar(), saveData.hotbarItems);
-            restoreContainer(inventory.getStorage(), saveData.storageItems);
-            restoreContainer(inventory.getArmor(), saveData.armorItems);
-            restoreContainer(inventory.getUtility(), saveData.utilityItems);
+            InventoryComponent.Hotbar hotbarComp = store.getComponent(ref, InventoryComponent.Hotbar.getComponentType());
+            InventoryComponent.Storage storageComp = store.getComponent(ref, InventoryComponent.Storage.getComponentType());
+            InventoryComponent.Armor armorComp = store.getComponent(ref, InventoryComponent.Armor.getComponentType());
+            InventoryComponent.Utility utilityComp = store.getComponent(ref, InventoryComponent.Utility.getComponentType());
 
-            if (saveData.activeHotbarSlot >= 0 && saveData.activeHotbarSlot < inventory.getHotbar().getCapacity()) {
-                Ref<EntityStore> ref = player.getReference();
-                if (ref != null) {
-                    inventory.setActiveHotbarSlot(ref, saveData.activeHotbarSlot, ref.getStore());
-                }
+            if (hotbarComp != null) restoreContainer(hotbarComp.getInventory(), saveData.hotbarItems);
+            if (storageComp != null) restoreContainer(storageComp.getInventory(), saveData.storageItems);
+            if (armorComp != null) restoreContainer(armorComp.getInventory(), saveData.armorItems);
+            if (utilityComp != null) restoreContainer(utilityComp.getInventory(), saveData.utilityItems);
+
+            if (hotbarComp != null && saveData.activeHotbarSlot >= 0
+                    && saveData.activeHotbarSlot < hotbarComp.getInventory().getCapacity()) {
+                hotbarComp.setActiveSlot(saveData.activeHotbarSlot);
             }
 
-            syncInventoryAndSelectedSlots(playerRef, inventory);
+            syncInventoryAndSelectedSlots(playerRef, ref, store);
 
             if (deleteAfterRestore) {
                 Files.deleteIfExists(savePath);
@@ -853,15 +857,20 @@ public final class GameManager {
         }
     }
 
-    @SuppressWarnings("removal")
     private void clearPlayerInventory(@Nonnull Player player) {
-        Inventory inventory = player.getInventory();
-        if (inventory == null) return;
+        Ref<EntityStore> ref = player.getReference();
+        if (ref == null) return;
+        Store<EntityStore> store = ref.getStore();
 
-        clearContainer(inventory.getHotbar());
-        clearContainer(inventory.getStorage());
-        clearContainer(inventory.getArmor());
-        clearContainer(inventory.getUtility());
+        InventoryComponent.Hotbar hotbarComp = store.getComponent(ref, InventoryComponent.Hotbar.getComponentType());
+        InventoryComponent.Storage storageComp = store.getComponent(ref, InventoryComponent.Storage.getComponentType());
+        InventoryComponent.Armor armorComp = store.getComponent(ref, InventoryComponent.Armor.getComponentType());
+        InventoryComponent.Utility utilityComp = store.getComponent(ref, InventoryComponent.Utility.getComponentType());
+
+        if (hotbarComp != null) clearContainer(hotbarComp.getInventory());
+        if (storageComp != null) clearContainer(storageComp.getInventory());
+        if (armorComp != null) clearContainer(armorComp.getInventory());
+        if (utilityComp != null) clearContainer(utilityComp.getInventory());
     }
 
     private void clearContainer(@Nonnull ItemContainer container) {
@@ -1045,18 +1054,21 @@ public final class GameManager {
     //  Equipment
     // ────────────────────────────────────────────────
 
-    @SuppressWarnings("removal")
     private void giveStartEquipment(@Nonnull PlayerRef playerRef, @Nonnull Player player, @Nonnull DungeonConfig config) {
-        Inventory inventory = player.getInventory();
-        if (inventory == null) return;
+        Ref<EntityStore> ref = player.getReference();
+        if (ref == null) return;
+        Store<EntityStore> store = ref.getStore();
+
+        InventoryComponent.Hotbar hotbarComp = store.getComponent(ref, InventoryComponent.Hotbar.getComponentType());
+        if (hotbarComp == null) return;
 
         List<String> equipment = config.getStartEquipment();
-        ItemContainer hotbar = inventory.getHotbar();
-        if (hotbar == null || hotbar.getCapacity() <= 0) {
+        ItemContainer hotbar = hotbarComp.getInventory();
+        if (hotbar.getCapacity() <= 0) {
             return;
         }
 
-        byte preferredSlot = getPreferredHotbarSlot(inventory, hotbar);
+        byte preferredSlot = getPreferredHotbarSlot(hotbarComp);
         boolean placedPrimaryItem = false;
         short nextFallbackSlot = 0;
 
@@ -1089,14 +1101,11 @@ public final class GameManager {
             }
         }
 
-        if (inventory.getActiveHotbarSlot() != preferredSlot) {
-            Ref<EntityStore> ref = player.getReference();
-            if (ref != null) {
-                inventory.setActiveHotbarSlot(ref, preferredSlot, ref.getStore());
-            }
+        if (hotbarComp.getActiveSlot() != preferredSlot) {
+            hotbarComp.setActiveSlot(preferredSlot);
         }
 
-        syncInventoryAndSelectedSlots(playerRef, inventory);
+        syncInventoryAndSelectedSlots(playerRef, ref, store);
     }
 
     @Nullable
@@ -1109,26 +1118,35 @@ public final class GameManager {
         }
     }
 
-    private byte getPreferredHotbarSlot(@Nonnull Inventory inventory, @Nonnull ItemContainer hotbar) {
-        byte activeSlot = inventory.getActiveHotbarSlot();
+    private byte getPreferredHotbarSlot(@Nonnull InventoryComponent.Hotbar hotbarComp) {
+        byte activeSlot = hotbarComp.getActiveSlot();
         if (activeSlot >= 0 && activeSlot < InventoryLockService.MAX_WEAPON_SLOTS) {
             return activeSlot;
         }
         return 0;
     }
 
-    @SuppressWarnings("removal")
-    private void syncInventoryAndSelectedSlots(@Nullable PlayerRef playerRef, @Nonnull Inventory inventory) {
+    private void syncInventoryAndSelectedSlots(@Nullable PlayerRef playerRef,
+                                                  @Nonnull Ref<EntityStore> ref,
+                                                  @Nonnull Store<EntityStore> store) {
         if (playerRef != null && playerRef.isValid()) {
+            InventoryComponent.Storage storageComp = store.getComponent(ref, InventoryComponent.Storage.getComponentType());
+            InventoryComponent.Armor armorComp = store.getComponent(ref, InventoryComponent.Armor.getComponentType());
+            InventoryComponent.Hotbar hotbarComp = store.getComponent(ref, InventoryComponent.Hotbar.getComponentType());
+            InventoryComponent.Utility utilityComp = store.getComponent(ref, InventoryComponent.Utility.getComponentType());
+            InventoryComponent.Tool toolComp = store.getComponent(ref, InventoryComponent.Tool.getComponentType());
+            InventoryComponent.Backpack backpackComp = store.getComponent(ref, InventoryComponent.Backpack.getComponentType());
+
             playerRef.getPacketHandler().writeNoCache(new UpdatePlayerInventory(
-                    inventory.getStorage() != null ? inventory.getStorage().toPacket() : null,
-                    inventory.getArmor() != null ? inventory.getArmor().toPacket() : null,
-                    inventory.getHotbar() != null ? inventory.getHotbar().toPacket() : null,
-                    inventory.getUtility() != null ? inventory.getUtility().toPacket() : null,
-                    inventory.getTools() != null ? inventory.getTools().toPacket() : null,
-                    inventory.getBackpack() != null ? inventory.getBackpack().toPacket() : null
+                    storageComp != null ? storageComp.getInventory().toPacket() : null,
+                    armorComp != null ? armorComp.getInventory().toPacket() : null,
+                    hotbarComp != null ? hotbarComp.getInventory().toPacket() : null,
+                    utilityComp != null ? utilityComp.getInventory().toPacket() : null,
+                    toolComp != null ? toolComp.getInventory().toPacket() : null,
+                    backpackComp != null ? backpackComp.getInventory().toPacket() : null
             ));
-            playerRef.getPacketHandler().writeNoCache(new SetActiveSlot(-1, inventory.getActiveHotbarSlot()));
+            playerRef.getPacketHandler().writeNoCache(new SetActiveSlot(-1,
+                    hotbarComp != null ? hotbarComp.getActiveSlot() : (byte) 0));
         }
     }
 
@@ -1193,7 +1211,8 @@ public final class GameManager {
             for (int dy = 0; dy < 4; dy++) {
                 try {
                     world.setBlock(anchor.x + dx, anchor.y + dy, anchor.z - 1, wallBlock, 0);
-                } catch (Exception ignored) {
+                } catch (Exception e) {
+                    LOGGER.log(java.util.logging.Level.FINE, "Failed to seal block at offset " + dx + "," + dy, e);
                 }
             }
         }
@@ -1211,7 +1230,8 @@ public final class GameManager {
             for (int dy = 0; dy < 4; dy++) {
                 try {
                     world.setBlock(anchor.x + dx, anchor.y + dy, anchor.z - 1, "Empty", 0);
-                } catch (Exception ignored) {
+                } catch (Exception e) {
+                    LOGGER.log(java.util.logging.Level.FINE, "Failed to unseal block at offset " + dx + "," + dy, e);
                 }
             }
         }
@@ -1387,8 +1407,9 @@ public final class GameManager {
     public void clearPlayerInventoryPublic(@Nonnull Player player, @Nonnull PlayerRef playerRef) {
         plugin.getInventoryLockService().unlock(player, playerRef.getUuid());
         clearPlayerInventory(player);
-        if (player.getInventory() != null) {
-            syncInventoryAndSelectedSlots(playerRef, player.getInventory());
+        Ref<EntityStore> ref = player.getReference();
+        if (ref != null) {
+            syncInventoryAndSelectedSlots(playerRef, ref, ref.getStore());
         }
     }
 

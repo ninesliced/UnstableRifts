@@ -16,6 +16,8 @@ import com.hypixel.hytale.server.core.modules.entity.item.ItemComponent;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.core.util.NotificationUtil;
+import com.hypixel.hytale.logger.HytaleLogger;
+import dev.ninesliced.shotcave.ShotcaveLog;
 import dev.ninesliced.shotcave.pickup.ItemPickupConfig;
 import dev.ninesliced.shotcave.pickup.ItemPickupTracker;
 
@@ -29,6 +31,8 @@ import java.util.List;
  * {@link CoinScoreService}.
  */
 public final class CoinCollectionSystem extends EntityTickingSystem<EntityStore> {
+
+    private static final HytaleLogger LOGGER = ShotcaveLog.forModule("Coin");
 
     public CoinCollectionSystem() {
     }
@@ -158,7 +162,8 @@ public final class CoinCollectionSystem extends EntityTickingSystem<EntityStore>
                             + "  (Total: " + newTotal + ")"),
                     null,
                     "coin_collected");
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            LOGGER.at(java.util.logging.Level.FINE).withCause(e).log("Failed to send coin notification");
         }
     }
 }

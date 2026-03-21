@@ -1,12 +1,15 @@
 package dev.ninesliced.shotcave.inventory;
 
+import com.hypixel.hytale.component.Ref;
+import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.server.core.entity.entities.Player;
-import com.hypixel.hytale.server.core.inventory.Inventory;
+import com.hypixel.hytale.server.core.inventory.InventoryComponent;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
 import com.hypixel.hytale.server.core.inventory.container.filter.FilterActionType;
 import com.hypixel.hytale.server.core.inventory.container.filter.FilterType;
 import com.hypixel.hytale.server.core.inventory.container.filter.SlotFilter;
+import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 
 import javax.annotation.Nonnull;
 import java.util.Set;
@@ -28,41 +31,42 @@ public final class InventoryLockService {
      * Locks the player's inventory: only hotbar slots 0-2 remain usable,
      * storage/armor/utility reject all input.
      */
-    @SuppressWarnings("removal")
     public void lock(@Nonnull Player player, @Nonnull UUID playerId) {
-        Inventory inventory = player.getInventory();
-        if (inventory == null) return;
+        Ref<EntityStore> ref = player.getReference();
+        if (ref == null) return;
+        Store<EntityStore> store = ref.getStore();
 
-        ItemContainer hotbar = inventory.getHotbar();
-        if (hotbar != null) {
+        InventoryComponent.Hotbar hotbarComp = store.getComponent(ref, InventoryComponent.Hotbar.getComponentType());
+        if (hotbarComp != null) {
+            ItemContainer hotbar = hotbarComp.getInventory();
             for (short slot = MAX_WEAPON_SLOTS; slot < hotbar.getCapacity(); slot++) {
                 hotbar.setSlotFilter(FilterActionType.ADD, slot, SlotFilter.DENY);
             }
         }
 
-        ItemContainer storage = inventory.getStorage();
-        if (storage != null) {
-            storage.setGlobalFilter(FilterType.ALLOW_OUTPUT_ONLY);
+        InventoryComponent.Storage storageComp = store.getComponent(ref, InventoryComponent.Storage.getComponentType());
+        if (storageComp != null) {
+            storageComp.getInventory().setGlobalFilter(FilterType.ALLOW_OUTPUT_ONLY);
         }
 
-        ItemContainer armor = inventory.getArmor();
-        if (armor != null) {
-            armor.setGlobalFilter(FilterType.ALLOW_OUTPUT_ONLY);
+        InventoryComponent.Armor armorComp = store.getComponent(ref, InventoryComponent.Armor.getComponentType());
+        if (armorComp != null) {
+            armorComp.getInventory().setGlobalFilter(FilterType.ALLOW_OUTPUT_ONLY);
         }
 
-        ItemContainer utility = inventory.getUtility();
-        if (utility != null) {
-            utility.setGlobalFilter(FilterType.ALLOW_OUTPUT_ONLY);
+        InventoryComponent.Utility utilityComp = store.getComponent(ref, InventoryComponent.Utility.getComponentType());
+        if (utilityComp != null) {
+            utilityComp.getInventory().setGlobalFilter(FilterType.ALLOW_OUTPUT_ONLY);
         }
 
-        ItemContainer tools = inventory.getTools();
-        if (tools != null) {
-            tools.setGlobalFilter(FilterType.ALLOW_OUTPUT_ONLY);
+        InventoryComponent.Tool toolComp = store.getComponent(ref, InventoryComponent.Tool.getComponentType());
+        if (toolComp != null) {
+            toolComp.getInventory().setGlobalFilter(FilterType.ALLOW_OUTPUT_ONLY);
         }
 
-        ItemContainer backpack = inventory.getBackpack();
-        if (backpack != null) {
-            backpack.setGlobalFilter(FilterType.ALLOW_OUTPUT_ONLY);
+        InventoryComponent.Backpack backpackComp = store.getComponent(ref, InventoryComponent.Backpack.getComponentType());
+        if (backpackComp != null) {
+            backpackComp.getInventory().setGlobalFilter(FilterType.ALLOW_OUTPUT_ONLY);
         }
 
         lockedPlayers.add(playerId);
@@ -71,43 +75,44 @@ public final class InventoryLockService {
     /**
      * Unlocks the player's inventory, restoring normal filter state.
      */
-    @SuppressWarnings("removal")
     public void unlock(@Nonnull Player player, @Nonnull UUID playerId) {
         lockedPlayers.remove(playerId);
 
-        Inventory inventory = player.getInventory();
-        if (inventory == null) return;
+        Ref<EntityStore> ref = player.getReference();
+        if (ref == null) return;
+        Store<EntityStore> store = ref.getStore();
 
-        ItemContainer hotbar = inventory.getHotbar();
-        if (hotbar != null) {
+        InventoryComponent.Hotbar hotbarComp = store.getComponent(ref, InventoryComponent.Hotbar.getComponentType());
+        if (hotbarComp != null) {
+            ItemContainer hotbar = hotbarComp.getInventory();
             for (short slot = MAX_WEAPON_SLOTS; slot < hotbar.getCapacity(); slot++) {
                 hotbar.setSlotFilter(FilterActionType.ADD, slot, SlotFilter.ALLOW);
             }
         }
 
-        ItemContainer storage = inventory.getStorage();
-        if (storage != null) {
-            storage.setGlobalFilter(FilterType.ALLOW_ALL);
+        InventoryComponent.Storage storageComp = store.getComponent(ref, InventoryComponent.Storage.getComponentType());
+        if (storageComp != null) {
+            storageComp.getInventory().setGlobalFilter(FilterType.ALLOW_ALL);
         }
 
-        ItemContainer armor = inventory.getArmor();
-        if (armor != null) {
-            armor.setGlobalFilter(FilterType.ALLOW_ALL);
+        InventoryComponent.Armor armorComp = store.getComponent(ref, InventoryComponent.Armor.getComponentType());
+        if (armorComp != null) {
+            armorComp.getInventory().setGlobalFilter(FilterType.ALLOW_ALL);
         }
 
-        ItemContainer utility = inventory.getUtility();
-        if (utility != null) {
-            utility.setGlobalFilter(FilterType.ALLOW_ALL);
+        InventoryComponent.Utility utilityComp = store.getComponent(ref, InventoryComponent.Utility.getComponentType());
+        if (utilityComp != null) {
+            utilityComp.getInventory().setGlobalFilter(FilterType.ALLOW_ALL);
         }
 
-        ItemContainer tools = inventory.getTools();
-        if (tools != null) {
-            tools.setGlobalFilter(FilterType.ALLOW_ALL);
+        InventoryComponent.Tool toolComp = store.getComponent(ref, InventoryComponent.Tool.getComponentType());
+        if (toolComp != null) {
+            toolComp.getInventory().setGlobalFilter(FilterType.ALLOW_ALL);
         }
 
-        ItemContainer backpack = inventory.getBackpack();
-        if (backpack != null) {
-            backpack.setGlobalFilter(FilterType.ALLOW_ALL);
+        InventoryComponent.Backpack backpackComp = store.getComponent(ref, InventoryComponent.Backpack.getComponentType());
+        if (backpackComp != null) {
+            backpackComp.getInventory().setGlobalFilter(FilterType.ALLOW_ALL);
         }
     }
 

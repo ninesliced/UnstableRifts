@@ -6,6 +6,7 @@ import com.hypixel.hytale.protocol.packets.interaction.SyncInteractionChain;
 import com.hypixel.hytale.protocol.packets.interaction.SyncInteractionChains;
 import com.hypixel.hytale.server.core.io.adapter.PlayerPacketWatcher;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
+import dev.ninesliced.shotcave.ShotcavePacketIds;
 
 import javax.annotation.Nonnull;
 import java.util.Map;
@@ -14,14 +15,13 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public final class ReviveInteractionPacketHandler implements PlayerPacketWatcher {
 
-    private static final int SYNC_INTERACTION_CHAINS_PACKET_ID = 290;
     private static final long ACTIVE_TIMEOUT_MS = 750L;
 
     private static final Map<UUID, Long> activeReviveInputs = new ConcurrentHashMap<>();
 
     @Override
     public void accept(@Nonnull PlayerRef playerRef, @Nonnull Packet packet) {
-        if (packet.getId() != SYNC_INTERACTION_CHAINS_PACKET_ID) {
+        if (packet.getId() != ShotcavePacketIds.SYNC_INTERACTION_CHAINS) {
             return;
         }
 

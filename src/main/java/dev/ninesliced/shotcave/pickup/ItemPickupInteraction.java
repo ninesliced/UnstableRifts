@@ -10,7 +10,7 @@ import com.hypixel.hytale.protocol.InteractionType;
 import com.hypixel.hytale.server.core.entity.InteractionContext;
 import com.hypixel.hytale.server.core.entity.ItemUtils;
 import com.hypixel.hytale.server.core.entity.entities.Player;
-import com.hypixel.hytale.server.core.inventory.Inventory;
+import com.hypixel.hytale.server.core.inventory.InventoryComponent;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
 import com.hypixel.hytale.server.core.inventory.transaction.ItemStackTransaction;
@@ -60,7 +60,6 @@ public final class ItemPickupInteraction extends SimpleInstantInteraction {
      * then fully or partially removes the item entity.
      * Does NOT call generatePickedUpItem() to avoid infinite re-tracking loops.
      */
-    @SuppressWarnings("removal")
     @Override
     protected final void firstRun(
             @Nonnull InteractionType type,
@@ -122,17 +121,16 @@ public final class ItemPickupInteraction extends SimpleInstantInteraction {
         PlayerRef playerRefComp = commandBuffer.getComponent(ref, PlayerRef.getComponentType());
         if (shotcave != null && playerRefComp != null
                 && shotcave.getInventoryLockService().isLocked(playerRefComp.getUuid())) {
-            Inventory inventory = playerComponent.getInventory();
-            if (inventory == null) return;
+            InventoryComponent.Hotbar hotbarComp = commandBuffer.getComponent(ref, InventoryComponent.Hotbar.getComponentType());
+            if (hotbarComp == null) return;
 
-            ItemContainer hotbar = inventory.getHotbar();
-            if (hotbar == null) return;
+            ItemContainer hotbar = hotbarComp.getInventory();
 
             short emptySlot = InventoryLockService.findEmptyWeaponSlot(hotbar);
             if (emptySlot >= 0) {
                 hotbar.setItemStackForSlot(emptySlot, itemStack);
             } else {
-                byte activeSlot = inventory.getActiveHotbarSlot();
+                byte activeSlot = hotbarComp.getActiveSlot();
                 if (activeSlot < 0 || activeSlot >= InventoryLockService.MAX_WEAPON_SLOTS) {
                     activeSlot = 0;
                 }
@@ -143,13 +141,19 @@ public final class ItemPickupInteraction extends SimpleInstantInteraction {
                 }
             }
 
+            InventoryComponent.Storage storageComp = commandBuffer.getComponent(ref, InventoryComponent.Storage.getComponentType());
+            InventoryComponent.Armor armorComp = commandBuffer.getComponent(ref, InventoryComponent.Armor.getComponentType());
+            InventoryComponent.Utility utilityComp = commandBuffer.getComponent(ref, InventoryComponent.Utility.getComponentType());
+            InventoryComponent.Tool toolComp = commandBuffer.getComponent(ref, InventoryComponent.Tool.getComponentType());
+            InventoryComponent.Backpack backpackComp = commandBuffer.getComponent(ref, InventoryComponent.Backpack.getComponentType());
+
             playerRefComp.getPacketHandler().writeNoCache(new UpdatePlayerInventory(
-                    inventory.getStorage() != null ? inventory.getStorage().toPacket() : null,
-                    inventory.getArmor() != null ? inventory.getArmor().toPacket() : null,
-                    inventory.getHotbar() != null ? inventory.getHotbar().toPacket() : null,
-                    inventory.getUtility() != null ? inventory.getUtility().toPacket() : null,
-                    inventory.getTools() != null ? inventory.getTools().toPacket() : null,
-                    inventory.getBackpack() != null ? inventory.getBackpack().toPacket() : null
+                    storageComp != null ? storageComp.getInventory().toPacket() : null,
+                    armorComp != null ? armorComp.getInventory().toPacket() : null,
+                    hotbar.toPacket(),
+                    utilityComp != null ? utilityComp.getInventory().toPacket() : null,
+                    toolComp != null ? toolComp.getInventory().toPacket() : null,
+                    backpackComp != null ? backpackComp.getInventory().toPacket() : null
             ));
             itemComponent.setRemovedByPlayerPickup(true);
             commandBuffer.removeEntity(targetRef, RemoveReason.REMOVE);

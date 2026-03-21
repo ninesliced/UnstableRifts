@@ -7,7 +7,7 @@ import com.hypixel.hytale.server.core.command.system.CommandContext;
 import com.hypixel.hytale.server.core.command.system.basecommands.AbstractPlayerCommand;
 import com.hypixel.hytale.server.core.command.system.CommandSender;
 import com.hypixel.hytale.server.core.entity.entities.Player;
-import com.hypixel.hytale.server.core.inventory.Inventory;
+import com.hypixel.hytale.server.core.inventory.InventoryComponent;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.permissions.PermissionsModule;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
@@ -52,7 +52,6 @@ public final class GivePartyPortalCommand extends AbstractPlayerCommand {
         return "";
     }
 
-    @SuppressWarnings("removal")
     @Override
     protected void execute(@Nonnull CommandContext context,
                            @Nonnull Store<EntityStore> store,
@@ -70,22 +69,31 @@ public final class GivePartyPortalCommand extends AbstractPlayerCommand {
             return;
         }
 
-        Inventory inventory = player.getInventory();
-        byte activeSlot = inventory.getActiveHotbarSlot();
+        InventoryComponent.Hotbar hotbarComp = store.getComponent(ref, InventoryComponent.Hotbar.getComponentType());
+        if (hotbarComp == null) return;
+
+        byte activeSlot = hotbarComp.getActiveSlot();
         if (activeSlot < 0) {
             activeSlot = 0;
-            inventory.setActiveHotbarSlot(ref, activeSlot, store);
+            hotbarComp.setActiveSlot(activeSlot);
             playerRef.getPacketHandler().writeNoCache(new SetActiveSlot(-1, activeSlot));
         }
 
-        inventory.getHotbar().setItemStackForSlot((short) activeSlot, new ItemStack(PORTAL_ITEM_ID));
+        hotbarComp.getInventory().setItemStackForSlot((short) activeSlot, new ItemStack(PORTAL_ITEM_ID));
+
+        InventoryComponent.Storage storageComp = store.getComponent(ref, InventoryComponent.Storage.getComponentType());
+        InventoryComponent.Armor armorComp = store.getComponent(ref, InventoryComponent.Armor.getComponentType());
+        InventoryComponent.Utility utilityComp = store.getComponent(ref, InventoryComponent.Utility.getComponentType());
+        InventoryComponent.Tool toolComp = store.getComponent(ref, InventoryComponent.Tool.getComponentType());
+        InventoryComponent.Backpack backpackComp = store.getComponent(ref, InventoryComponent.Backpack.getComponentType());
+
         playerRef.getPacketHandler().writeNoCache(new UpdatePlayerInventory(
-                inventory.getStorage() != null ? inventory.getStorage().toPacket() : null,
-                inventory.getArmor() != null ? inventory.getArmor().toPacket() : null,
-                inventory.getHotbar() != null ? inventory.getHotbar().toPacket() : null,
-                inventory.getUtility() != null ? inventory.getUtility().toPacket() : null,
-                inventory.getTools() != null ? inventory.getTools().toPacket() : null,
-                inventory.getBackpack() != null ? inventory.getBackpack().toPacket() : null
+                storageComp != null ? storageComp.getInventory().toPacket() : null,
+                armorComp != null ? armorComp.getInventory().toPacket() : null,
+                hotbarComp.getInventory().toPacket(),
+                utilityComp != null ? utilityComp.getInventory().toPacket() : null,
+                toolComp != null ? toolComp.getInventory().toPacket() : null,
+                backpackComp != null ? backpackComp.getInventory().toPacket() : null
         ));
         context.sendMessage(Message.raw("Placed the Ancient Party Portal in your hand.").color(Color.GREEN));
     }

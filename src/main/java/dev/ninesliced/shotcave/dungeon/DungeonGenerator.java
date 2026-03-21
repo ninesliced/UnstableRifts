@@ -721,7 +721,8 @@ public class DungeonGenerator {
                             activeWorld.setBlock(wx, wy, wz, block.name, 0);
                             occupiedBlocks.add(packPos(wx, wy, wz));
                             placed++;
-                        } catch (Exception ignored) {
+                        } catch (Exception e) {
+                            LOGGER.at(Level.FINE).withCause(e).log("Failed to place wall block at %d,%d,%d", wx, wy, wz);
                         }
                     }
                     LOGGER.at(Level.FINE).log("[Wall] sealed (%d,%d,%d) rot=%d %d blocks",
@@ -732,7 +733,8 @@ public class DungeonGenerator {
         }
         try {
             activeWorld.setBlock(exit.worldX, exit.worldY, exit.worldZ, "Empty", 0);
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            LOGGER.at(Level.FINE).withCause(e).log("Failed to clear exit block at %d,%d,%d", exit.worldX, exit.worldY, exit.worldZ);
         }
     }
 
@@ -877,7 +879,8 @@ public class DungeonGenerator {
                     if (mt == MarkerType.WATER) {
                         placeFluid(world, wx, wy, wz, "Water", (byte) 8);
                     }
-                } catch (Exception ignored) {
+                } catch (Exception e) {
+                    LOGGER.at(Level.FINE).withCause(e).log("Failed to process marker block at %d,%d,%d", wx, wy, wz);
                 }
             }
         }
