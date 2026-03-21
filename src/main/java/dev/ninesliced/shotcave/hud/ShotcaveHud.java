@@ -2,6 +2,8 @@ package dev.ninesliced.shotcave.hud;
 
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.entity.entities.player.hud.CustomUIHud;
+import com.hypixel.hytale.server.core.ui.Anchor;
+import com.hypixel.hytale.server.core.ui.Value;
 import com.hypixel.hytale.server.core.ui.builder.UICommandBuilder;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import dev.ninesliced.shotcave.guns.DamageEffect;
@@ -25,6 +27,7 @@ public final class ShotcaveHud extends CustomUIHud {
     private static final String BAR_NORMAL = "#7aa8d4";
     private static final String BAR_LOW = "#d4534a";
     private static final int BAR_WIDTH = 239;        // 270 - 3 accent - 14*2 padding
+    private static final int BAR_HEIGHT = 5;
 
     private final int ammo;
     private final int baseMaxAmmo;
@@ -119,14 +122,21 @@ public final class ShotcaveHud extends CustomUIHud {
             boolean isLow = ratio <= LOW_AMMO_THRESHOLD && this.ammo > 0;
             boolean isEmpty = this.ammo <= 0;
 
-            int fillRight = BAR_WIDTH - (int) Math.round(ratio * BAR_WIDTH);
-            ui.set("#ShotcaveAmmoBarFill.Anchor.Right", fillRight);
+            int fillWidth = (int) Math.round(ratio * BAR_WIDTH);
+            setAmmoBarWidth(ui, fillWidth);
 
-            if (isEmpty || isLow) {
-                ui.set("#ShotcaveAmmoValue.Style.TextColor", COLOR_LOW);
-                ui.set("#ShotcaveAmmoBarFill.Background", BAR_LOW);
-            }
+            ui.set("#ShotcaveAmmoValue.Style.TextColor", isEmpty || isLow ? COLOR_LOW : COLOR_BRIGHT);
+            ui.set("#ShotcaveAmmoBarFill.Background", isEmpty || isLow ? BAR_LOW : BAR_NORMAL);
         }
+    }
+
+    private static void setAmmoBarWidth(@Nonnull UICommandBuilder ui, int width) {
+        Anchor anchor = new Anchor();
+        anchor.setLeft(Value.of(0));
+        anchor.setTop(Value.of(0));
+        anchor.setWidth(Value.of(Math.max(0, Math.min(BAR_WIDTH, width))));
+        anchor.setHeight(Value.of(BAR_HEIGHT));
+        ui.setObject("#ShotcaveAmmoBarFill.Anchor", anchor);
     }
 
     private void buildSummoningStats(@Nonnull UICommandBuilder ui) {
