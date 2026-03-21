@@ -354,7 +354,7 @@
           "orientation": {"x": 0, "y": 0, "z": 0, "w": 1},
           "shape": {
             "type": "box",
-            "offset": {"x": -14, "y": 35.5, "z": 0},
+            "offset": {"x": -14, "y": 35.51, "z": 0},
             "stretch": {"x": 1, "y": 1, "z": 1},
             "settings": {
               "isPiece": false,
@@ -391,11 +391,11 @@
             {
               "id": "14",
               "name": "Contour--C1",
-              "position": {"x": 14.00321, "y": 7.5, "z": -0.00462},
+              "position": {"x": 14.00321, "y": 7.49, "z": -0.00462},
               "orientation": {"x": 0, "y": 0.38268, "z": 0, "w": 0.92388},
               "shape": {
                 "type": "box",
-                "offset": {"x": -0.01657, "y": -7.5, "z": 13.85024},
+                "offset": {"x": -0.01657, "y": -7.51, "z": 13.85024},
                 "stretch": {"x": 1.0625, "y": 0.99688, "z": 1},
                 "settings": {
                   "isPiece": false,
@@ -433,11 +433,11 @@
             {
               "id": "15",
               "name": "Contour--C2",
-              "position": {"x": 14.00462, "y": 7.5, "z": 0.00321},
+              "position": {"x": 14.00462, "y": 7.49, "z": 0.00321},
               "orientation": {"x": 0, "y": -0.38268, "z": 0, "w": 0.92388},
               "shape": {
                 "type": "box",
-                "offset": {"x": -0.01658, "y": -7.5, "z": 13.85024},
+                "offset": {"x": -0.01658, "y": -7.51, "z": 13.85024},
                 "stretch": {"x": 1.0625, "y": 0.99688, "z": 1},
                 "settings": {
                   "isPiece": false,
@@ -475,11 +475,11 @@
             {
               "id": "16",
               "name": "Contour--C3",
-              "position": {"x": 13.97977, "y": 7.5, "z": -0.01882},
+              "position": {"x": 13.97977, "y": 7.49, "z": -0.01882},
               "orientation": {"x": 0, "y": 0.92388, "z": 0, "w": 0.38268},
               "shape": {
                 "type": "box",
-                "offset": {"x": -0.01657, "y": -7.5, "z": 13.85024},
+                "offset": {"x": -0.01657, "y": -7.51, "z": 13.85024},
                 "stretch": {"x": 1.0625, "y": 0.99688, "z": 1},
                 "settings": {
                   "isPiece": false,
@@ -517,11 +517,11 @@
             {
               "id": "17",
               "name": "Contour--C4",
-              "position": {"x": 13.98118, "y": 7.5, "z": 0.02023},
+              "position": {"x": 13.98118, "y": 7.49, "z": 0.02023},
               "orientation": {"x": 0, "y": -0.92388, "z": 0, "w": 0.38268},
               "shape": {
                 "type": "box",
-                "offset": {"x": -0.01657, "y": -7.5, "z": 13.85024},
+                "offset": {"x": -0.01657, "y": -7.51, "z": 13.85024},
                 "stretch": {"x": 1.0625, "y": 0.99688, "z": 1},
                 "settings": {
                   "isPiece": false,
@@ -559,11 +559,11 @@
             {
               "id": "18",
               "name": "Contour--C5",
-              "position": {"x": 14, "y": 7.5, "z": 0},
+              "position": {"x": 14, "y": 7.49, "z": 0},
               "orientation": {"x": 0, "y": 0, "z": 0, "w": 1},
               "shape": {
                 "type": "box",
-                "offset": {"x": 0, "y": -7.5, "z": 14},
+                "offset": {"x": 0, "y": -7.49, "z": 14},
                 "stretch": {"x": 1, "y": 1, "z": 1},
                 "settings": {
                   "isPiece": false,
@@ -601,11 +601,11 @@
             {
               "id": "19",
               "name": "Contour--C6",
-              "position": {"x": 14, "y": 7.5, "z": 0},
+              "position": {"x": 14, "y": 7.49, "z": 0},
               "orientation": {"x": 0, "y": 0, "z": 0, "w": 1},
               "shape": {
                 "type": "box",
-                "offset": {"x": 0, "y": -7.5, "z": -14},
+                "offset": {"x": 0, "y": -7.49, "z": -14},
                 "stretch": {"x": 1, "y": 1, "z": 1},
                 "settings": {
                   "isPiece": false,
@@ -643,11 +643,11 @@
             {
               "id": "20",
               "name": "Contour--C7",
-              "position": {"x": 14, "y": 7.5, "z": 0},
+              "position": {"x": 14, "y": 7.49, "z": 0},
               "orientation": {"x": 0, "y": 0, "z": 0, "w": 1},
               "shape": {
                 "type": "box",
-                "offset": {"x": 14, "y": -7.5, "z": 0},
+                "offset": {"x": 14, "y": -7.49, "z": 0},
                 "stretch": {"x": 1, "y": 1, "z": 1},
                 "settings": {
                   "isPiece": false,
@@ -685,7 +685,7 @@
             {
               "id": "21",
               "name": "Contour--C8",
-              "position": {"x": 14, "y": -28.5, "z": 0},
+              "position": {"x": 14, "y": -28.51, "z": 0},
               "orientation": {"x": 0, "y": 0, "z": 0, "w": 1},
               "shape": {
                 "type": "box",
@@ -727,7 +727,7 @@
             {
               "id": "22",
               "name": "Contour--C9",
-              "position": {"x": 14.00321, "y": -28.5, "z": -0.00462},
+              "position": {"x": 14.00321, "y": -28.51, "z": -0.00462},
               "orientation": {"x": 0, "y": 0.38268, "z": 0, "w": 0.92388},
               "shape": {
                 "type": "box",
@@ -769,7 +769,7 @@
             {
               "id": "23",
               "name": "Contour--C10",
-              "position": {"x": 14, "y": -28.5, "z": 0},
+              "position": {"x": 14, "y": -28.51, "z": 0},
               "orientation": {"x": 0, "y": 0, "z": 0, "w": 1},
               "shape": {
                 "type": "box",
@@ -811,7 +811,7 @@
             {
               "id": "24",
               "name": "Contour--C11",
-              "position": {"x": 13.97977, "y": -28.5, "z": -0.01882},
+              "position": {"x": 13.97977, "y": -28.51, "z": -0.01882},
               "orientation": {"x": 0, "y": 0.92388, "z": 0, "w": 0.38268},
               "shape": {
                 "type": "box",
@@ -853,7 +853,7 @@
             {
               "id": "25",
               "name": "Contour--C12",
-              "position": {"x": 14, "y": -28.5, "z": 0},
+              "position": {"x": 14, "y": -28.51, "z": 0},
               "orientation": {"x": 0, "y": 0, "z": 0, "w": 1},
               "shape": {
                 "type": "box",
@@ -895,7 +895,7 @@
             {
               "id": "26",
               "name": "Contour--C13",
-              "position": {"x": 13.98118, "y": -28.5, "z": 0.02023},
+              "position": {"x": 13.98118, "y": -28.51, "z": 0.02023},
               "orientation": {"x": 0, "y": -0.92388, "z": 0, "w": 0.38268},
               "shape": {
                 "type": "box",
@@ -937,7 +937,7 @@
             {
               "id": "27",
               "name": "Contour--C14",
-              "position": {"x": 13.8, "y": -28.5, "z": 0},
+              "position": {"x": 13.8, "y": -28.51, "z": 0},
               "orientation": {"x": 0, "y": 0, "z": 0, "w": 1},
               "shape": {
                 "type": "box",
@@ -979,7 +979,7 @@
             {
               "id": "28",
               "name": "Contour--C15",
-              "position": {"x": 14.00462, "y": -28.5, "z": 0.00321},
+              "position": {"x": 14.00462, "y": -28.51, "z": 0.00321},
               "orientation": {"x": 0, "y": -0.38268, "z": 0, "w": 0.92388},
               "shape": {
                 "type": "box",
@@ -1021,7 +1021,7 @@
             {
               "id": "29",
               "name": "Contour--C16",
-              "position": {"x": 13.8, "y": -1.5, "z": 0},
+              "position": {"x": 13.8, "y": -1.51, "z": 0},
               "orientation": {"x": 0, "y": 0, "z": 0, "w": 1},
               "shape": {
                 "type": "box",
@@ -1058,7 +1058,7 @@
             {
               "id": "30",
               "name": "Contour--C17",
-              "position": {"x": 14.00321, "y": -1.5, "z": -0.00462},
+              "position": {"x": 14.00321, "y": -1.51, "z": -0.00462},
               "orientation": {"x": 0, "y": 0.38268, "z": 0, "w": 0.92388},
               "shape": {
                 "type": "box",
@@ -1095,7 +1095,7 @@
             {
               "id": "31",
               "name": "Contour--C18",
-              "position": {"x": 14.00462, "y": -1.5, "z": 0.00321},
+              "position": {"x": 14.00462, "y": -1.51, "z": 0.00321},
               "orientation": {"x": 0, "y": -0.38268, "z": 0, "w": 0.92388},
               "shape": {
                 "type": "box",
@@ -1132,7 +1132,7 @@
             {
               "id": "32",
               "name": "Contour--C19",
-              "position": {"x": 13.97977, "y": -1.5, "z": -0.01882},
+              "position": {"x": 13.97977, "y": -1.51, "z": -0.01882},
               "orientation": {"x": 0, "y": 0.92388, "z": 0, "w": 0.38268},
               "shape": {
                 "type": "box",
@@ -1169,7 +1169,7 @@
             {
               "id": "33",
               "name": "Contour--C20",
-              "position": {"x": 13.98118, "y": -1.5, "z": 0.02023},
+              "position": {"x": 13.98118, "y": -1.51, "z": 0.02023},
               "orientation": {"x": 0, "y": -0.92388, "z": 0, "w": 0.38268},
               "shape": {
                 "type": "box",
@@ -1206,7 +1206,7 @@
             {
               "id": "34",
               "name": "Contour--C21",
-              "position": {"x": 14, "y": -1.5, "z": 0},
+              "position": {"x": 14, "y": -1.51, "z": 0},
               "orientation": {"x": 0, "y": 0, "z": 0, "w": 1},
               "shape": {
                 "type": "box",
@@ -1243,7 +1243,7 @@
             {
               "id": "35",
               "name": "Contour--C22",
-              "position": {"x": 14, "y": -1.5, "z": 0},
+              "position": {"x": 14, "y": -1.51, "z": 0},
               "orientation": {"x": 0, "y": 0, "z": 0, "w": 1},
               "shape": {
                 "type": "box",
@@ -1280,7 +1280,7 @@
             {
               "id": "36",
               "name": "Contour--C23",
-              "position": {"x": 14, "y": -1.5, "z": 0},
+              "position": {"x": 14, "y": -1.51, "z": 0},
               "orientation": {"x": 0, "y": 0, "z": 0, "w": 1},
               "shape": {
                 "type": "box",
@@ -1317,7 +1317,7 @@
             {
               "id": "37",
               "name": "Contour--C24",
-              "position": {"x": 14, "y": -20.5, "z": 0},
+              "position": {"x": 14, "y": -20.51, "z": 0},
               "orientation": {"x": 0, "y": 0, "z": 0, "w": 1},
               "shape": {
                 "type": "box",
@@ -1354,7 +1354,7 @@
             {
               "id": "38",
               "name": "Contour--C25",
-              "position": {"x": 14, "y": -20.5, "z": 0},
+              "position": {"x": 14, "y": -20.51, "z": 0},
               "orientation": {"x": 0, "y": 0, "z": 0, "w": 1},
               "shape": {
                 "type": "box",
@@ -1391,7 +1391,7 @@
             {
               "id": "39",
               "name": "Contour--C26",
-              "position": {"x": 13.98118, "y": -20.5, "z": 0.02023},
+              "position": {"x": 13.98118, "y": -20.51, "z": 0.02023},
               "orientation": {"x": 0, "y": -0.92388, "z": 0, "w": 0.38268},
               "shape": {
                 "type": "box",
@@ -1428,7 +1428,7 @@
             {
               "id": "40",
               "name": "Contour--C27",
-              "position": {"x": 13.97977, "y": -20.5, "z": -0.01882},
+              "position": {"x": 13.97977, "y": -20.51, "z": -0.01882},
               "orientation": {"x": 0, "y": 0.92388, "z": 0, "w": 0.38268},
               "shape": {
                 "type": "box",
@@ -1465,7 +1465,7 @@
             {
               "id": "41",
               "name": "Contour--C28",
-              "position": {"x": 14.00462, "y": -20.5, "z": 0.00321},
+              "position": {"x": 14.00462, "y": -20.51, "z": 0.00321},
               "orientation": {"x": 0, "y": -0.38268, "z": 0, "w": 0.92388},
               "shape": {
                 "type": "box",
@@ -1502,7 +1502,7 @@
             {
               "id": "42",
               "name": "Contour--C29",
-              "position": {"x": 14.00321, "y": -20.5, "z": -0.00462},
+              "position": {"x": 14.00321, "y": -20.51, "z": -0.00462},
               "orientation": {"x": 0, "y": 0.38268, "z": 0, "w": 0.92388},
               "shape": {
                 "type": "box",
@@ -1539,7 +1539,7 @@
             {
               "id": "43",
               "name": "Contour--C30",
-              "position": {"x": 13.8, "y": -20.5, "z": 0},
+              "position": {"x": 13.8, "y": -20.51, "z": 0},
               "orientation": {"x": 0, "y": 0, "z": 0, "w": 1},
               "shape": {
                 "type": "box",
@@ -1576,7 +1576,7 @@
             {
               "id": "44",
               "name": "Contour--C31",
-              "position": {"x": 14, "y": -20.5, "z": 0},
+              "position": {"x": 14, "y": -20.51, "z": 0},
               "orientation": {"x": 0, "y": 0, "z": 0, "w": 1},
               "shape": {
                 "type": "box",
@@ -1983,7 +1983,7 @@
               "orientation": {"x": 0, "y": 0, "z": 0, "w": 1},
               "shape": {
                 "type": "quad",
-                "offset": {"x": -1.5, "y": 0, "z": 0},
+                "offset": {"x": -1.5, "y": 0.2, "z": 0},
                 "stretch": {"x": 0.6875, "y": 1, "z": 0.69375},
                 "settings": {
                   "isPiece": false,
@@ -2011,7 +2011,7 @@
               "orientation": {"x": 0.70711, "y": 0, "z": 0, "w": 0.70711},
               "shape": {
                 "type": "quad",
-                "offset": {"x": -1.5, "y": 0, "z": 0.5},
+                "offset": {"x": -1.5, "y": 0.0165, "z": 0.26038},
                 "stretch": {"x": 0.6875, "y": 1, "z": 0.69375},
                 "settings": {
                   "isPiece": false,
@@ -2039,7 +2039,7 @@
               "orientation": {"x": 0.70711, "y": 0, "z": 0, "w": 0.70711},
               "shape": {
                 "type": "quad",
-                "offset": {"x": -1.5, "y": 0, "z": -1},
+                "offset": {"x": -1.5, "y": 0.02587, "z": -1.20938},
                 "stretch": {"x": 0.6875, "y": 1, "z": 0.69375},
                 "settings": {
                   "isPiece": false,
@@ -2067,7 +2067,7 @@
               "orientation": {"x": 0, "y": 0.70711, "z": 0, "w": 0.70711},
               "shape": {
                 "type": "quad",
-                "offset": {"x": 3, "y": 0.69325, "z": 0.0005},
+                "offset": {"x": 3, "y": 0.89325, "z": 0.0005},
                 "stretch": {"x": 0.6875, "y": 1, "z": 0.69375},
                 "settings": {
                   "isPiece": false,
@@ -2095,7 +2095,7 @@
               "orientation": {"x": 0.5, "y": 0.5, "z": -0.5, "w": 0.5},
               "shape": {
                 "type": "quad",
-                "offset": {"x": 3, "y": 1.04012, "z": 0.69325},
+                "offset": {"x": 3, "y": 1.07325, "z": 0.4505},
                 "stretch": {"x": 0.6875, "y": 1, "z": 0.69375},
                 "settings": {
                   "isPiece": false,
@@ -2123,7 +2123,7 @@
               "orientation": {"x": 0.5, "y": 0.5, "z": -0.5, "w": 0.5},
               "shape": {
                 "type": "quad",
-                "offset": {"x": 3, "y": -1.04012, "z": -0.34738},
+                "offset": {"x": 3, "y": -1.02675, "z": -0.4995},
                 "stretch": {"x": 0.6875, "y": 1, "z": 0.69375},
                 "settings": {
                   "isPiece": false,
@@ -2151,7 +2151,7 @@
               "orientation": {"x": 0, "y": 0.92388, "z": 0, "w": -0.38268},
               "shape": {
                 "type": "quad",
-                "offset": {"x": 0, "y": 0.69325, "z": 0.0005},
+                "offset": {"x": 0, "y": 0.89325, "z": 0.0005},
                 "stretch": {"x": 0.6875, "y": 1, "z": 0.69375},
                 "settings": {
                   "isPiece": false,
@@ -2179,7 +2179,7 @@
               "orientation": {"x": -0.2706, "y": 0.65328, "z": -0.65328, "w": -0.2706},
               "shape": {
                 "type": "quad",
-                "offset": {"x": 0, "y": 1.04012, "z": 0.69325},
+                "offset": {"x": 0, "y": 1.04325, "z": 0.4255},
                 "stretch": {"x": 0.6875, "y": 1, "z": 0.69375},
                 "settings": {
                   "isPiece": false,
@@ -2207,7 +2207,7 @@
               "orientation": {"x": -0.2706, "y": 0.65328, "z": -0.65328, "w": -0.2706},
               "shape": {
                 "type": "quad",
-                "offset": {"x": 0, "y": -1.04013, "z": -0.34738},
+                "offset": {"x": 0, "y": -1.05675, "z": -0.5745},
                 "stretch": {"x": 0.6875, "y": 1, "z": 0.69375},
                 "settings": {
                   "isPiece": false,
@@ -2235,7 +2235,7 @@
               "orientation": {"x": 0.70711, "y": 0, "z": 0, "w": 0.70711},
               "shape": {
                 "type": "quad",
-                "offset": {"x": -3, "y": 0, "z": 0},
+                "offset": {"x": -3, "y": 0.04962, "z": -0.23962},
                 "stretch": {"x": 0.6875, "y": 1, "z": 0.69375},
                 "settings": {
                   "isPiece": false,
@@ -2263,7 +2263,7 @@
               "orientation": {"x": 0.70711, "y": 0, "z": 0, "w": 0.70711},
               "shape": {
                 "type": "quad",
-                "offset": {"x": -3, "y": 0, "z": -1},
+                "offset": {"x": -3, "y": 0.02587, "z": -1.20938},
                 "stretch": {"x": 0.6875, "y": 1, "z": 0.69375},
                 "settings": {
                   "isPiece": false,
@@ -2291,7 +2291,7 @@
               "orientation": {"x": 0, "y": 0, "z": 0, "w": 1},
               "shape": {
                 "type": "quad",
-                "offset": {"x": -3, "y": 0, "z": 0},
+                "offset": {"x": -3, "y": 0.2, "z": 0},
                 "stretch": {"x": 0.6875, "y": 1, "z": 0.69375},
                 "settings": {
                   "isPiece": false,
@@ -2319,7 +2319,7 @@
               "orientation": {"x": 0, "y": -0.70711, "z": 0.70711, "w": 0},
               "shape": {
                 "type": "quad",
-                "offset": {"x": 0, "y": -1.04012, "z": -0.34738},
+                "offset": {"x": 0, "y": -1.00675, "z": -0.4995},
                 "stretch": {"x": 0.6875, "y": 1, "z": 0.69375},
                 "settings": {
                   "isPiece": false,
@@ -2347,7 +2347,7 @@
               "orientation": {"x": 0, "y": 1, "z": 0, "w": 0},
               "shape": {
                 "type": "quad",
-                "offset": {"x": 0, "y": 0.69325, "z": 0.0005},
+                "offset": {"x": 0, "y": 0.89325, "z": 0.0005},
                 "stretch": {"x": 0.6875, "y": 1, "z": 0.69375},
                 "settings": {
                   "isPiece": false,
@@ -2375,7 +2375,7 @@
               "orientation": {"x": 0, "y": -0.70711, "z": 0.70711, "w": 0},
               "shape": {
                 "type": "quad",
-                "offset": {"x": 0, "y": 1.04012, "z": 0.69325},
+                "offset": {"x": 0, "y": 1.07325, "z": 0.4005},
                 "stretch": {"x": 0.6875, "y": 1, "z": 0.69375},
                 "settings": {
                   "isPiece": false,
