@@ -57,6 +57,13 @@ public final class CrateBreakDropSystem extends EntityEventSystem<EntityStore, B
             return;
         }
 
+        // Use the event's captured block type — by the time BreakBlockEvent fires
+        // the block in the world is already air.
+        BlockType blockType = event.getBlockType();
+        if (blockType == null) {
+            return;
+        }
+
         World world;
         try {
             world = store.getExternalData().getWorld();
@@ -68,16 +75,19 @@ public final class CrateBreakDropSystem extends EntityEventSystem<EntityStore, B
             return;
         }
 
-        BlockType blockType = world.getBlockType(targetBlock.x, targetBlock.y, targetBlock.z);
-        if (blockType == null) {
-            return;
-        }
-
         String blockTypeId = blockType.getId();
-        if (blockTypeId == null || !CrateDropGenerator.isCrate(blockTypeId)) {
+        if (blockTypeId == null || !DestructibleBlockConfig.isDestructible(blockTypeId)) {
             return;
         }
 
+        if (DestructibleBlockConfig.isCrate(blockTypeId)) {
+            spawnCrateDrops(blockTypeId, targetBlock, world);
+        }
+    }
+
+    private void spawnCrateDrops(@Nonnull String blockTypeId,
+            @Nonnull Vector3i targetBlock,
+            @Nonnull World world) {
         List<ItemStack> drops = CrateDropGenerator.generateDrops(blockTypeId);
         if (drops.isEmpty()) {
             return;

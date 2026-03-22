@@ -33,6 +33,7 @@
     ]
   },
   "DamageRoot": "Root_Shotcave_Taser_Chain_Damage",
+  "MissRoot": "Root_Shotcave_Projectile_Miss",
   "JumpRange": 5.0,
   "MaxTargets": 5,
   "IncludeInitialTarget": true,

@@ -24,7 +24,8 @@
     "Flags": {},
     "Gathering": {
       "Soft": {
-        "DropList": "Empty"
+        "DropList": "Empty",
+        "WeaponBreakable": true
       }
     },
     "BlockParticleSetId": "Shotcave_Props_Crate",

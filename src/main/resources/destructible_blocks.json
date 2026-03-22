@@ -1,0 +1,12 @@
+{
+  "crates": [
+    "Shotcave_Props_Crate_Level1",
+    "Shotcave_Props_Crate_Level2",
+    "Shotcave_Props_Crate_Level3",
+    "Shotcave_Props_Crate_2x2"
+  ],
+  "barrels": [
+    "Shotcave_Props_Radioactive_Barrel",
+    "Shotcave_Props_Radioactive_Barrel_Rusted"
+  ]
+}

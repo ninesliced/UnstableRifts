@@ -25,6 +25,7 @@ import dev.ninesliced.shotcave.coin.CoinCollectionSystem;
 import dev.ninesliced.shotcave.command.PartyCommand;
 import dev.ninesliced.shotcave.command.ShotcaveCommand;
 import dev.ninesliced.shotcave.crate.CrateBreakDropSystem;
+import dev.ninesliced.shotcave.crate.DestructibleBlockConfig;
 import dev.ninesliced.shotcave.dungeon.DungeonConfig;
 import dev.ninesliced.shotcave.dungeon.DungeonInstanceService;
 import dev.ninesliced.shotcave.dungeon.GameManager;
@@ -62,6 +63,7 @@ import dev.ninesliced.shotcave.systems.DamageEffectComponent;
 import dev.ninesliced.shotcave.systems.DamageEffectTickSystem;
 import dev.ninesliced.shotcave.systems.DamageEffectVisualCleanupSystem;
 import dev.ninesliced.shotcave.systems.SummonedEffectComponent;
+import dev.ninesliced.shotcave.systems.MeleeBlockBreakSystem;
 import dev.ninesliced.shotcave.systems.MeleeDamageEffectSystem;
 import dev.ninesliced.shotcave.systems.SummonedNPCDamageEffectSystem;
 import dev.ninesliced.shotcave.systems.VoidSafetySystem;
@@ -111,6 +113,7 @@ public class Shotcave extends JavaPlugin {
     protected void setup() {
         instance = this;
         this.dungeonConfigPath = DungeonConfig.ensureRuntimeConfig(this.getDataDirectory());
+        DestructibleBlockConfig.load();
 
         this.getCodecRegistry(OpenCustomUIInteraction.PAGE_CODEC)
                 .register("ShotcavePartyPortal", ShotcavePartyPageSupplier.class, ShotcavePartyPageSupplier.CODEC);
@@ -202,8 +205,13 @@ public class Shotcave extends JavaPlugin {
 
         this.getEntityStoreRegistry().registerSystem(new SummonedNPCDamageEffectSystem());
 
+        // Toxic gas zone — barrel explosions spawn a deployable AOE (initialized above)
+
         // Melee weapon effect/modifier system — applies SC_Effect DoT and WEAPON_DAMAGE scaling
         this.getEntityStoreRegistry().registerSystem(new MeleeDamageEffectSystem());
+
+        // Ensure destructible blocks (crates, barrels) break on melee hit
+        this.getEntityStoreRegistry().registerSystem(new MeleeBlockBreakSystem());
 
         // Inventory lock: block drops and slot switches beyond slot 2 when locked
         this.getEntityStoreRegistry().registerSystem(new DropBlockSystem(this.inventoryLockService));

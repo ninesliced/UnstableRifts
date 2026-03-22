@@ -355,10 +355,10 @@ public final class ContinuousBeamInteraction extends ChargingInteraction {
 
         Vector3d direction = getLookDirection(commandBuffer, context.getEntity());
         if (this.aimAssist) {
-            Vector3d assistedDirection = AimAssistHelper.computeAssistedDirection(
+            Vector3d assisted = AimAssistHelper.computeAssistedDirectionNearest(
                     commandBuffer, context, start, direction, (double) effectiveRange);
-            if (assistedDirection != null) {
-                direction = assistedDirection;
+            if (assisted != null) {
+                direction = assisted;
             }
         }
 

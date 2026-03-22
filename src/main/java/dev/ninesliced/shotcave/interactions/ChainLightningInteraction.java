@@ -30,6 +30,7 @@ import com.hypixel.hytale.server.core.modules.interaction.interaction.config.Sim
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.Interaction;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.selector.Selector;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
+import com.hypixel.hytale.protocol.BlockPosition;
 import com.hypixel.hytale.server.core.universe.world.ParticleUtil;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
@@ -132,6 +133,12 @@ public final class ChainLightningInteraction extends SimpleInstantInteraction {
                 (o, p) -> o.aimAssist = p.aimAssist).add();
 
         builder.appendInherited(
+                new KeyedCodec<String>("MissRoot", Codec.STRING),
+                (o, v) -> o.missRoot = v,
+                o -> o.missRoot,
+                (o, p) -> o.missRoot = p.missRoot).add();
+
+        builder.appendInherited(
                 new KeyedCodec<Boolean>("UseAmmo", Codec.BOOLEAN),
                 (o, v) -> o.useAmmo = v,
                 o -> o.useAmmo,
@@ -164,6 +171,8 @@ public final class ChainLightningInteraction extends SimpleInstantInteraction {
     private double beamRightOffset = 0.0;
     private double beamParticleScale = 0.35;
     private int maxDistance = 30;
+    @Nullable
+    private String missRoot = null;
     private boolean aimAssist = false;
     private boolean useAmmo = false;
     private int maxAmmo = 8;
@@ -215,7 +224,7 @@ public final class ChainLightningInteraction extends SimpleInstantInteraction {
         // Compute look direction with optional aim-assist
         Vector3d lookDir = getLookDirection(commandBuffer, context.getEntity());
         if (this.aimAssist) {
-            Vector3d assisted = AimAssistHelper.computeAssistedDirection(
+            Vector3d assisted = AimAssistHelper.computeAssistedDirectionNearest(
                     commandBuffer, context, from, lookDir, (double) effectiveMaxDistance);
             if (assisted != null) {
                 lookDir = assisted;
@@ -226,6 +235,14 @@ public final class ChainLightningInteraction extends SimpleInstantInteraction {
         spawnBeamSegment(from, hit.position, commandBuffer);
 
         if (hit.target == null) {
+            // No entity hit — fork miss interaction so BreakSoftBlockInteraction
+            // can destroy crates/barrels at the block hit position.
+            if (hit.block != null && this.missRoot != null && !this.missRoot.isEmpty()) {
+                RootInteraction miss = RootInteraction.getRootInteractionOrUnknown(this.missRoot);
+                if (miss != null) {
+                    forkMissInteraction(context, miss, hit.block, hit.position);
+                }
+            }
             return;
         }
 
@@ -331,6 +348,21 @@ public final class ChainLightningInteraction extends SimpleInstantInteraction {
         context.fork(new InteractionChainData(), context.getChain().getType(), forkContext, root, false);
     }
 
+    private void forkMissInteraction(@Nonnull InteractionContext context,
+            @Nonnull RootInteraction root,
+            @Nonnull BlockPosition rawBlock,
+            @Nonnull Vector3d hitPosition) {
+        InteractionContext forkContext = context.duplicate();
+        DynamicMetaStore<InteractionContext> metaStore = forkContext.getMetaStore();
+        metaStore.putMetaObject(Interaction.HIT_LOCATION,
+                new Vector4d(hitPosition.x, hitPosition.y, hitPosition.z, 1.0));
+        metaStore.putMetaObject(Interaction.TARGET_BLOCK_RAW, rawBlock);
+        metaStore.putMetaObject(Interaction.TARGET_BLOCK, rawBlock);
+        metaStore.removeMetaObject(Interaction.TARGET_ENTITY);
+
+        context.fork(new InteractionChainData(), context.getChain().getType(), forkContext, root, false);
+    }
+
     @Nullable
     private Vector3d getPosition(@Nonnull CommandBuffer<EntityStore> commandBuffer, @Nonnull Ref<EntityStore> ref) {
         TransformComponent transform = commandBuffer.getComponent(ref, TransformComponent.getComponentType());
@@ -432,15 +464,16 @@ public final class ChainLightningInteraction extends SimpleInstantInteraction {
             Vector3d blockHitPos = new Vector3d((double) block.x + 0.5, (double) block.y + 0.5, (double) block.z + 0.5);
             double blockDistanceSq = from.distanceSquaredTo(blockHitPos);
             if (entityHitRef[0] == null || blockDistanceSq < entityHitDistanceSq[0]) {
-                return new RaycastHit(blockHitPos, null);
+                BlockPosition bp = new BlockPosition(block.x, block.y, block.z);
+                return new RaycastHit(blockHitPos, null, bp);
             }
         }
 
         if (entityHitRef[0] != null && entityHitPos[0] != null) {
-            return new RaycastHit(entityHitPos[0], entityHitRef[0]);
+            return new RaycastHit(entityHitPos[0], entityHitRef[0], null);
         }
 
-        return new RaycastHit(missPosition, null);
+        return new RaycastHit(missPosition, null, null);
     }
 
     @Nonnull
@@ -532,10 +565,13 @@ public final class ChainLightningInteraction extends SimpleInstantInteraction {
         private final Vector3d position;
         @Nullable
         private final Ref<EntityStore> target;
+        @Nullable
+        private final BlockPosition block;
 
-        private RaycastHit(@Nonnull Vector3d position, @Nullable Ref<EntityStore> target) {
+        private RaycastHit(@Nonnull Vector3d position, @Nullable Ref<EntityStore> target, @Nullable BlockPosition block) {
             this.position = position;
             this.target = target;
+            this.block = block;
         }
     }
 }

@@ -341,21 +341,21 @@ public final class GameManager {
             World trackedReturnWorld = game.getReturnWorlds().get(playerId);
             boolean wasInInstance = game.isPlayerInInstance(playerId);
 
-            // Immediately reset death state and remove Invulnerable/Intangible
-            // BEFORE deferring the rest to world.execute(). This prevents
-            // ReviveTickSystem from re-applying them on the next tick.
-            DeathComponent deathComponent = store.getComponent(ref, DeathComponent.getComponentType());
-            if (deathComponent != null) {
-                deathComponent.reset();
-            }
-            DeathStateController.clear(store, ref);
-
             plugin.getCameraService().restoreDefault(playerRef);
 
             store.getExternalData().getWorld().execute(() -> {
                 if (!ref.isValid()) {
                     return;
                 }
+
+                // Reset death state inside world.execute() so we're on the
+                // correct thread for store access. ReviveTickSystem also runs
+                // on this thread, so the reset still happens before the next tick.
+                DeathComponent deathComponent = store.getComponent(ref, DeathComponent.getComponentType());
+                if (deathComponent != null) {
+                    deathComponent.reset();
+                }
+                DeathStateController.clear(store, ref);
 
                 Player player = store.getComponent(ref, Player.getComponentType());
                 if (player == null) {
@@ -798,7 +798,15 @@ public final class GameManager {
         for (Game game : removedGames) {
             LOGGER.warning("Dungeon instance world was removed for party " + game.getPartyId() + ". Ending the run and closing the party.");
             game.setInstanceWorld(null);
-            endGame(game, true);
+            // endGame accesses player stores that may live on a different world
+            // thread. Defer cleanup so it runs without cross-thread store access.
+            try {
+                endGame(game, true);
+            } catch (Exception e) {
+                LOGGER.severe("Failed to end game for party " + game.getPartyId() + " during world removal: " + e.getMessage());
+                // Still clean up the game mapping so it doesn't leak.
+                activeGames.remove(game.getPartyId());
+            }
         }
     }
 

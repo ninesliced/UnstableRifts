@@ -372,7 +372,7 @@ public final class ModularGunShootInteraction extends SimpleInteraction {
         Vector3d assistedBaseDir = null;
         if (this.aimAssist) {
             Vector3d rawLook = getShotDirection(commandBuffer, context.getEntity());
-            assistedBaseDir = AimAssistHelper.computeAssistedDirection(
+            assistedBaseDir = AimAssistHelper.computeAssistedDirectionNearest(
                     commandBuffer, context, start, rawLook, (double) effectiveRange);
         }
 
