@@ -9,6 +9,9 @@ import com.hypixel.hytale.component.system.tick.EntityTickingSystem;
 import com.hypixel.hytale.server.core.modules.entitystats.EntityStatMap;
 import com.hypixel.hytale.server.core.modules.entitystats.EntityStatValue;
 import com.hypixel.hytale.server.core.modules.entitystats.asset.DefaultEntityStatTypes;
+import com.hypixel.hytale.server.core.inventory.InventoryComponent;
+import com.hypixel.hytale.server.core.inventory.ItemStack;
+import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 
 import javax.annotation.Nonnull;
@@ -33,6 +36,8 @@ public final class ArmorChargeSystem extends EntityTickingSystem<EntityStore> {
                      @Nonnull CommandBuffer<EntityStore> commandBuffer) {
         ArmorChargeComponent charge = archetypeChunk.getComponent(index, ArmorChargeComponent.getComponentType());
         if (charge == null) return;
+        Ref<EntityStore> ref = archetypeChunk.getReferenceTo(index);
+        boolean hasCompleteSetAbility = hasCompleteSetAbility(ref, store);
 
         // Tick active buff expiration
         if (charge.hasActiveBuff()) {
@@ -54,7 +59,6 @@ public final class ArmorChargeSystem extends EntityTickingSystem<EntityStore> {
             }
 
             if (charge.tickBuff()) {
-                Ref<EntityStore> ref = archetypeChunk.getReferenceTo(index);
                 ArmorAbilityBuffSystem.expireBuff(ref, commandBuffer, activeAbility);
                 charge.clearBuff();
             }
@@ -70,9 +74,50 @@ public final class ArmorChargeSystem extends EntityTickingSystem<EntityStore> {
         if (statMap != null) {
             int sigEnergyIdx = DefaultEntityStatTypes.getSignatureEnergy();
             if (sigEnergyIdx >= 0) {
-                float progress = charge.getChargeProgress() * 100.0f;
+                float progress = (charge.hasActiveBuff() || hasCompleteSetAbility)
+                        ? charge.getChargeProgress() * 100.0f
+                        : 0.0f;
                 statMap.setStatValue(sigEnergyIdx, progress);
             }
         }
+    }
+
+    private static boolean hasCompleteSetAbility(@Nonnull Ref<EntityStore> ref,
+                                                 @Nonnull Store<EntityStore> store) {
+        InventoryComponent.Armor armorComponent = store.getComponent(ref, InventoryComponent.Armor.getComponentType());
+        if (armorComponent == null) {
+            return false;
+        }
+
+        ItemContainer armorInventory = armorComponent.getInventory();
+        String setId = null;
+        int count = 0;
+        for (int slot = 0; slot < 4; slot++) {
+            ItemStack stack = armorInventory.getItemStack((short) slot);
+            if (ItemStack.isEmpty(stack)) {
+                continue;
+            }
+
+            String currentSetId = ArmorItemMetadata.getSetId(stack);
+            if (currentSetId == null) {
+                return false;
+            }
+            if (setId == null) {
+                setId = currentSetId;
+            } else if (!setId.equals(currentSetId)) {
+                return false;
+            }
+            count++;
+        }
+
+        if (setId == null || count < 4) {
+            return false;
+        }
+
+        return ArmorDefinitions.getBySetId(setId).stream()
+                .findFirst()
+                .map(ArmorDefinition::getSetAbility)
+                .filter(ability -> ability != ArmorSetAbility.NONE)
+                .isPresent();
     }
 }

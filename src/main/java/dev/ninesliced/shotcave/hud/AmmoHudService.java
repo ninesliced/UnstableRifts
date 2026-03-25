@@ -16,6 +16,7 @@ import dev.ninesliced.shotcave.armor.ArmorItemMetadata;
 import dev.ninesliced.shotcave.armor.ArmorModifier;
 import dev.ninesliced.shotcave.armor.ArmorSetAbility;
 import dev.ninesliced.shotcave.armor.ArmorSetTracker;
+import dev.ninesliced.shotcave.armor.ArmorStatResolver;
 import dev.ninesliced.shotcave.guns.DamageEffect;
 import dev.ninesliced.shotcave.guns.GunItemMetadata;
 import dev.ninesliced.shotcave.guns.WeaponCategory;
@@ -64,6 +65,7 @@ public final class AmmoHudService {
         if (heldItem != null) {
             String itemId = heldItem.getItemId();
             WeaponDefinition definition = itemId != null ? WeaponDefinitions.getById(itemId) : null;
+            double armorAmmoCapacityBonus = getEquippedArmorAmmoCapacityBonus(ref);
 
             WeaponCategory category = definition != null ? definition.getCategory() : null;
             boolean isMelee = category == WeaponCategory.MELEE;
@@ -74,7 +76,7 @@ public final class AmmoHudService {
 
             if (baseMaxAmmo > 0 || isMelee) {
                 isWeapon = true;
-                int maxAmmo = isMelee ? 0 : GunItemMetadata.getEffectiveMaxAmmo(heldItem, baseMaxAmmo);
+                int maxAmmo = isMelee ? 0 : GunItemMetadata.getEffectiveMaxAmmo(heldItem, baseMaxAmmo, armorAmmoCapacityBonus);
                 int ammo = isMelee ? 0 : GunItemMetadata.getInt(heldItem, GunItemMetadata.AMMO_KEY, maxAmmo);
                 ammo = Math.max(0, Math.min(ammo, maxAmmo));
 
@@ -223,16 +225,18 @@ public final class AmmoHudService {
         // Read charge state
         float chargeProgress = 0f;
         boolean abilityActive = false;
+        int chargeProgressPct = 0;
         ArmorChargeComponent charge = ref.getStore().getComponent(ref, ArmorChargeComponent.getComponentType());
         if (charge != null) {
             chargeProgress = charge.getChargeProgress();
             abilityActive = charge.hasActiveBuff();
+            chargeProgressPct = charge.isReady() ? 100 : (int) (chargeProgress * 100.0f);
         }
 
         // State hash — includes crouching so expanded/compact triggers update
         long state = computeArmorState(bestSetId, bestSetCount, bestRarity.ordinal(),
                 allModifiers.hashCode(), crouching ? 1 : 0,
-                Math.round(chargeProgress * 100), abilityActive ? 1 : 0);
+                chargeProgressPct, abilityActive ? 1 : 0);
 
         UUID uuid = playerRef.getUuid();
         Long previous = LAST_ARMOR_STATE.get(uuid);
@@ -300,6 +304,19 @@ public final class AmmoHudService {
         h = 31L * h + modifiersHash;
         h = 31L * h + (crouching ? 1 : 0);
         return h;
+    }
+
+    private static double getEquippedArmorAmmoCapacityBonus(@Nullable Ref<EntityStore> ref) {
+        if (ref == null || !ref.isValid()) {
+            return 0.0;
+        }
+
+        InventoryComponent.Armor armorComponent = ref.getStore().getComponent(ref, InventoryComponent.Armor.getComponentType());
+        if (armorComponent == null) {
+            return 0.0;
+        }
+
+        return ArmorStatResolver.getTotalAmmoCapacityBonus(armorComponent.getInventory());
     }
 
     @Nullable

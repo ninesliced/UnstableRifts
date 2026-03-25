@@ -198,7 +198,7 @@ public final class ChainLightningInteraction extends SimpleInstantInteraction {
 
             double targetBonus = GunItemMetadata.getModifierBonus(heldItem, WeaponModifierType.ADDITIONAL_BULLETS);
             effectiveMaxTargets = this.maxTargets + (int) targetBonus;
-            effectiveMaxAmmo = GunItemMetadata.getEffectiveMaxAmmo(heldItem, this.maxAmmo);
+            effectiveMaxAmmo = GunItemMetadata.getEffectiveMaxAmmo(context, heldItem, this.maxAmmo);
         }
 
         if (this.useAmmo) {

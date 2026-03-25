@@ -78,7 +78,7 @@ public final class ReloadInteraction extends SimpleInstantInteraction {
         }
 
         int baseMaxAmmo = (this.maxAmmo > 0) ? this.maxAmmo : GunItemMetadata.getBaseMaxAmmo(heldItem, 30);
-        int effectiveMaxAmmo = GunItemMetadata.getEffectiveMaxAmmo(heldItem, baseMaxAmmo);
+        int effectiveMaxAmmo = GunItemMetadata.getEffectiveMaxAmmo(context, heldItem, baseMaxAmmo);
 
         ItemStack updated = GunItemMetadata.ensureAmmo(heldItem, baseMaxAmmo, effectiveMaxAmmo);
         int ammo = GunItemMetadata.getInt(updated, GunItemMetadata.AMMO_KEY, effectiveMaxAmmo);

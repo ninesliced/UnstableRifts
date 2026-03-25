@@ -1,6 +1,7 @@
 package dev.ninesliced.shotcave.armor;
 
 import com.hypixel.hytale.server.core.inventory.ItemStack;
+import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
 
 import javax.annotation.Nonnull;
 import java.util.List;
@@ -39,6 +40,21 @@ public final class ArmorStatResolver {
             total += ArmorItemMetadata.getModifierBonus(stack, type);
         }
         return total;
+    }
+
+    public static double getTotalModifierBonus(@Nonnull ItemContainer armorInventory,
+                                               @Nonnull ArmorModifierType type) {
+        double total = 0;
+        for (int slot = 0; slot < armorInventory.getCapacity(); slot++) {
+            ItemStack stack = armorInventory.getItemStack((short) slot);
+            if (ItemStack.isEmpty(stack)) continue;
+            total += ArmorItemMetadata.getModifierBonus(stack, type);
+        }
+        return total;
+    }
+
+    public static double getTotalAmmoCapacityBonus(@Nonnull ItemContainer armorInventory) {
+        return getTotalModifierBonus(armorInventory, ArmorModifierType.AMMO_CAPACITY);
     }
 
     /**

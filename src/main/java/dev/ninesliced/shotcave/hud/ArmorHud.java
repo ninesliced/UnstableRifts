@@ -110,17 +110,19 @@ public final class ArmorHud extends CustomUIHud {
                 ui.set("#ArmorAbilityStatus.Style.TextColor", "#d4534a");
                 ui.set("#ArmorAbilityBarFill.Background", "#d4534a");
                 setBarFill(ui, 1.0f);
-            } else if (chargeProgress >= 1.0f) {
-                ui.set("#ArmorAbilityStatus.TextSpans", Message.raw("READY! [A]"));
-                ui.set("#ArmorAbilityStatus.Style.TextColor", "#3e9049");
-                ui.set("#ArmorAbilityBarFill.Background", "#3e9049");
-                setBarFill(ui, 1.0f);
             } else if (bestSetCount >= setTotalPieces) {
-                int pct = (int) (chargeProgress * 100);
-                ui.set("#ArmorAbilityStatus.TextSpans", Message.raw(pct + "%"));
-                ui.set("#ArmorAbilityStatus.Style.TextColor", "#7aa8d4");
-                ui.set("#ArmorAbilityBarFill.Background", "#7aa8d4");
-                setBarFill(ui, chargeProgress);
+                if (chargeProgress >= 1.0f) {
+                    ui.set("#ArmorAbilityStatus.TextSpans", Message.raw("READY! [F]"));
+                    ui.set("#ArmorAbilityStatus.Style.TextColor", "#3e9049");
+                    ui.set("#ArmorAbilityBarFill.Background", "#3e9049");
+                    setBarFill(ui, 1.0f);
+                } else {
+                    int pct = (int) (chargeProgress * 100);
+                    ui.set("#ArmorAbilityStatus.TextSpans", Message.raw(pct + "%"));
+                    ui.set("#ArmorAbilityStatus.Style.TextColor", "#7aa8d4");
+                    ui.set("#ArmorAbilityBarFill.Background", "#7aa8d4");
+                    setBarFill(ui, chargeProgress);
+                }
             } else {
                 ui.set("#ArmorAbilityStatus.TextSpans", Message.raw(bestSetCount + "/" + setTotalPieces));
                 ui.set("#ArmorAbilityStatus.Style.TextColor", "#8a9bb0");
