@@ -1,0 +1,52 @@
+{
+  "TranslationProperties": {
+    "Name": "server.items.Ruined_Kweebec_SmallChest.name"
+  },
+  "Icon": "Icons/ItemsGenerated/Ruined_Kweebec_SmallChest.png",
+  "Categories": [
+    "Furniture.Containers"
+  ],
+  "BlockType": {
+    "Material": "Solid",
+    "DrawType": "Model",
+    "Opacity": "Transparent",
+    "Group": "Props",
+    "CustomModel": "Blocks/kweebec_furniture/Ruined_Kweebec_SmallChest.blockymodel",
+    "CustomModelTexture": [
+      {
+        "Texture": "Blocks/kweebec_furniture/Ruined_Kweebec_SmallChest_Texture.png",
+        "Weight": 1
+      }
+    ],
+    "CustomModelScale": 1,
+    "HitboxType": "Ruined_Kweebec_SmallChest",
+    "VariantRotation": "NESW",
+    "Flags": {},
+    "Gathering": {
+      "Soft": {
+        "DropList": "Empty",
+        "WeaponBreakable": true
+      }
+    },
+    "BlockParticleSetId": "Stone",
+    "ParticleColor": "#6f5a40",
+    "BlockSoundSetId": "Stone",
+    "Support": {
+      "Down": [
+        {
+          "FaceType": "Full"
+        }
+      ]
+    }
+  },
+  "PlayerAnimationsId": "Block",
+  "Tags": {
+    "Type": [
+      "Furniture"
+    ],
+    "Family": [
+      "Kweebec_Furniture"
+    ]
+  },
+  "MaxStack": 1
+}
