@@ -135,7 +135,7 @@ public final class ItemPickupInteraction extends SimpleInstantInteraction {
                 ItemContainer armorInv = armorComp.getInventory();
                 short targetSlot = (short) armorDef.getSlotType().getSlotIndex();
                 ItemStack oldArmor = armorInv.getItemStack(targetSlot);
-                armorInv.setItemStackForSlot(targetSlot, itemStack);
+                armorInv.setItemStackForSlot(targetSlot, itemStack, false);
 
                 if (!ItemStack.isEmpty(oldArmor)) {
                     ItemUtils.dropItem(ref, oldArmor, commandBuffer);
