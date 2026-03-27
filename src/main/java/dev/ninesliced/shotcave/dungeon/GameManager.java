@@ -50,6 +50,7 @@ import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.NPCPlugin;
+import dev.ninesliced.shotcave.OnlinePlayers;
 import dev.ninesliced.shotcave.PlayerEventNotifier;
 import dev.ninesliced.shotcave.Shotcave;
 import dev.ninesliced.shotcave.armor.ArmorChargeComponent;
@@ -111,6 +112,11 @@ public final class GameManager {
      * Prevents repeated inventory restores if multiple world/ready/tick hooks fire.
      */
     private final Set<UUID> outsideDungeonNormalizedPlayers = ConcurrentHashMap.newKeySet();
+    /**
+     * Players reconnecting with a saved inventory whose recovery must wait
+     * until PlayerReady so the engine does not overwrite restored containers.
+     */
+    private final Set<UUID> pendingReadyRecoveryPlayers = ConcurrentHashMap.newKeySet();
 
     public GameManager(@Nonnull Shotcave plugin) {
         this.plugin = plugin;
@@ -492,7 +498,12 @@ public final class GameManager {
                 plugin.getInventoryLockService().unlock(player, playerId);
                 if (wasInInstance) {
                     restorePlayerInventory(playerId, player, true);
+                } else if (shouldPreserveSavedInventoryDuringCleanup(playerId, player, game)) {
+                    LOGGER.info("Preserving saved inventory for disconnected player " + playerId
+                            + " during endGame cleanup.");
                 } else {
+                    LOGGER.info("Deleting saved inventory for player " + playerId
+                            + " during endGame cleanup.");
                     deleteSavedInventory(playerId);
                 }
 
@@ -598,7 +609,12 @@ public final class GameManager {
                         plugin.getInventoryLockService().unlock(player, playerId);
                         if (wasInInstance) {
                             restorePlayerInventory(playerId, player, true);
+                        } else if (shouldPreserveSavedInventoryDuringCleanup(playerId, player, game)) {
+                            LOGGER.info("Preserving saved inventory for disconnected player " + playerId
+                                    + " during party-leave cleanup.");
                         } else {
+                            LOGGER.info("Deleting saved inventory for player " + playerId
+                                    + " during party-leave cleanup.");
                             deleteSavedInventory(playerId);
                         }
                         resetPlayerStatus(player, ref, store);
@@ -632,6 +648,7 @@ public final class GameManager {
      */
     public void onPlayerDisconnect(@Nonnull PlayerRef playerRef) {
         UUID playerId = playerRef.getUuid();
+        pendingReadyRecoveryPlayers.remove(playerId);
         plugin.getCameraService().restoreDefault(playerRef);
         plugin.getInventoryLockService().remove(playerId);
         despawnReviveMarker(playerId);
@@ -722,38 +739,27 @@ public final class GameManager {
      */
     public void onPlayerConnect(@Nonnull PlayerRef playerRef) {
         UUID playerId = playerRef.getUuid();
-        Path savePath = getSaveFilePath(playerId);
+        boolean hasFileSnapshot = hasSavedInventoryFile(playerId);
 
-        if (Files.exists(savePath)) {
-            LOGGER.info("Found saved inventory for " + playerRef.getUsername() + ", scheduling restore...");
-            Game activeGame = findGameForPlayer(playerId);
-
-            Ref<EntityStore> ref = playerRef.getReference();
-            if (ref != null && ref.isValid()) {
-                Store<EntityStore> store = ref.getStore();
-                store.getExternalData().getWorld().execute(() -> {
-                    if (!ref.isValid()) return;
-                    Player player = store.getComponent(ref, Player.getComponentType());
-                    if (player != null) {
-                        restorePlayerInventory(playerId, player, activeGame == null);
-                        if (activeGame != null) {
-                            activeGame.setPlayerInInstance(playerId, false);
-                        }
-                        PlayerEventNotifier.showEventTitle(
-                                playerRef,
-                                "Inventory Restored",
-                                "Recovered from a previous dungeon run.",
-                                true
-                        );
-                    }
-                });
-            }
+        if (hasFileSnapshot) {
+            pendingReadyRecoveryPlayers.add(playerId);
+            LOGGER.info("Found saved inventory for " + playerRef.getUsername()
+                    + "; recovery will run once the player is fully loaded."
+                    + " fileSnapshot=" + hasFileSnapshot);
+        } else {
+            pendingReadyRecoveryPlayers.remove(playerId);
         }
+    }
+
+    public void releasePendingRecovery(@Nonnull UUID playerId) {
+        pendingReadyRecoveryPlayers.remove(playerId);
     }
 
     public void onPlayerAddedToWorld(@Nonnull PlayerRef playerRef, @Nonnull Player player, @Nonnull World world) {
         UUID playerId = playerRef.getUuid();
         Game game = findGameForPlayer(playerId);
+        boolean hasSavedInventoryFile = hasSavedInventoryFile(playerId);
+        boolean hasSavedInventory = hasSavedInventoryFile;
         boolean inActiveDungeonWorld = game != null
                 && game.getState() != GameState.COMPLETE
                 && world == game.getInstanceWorld();
@@ -762,7 +768,8 @@ public final class GameManager {
                 + " gameState=" + (game != null ? game.getState() : null)
                 + " inActiveDungeonWorld=" + inActiveDungeonWorld
                 + " isPlayerInInstance=" + (game != null && game.isPlayerInInstance(playerId))
-                + " hasSavedInventory=" + hasSavedInventory(playerId));
+                + " hasSavedInventory=" + hasSavedInventory
+                + " fileSnapshot=" + hasSavedInventoryFile);
 
         if (!inActiveDungeonWorld) {
             normalizeOutsideDungeonState(playerRef, player, game);
@@ -771,7 +778,7 @@ public final class GameManager {
 
         outsideDungeonNormalizedPlayers.remove(playerId);
 
-        if (game.isPlayerInInstance(playerId) || !hasSavedInventory(playerId)) {
+        if (game.isPlayerInInstance(playerId) || !hasSavedInventory) {
             return;
         }
 
@@ -872,6 +879,11 @@ public final class GameManager {
 
         if (!shouldNormalize) {
             outsideDungeonNormalizedPlayers.remove(playerId);
+            return false;
+        }
+
+        if (pendingReadyRecoveryPlayers.contains(playerId)) {
+            LOGGER.info("Deferring outside-dungeon normalization until PlayerReady for " + playerId);
             return false;
         }
 
@@ -1031,7 +1043,7 @@ public final class GameManager {
         if (ref == null) return;
         Store<EntityStore> store = ref.getStore();
 
-        Path savePath = getSaveFilePath(playerId);
+        Path savePath = getPrimarySaveFilePath(playerId);
         try {
             Files.createDirectories(savePath.getParent());
 
@@ -1055,27 +1067,25 @@ public final class GameManager {
                 game.getSavedInventoryPaths().put(playerId, savePath.toString());
             }
 
-            LOGGER.info("Saved inventory for player " + playerId + " to " + savePath);
+            LOGGER.info("Saved inventory for player " + playerId + " to " + savePath.toAbsolutePath());
         } catch (IOException e) {
             LOGGER.log(java.util.logging.Level.SEVERE, "CRITICAL: Failed to save inventory for " + playerId, e);
         }
     }
 
     private void restorePlayerInventory(@Nonnull UUID playerId, @Nonnull Player player, boolean deleteAfterRestore) {
-        Path savePath = getSaveFilePath(playerId);
-        if (!Files.exists(savePath)) {
-            LOGGER.warning("No saved inventory found for " + playerId);
-            return;
-        }
-
         try {
-            String json = Files.readString(savePath, StandardCharsets.UTF_8);
-            InventorySaveData saveData = GSON.fromJson(json, InventorySaveData.class);
-            PlayerRef playerRef = Universe.get().getPlayer(playerId);
-
             Ref<EntityStore> ref = player.getReference();
             if (ref == null) return;
             Store<EntityStore> store = ref.getStore();
+            PlayerRef playerRef = Universe.get().getPlayer(playerId);
+            LoadedInventorySave loadedSave = loadInventorySave(playerId, ref, store);
+            if (loadedSave == null || loadedSave.data == null) {
+                LOGGER.warning("No saved inventory found for " + playerId
+                        + " fileSnapshot=" + hasSavedInventoryFile(playerId));
+                return;
+            }
+            InventorySaveData saveData = loadedSave.data;
 
             plugin.getInventoryLockService().unlock(player, playerId);
 
@@ -1099,10 +1109,11 @@ public final class GameManager {
             syncInventoryAndSelectedSlots(playerRef, ref, store);
 
             if (deleteAfterRestore) {
-                Files.deleteIfExists(savePath);
+                deleteSavedInventoryFiles(playerId);
             }
 
-            LOGGER.info("Restored inventory for player " + playerId);
+            LOGGER.info("Restored inventory for player " + playerId + " from " + loadedSave.source
+                    + " deleteAfterRestore=" + deleteAfterRestore);
         } catch (Exception e) {
             LOGGER.log(java.util.logging.Level.SEVERE, "Failed to restore inventory for " + playerId, e);
         }
@@ -1132,15 +1143,26 @@ public final class GameManager {
     }
 
     private boolean hasSavedInventory(@Nonnull UUID playerId) {
-        return Files.exists(getSaveFilePath(playerId));
+        return hasSavedInventoryFile(playerId);
     }
 
     private void deleteSavedInventory(@Nonnull UUID playerId) {
-        try {
-            Files.deleteIfExists(getSaveFilePath(playerId));
-        } catch (IOException e) {
-            LOGGER.log(java.util.logging.Level.WARNING, "Failed to delete saved inventory for " + playerId, e);
+        deleteSavedInventoryFiles(playerId);
+    }
+
+    private boolean shouldPreserveSavedInventoryDuringCleanup(@Nonnull UUID playerId,
+                                                              @Nonnull Player player,
+                                                              @Nullable Game game) {
+        if (!hasSavedInventory(playerId)) {
+            return false;
         }
+
+        if (player.wasRemoved()) {
+            return true;
+        }
+
+        World currentWorld = player.getWorld();
+        return currentWorld == null || (game != null && currentWorld == game.getInstanceWorld());
     }
 
     private void clearPlayerInventory(@Nonnull Player player) {
@@ -1163,6 +1185,22 @@ public final class GameManager {
         for (short i = 0; i < container.getCapacity(); i++) {
             container.removeItemStackFromSlot(i);
         }
+    }
+
+    @Nullable
+    private LoadedInventorySave loadInventorySave(@Nonnull UUID playerId,
+                                                  @Nonnull Ref<EntityStore> ref,
+                                                  @Nonnull Store<EntityStore> store) throws IOException {
+        if (ref == null || store == null) {
+            return null;
+        }
+        Path savePath = findExistingSaveFilePath(playerId);
+        if (Files.exists(savePath)) {
+            String json = Files.readString(savePath, StandardCharsets.UTF_8);
+            return new LoadedInventorySave("file:" + savePath, GSON.fromJson(json, InventorySaveData.class));
+        }
+
+        return null;
     }
 
     @Nonnull
@@ -1703,8 +1741,87 @@ public final class GameManager {
     // ────────────────────────────────────────────────
 
     @Nonnull
-    private Path getSaveFilePath(@Nonnull UUID playerId) {
-        return plugin.getDataDirectory().resolve("saves").resolve(playerId.toString() + ".json");
+    private Path getPrimarySaveFilePath(@Nonnull UUID playerId) {
+        return plugin.getDataDirectory()
+                .toAbsolutePath()
+                .normalize()
+                .resolve("saves")
+                .resolve(playerId.toString() + ".json");
+    }
+
+    @Nonnull
+    private Path getUniverseSaveFilePath(@Nonnull UUID playerId) {
+        Universe universe = Universe.get();
+        Path root = universe != null
+                ? universe.getPath().toAbsolutePath().normalize().resolve("Shotcave")
+                : plugin.getDataDirectory().toAbsolutePath().normalize();
+        return root.resolve("saves").resolve(playerId.toString() + ".json");
+    }
+
+    @Nonnull
+    private Path getHomeSaveFilePath(@Nonnull UUID playerId) {
+        String userHome = System.getProperty("user.home");
+        if (userHome == null || userHome.isBlank()) {
+            return getPrimarySaveFilePath(playerId);
+        }
+
+        return Path.of(userHome)
+                .resolve(".shotcave")
+                .resolve("saves")
+                .resolve(playerId.toString() + ".json");
+    }
+
+    private boolean hasSavedInventoryFile(@Nonnull UUID playerId) {
+        Path primary = getPrimarySaveFilePath(playerId);
+        if (Files.exists(primary)) {
+            return true;
+        }
+
+        Path universe = getUniverseSaveFilePath(playerId);
+        if (!universe.equals(primary) && Files.exists(universe)) {
+            return true;
+        }
+
+        Path home = getHomeSaveFilePath(playerId);
+        return !home.equals(primary) && Files.exists(home);
+    }
+
+    @Nonnull
+    private Path findExistingSaveFilePath(@Nonnull UUID playerId) {
+        Path primary = getPrimarySaveFilePath(playerId);
+        if (Files.exists(primary)) {
+            return primary;
+        }
+
+        Path universe = getUniverseSaveFilePath(playerId);
+        if (!universe.equals(primary) && Files.exists(universe)) {
+            return universe;
+        }
+
+        Path home = getHomeSaveFilePath(playerId);
+        if (!home.equals(primary) && Files.exists(home)) {
+            return home;
+        }
+
+        return primary;
+    }
+
+    private void deleteSavedInventoryFiles(@Nonnull UUID playerId) {
+        Path primary = getPrimarySaveFilePath(playerId);
+        Path universe = getUniverseSaveFilePath(playerId);
+        Path home = getHomeSaveFilePath(playerId);
+
+        try {
+            Files.deleteIfExists(primary);
+            if (!universe.equals(primary)) {
+                Files.deleteIfExists(universe);
+            }
+            if (!home.equals(primary)) {
+                Files.deleteIfExists(home);
+            }
+        } catch (IOException e) {
+            LOGGER.log(java.util.logging.Level.WARNING, "Failed to delete saved inventory for " + playerId, e);
+        }
     }
 
     @Nullable
@@ -1804,6 +1921,56 @@ public final class GameManager {
      * Shutdown: clean up all active games, restore inventories.
      */
     public void shutdown() {
+        for (PlayerRef playerRef : OnlinePlayers.snapshot()) {
+            if (playerRef == null || !playerRef.isValid()) {
+                continue;
+            }
+
+            UUID playerId = playerRef.getUuid();
+            Game game = findGameForPlayer(playerId);
+            Ref<EntityStore> ref = playerRef.getReference();
+            if (ref == null || !ref.isValid()) {
+                continue;
+            }
+
+            Store<EntityStore> store = ref.getStore();
+            store.getExternalData().getWorld().execute(() -> {
+                if (!ref.isValid()) {
+                    return;
+                }
+
+                Player player = store.getComponent(ref, Player.getComponentType());
+                if (player == null) {
+                    return;
+                }
+
+                boolean hasSavedInventory = hasSavedInventory(playerId);
+                boolean inventoryLocked = plugin.getInventoryLockService().isLocked(playerId);
+                DeathComponent deathComponent = store.getComponent(ref, DeathComponent.getComponentType());
+                boolean customDead = deathComponent != null && deathComponent.isDead();
+
+                if (game == null && !hasSavedInventory && !inventoryLocked && !customDead) {
+                    return;
+                }
+
+                despawnReviveMarker(playerId);
+                plugin.getCameraService().restoreDefault(playerRef);
+                hideDungeonHuds(player, playerRef);
+                plugin.getInventoryLockService().unlock(player, playerId);
+
+                if (hasSavedInventory) {
+                    restorePlayerInventory(playerId, player, false);
+                }
+
+                resetPlayerStatus(player, ref, store);
+
+                if (game != null) {
+                    game.removeDeadPlayer(playerId);
+                    game.setPlayerInInstance(playerId, false);
+                }
+            });
+        }
+
         for (Game game : new ArrayList<>(activeGames.values())) {
             if (game.getState() != GameState.COMPLETE) {
                 LOGGER.info("Shutting down active game for party " + game.getPartyId());
@@ -1813,6 +1980,8 @@ public final class GameManager {
         activeGames.clear();
         playerToParty.clear();
         reviveMarkers.clear();
+        outsideDungeonNormalizedPlayers.clear();
+        pendingReadyRecoveryPlayers.clear();
     }
 
     // ────────────────────────────────────────────────
@@ -2040,5 +2209,15 @@ public final class GameManager {
         double maxDurability;
         boolean overrideDroppedItemAnimation;
         String metadataJson;
+    }
+
+    private static final class LoadedInventorySave {
+        final String source;
+        final InventorySaveData data;
+
+        private LoadedInventorySave(@Nonnull String source, @Nonnull InventorySaveData data) {
+            this.source = source;
+            this.data = data;
+        }
     }
 }

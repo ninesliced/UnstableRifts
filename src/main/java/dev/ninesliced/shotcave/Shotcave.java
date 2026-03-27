@@ -326,6 +326,7 @@ public class Shotcave extends JavaPlugin {
         }
 
         this.cameraService.handlePlayerReady(ref);
+        this.gameManager.releasePendingRecovery(playerRef.getUuid());
 
         World world = player.getWorld();
         if (world == null) {

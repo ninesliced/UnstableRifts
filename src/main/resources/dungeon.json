@@ -24,21 +24,21 @@
       },
       "main": {
         "maxRooms": 6,
-        "challengeRooms": { "min": 1, "max": 2 },
+        "challengeRooms": { "min": 2, "max": 2 },
         "minimumCorridorLength": 1,
-        "mobsToSpawn":     { "min": 250, "max": 300 },
+        "mobsToSpawn":     { "min": 500, "max": 500 },
         "treasureRooms":   { "min": 0, "max": 0 },
         "shopRooms":       { "min": 1, "max": 1 }
       },
       "branch": {
-        "splitterCount": { "min": 1, "max": 2 },
+        "splitterCount": { "min": 1, "max": 1 },
         "spawnProbability": {
           "1": 0.5
         },
         "maxRooms": 3,
-        "challengeRooms": { "min": 0, "max": 1 },
+        "challengeRooms": { "min": 1, "max": 1 },
         "minimumCorridorLength": 1,
-        "mobsToSpawn":     { "min": 100, "max": 200 }
+        "mobsToSpawn":     { "min": 250, "max": 250 }
       },
       "mobs": {
         "Industrial_Nosuit": 3,
@@ -53,8 +53,7 @@
         "Kweebec_DeadWood_Seedling": 4,
         "Kweebec_Seedling": 3
       },
-      "nextLevel": null,
-      "moneyPerKill": 5
+      "nextLevel": null
     }
   ]
 }
