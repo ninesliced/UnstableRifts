@@ -6,6 +6,8 @@
       "weaponChance": 0.10,
       "coinMin": 1,
       "coinMax": 3,
+      "ammoChance": 0.10,
+      "healChance": 0.08,
       "weaponWhitelist": [
         "Weapon_Pistol_Shotcave",
         "Weapon_Crystal_Sword_Shotcave",
@@ -38,6 +40,8 @@
       "weaponChance": 0.20,
       "coinMin": 2,
       "coinMax": 5,
+      "ammoChance": 0.14,
+      "healChance": 0.12,
       "weaponWhitelist": [
         "Weapon_Pistol_Shotcave",
         "Weapon_Crystal_Sword_Shotcave",
@@ -84,6 +88,8 @@
       "weaponChance": 0.35,
       "coinMin": 3,
       "coinMax": 7,
+      "ammoChance": 0.20,
+      "healChance": 0.16,
       "weaponWhitelist": [
         "Weapon_Pistol_Shotcave",
         "Weapon_Crystal_Sword_Shotcave",
@@ -140,6 +146,8 @@
       "weaponChance": 0.10,
       "coinMin": 1,
       "coinMax": 3,
+      "ammoChance": 0.10,
+      "healChance": 0.08,
       "weaponWhitelist": [
         "Weapon_Pistol_Shotcave",
         "Weapon_Crystal_Sword_Shotcave",
@@ -172,6 +180,8 @@
       "weaponChance": 0.25,
       "coinMin": 3,
       "coinMax": 7,
+      "ammoChance": 0.16,
+      "healChance": 0.14,
       "weaponWhitelist": [
         "Weapon_Pistol_Shotcave",
         "Weapon_Crystal_Sword_Shotcave",

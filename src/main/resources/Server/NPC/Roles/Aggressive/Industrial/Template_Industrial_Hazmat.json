@@ -51,7 +51,7 @@
 			"Description": "Absolute max distance from spawn"
 		},
 		"DropList": {
-			"Value": "Drop_Zombie_Aberrant_Big",
+			"Value": "Drop_Shotcave_Industrial_Combat",
 			"Description": "Drop items"
 		},
 		"MaxSpeed": {

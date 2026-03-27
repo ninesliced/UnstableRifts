@@ -16,6 +16,8 @@ import java.util.concurrent.ThreadLocalRandom;
 public final class CrateDropGenerator {
 
     private static final String COIN_ITEM_ID = "Shotcave_Props_Coin";
+    private static final String AMMO_ITEM_ID = "Shotcave_Ammo_Item";
+    private static final String HEAL_ITEM_ID = "Shotcave_Heal_Item";
 
     private CrateDropGenerator() {}
 
@@ -26,7 +28,8 @@ public final class CrateDropGenerator {
 
     /**
      * Generates drops for a crate block type based on its config entry.
-     * Returns coins (always) and optionally a rolled weapon and/or armor piece.
+    * Returns coins (always) and optionally ammo/heal pickups, plus a rolled
+    * weapon and/or armor piece.
      */
     @Nonnull
     public static List<ItemStack> generateDrops(@Nonnull String blockTypeId) {
@@ -39,6 +42,14 @@ public final class CrateDropGenerator {
         int coinQuantity = rng.nextInt(entry.getCoinMin(), entry.getCoinMax() + 1);
         if (coinQuantity > 0) {
             drops.add(new ItemStack(COIN_ITEM_ID, coinQuantity));
+        }
+
+        if (rng.nextDouble() < entry.getAmmoChance()) {
+            drops.add(new ItemStack(AMMO_ITEM_ID, 1));
+        }
+
+        if (rng.nextDouble() < entry.getHealChance()) {
+            drops.add(new ItemStack(HEAL_ITEM_ID, 1));
         }
 
         if (rng.nextDouble() < entry.getWeaponChance()) {

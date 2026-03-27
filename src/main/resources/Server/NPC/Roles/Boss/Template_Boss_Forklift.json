@@ -197,7 +197,7 @@
       "Description": "Groups not to take damage from."
     },
     "DropList": {
-      "Value": "Drop_Zombie_Aberrant_Big",
+      "Value": "Drop_Shotcave_Forklift_Boss",
       "Description": "Drop Items."
     },
     "UseCombatActionEvaluator": {

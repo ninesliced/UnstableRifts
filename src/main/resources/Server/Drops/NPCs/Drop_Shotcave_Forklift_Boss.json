@@ -1,0 +1,57 @@
+{
+  "Container": {
+    "Type": "Multiple",
+    "Containers": [
+      {
+        "Type": "Choice",
+        "Containers": [
+          {
+            "Type": "Single",
+            "Weight": 100,
+            "Item": {
+              "ItemId": "Shotcave_Props_Coin",
+              "QuantityMin": 8,
+              "QuantityMax": 14
+            }
+          }
+        ]
+      },
+      {
+        "Type": "Choice",
+        "Containers": [
+          {
+            "Type": "Single",
+            "Weight": 70,
+            "Item": {
+              "ItemId": "Shotcave_Ammo_Item",
+              "QuantityMin": 1,
+              "QuantityMax": 1
+            }
+          },
+          {
+            "Type": "Empty",
+            "Weight": 30
+          }
+        ]
+      },
+      {
+        "Type": "Choice",
+        "Containers": [
+          {
+            "Type": "Single",
+            "Weight": 55,
+            "Item": {
+              "ItemId": "Shotcave_Heal_Item",
+              "QuantityMin": 1,
+              "QuantityMax": 1
+            }
+          },
+          {
+            "Type": "Empty",
+            "Weight": 45
+          }
+        ]
+      }
+    ]
+  }
+}

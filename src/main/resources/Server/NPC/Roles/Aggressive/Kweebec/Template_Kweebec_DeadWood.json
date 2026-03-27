@@ -51,7 +51,7 @@
       "Description": "Absolute max distance from spawn"
     },
     "DropList": {
-      "Value": "Drop_Kweebec_Sapling",
+      "Value": "Drop_Shotcave_DeadWood_Combat",
       "Description": "Drop items"
     },
     "MaxSpeed": {

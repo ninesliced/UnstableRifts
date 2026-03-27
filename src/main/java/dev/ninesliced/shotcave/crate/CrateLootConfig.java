@@ -64,6 +64,8 @@ public final class CrateLootConfig {
         @SerializedName("weaponChance") private double weaponChance;
         @SerializedName("coinMin") private int coinMin;
         @SerializedName("coinMax") private int coinMax;
+        @SerializedName("ammoChance") private double ammoChance;
+        @SerializedName("healChance") private double healChance;
         @SerializedName("weaponWhitelist") private List<String> weaponWhitelist;
         @SerializedName("armorChance") private double armorChance;
         @SerializedName("armorMinRarity") private String armorMinRarity;
@@ -81,6 +83,8 @@ public final class CrateLootConfig {
         public double getWeaponChance() { return weaponChance; }
         public int getCoinMin() { return coinMin; }
         public int getCoinMax() { return coinMax; }
+        public double getAmmoChance() { return ammoChance; }
+        public double getHealChance() { return healChance; }
 
         @Nonnull public List<String> getWeaponWhitelist() {
             return weaponWhitelist != null ? weaponWhitelist : List.of();
