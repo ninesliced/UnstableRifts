@@ -20,6 +20,7 @@ import dev.ninesliced.shotcave.guns.WeaponDefinition;
 import dev.ninesliced.shotcave.guns.WeaponDefinitions;
 import dev.ninesliced.shotcave.guns.WeaponModifierType;
 import dev.ninesliced.shotcave.guns.WeaponRarity;
+import dev.ninesliced.shotcave.armor.ArmorAbilityBuffSystem;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -78,15 +79,19 @@ public final class MeleeDamageEffectSystem extends DamageEventSystem {
         // Don't apply effects to self
         if (targetRef.equals(sourceRef)) return;
 
-        // ── Scale damage by WEAPON_DAMAGE modifier ──
+        // ── Scale damage by WEAPON_DAMAGE modifier + Berserker buff ──
         double dmgBonus = GunItemMetadata.getModifierBonus(heldItem, WeaponModifierType.WEAPON_DAMAGE);
-        if (dmgBonus > 0.001) {
-            damage.setAmount(damage.getAmount() * (float) (1.0 + dmgBonus));
+        float berserkerMul = ArmorAbilityBuffSystem.getDamageMultiplier(sourceRef);
+        float totalMul = (float) (1.0 + dmgBonus) * berserkerMul;
+        if (totalMul != 1.0f) {
+            damage.setAmount(damage.getAmount() * totalMul);
         }
 
         // ── Apply DoT effect with rarity-scaled duration ──
+        // Skip DoT if target has Purification buff active
         DamageEffect effect = GunItemMetadata.getEffect(heldItem);
-        if (effect != DamageEffect.NONE && effect.hasDoT()) {
+        if (effect != DamageEffect.NONE && effect.hasDoT()
+                && !ArmorAbilityBuffSystem.isPurificationActive(targetRef)) {
             WeaponRarity rarity = GunItemMetadata.getRarity(heldItem);
             DamageEffectRuntime.apply(commandBuffer, targetRef, effect, rarity);
 

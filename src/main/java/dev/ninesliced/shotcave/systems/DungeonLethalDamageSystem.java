@@ -10,12 +10,14 @@ import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.modules.entity.damage.Damage;
 import com.hypixel.hytale.server.core.modules.entity.damage.DamageEventSystem;
 import com.hypixel.hytale.server.core.modules.entity.damage.DamageModule;
+import com.hypixel.hytale.server.core.modules.entity.damage.DamageSystems;
 import com.hypixel.hytale.server.core.modules.entitystats.EntityStatMap;
 import com.hypixel.hytale.server.core.modules.entitystats.EntityStatValue;
 import com.hypixel.hytale.server.core.modules.entitystats.asset.DefaultEntityStatTypes;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import dev.ninesliced.shotcave.Shotcave;
+import dev.ninesliced.shotcave.armor.ArmorAbilityBuffSystem;
 import dev.ninesliced.shotcave.dungeon.Game;
 import dev.ninesliced.shotcave.dungeon.GameManager;
 import dev.ninesliced.shotcave.dungeon.GameState;
@@ -81,15 +83,32 @@ public final class DungeonLethalDamageSystem extends DamageEventSystem {
         EntityStatValue healthStat = healthIdx >= 0 ? statMap.get(healthIdx) : null;
         if (healthStat == null) return;
 
+        Ref<EntityStore> ref = archetypeChunk.getReferenceTo(index);
+        if (!ref.isValid()) return;
+
+        // ── Guardian: 50% incoming damage reduction ──
+        float guardianMul = ArmorAbilityBuffSystem.getGuardianReduction(ref);
+        if (guardianMul < 1.0f) {
+            damage.setAmount(damage.getAmount() * guardianMul);
+        }
+
+        // ── Warden: reflect 25% of damage back to attacker ──
+        float wardenReflect = ArmorAbilityBuffSystem.getWardenReflection(ref);
+        if (wardenReflect > 0.0f && damage.getSource() instanceof Damage.EntitySource entitySource) {
+            Ref<EntityStore> attackerRef = entitySource.getRef();
+            if (attackerRef.isValid()) {
+                float reflectedAmount = damage.getAmount() * wardenReflect;
+                Damage reflectedDamage = new Damage(
+                        new Damage.EntitySource(ref), damage.getDamageCauseIndex(), reflectedAmount);
+                DamageSystems.executeDamage(attackerRef, commandBuffer, reflectedDamage);
+            }
+        }
+
         float pendingDamage = Math.round(damage.getAmount());
         float currentHealth = healthStat.get();
         if ((currentHealth - pendingDamage) > healthStat.getMin()) return;
 
         damage.setCancelled(true);
-
-        Ref<EntityStore> ref = archetypeChunk.getReferenceTo(index);
-        if (!ref.isValid()) return;
-
         PlayerDeathSystem.handleDungeonDeath(commandBuffer, store, ref, playerRef, player, death);
     }
 }

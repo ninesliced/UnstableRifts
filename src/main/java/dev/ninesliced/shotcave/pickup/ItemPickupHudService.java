@@ -3,6 +3,10 @@ package dev.ninesliced.shotcave.pickup;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
+import dev.ninesliced.shotcave.armor.ArmorDefinition;
+import dev.ninesliced.shotcave.armor.ArmorDefinitions;
+import dev.ninesliced.shotcave.armor.ArmorItemMetadata;
+import dev.ninesliced.shotcave.armor.ArmorModifier;
 import dev.ninesliced.shotcave.guns.DamageEffect;
 import dev.ninesliced.shotcave.guns.GunItemMetadata;
 import dev.ninesliced.shotcave.guns.WeaponCategory;
@@ -42,11 +46,14 @@ public final class ItemPickupHudService {
 
         // Read weapon metadata from the ItemStack
         boolean isWeapon = false;
+        boolean isArmor = false;
         WeaponRarity rarity = WeaponRarity.BASIC;
         DamageEffect effect = DamageEffect.NONE;
         WeaponCategory category = WeaponCategory.LASER;
         WeaponDefinition definition = null;
+        ArmorDefinition armorDefinition = null;
         List<WeaponModifier> modifiers = Collections.emptyList();
+        List<ArmorModifier> armorModifiers = Collections.emptyList();
         int baseMaxAmmo = 0;
         int maxAmmo = 0;
 
@@ -54,6 +61,9 @@ public final class ItemPickupHudService {
             String itemId = itemStack.getItemId();
             if (itemId != null) {
                 definition = WeaponDefinitions.getById(itemId);
+                if (definition == null) {
+                    armorDefinition = ArmorDefinitions.getById(itemId);
+                }
             }
             if (definition != null) {
                 isWeapon = true;
@@ -65,15 +75,22 @@ public final class ItemPickupHudService {
                         ? definition.getBaseMaxAmmo()
                         : GunItemMetadata.getBaseMaxAmmo(itemStack, -1);
                 maxAmmo = GunItemMetadata.getEffectiveMaxAmmo(itemStack, baseMaxAmmo);
-                // Use definition's display name if available
                 if (definition.getDisplayName() != null && !definition.getDisplayName().isBlank()) {
                     itemName = definition.getDisplayName();
+                }
+            } else if (armorDefinition != null) {
+                isArmor = true;
+                rarity = ArmorItemMetadata.getRarity(itemStack);
+                armorModifiers = ArmorItemMetadata.getModifiers(itemStack);
+                if (armorDefinition.getDisplayName() != null && !armorDefinition.getDisplayName().isBlank()) {
+                    itemName = armorDefinition.getDisplayName();
                 }
             }
         }
 
         long state = computeState(itemName, itemIconPath, itemQuantity, crouching,
-            rarity.ordinal(), effect.ordinal(), baseMaxAmmo, maxAmmo, modifiers.hashCode());
+            rarity.ordinal(), effect.ordinal(), baseMaxAmmo, maxAmmo,
+            isWeapon ? modifiers.hashCode() : armorModifiers.hashCode());
         UUID uuid = playerRef.getUuid();
 
         Long previous = LAST_STATE.get(uuid);
@@ -83,7 +100,8 @@ public final class ItemPickupHudService {
         LAST_STATE.put(uuid, state);
 
     ItemPickupHud hud = new ItemPickupHud(playerRef, itemName, itemIconPath, itemQuantity,
-        crouching, rarity, effect, category, definition, modifiers, isWeapon, baseMaxAmmo, maxAmmo);
+        crouching, rarity, effect, category, definition, modifiers, isWeapon, baseMaxAmmo, maxAmmo,
+        isArmor, armorDefinition, armorModifiers);
 
         if (!MultiHudCompat.setHud(player, playerRef, HUD_IDENTIFIER, hud)) {
             player.getHudManager().setCustomHud(playerRef, hud);

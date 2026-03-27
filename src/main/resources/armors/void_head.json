@@ -1,0 +1,19 @@
+{
+  "itemId": "Armor_Void_Head_Shotcave",
+  "displayName": "Void Mask",
+  "setId": "void",
+  "slotType": "HEAD",
+  "setAbility": "PURIFICATION",
+  "minRarity": "RARE",
+  "maxRarity": "UNIQUE",
+  "spawnWeight": 10,
+  "baseStats": {
+    "protection": 12,
+    "knockback": 0,
+    "closeDmgReduce": 0,
+    "farDmgReduce": 0.08,
+    "spikeDamage": 0,
+    "lifeBoost": 0,
+    "speedBoost": 0
+  }
+}

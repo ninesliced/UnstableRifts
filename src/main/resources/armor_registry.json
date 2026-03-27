@@ -1,0 +1,28 @@
+{
+  "armors": [
+    "armors/crystal_head.json",
+    "armors/crystal_chest.json",
+    "armors/crystal_legs.json",
+    "armors/crystal_boots.json",
+    "armors/vine_head.json",
+    "armors/vine_chest.json",
+    "armors/vine_legs.json",
+    "armors/vine_boots.json",
+    "armors/shale_head.json",
+    "armors/shale_chest.json",
+    "armors/shale_legs.json",
+    "armors/shale_boots.json",
+    "armors/bone_head.json",
+    "armors/bone_chest.json",
+    "armors/bone_legs.json",
+    "armors/bone_boots.json",
+    "armors/void_head.json",
+    "armors/void_chest.json",
+    "armors/void_legs.json",
+    "armors/void_boots.json",
+    "armors/warden_head.json",
+    "armors/warden_chest.json",
+    "armors/warden_legs.json",
+    "armors/warden_boots.json"
+  ]
+}

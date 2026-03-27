@@ -1,0 +1,19 @@
+{
+  "itemId": "Armor_Bone_Chest_Shotcave",
+  "displayName": "Bone Cuirass",
+  "setId": "bone",
+  "slotType": "CHEST",
+  "setAbility": "SWIFTNESS",
+  "minRarity": "UNCOMMON",
+  "maxRarity": "UNIQUE",
+  "spawnWeight": 12,
+  "baseStats": {
+    "protection": 10,
+    "knockback": 1.2,
+    "closeDmgReduce": 0.06,
+    "farDmgReduce": 0.04,
+    "spikeDamage": 2,
+    "lifeBoost": 15,
+    "speedBoost": 0
+  }
+}

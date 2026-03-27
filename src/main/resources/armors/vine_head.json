@@ -1,0 +1,19 @@
+{
+  "itemId": "Armor_Vine_Head_Shotcave",
+  "displayName": "Vine Crown",
+  "setId": "vine",
+  "slotType": "HEAD",
+  "setAbility": "REGENERATION",
+  "minRarity": "BASIC",
+  "maxRarity": "LEGENDARY",
+  "spawnWeight": 15,
+  "baseStats": {
+    "protection": 8,
+    "knockback": 0,
+    "closeDmgReduce": 0,
+    "farDmgReduce": 0.05,
+    "spikeDamage": 0,
+    "lifeBoost": 0,
+    "speedBoost": 0
+  }
+}

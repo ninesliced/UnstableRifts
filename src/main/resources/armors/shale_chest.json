@@ -1,0 +1,19 @@
+{
+  "itemId": "Armor_Shale_Chest_Shotcave",
+  "displayName": "Shale Chestplate",
+  "setId": "shale",
+  "slotType": "CHEST",
+  "setAbility": "GUARDIAN",
+  "minRarity": "UNCOMMON",
+  "maxRarity": "UNIQUE",
+  "spawnWeight": 12,
+  "baseStats": {
+    "protection": 18,
+    "knockback": 2.0,
+    "closeDmgReduce": 0.10,
+    "farDmgReduce": 0.07,
+    "spikeDamage": 4,
+    "lifeBoost": 30,
+    "speedBoost": 0
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "itemId": "Armor_Void_Legs_Shotcave",
+  "displayName": "Void Gauntlets",
+  "setId": "void",
+  "slotType": "ARMS",
+  "setAbility": "PURIFICATION",
+  "minRarity": "RARE",
+  "maxRarity": "UNIQUE",
+  "spawnWeight": 10,
+  "baseStats": {
+    "protection": 16,
+    "knockback": 1.5,
+    "closeDmgReduce": 0.10,
+    "farDmgReduce": 0.06,
+    "spikeDamage": 4,
+    "lifeBoost": 20,
+    "speedBoost": 0
+  }
+}

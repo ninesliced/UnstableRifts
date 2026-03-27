@@ -1,0 +1,19 @@
+{
+  "itemId": "Armor_Warden_Chest_Shotcave",
+  "displayName": "Warden Chestplate",
+  "setId": "warden",
+  "slotType": "CHEST",
+  "setAbility": "WARDEN",
+  "minRarity": "RARE",
+  "maxRarity": "UNIQUE",
+  "spawnWeight": 10,
+  "baseStats": {
+    "protection": 14,
+    "knockback": 3.0,
+    "closeDmgReduce": 0.06,
+    "farDmgReduce": 0.04,
+    "spikeDamage": 12,
+    "lifeBoost": 20,
+    "speedBoost": 0
+  }
+}

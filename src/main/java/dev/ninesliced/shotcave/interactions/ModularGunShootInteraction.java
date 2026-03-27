@@ -275,7 +275,7 @@ public final class ModularGunShootInteraction extends SimpleInteraction {
                     super.tick0(firstRun, time, type, context, cooldownHandler);
                     return;
                 }
-                int effectiveMaxAmmo = GunItemMetadata.getEffectiveMaxAmmo(heldItem, this.maxAmmo);
+                int effectiveMaxAmmo = GunItemMetadata.getEffectiveMaxAmmo(context, heldItem, this.maxAmmo);
                 ItemStack updated = GunItemMetadata.ensureAmmo(heldItem, this.maxAmmo, effectiveMaxAmmo);
                 int ammo = GunItemMetadata.getInt(updated, GunItemMetadata.AMMO_KEY, effectiveMaxAmmo);
                 if (ammo < this.ammoPerShot) {
@@ -372,7 +372,7 @@ public final class ModularGunShootInteraction extends SimpleInteraction {
         Vector3d assistedBaseDir = null;
         if (this.aimAssist) {
             Vector3d rawLook = getShotDirection(commandBuffer, context.getEntity());
-            assistedBaseDir = AimAssistHelper.computeAssistedDirection(
+            assistedBaseDir = AimAssistHelper.computeAssistedDirectionNearest(
                     commandBuffer, context, start, rawLook, (double) effectiveRange);
         }
 

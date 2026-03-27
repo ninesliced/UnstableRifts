@@ -64,4 +64,3 @@ public final class ReloadInteraction extends SimpleInstantInteraction {
         context.getState().state = InteractionState.Failed;
     }
 }
-

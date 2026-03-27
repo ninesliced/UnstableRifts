@@ -14,7 +14,8 @@
     "RandomRotation": "YawStep1",
     "Gathering": {
       "Soft": {
-        "DropList": "Empty"
+        "DropList": "Empty",
+        "WeaponBreakable": true
       }
     },
     "Flags": {},

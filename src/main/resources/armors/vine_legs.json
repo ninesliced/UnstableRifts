@@ -1,0 +1,19 @@
+{
+  "itemId": "Armor_Vine_Legs_Shotcave",
+  "displayName": "Vine Gauntlets",
+  "setId": "vine",
+  "slotType": "ARMS",
+  "setAbility": "REGENERATION",
+  "minRarity": "BASIC",
+  "maxRarity": "LEGENDARY",
+  "spawnWeight": 15,
+  "baseStats": {
+    "protection": 12,
+    "knockback": 0.8,
+    "closeDmgReduce": 0.05,
+    "farDmgReduce": 0,
+    "spikeDamage": 1,
+    "lifeBoost": 0,
+    "speedBoost": 0
+  }
+}

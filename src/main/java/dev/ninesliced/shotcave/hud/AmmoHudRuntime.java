@@ -83,7 +83,7 @@ public final class AmmoHudRuntime {
             if (player.getInventory() != null) {
                 heldItem = player.getInventory().getItemInHand();
             }
-            AmmoHudService.updateForHeldItem(player, playerRef, heldItem, crouching);
+            AmmoHudService.updateForHeldItem(player, playerRef, heldItem, crouching, ref);
         });
     }
 

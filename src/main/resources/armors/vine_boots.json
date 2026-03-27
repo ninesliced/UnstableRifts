@@ -1,0 +1,19 @@
+{
+  "itemId": "Armor_Vine_Boots_Shotcave",
+  "displayName": "Vine Leggings",
+  "setId": "vine",
+  "slotType": "LEGS",
+  "setAbility": "REGENERATION",
+  "minRarity": "BASIC",
+  "maxRarity": "LEGENDARY",
+  "spawnWeight": 15,
+  "baseStats": {
+    "protection": 7,
+    "knockback": 0,
+    "closeDmgReduce": 0,
+    "farDmgReduce": 0,
+    "spikeDamage": 0,
+    "lifeBoost": 0,
+    "speedBoost": 0.04
+  }
+}

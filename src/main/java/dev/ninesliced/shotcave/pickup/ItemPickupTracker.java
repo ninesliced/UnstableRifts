@@ -2,6 +2,7 @@ package dev.ninesliced.shotcave.pickup;
 
 import com.hypixel.hytale.component.Ref;
 import org.joml.Vector3d;
+import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
 import com.hypixel.hytale.server.core.modules.entity.item.ItemComponent;
@@ -74,7 +75,16 @@ public final class ItemPickupTracker {
             if (!ref.isValid()) {
                 return null;
             }
-            TransformComponent transform = accessor.getComponent(ref, TransformComponent.getComponentType());
+            if (!isAccessibleFrom(accessor)) {
+                return null;
+            }
+
+            TransformComponent transform;
+            try {
+                transform = accessor.getComponent(ref, TransformComponent.getComponentType());
+            } catch (IllegalStateException e) {
+                return null;
+            }
             if (transform == null) {
                 return null;
             }
@@ -86,11 +96,27 @@ public final class ItemPickupTracker {
             if (!ref.isValid()) {
                 return null;
             }
-            ItemComponent itemComponent = accessor.getComponent(ref, ItemComponent.getComponentType());
+            if (!isAccessibleFrom(accessor)) {
+                return null;
+            }
+
+            ItemComponent itemComponent;
+            try {
+                itemComponent = accessor.getComponent(ref, ItemComponent.getComponentType());
+            } catch (IllegalStateException e) {
+                return null;
+            }
             if (itemComponent == null) {
                 return null;
             }
             return itemComponent.getItemStack();
+        }
+
+        private boolean isAccessibleFrom(@Nonnull com.hypixel.hytale.component.ComponentAccessor<EntityStore> accessor) {
+            if (accessor instanceof Store<?> store) {
+                return store == ref.getStore();
+            }
+            return true;
         }
     }
 

@@ -36,6 +36,9 @@ import dev.ninesliced.shotcave.dungeon.DungeonConfig;
 import dev.ninesliced.shotcave.dungeon.Game;
 import dev.ninesliced.shotcave.dungeon.Level;
 import dev.ninesliced.shotcave.dungeon.RoomData;
+import dev.ninesliced.shotcave.armor.ArmorDefinition;
+import dev.ninesliced.shotcave.armor.ArmorDefinitions;
+import dev.ninesliced.shotcave.armor.ArmorSetTracker;
 import dev.ninesliced.shotcave.guns.GunItemMetadata;
 import dev.ninesliced.shotcave.guns.WeaponDefinition;
 import dev.ninesliced.shotcave.guns.WeaponDefinitions;
@@ -157,6 +160,9 @@ public final class FKeyPickupPacketHandler implements PlayerPacketWatcher {
             if (!tracked.getRef().isValid()) {
                 continue;
             }
+            if (tracked.getRef().getStore() != store) {
+                continue;
+            }
 
             Vector3d itemPos = tracked.getPosition(store);
             if (itemPos == null) {
@@ -271,7 +277,13 @@ public final class FKeyPickupPacketHandler implements PlayerPacketWatcher {
             @Nonnull Store<EntityStore> store,
             @Nonnull Ref<EntityStore> itemRef,
             @Nonnull ItemComponent itemComponent,
-            @Nonnull ItemStack newWeapon) {
+            @Nonnull ItemStack pickedItem) {
+
+        ArmorDefinition armorDef = ArmorDefinitions.getById(pickedItem.getItemId());
+        if (armorDef != null) {
+            collectArmorLocked(tracked, player, playerRef, playerEntityRef, store, itemRef, itemComponent, pickedItem, armorDef);
+            return;
+        }
 
         InventoryComponent.Hotbar hotbarComp = store.getComponent(playerEntityRef, InventoryComponent.Hotbar.getComponentType());
         if (hotbarComp == null) {
@@ -284,7 +296,7 @@ public final class FKeyPickupPacketHandler implements PlayerPacketWatcher {
 
         if (emptySlot >= 0) {
             // Free slot available — place directly.
-            hotbar.setItemStackForSlot(emptySlot, newWeapon);
+            hotbar.setItemStackForSlot(emptySlot, pickedItem);
         } else {
             // All 3 weapon slots full — swap with held slot.
             byte activeSlot = hotbarComp.getActiveSlot();
@@ -293,7 +305,7 @@ public final class FKeyPickupPacketHandler implements PlayerPacketWatcher {
             }
 
             ItemStack oldWeapon = hotbar.getItemStack(activeSlot);
-            hotbar.setItemStackForSlot(activeSlot, newWeapon);
+            hotbar.setItemStackForSlot(activeSlot, pickedItem);
 
             // Drop the old weapon back into the world.
             if (!ItemStack.isEmpty(oldWeapon)) {
@@ -321,7 +333,61 @@ public final class FKeyPickupPacketHandler implements PlayerPacketWatcher {
         itemComponent.setRemovedByPlayerPickup(true);
         store.removeEntity(itemRef, RemoveReason.REMOVE);
 
-        sendPickupNotification(playerRef, tracked, newWeapon.getQuantity());
+        sendPickupNotification(playerRef, tracked, pickedItem.getQuantity());
+    }
+
+    private static void collectArmorLocked(@Nonnull ItemPickupTracker.TrackedItem tracked,
+            @Nonnull Player player,
+            @Nonnull PlayerRef playerRef,
+            @Nonnull Ref<EntityStore> playerEntityRef,
+            @Nonnull Store<EntityStore> store,
+            @Nonnull Ref<EntityStore> itemRef,
+            @Nonnull ItemComponent itemComponent,
+            @Nonnull ItemStack armorItem,
+            @Nonnull ArmorDefinition armorDef) {
+
+        InventoryComponent.Armor armorComp = store.getComponent(playerEntityRef, InventoryComponent.Armor.getComponentType());
+        if (armorComp == null) {
+            ItemPickupTracker.track(tracked);
+            return;
+        }
+
+        ItemContainer armorInv = armorComp.getInventory();
+        short targetSlot = (short) armorDef.getSlotType().getSlotIndex();
+        ItemStack oldArmor = armorInv.getItemStack(targetSlot);
+        armorInv.setItemStackForSlot(targetSlot, armorItem, false);
+
+        if (!ItemStack.isEmpty(oldArmor)) {
+            ItemUtils.dropItem(playerEntityRef, oldArmor, store);
+        }
+
+        Shotcave shotcave = Shotcave.getInstance();
+        if (shotcave != null) {
+            ArmorSetTracker tracker = shotcave.getArmorSetTracker();
+            if (tracker != null) {
+                tracker.onArmorChanged(playerRef.getUuid(), armorInv);
+            }
+        }
+
+        InventoryComponent.Storage storageComp = store.getComponent(playerEntityRef, InventoryComponent.Storage.getComponentType());
+        InventoryComponent.Hotbar hotbarComp = store.getComponent(playerEntityRef, InventoryComponent.Hotbar.getComponentType());
+        InventoryComponent.Utility utilityComp = store.getComponent(playerEntityRef, InventoryComponent.Utility.getComponentType());
+        InventoryComponent.Tool toolComp = store.getComponent(playerEntityRef, InventoryComponent.Tool.getComponentType());
+        InventoryComponent.Backpack backpackComp = store.getComponent(playerEntityRef, InventoryComponent.Backpack.getComponentType());
+
+        playerRef.getPacketHandler().writeNoCache(new UpdatePlayerInventory(
+                storageComp != null ? storageComp.getInventory().toPacket() : null,
+                armorInv.toPacket(),
+                hotbarComp != null ? hotbarComp.getInventory().toPacket() : null,
+                utilityComp != null ? utilityComp.getInventory().toPacket() : null,
+                toolComp != null ? toolComp.getInventory().toPacket() : null,
+                backpackComp != null ? backpackComp.getInventory().toPacket() : null
+        ));
+
+        itemComponent.setRemovedByPlayerPickup(true);
+        store.removeEntity(itemRef, RemoveReason.REMOVE);
+
+        sendPickupNotification(playerRef, tracked, armorItem.getQuantity());
     }
 
     /**

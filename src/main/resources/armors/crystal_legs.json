@@ -1,0 +1,19 @@
+{
+  "itemId": "Armor_Crystal_Legs_Shotcave",
+  "displayName": "Crystal Gauntlets",
+  "setId": "crystal",
+  "slotType": "ARMS",
+  "setAbility": "BERSERKER",
+  "minRarity": "BASIC",
+  "maxRarity": "LEGENDARY",
+  "spawnWeight": 15,
+  "baseStats": {
+    "protection": 10,
+    "knockback": 1.0,
+    "closeDmgReduce": 0.06,
+    "farDmgReduce": 0,
+    "spikeDamage": 2,
+    "lifeBoost": 0,
+    "speedBoost": 0
+  }
+}

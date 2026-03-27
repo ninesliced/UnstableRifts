@@ -1,0 +1,44 @@
+{
+  "itemId": "Weapon_Rifle_Shotcave",
+  "displayName": "Rifle",
+  "category": "BULLET",
+  "minRarity": "BASIC",
+  "maxRarity": "UNIQUE",
+  "spawnWeight": 8,
+  "baseStats": {
+    "range": 40,
+    "spread": 2.4,
+    "pellets": 1,
+    "knockback": 0.35,
+    "precision": 24
+  },
+  "primary": {
+    "id": "Shotcave_Rifle_Primary",
+    "cooldown": 1.0,
+    "requireAmmo": true,
+    "shotId": "Shotcave_Rifle_Shot",
+    "reloadId": "Shotcave_Rifle_Reload"
+  },
+  "reload": {
+    "id": "Shotcave_Rifle_Reload",
+    "cooldown": 1.0,
+    "runTime": 0.9,
+    "amount": 0,
+    "nextId": "Shotcave_Update_Hud",
+    "worldSfx": "SFX_Rifle_Fire",
+    "localSfx": "SFX_Rifle_Fire_Local",
+    "maxAmmo": 14
+  },
+  "damage": {
+    "id": "Shotcave_Rifle_Projectile_Hit",
+    "amount": 7,
+    "type": "Projectile",
+    "worldSfx": "SFX_Blunderbuss_Hit",
+    "localSfx": "SFX_Blunderbuss_Hit",
+    "particleId": "RifleShooting_Impact",
+    "particleYOffset": 0.8
+  },
+  "extraRoots": [
+    "Shotcave_Projectile_Miss"
+  ]
+}

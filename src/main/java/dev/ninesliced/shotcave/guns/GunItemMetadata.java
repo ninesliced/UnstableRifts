@@ -1,8 +1,12 @@
 package dev.ninesliced.shotcave.guns;
 
 import com.hypixel.hytale.server.core.entity.InteractionContext;
+import com.hypixel.hytale.server.core.inventory.InventoryComponent;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
+import com.hypixel.hytale.component.Ref;
+import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import dev.ninesliced.shotcave.armor.ArmorStatResolver;
 import org.bson.BsonArray;
 import org.bson.BsonDocument;
 import org.bson.BsonInt32;
@@ -107,12 +111,35 @@ public final class GunItemMetadata {
     }
 
     public static int getEffectiveMaxAmmo(@Nonnull ItemStack stack, int baseMaxAmmo) {
+        return getEffectiveMaxAmmo(stack, baseMaxAmmo, 0.0);
+    }
+
+    public static int getEffectiveMaxAmmo(@Nonnull ItemStack stack, int baseMaxAmmo, double armorAmmoCapacityBonus) {
         if (baseMaxAmmo <= 0) {
             return baseMaxAmmo;
         }
 
         double bulletBonus = getModifierBonus(stack, WeaponModifierType.MAX_BULLETS);
-        return Math.max(1, (int) Math.round(baseMaxAmmo * (1.0 + bulletBonus)));
+        double totalBonus = bulletBonus + Math.max(0.0, armorAmmoCapacityBonus);
+        return Math.max(1, (int) Math.round(baseMaxAmmo * (1.0 + totalBonus)));
+    }
+
+    public static int getEffectiveMaxAmmo(@Nonnull InteractionContext context, @Nonnull ItemStack stack, int baseMaxAmmo) {
+        double armorAmmoCapacityBonus = 0.0;
+        Ref<EntityStore> ref = context.getEntity();
+        if (ref != null && ref.isValid()) {
+            InventoryComponent.Armor armorComponent = null;
+            if (context.getCommandBuffer() != null) {
+                armorComponent = context.getCommandBuffer().getComponent(ref, InventoryComponent.Armor.getComponentType());
+            }
+            if (armorComponent == null) {
+                armorComponent = ref.getStore().getComponent(ref, InventoryComponent.Armor.getComponentType());
+            }
+            if (armorComponent != null) {
+                armorAmmoCapacityBonus = ArmorStatResolver.getTotalAmmoCapacityBonus(armorComponent.getInventory());
+            }
+        }
+        return getEffectiveMaxAmmo(stack, baseMaxAmmo, armorAmmoCapacityBonus);
     }
 
     @Nonnull

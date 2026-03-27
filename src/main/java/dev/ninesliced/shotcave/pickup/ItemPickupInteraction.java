@@ -24,6 +24,9 @@ import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 
 import dev.ninesliced.shotcave.Shotcave;
+import dev.ninesliced.shotcave.armor.ArmorDefinition;
+import dev.ninesliced.shotcave.armor.ArmorDefinitions;
+import dev.ninesliced.shotcave.armor.ArmorSetTracker;
 import dev.ninesliced.shotcave.inventory.InventoryLockService;
 
 import javax.annotation.Nonnull;
@@ -116,11 +119,55 @@ public final class ItemPickupInteraction extends SimpleInstantInteraction {
             }
         }
 
-        // Locked inventory (dungeon) — use 3-slot weapon swap logic.
+        // Locked inventory (dungeon) — weapon swap or armor equip logic.
         Shotcave shotcave = Shotcave.getInstance();
         PlayerRef playerRefComp = commandBuffer.getComponent(ref, PlayerRef.getComponentType());
         if (shotcave != null && playerRefComp != null
                 && shotcave.getInventoryLockService().isLocked(playerRefComp.getUuid())) {
+
+            // Check if this item is an armor piece
+            ArmorDefinition armorDef = ArmorDefinitions.getById(itemStack.getItemId());
+            if (armorDef != null) {
+                // Armor pickup — equip to the correct armor slot
+                InventoryComponent.Armor armorComp = commandBuffer.getComponent(ref, InventoryComponent.Armor.getComponentType());
+                if (armorComp == null) return;
+
+                ItemContainer armorInv = armorComp.getInventory();
+                short targetSlot = (short) armorDef.getSlotType().getSlotIndex();
+                ItemStack oldArmor = armorInv.getItemStack(targetSlot);
+                armorInv.setItemStackForSlot(targetSlot, itemStack, false);
+
+                if (!ItemStack.isEmpty(oldArmor)) {
+                    ItemUtils.dropItem(ref, oldArmor, commandBuffer);
+                }
+
+                // Notify armor set tracker
+                ArmorSetTracker tracker = shotcave.getArmorSetTracker();
+                if (tracker != null) {
+                    tracker.onArmorChanged(playerRefComp.getUuid(), armorInv);
+                }
+
+                InventoryComponent.Storage storageComp = commandBuffer.getComponent(ref, InventoryComponent.Storage.getComponentType());
+                InventoryComponent.Hotbar hotbarComp = commandBuffer.getComponent(ref, InventoryComponent.Hotbar.getComponentType());
+                InventoryComponent.Utility utilityComp = commandBuffer.getComponent(ref, InventoryComponent.Utility.getComponentType());
+                InventoryComponent.Tool toolComp = commandBuffer.getComponent(ref, InventoryComponent.Tool.getComponentType());
+                InventoryComponent.Backpack backpackComp = commandBuffer.getComponent(ref, InventoryComponent.Backpack.getComponentType());
+
+                playerRefComp.getPacketHandler().writeNoCache(new UpdatePlayerInventory(
+                        storageComp != null ? storageComp.getInventory().toPacket() : null,
+                        armorInv.toPacket(),
+                        hotbarComp != null ? hotbarComp.getInventory().toPacket() : null,
+                        utilityComp != null ? utilityComp.getInventory().toPacket() : null,
+                        toolComp != null ? toolComp.getInventory().toPacket() : null,
+                        backpackComp != null ? backpackComp.getInventory().toPacket() : null
+                ));
+                itemComponent.setRemovedByPlayerPickup(true);
+                commandBuffer.removeEntity(targetRef, RemoveReason.REMOVE);
+                playerComponent.notifyPickupItem(ref, itemStack, itemEntityPosition, commandBuffer);
+                return;
+            }
+
+            // Weapon pickup — use 3-slot weapon swap logic.
             InventoryComponent.Hotbar hotbarComp = commandBuffer.getComponent(ref, InventoryComponent.Hotbar.getComponentType());
             if (hotbarComp == null) return;
 

@@ -1,0 +1,19 @@
+{
+  "itemId": "Armor_Void_Boots_Shotcave",
+  "displayName": "Void Leggings",
+  "setId": "void",
+  "slotType": "LEGS",
+  "setAbility": "PURIFICATION",
+  "minRarity": "RARE",
+  "maxRarity": "UNIQUE",
+  "spawnWeight": 10,
+  "baseStats": {
+    "protection": 10,
+    "knockback": 1.2,
+    "closeDmgReduce": 0.06,
+    "farDmgReduce": 0.04,
+    "spikeDamage": 3,
+    "lifeBoost": 15,
+    "speedBoost": 0.05
+  }
+}

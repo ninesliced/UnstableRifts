@@ -53,7 +53,7 @@ public final class ConsumeAmmoInteraction extends SimpleInstantInteraction {
             return;
         }
 
-        int effectiveMaxAmmo = GunItemMetadata.getEffectiveMaxAmmo(heldItem, this.maxAmmo);
+        int effectiveMaxAmmo = GunItemMetadata.getEffectiveMaxAmmo(context, heldItem, this.maxAmmo);
 
         ItemStack updated = GunItemMetadata.ensureAmmo(heldItem, this.maxAmmo, effectiveMaxAmmo);
         int ammo = GunItemMetadata.getInt(updated, GunItemMetadata.AMMO_KEY, effectiveMaxAmmo);

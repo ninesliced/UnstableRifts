@@ -1,0 +1,19 @@
+{
+  "itemId": "Armor_Bone_Legs_Shotcave",
+  "displayName": "Bone Gauntlets",
+  "setId": "bone",
+  "slotType": "ARMS",
+  "setAbility": "SWIFTNESS",
+  "minRarity": "UNCOMMON",
+  "maxRarity": "UNIQUE",
+  "spawnWeight": 12,
+  "baseStats": {
+    "protection": 8,
+    "knockback": 0.8,
+    "closeDmgReduce": 0.05,
+    "farDmgReduce": 0,
+    "spikeDamage": 2,
+    "lifeBoost": 0,
+    "speedBoost": 0
+  }
+}

@@ -89,6 +89,11 @@ public final class CoinCollectionSystem extends EntityTickingSystem<EntityStore>
             if (!tracked.getRef().isValid()) {
                 continue;
             }
+            // Guard against cross-world refs: the tracked item may belong to a
+            // different world's store (e.g. a dungeon instance that has been removed).
+            if (tracked.getRef().getStore() != store) {
+                continue;
+            }
 
             Vector3d itemPos = tracked.getPosition(store);
             if (itemPos == null) {

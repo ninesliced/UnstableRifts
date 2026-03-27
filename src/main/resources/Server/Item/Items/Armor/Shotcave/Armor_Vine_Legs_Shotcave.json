@@ -1,0 +1,6 @@
+{
+  "Parent": "Armor_Copper_Hands",
+  "TranslationProperties": { "Name": "server.items.Armor_Vine_Legs_Shotcave.name" },
+  "MaxDurability": 0,
+  "Tags": { "Type": ["Armor"], "Pickup": ["FKey"] }
+}

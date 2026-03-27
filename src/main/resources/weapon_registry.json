@@ -20,6 +20,7 @@
     "weapons/blunderbuss_void.json",
     "weapons/crystal_sword.json",
     "weapons/hytale_blunderbuss.json",
-    "weapons/assault_rifle.json"
+    "weapons/assault_rifle.json",
+    "weapons/rifle.json"
   ]
 }

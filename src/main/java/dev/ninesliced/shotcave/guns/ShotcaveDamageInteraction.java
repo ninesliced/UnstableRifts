@@ -1,9 +1,12 @@
 package dev.ninesliced.shotcave.guns;
 
+import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.protocol.InteractionType;
 import com.hypixel.hytale.server.core.asset.type.particle.config.WorldParticle;
 import com.hypixel.hytale.server.core.entity.InteractionContext;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
+import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import dev.ninesliced.shotcave.armor.ArmorAbilityBuffSystem;
 import com.hypixel.hytale.server.core.modules.entity.damage.DamageCause;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.CooldownHandler;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.server.DamageEntityInteraction;
@@ -88,11 +91,18 @@ public final class ShotcaveDamageInteraction extends DamageEntityInteraction {
                          @Nonnull InteractionContext context,
                          @Nonnull CooldownHandler cooldownHandler) {
         ItemStack heldItem = context.getHeldItem();
+        double multiplier = 1.0;
         if (heldItem != null) {
             double dmgBonus = GunItemMetadata.getModifierBonus(heldItem, WeaponModifierType.WEAPON_DAMAGE);
-            if (dmgBonus != 0.0) {
-                GunItemMetadata.DAMAGE_MULTIPLIER.set(1.0 + dmgBonus);
-            }
+            multiplier += dmgBonus;
+        }
+        // Apply Berserker buff damage bonus
+        Ref<EntityStore> entityRef = context.getEntity();
+        if (entityRef != null && entityRef.isValid()) {
+            multiplier *= ArmorAbilityBuffSystem.getDamageMultiplier(entityRef);
+        }
+        if (multiplier != 1.0) {
+            GunItemMetadata.DAMAGE_MULTIPLIER.set(multiplier);
         }
         try {
             super.tick0(firstRun, time, type, context, cooldownHandler);

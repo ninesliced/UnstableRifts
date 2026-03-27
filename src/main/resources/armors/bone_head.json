@@ -1,0 +1,19 @@
+{
+  "itemId": "Armor_Bone_Head_Shotcave",
+  "displayName": "Bone Visor",
+  "setId": "bone",
+  "slotType": "HEAD",
+  "setAbility": "SWIFTNESS",
+  "minRarity": "UNCOMMON",
+  "maxRarity": "UNIQUE",
+  "spawnWeight": 12,
+  "baseStats": {
+    "protection": 7,
+    "knockback": 0,
+    "closeDmgReduce": 0,
+    "farDmgReduce": 0.05,
+    "spikeDamage": 0,
+    "lifeBoost": 0,
+    "speedBoost": 0
+  }
+}

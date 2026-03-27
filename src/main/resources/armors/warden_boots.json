@@ -1,0 +1,19 @@
+{
+  "itemId": "Armor_Warden_Boots_Shotcave",
+  "displayName": "Warden Leggings",
+  "setId": "warden",
+  "slotType": "LEGS",
+  "setAbility": "WARDEN",
+  "minRarity": "RARE",
+  "maxRarity": "UNIQUE",
+  "spawnWeight": 10,
+  "baseStats": {
+    "protection": 8,
+    "knockback": 2.2,
+    "closeDmgReduce": 0.03,
+    "farDmgReduce": 0.02,
+    "spikeDamage": 7,
+    "lifeBoost": 10,
+    "speedBoost": 0.06
+  }
+}

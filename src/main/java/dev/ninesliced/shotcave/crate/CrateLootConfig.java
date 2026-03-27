@@ -65,6 +65,10 @@ public final class CrateLootConfig {
         @SerializedName("coinMin") private int coinMin;
         @SerializedName("coinMax") private int coinMax;
         @SerializedName("weaponWhitelist") private List<String> weaponWhitelist;
+        @SerializedName("armorChance") private double armorChance;
+        @SerializedName("armorMinRarity") private String armorMinRarity;
+        @SerializedName("armorMaxRarity") private String armorMaxRarity;
+        @SerializedName("armorWhitelist") private List<String> armorWhitelist;
 
         @Nonnull public WeaponRarity getMinRarity() {
             return minRarity != null ? WeaponRarity.fromString(minRarity) : WeaponRarity.BASIC;
@@ -80,6 +84,20 @@ public final class CrateLootConfig {
 
         @Nonnull public List<String> getWeaponWhitelist() {
             return weaponWhitelist != null ? weaponWhitelist : List.of();
+        }
+
+        public double getArmorChance() { return armorChance; }
+
+        @Nonnull public WeaponRarity getArmorMinRarity() {
+            return armorMinRarity != null ? WeaponRarity.fromString(armorMinRarity) : WeaponRarity.BASIC;
+        }
+
+        @Nonnull public WeaponRarity getArmorMaxRarity() {
+            return armorMaxRarity != null ? WeaponRarity.fromString(armorMaxRarity) : WeaponRarity.UNIQUE;
+        }
+
+        @Nonnull public List<String> getArmorWhitelist() {
+            return armorWhitelist != null ? armorWhitelist : List.of();
         }
     }
 

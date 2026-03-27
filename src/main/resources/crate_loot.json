@@ -16,6 +16,19 @@
         "Weapon_Crystal_Musket_Ice_Shotcave",
         "Weapon_Crystal_Musket_Lightning_Shotcave",
         "Weapon_Crystal_Musket_Void_Shotcave"
+      ],
+      "armorChance": 0.1,
+      "armorMinRarity": "BASIC",
+      "armorMaxRarity": "RARE",
+      "armorWhitelist": [
+        "Armor_Crystal_Head_Shotcave",
+        "Armor_Crystal_Chest_Shotcave",
+        "Armor_Crystal_Legs_Shotcave",
+        "Armor_Crystal_Boots_Shotcave",
+        "Armor_Vine_Head_Shotcave",
+        "Armor_Vine_Chest_Shotcave",
+        "Armor_Vine_Legs_Shotcave",
+        "Armor_Vine_Boots_Shotcave"
       ]
     },
     "Shotcave_Props_Crate_Level2": {
@@ -40,6 +53,27 @@
         "Weapon_Crystal_Blunderbuss_Ice_Shotcave",
         "Weapon_Crystal_Blunderbuss_Lightning_Shotcave",
         "Weapon_Crystal_Blunderbuss_Void_Shotcave"
+      ],
+      "armorChance": 0.15,
+      "armorMinRarity": "UNCOMMON",
+      "armorMaxRarity": "EPIC",
+      "armorWhitelist": [
+        "Armor_Crystal_Head_Shotcave",
+        "Armor_Crystal_Chest_Shotcave",
+        "Armor_Crystal_Legs_Shotcave",
+        "Armor_Crystal_Boots_Shotcave",
+        "Armor_Vine_Head_Shotcave",
+        "Armor_Vine_Chest_Shotcave",
+        "Armor_Vine_Legs_Shotcave",
+        "Armor_Vine_Boots_Shotcave",
+        "Armor_Shale_Head_Shotcave",
+        "Armor_Shale_Chest_Shotcave",
+        "Armor_Shale_Legs_Shotcave",
+        "Armor_Shale_Boots_Shotcave",
+        "Armor_Bone_Head_Shotcave",
+        "Armor_Bone_Chest_Shotcave",
+        "Armor_Bone_Legs_Shotcave",
+        "Armor_Bone_Boots_Shotcave"
       ]
     },
     "Shotcave_Props_Crate_Level3": {
@@ -66,6 +100,35 @@
         "Weapon_Crystal_Blunderbuss_Void_Shotcave",
         "Weapon_Taser_Shotcave",
         "Weapon_Voidlance_Shotcave"
+      ],
+      "armorChance": 0.25,
+      "armorMinRarity": "RARE",
+      "armorMaxRarity": "UNIQUE",
+      "armorWhitelist": [
+        "Armor_Crystal_Head_Shotcave",
+        "Armor_Crystal_Chest_Shotcave",
+        "Armor_Crystal_Legs_Shotcave",
+        "Armor_Crystal_Boots_Shotcave",
+        "Armor_Vine_Head_Shotcave",
+        "Armor_Vine_Chest_Shotcave",
+        "Armor_Vine_Legs_Shotcave",
+        "Armor_Vine_Boots_Shotcave",
+        "Armor_Shale_Head_Shotcave",
+        "Armor_Shale_Chest_Shotcave",
+        "Armor_Shale_Legs_Shotcave",
+        "Armor_Shale_Boots_Shotcave",
+        "Armor_Bone_Head_Shotcave",
+        "Armor_Bone_Chest_Shotcave",
+        "Armor_Bone_Legs_Shotcave",
+        "Armor_Bone_Boots_Shotcave",
+        "Armor_Void_Head_Shotcave",
+        "Armor_Void_Chest_Shotcave",
+        "Armor_Void_Legs_Shotcave",
+        "Armor_Void_Boots_Shotcave",
+        "Armor_Warden_Head_Shotcave",
+        "Armor_Warden_Chest_Shotcave",
+        "Armor_Warden_Legs_Shotcave",
+        "Armor_Warden_Boots_Shotcave"
       ]
     },
     "Shotcave_Props_Crate": {
@@ -84,6 +147,19 @@
         "Weapon_Crystal_Musket_Ice_Shotcave",
         "Weapon_Crystal_Musket_Lightning_Shotcave",
         "Weapon_Crystal_Musket_Void_Shotcave"
+      ],
+      "armorChance": 0.08,
+      "armorMinRarity": "BASIC",
+      "armorMaxRarity": "RARE",
+      "armorWhitelist": [
+        "Armor_Crystal_Head_Shotcave",
+        "Armor_Crystal_Chest_Shotcave",
+        "Armor_Crystal_Legs_Shotcave",
+        "Armor_Crystal_Boots_Shotcave",
+        "Armor_Vine_Head_Shotcave",
+        "Armor_Vine_Chest_Shotcave",
+        "Armor_Vine_Legs_Shotcave",
+        "Armor_Vine_Boots_Shotcave"
       ]
     },
     "Shotcave_Props_Crate_2x2": {
@@ -108,6 +184,27 @@
         "Weapon_Crystal_Blunderbuss_Ice_Shotcave",
         "Weapon_Crystal_Blunderbuss_Lightning_Shotcave",
         "Weapon_Crystal_Blunderbuss_Void_Shotcave"
+      ],
+      "armorChance": 0.18,
+      "armorMinRarity": "BASIC",
+      "armorMaxRarity": "EPIC",
+      "armorWhitelist": [
+        "Armor_Crystal_Head_Shotcave",
+        "Armor_Crystal_Chest_Shotcave",
+        "Armor_Crystal_Legs_Shotcave",
+        "Armor_Crystal_Boots_Shotcave",
+        "Armor_Vine_Head_Shotcave",
+        "Armor_Vine_Chest_Shotcave",
+        "Armor_Vine_Legs_Shotcave",
+        "Armor_Vine_Boots_Shotcave",
+        "Armor_Shale_Head_Shotcave",
+        "Armor_Shale_Chest_Shotcave",
+        "Armor_Shale_Legs_Shotcave",
+        "Armor_Shale_Boots_Shotcave",
+        "Armor_Bone_Head_Shotcave",
+        "Armor_Bone_Chest_Shotcave",
+        "Armor_Bone_Legs_Shotcave",
+        "Armor_Bone_Boots_Shotcave"
       ]
     }
   }

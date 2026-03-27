@@ -1,0 +1,19 @@
+{
+  "itemId": "Armor_Warden_Legs_Shotcave",
+  "displayName": "Warden Gauntlets",
+  "setId": "warden",
+  "slotType": "ARMS",
+  "setAbility": "WARDEN",
+  "minRarity": "RARE",
+  "maxRarity": "UNIQUE",
+  "spawnWeight": 10,
+  "baseStats": {
+    "protection": 12,
+    "knockback": 2.8,
+    "closeDmgReduce": 0.05,
+    "farDmgReduce": 0.03,
+    "spikeDamage": 10,
+    "lifeBoost": 15,
+    "speedBoost": 0
+  }
+}

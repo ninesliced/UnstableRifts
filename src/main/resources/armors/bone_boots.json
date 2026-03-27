@@ -1,0 +1,19 @@
+{
+  "itemId": "Armor_Bone_Boots_Shotcave",
+  "displayName": "Bone Leggings",
+  "setId": "bone",
+  "slotType": "LEGS",
+  "setAbility": "SWIFTNESS",
+  "minRarity": "UNCOMMON",
+  "maxRarity": "UNIQUE",
+  "spawnWeight": 12,
+  "baseStats": {
+    "protection": 5,
+    "knockback": 0,
+    "closeDmgReduce": 0,
+    "farDmgReduce": 0,
+    "spikeDamage": 0,
+    "lifeBoost": 0,
+    "speedBoost": 0.08
+  }
+}

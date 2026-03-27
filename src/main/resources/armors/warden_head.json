@@ -1,0 +1,19 @@
+{
+  "itemId": "Armor_Warden_Head_Shotcave",
+  "displayName": "Warden Helmet",
+  "setId": "warden",
+  "slotType": "HEAD",
+  "setAbility": "WARDEN",
+  "minRarity": "RARE",
+  "maxRarity": "UNIQUE",
+  "spawnWeight": 10,
+  "baseStats": {
+    "protection": 10,
+    "knockback": 2.5,
+    "closeDmgReduce": 0.04,
+    "farDmgReduce": 0.04,
+    "spikeDamage": 8,
+    "lifeBoost": 10,
+    "speedBoost": 0
+  }
+}

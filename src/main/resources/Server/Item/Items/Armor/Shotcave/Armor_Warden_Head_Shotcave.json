@@ -1,0 +1,6 @@
+{
+  "Parent": "Armor_Steel_Head",
+  "TranslationProperties": { "Name": "server.items.Armor_Warden_Head_Shotcave.name" },
+  "MaxDurability": 0,
+  "Tags": { "Type": ["Armor"], "Pickup": ["FKey"] }
+}

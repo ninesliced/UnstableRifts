@@ -18,6 +18,7 @@ import com.hypixel.hytale.server.core.modules.physics.component.Velocity;
 import com.hypixel.hytale.server.core.modules.physics.systems.GenericVelocityInstructionSystem;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.systems.NPCVelocityInstructionSystem;
+import dev.ninesliced.shotcave.armor.ArmorAbilityBuffSystem;
 import dev.ninesliced.shotcave.guns.DamageEffect;
 
 import javax.annotation.Nonnull;
@@ -64,6 +65,13 @@ public final class DamageEffectTickSystem extends EntityTickingSystem<EntityStor
 
         DamageEffect activeEffect = DamageEffect.fromOrdinal(effect.getEffectOrdinal());
         if (effect.isExpired()) {
+            DamageEffectRuntime.clearVisual(commandBuffer, ref, activeEffect);
+            commandBuffer.removeComponent(ref, DamageEffectComponent.getComponentType());
+            return;
+        }
+
+        // Purification buff: immediately cleanse any active DoT
+        if (ArmorAbilityBuffSystem.isPurificationActive(ref)) {
             DamageEffectRuntime.clearVisual(commandBuffer, ref, activeEffect);
             commandBuffer.removeComponent(ref, DamageEffectComponent.getComponentType());
             return;

@@ -355,10 +355,10 @@ public final class ContinuousBeamInteraction extends ChargingInteraction {
 
         Vector3d direction = getLookDirection(commandBuffer, context.getEntity());
         if (this.aimAssist) {
-            Vector3d assistedDirection = AimAssistHelper.computeAssistedDirection(
+            Vector3d assisted = AimAssistHelper.computeAssistedDirectionNearest(
                     commandBuffer, context, start, direction, (double) effectiveRange);
-            if (assistedDirection != null) {
-                direction = assistedDirection;
+            if (assisted != null) {
+                direction = assisted;
             }
         }
 
@@ -436,7 +436,7 @@ public final class ContinuousBeamInteraction extends ChargingInteraction {
             return false;
         }
 
-        int effectiveMaxAmmo = GunItemMetadata.getEffectiveMaxAmmo(heldItem, this.maxAmmo);
+        int effectiveMaxAmmo = GunItemMetadata.getEffectiveMaxAmmo(context, heldItem, this.maxAmmo);
         ItemStack updated = GunItemMetadata.ensureAmmo(heldItem, this.maxAmmo, effectiveMaxAmmo);
         int ammo = GunItemMetadata.getInt(updated, GunItemMetadata.AMMO_KEY, effectiveMaxAmmo);
         if (ammo < this.ammoPerShot) {

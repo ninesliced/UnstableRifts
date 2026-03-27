@@ -1,0 +1,19 @@
+{
+  "itemId": "Armor_Crystal_Chest_Shotcave",
+  "displayName": "Crystal Chestplate",
+  "setId": "crystal",
+  "slotType": "CHEST",
+  "setAbility": "BERSERKER",
+  "minRarity": "BASIC",
+  "maxRarity": "LEGENDARY",
+  "spawnWeight": 15,
+  "baseStats": {
+    "protection": 12,
+    "knockback": 1.5,
+    "closeDmgReduce": 0.08,
+    "farDmgReduce": 0.05,
+    "spikeDamage": 3,
+    "lifeBoost": 20,
+    "speedBoost": 0
+  }
+}

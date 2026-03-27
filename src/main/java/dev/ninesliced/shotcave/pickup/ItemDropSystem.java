@@ -16,6 +16,8 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import dev.ninesliced.shotcave.armor.ArmorDefinition;
+import dev.ninesliced.shotcave.armor.ArmorDefinitions;
 import dev.ninesliced.shotcave.guns.WeaponDefinition;
 import dev.ninesliced.shotcave.guns.WeaponDefinitions;
 
@@ -115,6 +117,10 @@ public final class ItemDropSystem extends RefSystem<EntityStore> {
         WeaponDefinition def = WeaponDefinitions.getById(itemId);
         if (def != null) {
             return def.getDisplayName();
+        }
+        ArmorDefinition armorDef = ArmorDefinitions.getById(itemId);
+        if (armorDef != null) {
+            return armorDef.getDisplayName();
         }
 
         String name = itemId;

@@ -1,0 +1,19 @@
+{
+  "itemId": "Armor_Vine_Chest_Shotcave",
+  "displayName": "Vine Chestplate",
+  "setId": "vine",
+  "slotType": "CHEST",
+  "setAbility": "REGENERATION",
+  "minRarity": "BASIC",
+  "maxRarity": "LEGENDARY",
+  "spawnWeight": 15,
+  "baseStats": {
+    "protection": 14,
+    "knockback": 1.0,
+    "closeDmgReduce": 0.06,
+    "farDmgReduce": 0.04,
+    "spikeDamage": 1,
+    "lifeBoost": 25,
+    "speedBoost": 0
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "itemId": "Armor_Crystal_Head_Shotcave",
+  "displayName": "Crystal Helmet",
+  "setId": "crystal",
+  "slotType": "HEAD",
+  "setAbility": "BERSERKER",
+  "minRarity": "BASIC",
+  "maxRarity": "LEGENDARY",
+  "spawnWeight": 15,
+  "baseStats": {
+    "protection": 6,
+    "knockback": 0,
+    "closeDmgReduce": 0,
+    "farDmgReduce": 0.04,
+    "spikeDamage": 0,
+    "lifeBoost": 0,
+    "speedBoost": 0
+  }
+}

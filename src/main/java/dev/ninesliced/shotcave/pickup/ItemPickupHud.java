@@ -4,6 +4,10 @@ import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.entity.entities.player.hud.CustomUIHud;
 import com.hypixel.hytale.server.core.ui.builder.UICommandBuilder;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
+import dev.ninesliced.shotcave.armor.ArmorDefinition;
+import dev.ninesliced.shotcave.armor.ArmorModifier;
+import dev.ninesliced.shotcave.armor.ArmorModifierType;
+import dev.ninesliced.shotcave.armor.ArmorSetAbility;
 import dev.ninesliced.shotcave.guns.DamageEffect;
 import dev.ninesliced.shotcave.guns.WeaponCategory;
 import dev.ninesliced.shotcave.guns.WeaponDefinition;
@@ -13,6 +17,7 @@ import dev.ninesliced.shotcave.guns.WeaponRarity;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -39,6 +44,11 @@ public final class ItemPickupHud extends CustomUIHud {
     private final int baseMaxAmmo;
     private final int maxAmmo;
 
+    // Armor support
+    private final boolean isArmor;
+    @Nullable private final ArmorDefinition armorDefinition;
+    @Nonnull private final List<ArmorModifier> armorModifiers;
+
     public ItemPickupHud(@Nonnull PlayerRef playerRef,
             @Nonnull String itemDisplayName,
             @Nullable String itemIconPath,
@@ -51,7 +61,10 @@ public final class ItemPickupHud extends CustomUIHud {
             @Nonnull List<WeaponModifier> modifiers,
             boolean isWeapon,
             int baseMaxAmmo,
-            int maxAmmo) {
+            int maxAmmo,
+            boolean isArmor,
+            @Nullable ArmorDefinition armorDefinition,
+            @Nonnull List<ArmorModifier> armorModifiers) {
         super(playerRef);
         this.itemDisplayName = itemDisplayName;
         this.itemIconPath = itemIconPath;
@@ -65,46 +78,62 @@ public final class ItemPickupHud extends CustomUIHud {
         this.isWeapon = isWeapon;
         this.baseMaxAmmo = Math.max(0, baseMaxAmmo);
         this.maxAmmo = maxAmmo;
+        this.isArmor = isArmor;
+        this.armorDefinition = armorDefinition;
+        this.armorModifiers = armorModifiers;
     }
 
     @Override
     protected void build(@Nonnull UICommandBuilder ui) {
         ui.append(UI_PATH);
 
-        if (isWeapon && crouching) {
+        if ((isWeapon || isArmor) && crouching) {
             ui.set("#CratePickupCompactWrapper.Visible", false);
             ui.set("#CratePickupExpandedWrapper.Visible", true);
-
-            if (isWeapon) {
-                ui.set("#CratePickupExpanded.Background", rarity.getColorHex());
-            }
+            ui.set("#CratePickupExpanded.Background", rarity.getColorHex());
 
             if (this.itemIconPath != null && !this.itemIconPath.isBlank()) {
                 ui.set("#CratePickupIconExpanded.AssetPath", this.itemIconPath);
                 ui.set("#CratePickupIconExpanded.Visible", true);
             }
 
-            String title = buildWeaponTitle();
-            ui.set("#CratePickupItemNameExpanded.TextSpans", Message.raw(title));
-            ui.set("#CratePickupItemNameExpanded.Style.TextColor", rarity.getColorHex());
+            if (isWeapon) {
+                String title = buildWeaponTitle();
+                ui.set("#CratePickupItemNameExpanded.TextSpans", Message.raw(title));
+                ui.set("#CratePickupItemNameExpanded.Style.TextColor", rarity.getColorHex());
 
-            if (effect != DamageEffect.NONE) {
-                ui.set("#CratePickupEffectLabelExpanded.TextSpans", Message.raw(effect.getDisplayName()));
-                ui.set("#CratePickupEffectLabelExpanded.Style.TextColor", effectColorHex(effect));
-                ui.set("#CratePickupEffectLabelExpanded.Visible", true);
+                if (effect != DamageEffect.NONE) {
+                    ui.set("#CratePickupEffectLabelExpanded.TextSpans", Message.raw(effect.getDisplayName()));
+                    ui.set("#CratePickupEffectLabelExpanded.Style.TextColor", effectColorHex(effect));
+                    ui.set("#CratePickupEffectLabelExpanded.Visible", true);
+                }
+
+                buildDetailsPanel(ui);
+                buildModifierSlots(ui);
+            } else if (isArmor && armorDefinition != null) {
+                String title = buildArmorTitle();
+                ui.set("#CratePickupItemNameExpanded.TextSpans", Message.raw(title));
+                ui.set("#CratePickupItemNameExpanded.Style.TextColor", rarity.getColorHex());
+
+                ArmorSetAbility ability = armorDefinition.getSetAbility();
+                if (ability != ArmorSetAbility.NONE) {
+                    ui.set("#CratePickupEffectLabelExpanded.TextSpans", Message.raw(ability.getDisplayName()));
+                    ui.set("#CratePickupEffectLabelExpanded.Style.TextColor", ability.getColorHex());
+                    ui.set("#CratePickupEffectLabelExpanded.Visible", true);
+                }
+
+                buildArmorDetailsPanel(ui);
+                buildArmorModifierSlots(ui);
             }
 
             ui.set("#CratePickupKeyHintExpanded.Visible", true);
             ui.set("#CratePickupCollectLabelExpanded.TextSpans", Message.raw("Collect"));
             ui.set("#CratePickupCollectLabelExpanded.Visible", true);
-
-            buildDetailsPanel(ui);
-            buildModifierSlots(ui);
         } else {
             ui.set("#CratePickupExpandedWrapper.Visible", false);
             ui.set("#CratePickupCompactWrapper.Visible", true);
 
-            if (isWeapon) {
+            if (isWeapon || isArmor) {
                 ui.set("#CratePickupAccentCompact.Background", rarity.getColorHex());
             }
 
@@ -115,6 +144,10 @@ public final class ItemPickupHud extends CustomUIHud {
 
             if (isWeapon) {
                 String title = buildWeaponTitle();
+                ui.set("#CratePickupItemNameCompact.TextSpans", Message.raw(title));
+                ui.set("#CratePickupItemNameCompact.Style.TextColor", rarity.getColorHex());
+            } else if (isArmor && armorDefinition != null) {
+                String title = buildArmorTitle();
                 ui.set("#CratePickupItemNameCompact.TextSpans", Message.raw(title));
                 ui.set("#CratePickupItemNameCompact.Style.TextColor", rarity.getColorHex());
             } else {
@@ -130,13 +163,20 @@ public final class ItemPickupHud extends CustomUIHud {
                 ui.set("#CratePickupEffectLabelCompact.TextSpans", Message.raw(effect.getDisplayName()));
                 ui.set("#CratePickupEffectLabelCompact.Style.TextColor", effectColorHex(effect));
                 ui.set("#CratePickupEffectLabelCompact.Visible", true);
+            } else if (isArmor && armorDefinition != null) {
+                ArmorSetAbility ability = armorDefinition.getSetAbility();
+                if (ability != ArmorSetAbility.NONE) {
+                    ui.set("#CratePickupEffectLabelCompact.TextSpans", Message.raw(ability.getDisplayName()));
+                    ui.set("#CratePickupEffectLabelCompact.Style.TextColor", ability.getColorHex());
+                    ui.set("#CratePickupEffectLabelCompact.Visible", true);
+                }
             }
 
             ui.set("#CratePickupKeyHintCompact.Visible", true);
             ui.set("#CratePickupCollectLabelCompact.TextSpans", Message.raw("Collect"));
             ui.set("#CratePickupCollectLabelCompact.Visible", true);
 
-            if (isWeapon) {
+            if (isWeapon || isArmor) {
                 ui.set("#CratePickupCrouchHint.TextSpans", Message.raw("Crouch for details"));
                 ui.set("#CratePickupCrouchHint.Visible", true);
             }
@@ -239,6 +279,61 @@ public final class ItemPickupHud extends CustomUIHud {
         }
     }
 
+    private void buildArmorDetailsPanel(@Nonnull UICommandBuilder ui) {
+        if (armorDefinition == null) return;
+        int row = 0;
+        row = addArmorStat(ui, row, "Protection", armorDefinition.getBaseProtection(), ArmorModifierType.PROTECTION);
+        row = addArmorStat(ui, row, "Close Def", armorDefinition.getBaseCloseDmgReduce(), ArmorModifierType.CLOSE_DMG_REDUCE);
+        row = addArmorStat(ui, row, "Far Def", armorDefinition.getBaseFarDmgReduce(), ArmorModifierType.FAR_DMG_REDUCE);
+        row = addArmorStat(ui, row, "Knockback", armorDefinition.getBaseKnockback(), ArmorModifierType.KNOCKBACK_ENEMIES);
+        row = addArmorStat(ui, row, "Spike Dmg", armorDefinition.getBaseSpikeDamage(), ArmorModifierType.SPIKE_DAMAGE);
+        row = addArmorStat(ui, row, "Speed", armorDefinition.getBaseSpeedBoost(), ArmorModifierType.SPEED_BOOST);
+        row = addArmorStat(ui, row, "Max HP", armorDefinition.getBaseLifeBoost(), ArmorModifierType.LIFE_BOOST);
+        for (int i = row; i < 7; i++) {
+            ui.set("#CratePickupStatRow" + i + ".Visible", false);
+        }
+    }
+
+    private int addArmorStat(@Nonnull UICommandBuilder ui, int row, @Nonnull String label,
+                              float baseValue, @Nonnull ArmorModifierType modType) {
+        double modBonus = getArmorModBonus(modType);
+        if (baseValue < 0.001f && modBonus < 0.001) return row;
+        if (row >= 7) return row;
+        String prefix = "#CratePickupStat";
+        ui.set(prefix + "Label" + row + ".TextSpans", Message.raw(label));
+        ui.set(prefix + "Base" + row + ".TextSpans", Message.raw(String.format("%d%%", Math.round(baseValue * 100))));
+        if (modBonus > 0.001) {
+            int bonusPct = (int) Math.round(modBonus * 100);
+            if (bonusPct > 0) {
+                ui.set(prefix + "Mod" + row + ".TextSpans", Message.raw("(+" + bonusPct + "%)"));
+            } else {
+                ui.set(prefix + "Mod" + row + ".TextSpans", Message.raw(""));
+            }
+        } else {
+            ui.set(prefix + "Mod" + row + ".TextSpans", Message.raw(""));
+        }
+        return row + 1;
+    }
+
+    private void buildArmorModifierSlots(@Nonnull UICommandBuilder ui) {
+        int modCount = Math.min(armorModifiers.size(), 5);
+        if (modCount > 0) {
+            for (int i = 0; i < modCount; i++) {
+                ArmorModifier mod = armorModifiers.get(i);
+                String modText = formatArmorModifier(mod);
+                ui.set("#CratePickupMod" + i + ".TextSpans", Message.raw(modText));
+            }
+            for (int i = modCount; i < 5; i++) {
+                ui.set("#CratePickupMod" + i + ".Visible", false);
+            }
+        } else {
+            ui.set("#CratePickupModSeparator.Visible", false);
+            for (int i = 0; i < 5; i++) {
+                ui.set("#CratePickupMod" + i + ".Visible", false);
+            }
+        }
+    }
+
     private void buildStatRow(@Nonnull UICommandBuilder ui, int index,
                                @Nonnull String label, double baseValue,
                                double modBonus, boolean isMultiplier) {
@@ -296,6 +391,14 @@ public final class ItemPickupHud extends CustomUIHud {
     }
 
     @Nonnull
+    private static String formatArmorModifier(@Nonnull ArmorModifier mod) {
+        StringBuilder sb = new StringBuilder("> ");
+        sb.append(mod.type().getDisplayName()).append(' ');
+        sb.append('+').append((int) Math.round(mod.rolledValue() * 100)).append('%');
+        return sb.toString();
+    }
+
+    @Nonnull
     private String buildWeaponTitle() {
         StringBuilder sb = new StringBuilder();
         if (rarity != WeaponRarity.BASIC) {
@@ -324,6 +427,32 @@ public final class ItemPickupHud extends CustomUIHud {
             }
         }
         return total;
+    }
+
+    private double getArmorModBonus(@Nonnull ArmorModifierType type) {
+        double total = 0.0;
+        for (ArmorModifier mod : armorModifiers) {
+            if (mod.type() == type) {
+                total += mod.rolledValue();
+            }
+        }
+        return total;
+    }
+
+    @Nonnull
+    private String buildArmorTitle() {
+        StringBuilder sb = new StringBuilder();
+        if (rarity != WeaponRarity.BASIC) {
+            sb.append(rarity.name()).append(' ');
+        }
+        String name = this.itemDisplayName;
+        if ((name == null || name.isBlank()) && armorDefinition != null) {
+            name = armorDefinition.getDisplayName();
+        }
+        if (name != null && !name.isBlank()) {
+            sb.append(name);
+        }
+        return sb.toString().toUpperCase();
     }
 
     @Nonnull

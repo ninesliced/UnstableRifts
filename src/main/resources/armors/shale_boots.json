@@ -1,0 +1,19 @@
+{
+  "itemId": "Armor_Shale_Boots_Shotcave",
+  "displayName": "Shale Leggings",
+  "setId": "shale",
+  "slotType": "LEGS",
+  "setAbility": "GUARDIAN",
+  "minRarity": "UNCOMMON",
+  "maxRarity": "UNIQUE",
+  "spawnWeight": 12,
+  "baseStats": {
+    "protection": 8,
+    "knockback": 0,
+    "closeDmgReduce": 0,
+    "farDmgReduce": 0,
+    "spikeDamage": 0,
+    "lifeBoost": 0,
+    "speedBoost": 0.06
+  }
+}

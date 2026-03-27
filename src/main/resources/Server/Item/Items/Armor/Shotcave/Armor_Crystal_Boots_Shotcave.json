@@ -1,0 +1,6 @@
+{
+  "Parent": "Armor_Mithril_Legs",
+  "TranslationProperties": { "Name": "server.items.Armor_Crystal_Boots_Shotcave.name" },
+  "MaxDurability": 0,
+  "Tags": { "Type": ["Armor"], "Pickup": ["FKey"] }
+}

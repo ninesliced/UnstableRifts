@@ -1,0 +1,19 @@
+{
+  "itemId": "Armor_Shale_Legs_Shotcave",
+  "displayName": "Shale Gauntlets",
+  "setId": "shale",
+  "slotType": "ARMS",
+  "setAbility": "GUARDIAN",
+  "minRarity": "UNCOMMON",
+  "maxRarity": "UNIQUE",
+  "spawnWeight": 12,
+  "baseStats": {
+    "protection": 15,
+    "knockback": 1.5,
+    "closeDmgReduce": 0.08,
+    "farDmgReduce": 0,
+    "spikeDamage": 3,
+    "lifeBoost": 0,
+    "speedBoost": 0
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "itemId": "Armor_Void_Chest_Shotcave",
+  "displayName": "Void Chestplate",
+  "setId": "void",
+  "slotType": "CHEST",
+  "setAbility": "PURIFICATION",
+  "minRarity": "RARE",
+  "maxRarity": "UNIQUE",
+  "spawnWeight": 10,
+  "baseStats": {
+    "protection": 20,
+    "knockback": 1.8,
+    "closeDmgReduce": 0.12,
+    "farDmgReduce": 0.08,
+    "spikeDamage": 5,
+    "lifeBoost": 35,
+    "speedBoost": 0
+  }
+}

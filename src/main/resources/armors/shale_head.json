@@ -1,0 +1,19 @@
+{
+  "itemId": "Armor_Shale_Head_Shotcave",
+  "displayName": "Shale Helmet",
+  "setId": "shale",
+  "slotType": "HEAD",
+  "setAbility": "GUARDIAN",
+  "minRarity": "UNCOMMON",
+  "maxRarity": "UNIQUE",
+  "spawnWeight": 12,
+  "baseStats": {
+    "protection": 10,
+    "knockback": 0,
+    "closeDmgReduce": 0,
+    "farDmgReduce": 0.07,
+    "spikeDamage": 0,
+    "lifeBoost": 0,
+    "speedBoost": 0
+  }
+}

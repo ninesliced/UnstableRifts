@@ -1,6 +1,7 @@
 package dev.ninesliced.shotcave.crate;
 
 import com.hypixel.hytale.server.core.inventory.ItemStack;
+import dev.ninesliced.shotcave.armor.ArmorLootRoller;
 import dev.ninesliced.shotcave.guns.WeaponLootRoller;
 
 import javax.annotation.Nonnull;
@@ -25,7 +26,7 @@ public final class CrateDropGenerator {
 
     /**
      * Generates drops for a crate block type based on its config entry.
-     * Returns coins (always) and optionally a rolled weapon.
+     * Returns coins (always) and optionally a rolled weapon and/or armor piece.
      */
     @Nonnull
     public static List<ItemStack> generateDrops(@Nonnull String blockTypeId) {
@@ -33,7 +34,7 @@ public final class CrateDropGenerator {
         if (entry == null) return List.of();
 
         ThreadLocalRandom rng = ThreadLocalRandom.current();
-        List<ItemStack> drops = new ArrayList<>(2);
+        List<ItemStack> drops = new ArrayList<>(3);
 
         int coinQuantity = rng.nextInt(entry.getCoinMin(), entry.getCoinMax() + 1);
         if (coinQuantity > 0) {
@@ -47,6 +48,16 @@ public final class CrateDropGenerator {
                         entry.getMinRarity(), entry.getMaxRarity(), whitelist));
             } else {
                 drops.add(WeaponLootRoller.rollRandom());
+            }
+        }
+
+        if (rng.nextDouble() < entry.getArmorChance()) {
+            List<String> armorWhitelist = entry.getArmorWhitelist();
+            if (!armorWhitelist.isEmpty()) {
+                drops.add(ArmorLootRoller.rollFromCrate(
+                        entry.getArmorMinRarity(), entry.getArmorMaxRarity(), armorWhitelist));
+            } else {
+                drops.add(ArmorLootRoller.rollRandom());
             }
         }
 

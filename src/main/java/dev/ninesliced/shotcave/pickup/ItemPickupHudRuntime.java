@@ -126,6 +126,9 @@ public final class ItemPickupHudRuntime {
                     if (!tracked.getRef().isValid()) {
                         continue;
                     }
+                    if (tracked.getRef().getStore() != ref.getStore()) {
+                        continue;
+                    }
 
                     Vector3d itemPos = tracked.getPosition(ref.getStore());
                     if (itemPos == null) {
