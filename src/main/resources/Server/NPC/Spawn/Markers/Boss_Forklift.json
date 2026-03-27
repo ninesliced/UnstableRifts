@@ -1,0 +1,13 @@
+{
+  "Model": "NPC_Spawn_Marker",
+  "NPCs": [
+    {
+      "Name": "Boss_Forklift",
+      "Weight": 100,
+      "SpawnAfterGameTime": "P0D"
+    }
+  ],
+  "ExclusionRadius": 16,
+  "MaxDropHeight": 4,
+  "DeactivationDistance": 180
+}

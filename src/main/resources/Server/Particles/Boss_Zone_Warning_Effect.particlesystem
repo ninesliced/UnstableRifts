@@ -1,0 +1,20 @@
+{
+  "$Comment": "Warning zone indicator - flat red circle on ground + dark tendrils at edge",
+  "Spawners": [
+    {
+      "SpawnerId": "Boss_Zone_Warning_Circle",
+      "PositionOffset": {
+        "Y": -0.5
+      }
+    },
+    {
+      "SpawnerId": "Boss_Zone_Warning_Tendrils",
+      "PositionOffset": {
+        "Y": 0.5
+      }
+    }
+  ],
+  "BoundingRadius": 50.0,
+  "CullDistance": 80.0,
+  "IsImportant": true
+}

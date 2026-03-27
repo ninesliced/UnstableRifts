@@ -1,0 +1,7 @@
+{
+  "Type": "CameraShake",
+  "CameraShake": "Boss_Zombie_Commander",
+  "Intensity": {
+    "Value": 0.08
+  }
+}

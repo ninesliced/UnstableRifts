@@ -1,0 +1,14 @@
+{
+  "Tags": {
+    "Attack": [
+      "Melee"
+    ]
+  },
+  "Cooldown": {
+    "Cooldown": 1.0
+  },
+  "Interactions": [
+    "Industrial_Hazmat_Swing_Combo",
+    "Industrial_Hazmat_Swing_Double"
+  ]
+}

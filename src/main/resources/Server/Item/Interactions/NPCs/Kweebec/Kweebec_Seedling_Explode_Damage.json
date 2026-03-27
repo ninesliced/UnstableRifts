@@ -1,0 +1,16 @@
+{
+  "Type": "DamageEntity",
+  "DamageCalculator": {
+    "BaseDamage": {
+      "Physical": 30
+    }
+  },
+  "DamageEffects": {
+    "WorldSoundEventId": "SFX_Goblin_Lobber_Bomb_Death",
+    "WorldParticles": [
+      {
+        "SystemId": "Explosion_Medium"
+      }
+    ]
+  }
+}

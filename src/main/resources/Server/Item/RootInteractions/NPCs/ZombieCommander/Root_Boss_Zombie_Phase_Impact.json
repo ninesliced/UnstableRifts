@@ -1,0 +1,10 @@
+{
+  "Interactions": [
+    "Boss_Zombie_Phase_Impact"
+  ],
+  "Tags": {
+    "Attack": [
+      "Melee"
+    ]
+  }
+}

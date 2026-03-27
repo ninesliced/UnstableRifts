@@ -1,0 +1,365 @@
+{
+	"Type": "Abstract",
+	"StartState": "Idle",
+	"DefaultNPCAttitude": "Ignore",
+	"DefaultPlayerAttitude": "Hostile",
+	"AttitudeGroup": { "Compute": "AttitudeGroup" },
+	"BusyStates": ["Alerted", "Chase", "Search", "ReturnHome"],
+	"Parameters": {
+		"Appearance": {
+			"Value": "Industrial_Hazmat",
+			"Description": "Model to be used"
+		},
+		"IdleMotionComponent": {
+			"Value": "Component_Instruction_Intelligent_Idle_Motion_Wander",
+			"Description": "The component that controls how the NPC moves during idle state"
+		},
+		"ViewRange": {
+			"Value": 28,
+			"Description": "View range"
+		},
+		"ViewSector": {
+			"Value": 280,
+			"Description": "View sector"
+		},
+		"HearingRange": {
+			"Value": 20,
+			"Description": "Hearing range"
+		},
+		"AbsoluteDetectionRange": {
+			"Value": 8,
+			"Description": "Guaranteed detection distance"
+		},
+		"AlertedRange": {
+			"Value": 54,
+			"Description": "Detection range while in combat/search"
+		},
+		"LeashDistance": {
+			"Value": 60,
+			"Description": "Distance before returning to spawn"
+		},
+		"LeashMinPlayerDistance": {
+			"Value": 7,
+			"Description": "Minimum player distance before leash can force return"
+		},
+		"LeashTimer": {
+			"Value": [8, 8],
+			"Description": "Time spent out of leash range before returning"
+		},
+		"HardLeashDistance": {
+			"Value": 220,
+			"Description": "Absolute max distance from spawn"
+		},
+		"DropList": {
+			"Value": "Drop_Zombie_Aberrant_Big",
+			"Description": "Drop items"
+		},
+		"MaxSpeed": {
+			"Value": 6.9,
+			"Description": "Maximum walking speed"
+		},
+		"RelativeChaseSpeed": {
+			"Value": 0.9,
+			"Description": "Relative chase speed"
+		},
+		"Weapons": {
+			"Value": [],
+			"TypeHint": "String",
+			"Description": "NPC weapon list (empty = fists)"
+		},
+		"AttackSequence": {
+			"Value": "Component_Instruction_Attack_Sequence_Industrial_Hazmat",
+			"Description": "Melee attack sequence"
+		},
+		"AttackDistance": {
+			"Value": 2,
+			"Description": "Distance at which attacks are executed"
+		},
+		"TargetGroups": {
+			"Value": ["Industrial_Hazmat"],
+			"Description": "Beacon target groups"
+		},
+		"DisableDamageGroups": {
+			"Value": ["Self", "Industrial"],
+			"Description": "Groups not to take damage from"
+		},
+		"AttitudeGroup": {
+			"Value": "Industrial",
+			"Description": "Attitude group"
+		},
+		"CombatRelativeTurnSpeed": {
+			"Value": 1.9,
+			"Description": "Turn speed modifier in combat"
+		},
+		"MaxHealth": {
+			"Value": 96,
+			"Description": "Max health for the NPC"
+		},
+		"IsMemory": {
+			"Value": true,
+			"Description": "Defines if the NPC is a memory"
+		},
+		"MemoriesCategory": {
+			"Value": "Industrial",
+			"Description": "Defines the memory category"
+		},
+		"MemoriesNameOverride": {
+			"Value": "Industrial_Hazmat",
+			"Description": "Memory name override"
+		},
+		"NameTranslationKey": {
+			"Value": "bettermobs.npcRoles.Industrial_Hazmat.name",
+			"Description": "Translation key for NPC name display"
+		}
+	},
+	"IsMemory": { "Compute": "IsMemory" },
+	"MemoriesCategory": { "Compute": "MemoriesCategory" },
+	"MemoriesNameOverride": { "Compute": "MemoriesNameOverride" },
+	"Appearance": { "Compute": "Appearance" },
+	"DropList": { "Compute": "DropList" },
+	"DisableDamageGroups": { "Compute": "DisableDamageGroups" },
+	"HotbarItems": { "Compute": "Weapons" },
+	"HotbarSize": 3,
+	"KnockbackScale": 0.5,
+	"MotionControllerList": [
+		{
+			"Type": "Walk",
+			"MaxWalkSpeed": { "Compute": "MaxSpeed" },
+			"Gravity": 10,
+			"RunThreshold": 0.3,
+			"MaxFallSpeed": 15,
+			"MaxRotationSpeed": 360,
+			"Acceleration": 10,
+			"MinJumpHeight": 0.8
+		}
+	],
+	"MaxHealth": { "Compute": "MaxHealth" },
+	"Instructions": [
+		{
+			"Continue": true,
+			"Sensor": {
+				"Type": "Beacon",
+				"Message": "IndustrialHazmat_EnemyFound",
+				"TargetSlot": "LockedTarget",
+				"Range": { "Compute": "HearingRange * 2" }
+			},
+			"Actions": [
+				{
+					"Type": "State",
+					"State": "Chase"
+				}
+			]
+		},
+		{
+			"Sensor": {
+				"Type": "State",
+				"State": "Idle"
+			},
+			"Instructions": [
+				{
+					"Reference": "Component_Instruction_Damage_Check",
+					"Modify": {
+						"_ExportStates": ["Chase", "Search"],
+						"AlertedRange": { "Compute": "AlertedRange" }
+					}
+				},
+				{
+					"Sensor": {
+						"Reference": "Component_Sensor_Standard_Detection",
+						"Modify": {
+							"ViewRange": { "Compute": "ViewRange" },
+							"ViewSector": { "Compute": "ViewSector" },
+							"HearingRange": { "Compute": "HearingRange" },
+							"AbsoluteDetectionRange": { "Compute": "AbsoluteDetectionRange" },
+							"Attitudes": ["Hostile"]
+						}
+					},
+					"Actions": [
+						{
+							"Type": "Beacon",
+							"Range": { "Compute": "HearingRange * 2" },
+							"Message": "IndustrialHazmat_EnemyFound",
+							"TargetGroups": { "Compute": "TargetGroups" },
+							"SendTargetSlot": "LockedTarget"
+						},
+						{
+							"Type": "State",
+							"State": "Alerted"
+						}
+					]
+				},
+				{
+					"Reference": { "Compute": "IdleMotionComponent" },
+					"Interfaces": ["Hytale.Instruction.Intelligent.Idle.Motion"]
+				}
+			]
+		},
+		{
+			"Sensor": {
+				"Type": "State",
+				"State": "Alerted"
+			},
+			"Instructions": [
+				{
+					"Continue": true,
+					"Sensor": {
+						"Type": "Any",
+						"Once": true
+					},
+					"Actions": [
+						{
+							"Type": "PlayAnimation",
+							"Slot": "Status",
+							"Animation": "Alerted"
+						}
+					]
+				},
+				{
+					"Continue": true,
+					"Sensor": {
+						"Type": "Target"
+					},
+					"HeadMotion": {
+						"Type": "Aim",
+						"Spread": 0,
+						"HitProbability": 1
+					}
+				},
+				{
+					"Sensor": {
+						"Type": "Any"
+					},
+					"Actions": [
+						{
+							"Type": "Timeout",
+							"Delay": [2.8333, 2.8333],
+							"Action": {
+								"Type": "State",
+								"State": "Chase"
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"Sensor": {
+				"Type": "State",
+				"State": "Chase"
+			},
+			"Instructions": [
+				{
+					"Continue": true,
+					"Sensor": {
+						"Type": "Any",
+						"Once": true
+					},
+					"Actions": [
+						{
+							"Type": "Beacon",
+							"Range": { "Compute": "HearingRange * 2" },
+							"Message": "IndustrialHazmat_EnemyFound",
+							"TargetGroups": { "Compute": "TargetGroups" },
+							"SendTargetSlot": "LockedTarget"
+						}
+					]
+				},
+				{
+					"Reference": "Component_Instruction_Clear_Status_Animation"
+				},
+				{
+					"Reference": "Component_Instruction_Target_Adjusted_Attack_Melee",
+					"Modify": {
+						"TargetSwitchTimer": [5, 5],
+						"AttackSequence": { "Compute": "AttackSequence" },
+						"AttackDistance": { "Compute": "AttackDistance" },
+						"TargetRange": 4,
+						"CombatRelativeTurnSpeed": { "Compute": "CombatRelativeTurnSpeed" }
+					}
+				},
+				{
+					"Reference": "Component_Instruction_Soft_Leash",
+					"Modify": {
+						"_ExportStates": ["ReturnHome"],
+						"LeashDistance": { "Compute": "LeashDistance" },
+						"LeashMinPlayerDistance": { "Compute": "LeashMinPlayerDistance" },
+						"LeashTimer": { "Compute": "LeashTimer" },
+						"HardLeashDistance": { "Compute": "HardLeashDistance" }
+					}
+				},
+				{
+					"Reference": "Component_Instruction_Intelligent_Chase",
+					"Modify": {
+						"_ExportStates": ["Search", "ReturnHome", "ReturnHome"],
+						"ViewRange": { "Compute": "AlertedRange" },
+						"HearingRange": { "Compute": "HearingRange" },
+						"RelativeSpeed": { "Compute": "RelativeChaseSpeed" }
+					}
+				}
+			]
+		},
+		{
+			"Sensor": {
+				"Type": "State",
+				"State": "Search"
+			},
+			"Instructions": [
+				{
+					"Continue": true,
+					"Sensor": {
+						"Type": "Any",
+						"Once": true
+					},
+					"Actions": [
+						{
+							"Type": "Beacon",
+							"Range": { "Compute": "HearingRange * 2" },
+							"Message": "IndustrialHazmat_EnemyFound",
+							"TargetGroups": { "Compute": "TargetGroups" },
+							"SendTargetSlot": "LockedTarget"
+						}
+					]
+				},
+				{
+					"Reference": "Component_Instruction_Generic_Search",
+					"Modify": {
+						"_ExportStates": ["Chase", "Chase", "Search", "Idle"],
+						"ViewRange": { "Compute": "ViewRange" },
+						"ViewSector": { "Compute": "ViewSector" },
+						"HearingRange": { "Compute": "HearingRange" }
+					}
+				}
+			]
+		},
+		{
+			"Sensor": {
+				"Type": "State",
+				"State": "ReturnHome"
+			},
+			"Instructions": [
+				{
+					"Sensor": {
+						"Type": "Leash",
+						"Range": { "Compute": "LeashDistance * 0.3" }
+					},
+					"BodyMotion": {
+						"Type": "Seek",
+						"SlowDownDistance": 1,
+						"StopDistance": 0.5,
+						"RelativeSpeed": 1,
+						"UsePathfinder": true
+					}
+				},
+				{
+					"Actions": [
+						{
+							"Type": "State",
+							"State": "Idle"
+						}
+					]
+				}
+			]
+		}
+	],
+	"NameTranslationKey": { "Compute": "NameTranslationKey" }
+}

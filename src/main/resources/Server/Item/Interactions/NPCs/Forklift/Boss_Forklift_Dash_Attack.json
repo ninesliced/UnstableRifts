@@ -1,0 +1,138 @@
+{
+  "$Comment": "Forklift dash: telegraph a forward lane, then lock direction and rush straight ahead with repeated force pulses and body-contact damage.",
+  "Type": "Simple",
+  "RunTime": 0.5,
+  "Effects": {
+    "ItemPlayerAnimationsId": "Forklift_Default",
+    "ItemAnimationId": "Dash",
+    "WorldSoundEventId": "SFX_Light_Melee_T2_Swing",
+    "MovementEffects": {
+      "DisableAll": true
+    }
+  },
+  "Next": {
+    "Type": "Repeat",
+    "Repeat": 6,
+    "Effects": {
+      "ItemPlayerAnimationsId": "Forklift_Default",
+      "ItemAnimationId": "Dash",
+      "MovementEffects": {
+        "DisableAll": true
+      }
+    },
+    "ForkInteractions": {
+      "Interactions": [
+        {
+          "Type": "Parallel",
+          "Interactions": [
+            {
+              "Interactions": [
+                {
+                  "Type": "Selector",
+                  "RunTime": 0.24,
+                  "Selector": {
+                    "Id": "Stab",
+                    "TestLineOfSight": true,
+                    "ExtendTop": 1.8,
+                    "ExtendLeft": 1.8,
+                    "ExtendRight": 1.8,
+                    "ExtendBottom": 1.0,
+                    "StartDistance": 0.0,
+                    "EndDistance": 2.8
+                  },
+                  "HitEntity": {
+                    "Interactions": [
+                      {
+                        "Type": "Replace",
+                        "Var": "Dash_Damage",
+                        "DefaultOk": true,
+                        "DefaultValue": {
+                          "Interactions": [
+                            "Boss_Forklift_Dash_Damage"
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  "Next": {
+                    "Type": "Simple",
+                    "RunTime": 0.0
+                  }
+                }
+              ]
+            },
+            {
+              "Interactions": [
+                {
+                  "Type": "Selector",
+                  "RunTime": 0.24,
+                  "Selector": {
+                    "Id": "AOECircle",
+                    "Range": 2.0
+                  },
+                  "HitEntity": {
+                    "Interactions": [
+                      {
+                        "Type": "Replace",
+                        "Var": "Dash_Damage",
+                        "DefaultOk": true,
+                        "DefaultValue": {
+                          "Interactions": [
+                            "Boss_Forklift_Dash_Damage"
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  "Next": {
+                    "Type": "Simple",
+                    "RunTime": 0.0
+                  }
+                }
+              ]
+            },
+            {
+              "Interactions": [
+                {
+                  "Type": "ApplyForce",
+                  "Force": 8000,
+                  "Direction": {
+                    "X": 0,
+                    "Y": 0,
+                    "Z": -5.5
+                  },
+                  "AdjustVertical": false,
+                  "Effects": {
+                    "ItemAnimationId": "Dash",
+                    "ItemPlayerAnimationsId": "Forklift_Default",
+                    "MovementEffects": {
+                      "DisableAll": true
+                    }
+                  },
+                  "ChangeVelocityType": "Add",
+                  "WaitForGround": false,
+                  "WaitForCollision": false,
+                  "VelocityConfig": {
+                    "AirResistance": 0.995,
+                    "AirResistanceMax": 0.99,
+                    "GroundResistance": 0.995,
+                    "GroundResistanceMax": 0.99,
+                    "Threshold": 3.0,
+                    "Style": "Linear"
+                  },
+                  "GroundCheckDelay": 0.0,
+                  "RunTime": 0.24,
+                  "VerticalClamp": [-1.2, 1.2],
+                  "Next": {
+                    "Type": "Simple",
+                    "RunTime": 0.8
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

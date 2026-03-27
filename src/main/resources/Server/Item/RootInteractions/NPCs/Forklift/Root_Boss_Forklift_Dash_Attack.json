@@ -1,0 +1,13 @@
+{
+  "Tags": {
+    "Attack": [
+      "Melee"
+    ]
+  },
+  "Cooldown": {
+    "Cooldown": 5.5
+  },
+  "Interactions": [
+    "Boss_Forklift_Dash_Attack"
+  ]
+}

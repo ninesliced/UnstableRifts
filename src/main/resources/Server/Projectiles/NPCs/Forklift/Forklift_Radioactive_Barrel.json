@@ -1,0 +1,38 @@
+{
+  "Appearance": "Forklift_Radioactive_Barrel",
+  "VerticalCenterShot": 0.35,
+  "HorizontalCenterShot": 0.0,
+  "DepthShot": 1.35,
+  "PitchAdjustShot": true,
+  "SticksVertically": true,
+  "MuzzleVelocity": 28,
+  "TerminalVelocity": 34,
+  "Gravity": 10,
+  "Damage": 0,
+  "DeathEffectsOnHit": true,
+  "BounceSoundEventId": "SFX_Bomb_Fire_Goblin_Bounce",
+  "HitSoundEventId": "SFX_Goblin_Lobber_Bomb_Death",
+  "MissSoundEventId": "SFX_Goblin_Lobber_Bomb_Death",
+  "DeathSoundEventId": "SFX_Goblin_Lobber_Bomb_Death",
+  "DeadTimeMiss": 0,
+  "DeadTime": 0,
+  "ExplosionConfig": {
+    "DamageEntities": true,
+    "DamageBlocks": false,
+    "BlockDamageRadius": 20,
+    "EntityDamageRadius": 5,
+    "EntityDamageFalloff": 1.0,
+    "Knockback": {
+      "Type": "Point",
+      "VelocityConfig": {
+        "AirResistance": 0.97,
+        "AirResistanceMax": 0.96,
+        "GroundResistance": 0.94,
+        "GroundResistanceMax": 0.3,
+        "Threshold": 3.0
+      },
+      "Force": 5,
+      "VelocityType": "Set"
+    }
+  }
+}

@@ -1,0 +1,134 @@
+{
+  "$Comment": "Fork Attack: Fork goes up at 0.19s (first hit), comes down at 0.57s (second hit). Total 0.91s.",
+  "Type": "Simple",
+  "RunTime": 0.19,
+  "Effects": {
+    "ItemPlayerAnimationsId": "Forklift_Default",
+    "ItemAnimationId": "ForkStab",
+    "WorldSoundEventId": "SFX_Unarmed_Swing",
+    "MovementEffects": {
+      "DisableAll": true
+    },
+    "Trails": [
+      {
+        "TargetNodeName": "ForkCliffC",
+        "TrailId": "Small_Default",
+        "RotationOffset": {
+          "Yaw": 0,
+          "Pitch": 0,
+          "Roll": 90
+        }
+      }
+    ]
+  },
+  "Next": {
+    "Type": "Parallel",
+    "Interactions": [
+      {
+        "$Comment": "First hit: fork goes up at 0.19s - frontal cone damage + knockback/air",
+        "Interactions": [
+          {
+            "Type": "Selector",
+            "RunTime": 0.18,
+            "Selector": {
+              "Id": "Stab",
+              "TestLineOfSight": true,
+              "ExtendTop": 1.75,
+              "ExtendLeft": 1.4,
+              "ExtendRight": 1.4,
+              "ExtendBottom": 0.9,
+              "StartDistance": 1.35,
+              "EndDistance": 4.8
+            },
+            "HitEntity": {
+              "Interactions": [
+                {
+                  "Type": "Replace",
+                  "Var": "Fork_Damage",
+                  "DefaultOk": true,
+                  "DefaultValue": {
+                    "Interactions": [
+                                   "Boss_Forklift_Fork_Damage_Second"
+                    ]
+                  }
+                }
+              ]
+            },
+            "Next": {
+              "$Comment": "Wait until 0.57s for second hit (0.57 - 0.19 - 0.18 = 0.20s gap)",
+              "Type": "Simple",
+              "RunTime": 0.2,
+              "Next": {
+                "Type": "Parallel",
+                "Interactions": [
+                  {
+                    "$Comment": "Second hit: fork comes down at 0.57s",
+                    "Interactions": [
+                      {
+                        "Type": "Selector",
+                        "RunTime": 0.18,
+                        "Selector": {
+                          "Id": "Stab",
+                          "TestLineOfSight": true,
+                          "ExtendTop": 1.75,
+                          "ExtendLeft": 1.4,
+                          "ExtendRight": 1.4,
+                          "ExtendBottom": 0.9,
+                          "StartDistance": 1.35,
+                          "EndDistance": 4.8
+                        },
+                        "HitEntity": {
+                          "Interactions": [
+                            {
+                              "Type": "Replace",
+                              "Var": "Fork_Damage",
+                              "DefaultOk": true,
+                              "DefaultValue": {
+                                "Interactions": [
+                                  "Boss_Forklift_Fork_Damage"
+                                ]
+                              }
+                            }
+                          ]
+                        },
+                        "Next": {
+                          "$Comment": "Recovery: remaining time (0.91 - 0.57 - 0.18 = 0.16s)",
+                          "Type": "Simple",
+                          "RunTime": 0.16
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "Interactions": [
+                      {
+                        "Type": "Simple",
+                        "RunTime": 0.18,
+                        "Effects": {
+                          "ItemAnimationId": "ForkStab",
+                          "WorldSoundEventId": "SFX_Unarmed_Swing"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      },
+      {
+        "Interactions": [
+          {
+            "Type": "Simple",
+            "RunTime": 0.18,
+            "Effects": {
+              "ItemAnimationId": "ForkStab",
+              "WorldSoundEventId": "SFX_Unarmed_Swing"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

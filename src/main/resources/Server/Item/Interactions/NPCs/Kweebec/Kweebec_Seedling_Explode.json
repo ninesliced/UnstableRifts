@@ -1,0 +1,49 @@
+{
+  "Type": "Parallel",
+  "Interactions": [
+    {
+      "Interactions": [
+        {
+          "Type": "Selector",
+          "RunTime": 0.1,
+          "Selector": {
+            "Id": "AOECircle",
+            "Range": 4
+          },
+          "HitEntity": {
+            "Interactions": [
+              {
+                "Type": "Replace",
+                "Var": "Rootling_Explode_Damage",
+                "DefaultOk": true,
+                "DefaultValue": {
+                  "Interactions": [
+                    "Kweebec_Seedling_Explode_Damage"
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "Interactions": [
+        {
+          "Type": "Simple",
+          "RunTime": 0.1,
+          "Effects": {
+            "WorldSoundEventId": "SFX_Goblin_Lobber_Bomb_Death",
+            "LocalSoundEventId": "SFX_Goblin_Lobber_Bomb_Death",
+            "Particles": [
+              {
+                "SystemId": "Explosion_Medium",
+                "TargetEntityPart": "Entity"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "Type": "Simple",
+  "Effects": {
+    "ItemPlayerAnimationsId": "Industrial_Hazmat_Default",
+    "ItemAnimationId": "SwingDouble",
+    "WorldSoundEventId": "SFX_Unarmed_Swing"
+  },
+  "$Comment": "Double-fist stomp, 1.3s total. Damage hits at ~0.65s in a frontal cone.",
+  "RunTime": 0.65,
+  "Next": {
+    "Type": "Selector",
+    "RunTime": 0.1,
+    "Selector": {
+      "Id": "Horizontal",
+      "Direction": "ToLeft",
+      "TestLineOfSight": true,
+      "ExtendTop": 0.6,
+      "ExtendBottom": 0.6,
+      "StartDistance": 0.2,
+      "EndDistance": 2.8,
+      "Length": 90,
+      "RollOffset": 0,
+      "YawStartOffset": -45
+    },
+    "HitEntity": {
+      "Interactions": [
+        {
+          "Type": "Replace",
+          "DefaultValue": {
+            "Interactions": [
+              "NPC_Attack_Melee_Damage"
+            ]
+          },
+          "Var": "Melee_Damage3"
+        }
+      ]
+    },
+    "Next": {
+      "Type": "Simple",
+      "$Comment": "Recovery after stomp",
+      "RunTime": 0.55
+    }
+  }
+}

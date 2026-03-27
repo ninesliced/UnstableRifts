@@ -1,0 +1,61 @@
+{
+  "RenderMode": "Erosion",
+  "ParticleRotationInfluence": "None",
+  "LinearFiltering": true,
+  "LightInfluence": 0,
+  "ParticleRotateWithSpawner": true,
+  "MaxConcurrentParticles": 1,
+  "ParticleLifeSpan": {
+    "Min": 0.4,
+    "Max": 0.4
+  },
+  "SpawnRate": {
+    "Min": 1.0,
+    "Max": 1.0
+  },
+  "$Comment": "Expanding red shockwave ring on impact",
+  "Particle": {
+    "Texture": "Particles/Textures/Circles/Explosion_Shockwave.png",
+    "ScaleRatioConstraint": "OneToOne",
+    "UVOption": "None",
+    "Animation": {
+      "0": {
+        "Scale": {
+          "X": { "Min": 0.3, "Max": 0.3 }
+        },
+        "Opacity": 1.0,
+        "Color": "#ff0000"
+      },
+      "60": {
+        "Opacity": 0.7,
+        "Color": "#ff4400"
+      },
+      "100": {
+        "Opacity": 0.0,
+        "Scale": {
+          "X": { "Min": 6.0, "Max": 6.0 }
+        },
+        "Color": "#ff6633"
+      }
+    },
+    "SoftParticles": "Disable",
+    "InitialAnimationFrame": {
+      "Scale": {
+        "X": { "Min": 0.2, "Max": 0.2 }
+      },
+      "Opacity": 1.0,
+      "Rotation": {
+        "X": { "Min": 90, "Max": 90 }
+      }
+    },
+    "FrameSize": {
+      "Height": 0
+    }
+  },
+  "CameraOffset": -1.0,
+  "TotalParticles": {
+    "Min": 1,
+    "Max": 1
+  },
+  "SpawnBurst": true
+}

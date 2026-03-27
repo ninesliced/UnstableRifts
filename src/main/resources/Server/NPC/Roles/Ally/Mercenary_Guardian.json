@@ -1,0 +1,49 @@
+{
+  "Type": "Variant",
+  "Reference": "Template_Summoned_Ally",
+  "Modify": {
+    "Appearance": "Player",
+    "MaxHealth": 260,
+    "MaxSpeed": 10.5,
+    "RunThreshold": 0.42,
+    "ViewRange": 34,
+    "ViewSector": 320,
+    "HearingRange": 16,
+    "AbsoluteDetectionRange": 8,
+    "AlertedRange": 40,
+    "Weapons": [
+      "Weapon_Sword_Iron",
+      "Potion_Health_Lesser",
+      "Potion_Health_Lesser"
+    ],
+    "DefaultHotbarSlot": 0,
+    "OffHand": [
+      "Weapon_Shield_Iron"
+    ],
+    "DefaultOffHandSlot": 0,
+    "UseCombatActionEvaluator": true,
+    "_CombatConfig": "CAE_Mercenary_Guardian",
+    "Attack": "Root_NPC_Attack_Melee",
+    "AttackDistance": 3,
+    "DesiredAttackDistanceRange": [1.4, 2.2],
+    "AttackPauseRange": [0.35, 0.7],
+    "CombatBehaviorDistance": 12,
+    "CombatRelativeTurnSpeed": 1.7,
+    "CombatDirectWeight": 16,
+    "CombatAlwaysMovingWeight": 8,
+    "CombatStrafeWeight": 20,
+    "CombatStrafingDurationRange": [0.6, 1.4],
+    "CombatStrafingFrequencyRange": [0.5, 1.2],
+    "CombatBackOffAfterAttack": false,
+    "CombatMovingRelativeSpeed": 0.95,
+    "CombatBackwardsRelativeSpeed": 0.7,
+    "ChaseRelativeSpeed": 0.85,
+    "SummonerLeashRange": 36,
+    "ApplySeparation": true,
+    "BreathesInWater": true,
+    "FlockArray": [
+      "Mercenary_Guardian"
+    ],
+    "NameTranslationKey": "bossnpc.npcRoles.Mercenary_Guardian.name"
+  }
+}

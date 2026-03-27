@@ -1,0 +1,15 @@
+{
+  "$Comment": "Impact shockwave expanding from boss on damage",
+  "Spawners": [
+    {
+      "SpawnerId": "Boss_Zone_Impact_Shockwave",
+      "PositionOffset": {
+        "Y": -0.5
+      }
+    }
+  ],
+  "BoundingRadius": 50.0,
+  "CullDistance": 80.0,
+  "LifeSpan": 0.5,
+  "IsImportant": true
+}

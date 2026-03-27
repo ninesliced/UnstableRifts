@@ -1,0 +1,214 @@
+{
+  "Type": "CombatActionEvaluator",
+  "TargetMemoryDuration": 14,
+  "CombatActionEvaluator": {
+    "RunConditions": [
+      {
+        "Type": "TimeSinceLastUsed",
+        "Curve": {
+          "ResponseCurve": "Linear",
+          "XRange": [0, 8]
+        }
+      },
+      {
+        "Type": "Randomiser",
+        "MinValue": 0.8,
+        "MaxValue": 1
+      }
+    ],
+    "MinRunUtility": 0.5,
+    "MinActionUtility": 0.01,
+    "AvailableActions": {
+      "HoldLine": {
+        "Type": "State",
+        "Description": "Tank posture against hostiles",
+        "State": "Combat",
+        "SubState": "Strafe",
+        "Target": "Hostile",
+        "PostExecuteDistanceRange": [1.5, 2.3],
+        "WeightCoefficient": 1.8,
+        "Conditions": [
+          {
+            "Type": "TimeSinceLastUsed",
+            "Curve": {
+              "Type": "Switch",
+              "SwitchPoint": 1
+            }
+          }
+        ]
+      },
+      "GuardFriendlyCritical": {
+        "Type": "State",
+        "Description": "Defend low-health ally",
+        "State": "Combat",
+        "SubState": "Strafe",
+        "Target": "Friendly",
+        "PostExecuteDistanceRange": [0.8, 1.8],
+        "WeightCoefficient": 2.8,
+        "Conditions": [
+          {
+            "Type": "TargetStatPercent",
+            "Stat": "Health",
+            "Curve": "ReverseLinear"
+          },
+          {
+            "Type": "TimeSinceLastUsed",
+            "Curve": {
+              "Type": "Switch",
+              "SwitchPoint": 2
+            }
+          }
+        ]
+      },
+      "ShieldBlock": {
+        "Type": "Ability",
+        "Description": "Block incoming damage while tanking",
+        "Target": "Hostile",
+        "AbilityType": "Secondary",
+        "OffhandSlot": 0,
+        "AttackDistanceRange": [0.5, 10],
+        "PostExecuteDistanceRange": [1.2, 1.8],
+        "Ability": "Root_NPC_Shield_Block",
+        "SubState": "Default",
+        "ChargeFor": 1.8,
+        "WeightCoefficient": 2.1,
+        "Conditions": [
+          {
+            "Type": "RecentSustainedDamage",
+            "Curve": {
+              "ResponseCurve": "InverseExponential",
+              "XRange": [0, 4]
+            }
+          },
+          {
+            "Type": "TimeSinceLastUsed",
+            "Curve": {
+              "Type": "Switch",
+              "SwitchPoint": 1
+            }
+          }
+        ]
+      },
+      "SelfPotionHeal": {
+        "Type": "Ability",
+        "Description": "Drink health potion",
+        "Target": "Self",
+        "WeaponSlot": 1,
+        "AttackDistanceRange": [1, 1],
+        "Ability": "Root_Secondary_Consume_Potion",
+        "WeightCoefficient": 2.6,
+        "Conditions": [
+          {
+            "Type": "OwnStatPercent",
+            "Stat": "Health",
+            "Curve": "ReverseLinear"
+          },
+          {
+            "Type": "TimeSinceLastUsed",
+            "Curve": {
+              "Type": "Switch",
+              "SwitchPoint": 8
+            }
+          }
+        ]
+      }
+    },
+    "ActionSets": {
+      "Default": {
+        "BasicAttacks": {
+          "Attacks": [
+            "Sword_Swing_Left_Fast",
+            "Sword_Swing_Right_Fast",
+            "Sword_Swing_Down_Strong"
+          ],
+          "InteractionVars": {
+            "Sword_Swing_Left_Fast_Damage": {
+              "Interactions": [
+                {
+                  "Parent": "Sword_Swing_Left_Fast_Damage",
+                  "DamageCalculator": {
+                    "Type": "Absolute",
+                    "BaseDamage": {
+                      "Physical": 14
+                    },
+                    "RandomPercentageModifier": 0
+                  },
+                  "DamageEffects": {
+                    "WorldSoundEventId": "SFX_Sword_T2_Impact",
+                    "LocalSoundEventId": "SFX_Sword_T2_Impact"
+                  }
+                }
+              ]
+            },
+            "Sword_Swing_Right_Fast_Damage": {
+              "Interactions": [
+                {
+                  "Parent": "Sword_Swing_Right_Fast_Damage",
+                  "DamageCalculator": {
+                    "Type": "Absolute",
+                    "BaseDamage": {
+                      "Physical": 14
+                    },
+                    "RandomPercentageModifier": 0
+                  },
+                  "DamageEffects": {
+                    "WorldSoundEventId": "SFX_Sword_T2_Impact",
+                    "LocalSoundEventId": "SFX_Sword_T2_Impact"
+                  }
+                }
+              ]
+            },
+            "Sword_Swing_Down_Strong_Damage": {
+              "Interactions": [
+                {
+                  "Parent": "Sword_Swing_Down_Strong_Damage",
+                  "DamageCalculator": {
+                    "Type": "Absolute",
+                    "BaseDamage": {
+                      "Physical": 18
+                    },
+                    "RandomPercentageModifier": 0
+                  },
+                  "DamageEffects": {
+                    "WorldSoundEventId": "SFX_Sword_T2_Impact",
+                    "LocalSoundEventId": "SFX_Sword_T2_Impact"
+                  }
+                }
+              ]
+            }
+          },
+          "Randomise": false,
+          "UseProjectedDistance": true,
+          "MaxRange": 2.8,
+          "Timeout": 0.5,
+          "CooldownRange": [0.4, 0.8]
+        },
+        "Actions": [
+          "GuardFriendlyCritical",
+          "ShieldBlock",
+          "SelfPotionHeal",
+          "HoldLine"
+        ]
+      },
+      "Strafe": {
+        "BasicAttacks": {
+          "Attacks": [
+            "Sword_Swing_Left_Fast",
+            "Sword_Swing_Right_Fast"
+          ],
+          "Randomise": false,
+          "UseProjectedDistance": true,
+          "MaxRange": 2.6,
+          "Timeout": 0.5,
+          "CooldownRange": [0.5, 0.9]
+        },
+        "Actions": [
+          "GuardFriendlyCritical",
+          "ShieldBlock",
+          "SelfPotionHeal",
+          "HoldLine"
+        ]
+      }
+    }
+  }
+}

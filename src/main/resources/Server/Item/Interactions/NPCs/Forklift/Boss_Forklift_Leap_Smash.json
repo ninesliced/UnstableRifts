@@ -1,0 +1,76 @@
+{
+  "$Comment": "Forklift leap smash: starts the arrive animation and deals the landing impact immediately as it begins.",
+  "Type": "Simple",
+  "Effects": {
+    "ItemPlayerAnimationsId": "Forklift_Default",
+    "ItemAnimationId": "JumpArrive",
+    "ClearAnimationOnFinish": false,
+    "CameraEffect": "Boss_Impact_Heavy"
+  },
+  "RunTime": 0.0,
+  "Next": {
+    "Type": "Parallel",
+    "Interactions": [
+      {
+        "Interactions": [
+          {
+            "Type": "Selector",
+            "RunTime": 0.05,
+            "Selector": {
+              "Id": "AOECylinder",
+              "Range": 5,
+              "Offset": {
+                "Y": -1
+              },
+              "Height": 3
+            },
+            "HitEntity": {
+              "Interactions": [
+                {
+                  "Type": "Replace",
+                  "DefaultOk": true,
+                  "DefaultValue": {
+                    "Interactions": [
+                      "Boss_Forklift_Leap_Smash_Damage"
+                    ]
+                  },
+                  "Var": "Leap_Smash_Damage"
+                }
+              ]
+            },
+            "Next": {
+              "Type": "Simple",
+              "RunTime": 0.5
+            }
+          }
+        ]
+      },
+      {
+        "Interactions": [
+          {
+            "Type": "Simple",
+            "RunTime": 0.5,
+            "Effects": {
+              "WorldSoundEventId": "SFX_Mace_T2_Impact",
+              "CameraEffect": "Boss_Impact_Heavy",
+              "Particles": [
+                {
+                  "SystemId": "Boss_Zone_Impact_Effect",
+                  "TargetEntityPart": "Entity"
+                },
+                {
+                  "SystemId": "Impact_Mace_Charged",
+                  "PositionOffset": {
+                    "Y": 0.5
+                  },
+                  "TargetEntityPart": "Entity",
+                  "Scale": 1.8
+                }
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

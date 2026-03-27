@@ -1,0 +1,47 @@
+{
+  "Type": "Variant",
+  "Reference": "Template_Summoned_Ally",
+  "Modify": {
+    "Appearance": "Kweebec_Seedling",
+    "MaxHealth": 36,
+    "MaxSpeed": 7.5,
+    "RunThreshold": 0.42,
+    "ViewRange": 32,
+    "ViewSector": 300,
+    "HearingRange": 24,
+    "AlertedRange": 56,
+    "AbsoluteDetectionRange": 8,
+    "Weapons": [],
+    "DefaultHotbarSlot": 0,
+    "OffHand": [],
+    "DefaultOffHandSlot": -1,
+    "UseCombatActionEvaluator": true,
+    "_CombatConfig": "CAE_Kweebec_Seedling",
+    "Attack": "Root_BossNPC_Kweebec_Seedling_Leap_Explode",
+    "AttackDistance": 3,
+    "DesiredAttackDistanceRange": [2.0, 3.0],
+    "AttackPauseRange": [0.3, 0.6],
+    "CombatBehaviorDistance": 18,
+    "CombatRelativeTurnSpeed": 2.0,
+    "CombatDirectWeight": 14,
+    "CombatAlwaysMovingWeight": 24,
+    "CombatStrafeWeight": 2,
+    "CombatStrafingDurationRange": [0.3, 0.8],
+    "CombatStrafingFrequencyRange": [0.2, 0.8],
+    "CombatMovingRelativeSpeed": 1.0,
+    "CombatBackwardsRelativeSpeed": 0.7,
+    "ChaseRelativeSpeed": 1.0,
+    "SummonerLeashRange": 56,
+    "ApplySeparation": true,
+    "BreathesInWater": true,
+    "FlockArray": [
+      "Kweebec_Seedling"
+    ],
+    "DespawnTimer": 600,
+    "DisableDamageGroups": [
+      "Self",
+      "Player"
+    ],
+    "NameTranslationKey": "bossnpc.npcRoles.Kweebec_Seedling.name"
+  }
+}

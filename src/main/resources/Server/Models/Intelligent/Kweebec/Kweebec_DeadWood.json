@@ -1,0 +1,6 @@
+{
+  "Parent": "Kweebec_Rootling",
+  "Model": "NPC/Intelligent/Kweebec_DeadWood/Model/Kweebec_DeadWood.blockymodel",
+  "Texture": "NPC/Intelligent/Kweebec_DeadWood/Model/Kweebec_Deadwood.png",
+  "DefaultAttachments": []
+}

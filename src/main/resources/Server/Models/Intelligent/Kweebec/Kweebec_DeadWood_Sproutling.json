@@ -1,0 +1,6 @@
+{
+  "Parent": "Kweebec_Sproutling",
+  "Model": "NPC/Intelligent/Kweebec_DeadWood_Sproutling/Model/deadwood_sproutling.blockymodel",
+  "Texture": "NPC/Intelligent/Kweebec_DeadWood_Sproutling/Model/deadwood_sproutling.png",
+  "DefaultAttachments": []
+}

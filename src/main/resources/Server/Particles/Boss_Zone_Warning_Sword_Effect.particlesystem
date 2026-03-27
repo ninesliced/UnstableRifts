@@ -1,0 +1,20 @@
+{
+  "$Comment": "Warning zone for sword sweep - flat red circle + dark tendrils, 2s duration to match wind-up",
+  "Spawners": [
+    {
+      "SpawnerId": "Boss_Zone_Warning_Circle_Sword",
+      "PositionOffset": {
+        "Y": -0.5
+      }
+    },
+    {
+      "SpawnerId": "Boss_Zone_Warning_Tendrils",
+      "PositionOffset": {
+        "Y": 0.5
+      }
+    }
+  ],
+  "BoundingRadius": 50.0,
+  "CullDistance": 80.0,
+  "IsImportant": true
+}

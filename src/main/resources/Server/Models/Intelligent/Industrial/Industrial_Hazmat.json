@@ -1,0 +1,73 @@
+{
+  "Parent": "Player",
+  "Model": "NPC/Intelligent/Industrial_hazmat/Model/hazmat.blockymodel",
+  "Texture": "NPC/Intelligent/Industrial_hazmat/Model/hazmat.png",
+  "DefaultAttachments": [],
+  "AnimationSets": {
+    "Idle": {
+      "Animations": [
+        {
+          "Animation": "NPC/Intelligent/Industrial_hazmat/Animations/Idle.blockyanim",
+          "BlendingDuration": 0.2,
+          "Speed": 0.5
+        }
+      ]
+    },
+    "Walk": {
+      "Animations": [
+        {
+          "Animation": "NPC/Intelligent/Industrial_hazmat/Animations/Walk.blockyanim",
+          "Speed": 0.85
+        }
+      ]
+    },
+    "WalkBackward": {
+      "Animations": [
+        {
+          "Animation": "NPC/Intelligent/Industrial_hazmat/Animations/Walk.blockyanim",
+          "Speed": 0.85
+        }
+      ]
+    },
+    "Run": {
+      "Animations": [
+        {
+          "Animation": "NPC/Intelligent/Industrial_hazmat/Animations/Walk.blockyanim",
+          "Speed": 1.2
+        }
+      ]
+    },
+    "Alerted": {
+      "Animations": [
+        {
+          "Animation": "NPC/Intelligent/Industrial_hazmat/Animations/LookPlayer.blockyanim",
+          "Looping": false
+        }
+      ]
+    },
+    "FluidIdle": {
+      "Animations": [
+        {
+          "Animation": "NPC/Intelligent/Industrial_hazmat/Animations/Idle.blockyanim",
+          "Speed": 0.3
+        }
+      ]
+    },
+    "FluidWalk": {
+      "Animations": [
+        {
+          "Animation": "NPC/Intelligent/Industrial_hazmat/Animations/Walk.blockyanim",
+          "Speed": 0.6
+        }
+      ]
+    },
+    "FluidRun": {
+      "Animations": [
+        {
+          "Animation": "NPC/Intelligent/Industrial_hazmat/Animations/Walk.blockyanim",
+          "Speed": 0.6
+        }
+      ]
+    }
+  }
+}

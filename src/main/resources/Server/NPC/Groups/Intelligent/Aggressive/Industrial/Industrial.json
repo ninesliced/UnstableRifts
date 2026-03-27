@@ -1,0 +1,6 @@
+{
+  "IncludeRoles": [
+    "Industrial_*",
+    "Template_Industrial_*"
+  ]
+}

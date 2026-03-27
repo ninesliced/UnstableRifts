@@ -1,0 +1,124 @@
+{
+  "Model": "NPC/Boss/Forklift/Model/Forkcliff.blockymodel",
+  "Texture": "NPC/Boss/Forklift/Model/forkkliff.png",
+  "EyeHeight": 3.5,
+  "HitBox": {
+    "Max": {
+      "X": 1.375,
+      "Y": 4,
+      "Z": 1.375
+    },
+    "Min": {
+      "X": -1.375,
+      "Y": 0,
+      "Z": -1.375
+    }
+  },
+  "MinScale": 1,
+  "MaxScale": 1,
+  "Camera": {
+    "PositionOffset": {
+      "X": 0.5,
+      "Y": 0.5,
+      "Z": 4
+    }
+  },
+  "AnimationSets": {
+    "Idle": {
+      "Animations": [
+        {
+          "Animation": "NPC/Boss/Forklift/Animations/idle.blockyanim",
+          "BlendingDuration": 0.2,
+          "Speed": 1
+        }
+      ]
+    },
+    "Walk": {
+      "Animations": [
+        {
+          "Animation": "NPC/Boss/Forklift/Animations/walk.blockyanim",
+          "Speed": 1
+        }
+      ]
+    },
+    "WalkBackward": {
+      "Animations": [
+        {
+          "Animation": "NPC/Boss/Forklift/Animations/walk.blockyanim",
+          "Speed": 1
+        }
+      ]
+    },
+    "Run": {
+      "Animations": [
+        {
+          "Animation": "NPC/Boss/Forklift/Animations/walk.blockyanim",
+          "Speed": 1.5
+        }
+      ]
+    },
+    "Alerted": {
+      "Animations": [
+        {
+          "Animation": "NPC/Boss/Forklift/Animations/idle.blockyanim",
+          "Looping": false
+        }
+      ]
+    },
+
+    "Fall": {
+      "Animations": [
+        {
+          "Animation": "NPC/Boss/Forklift/Animations/idle.blockyanim",
+          "BlendingDuration": 0.4,
+          "Looping": true
+        }
+      ]
+    },
+    "Hurt": {
+      "Animations": [
+        {
+          "Animation": "NPC/Boss/Forklift/Animations/idle.blockyanim",
+          "BlendingDuration": 0.1,
+          "Looping": false
+        }
+      ]
+    },
+    "Death": {
+      "Animations": [
+        {
+          "Animation": "NPC/Boss/Forklift/Animations/idle.blockyanim",
+          "Looping": false
+        }
+      ]
+    },
+    "Jump": {
+      "Animations": [
+        {
+          "Animation": "NPC/Boss/Forklift/Animations/idle.blockyanim",
+          "BlendingDuration": 0.2,
+          "Looping": false
+        }
+      ]
+    },
+    "JumpWalk": {
+      "Animations": [
+        {
+          "Animation": "NPC/Boss/Forklift/Animations/walk.blockyanim",
+          "BlendingDuration": 0.2,
+          "Looping": false
+        }
+      ]
+    },
+    "JumpRun": {
+      "Animations": [
+        {
+          "Animation": "NPC/Boss/Forklift/Animations/walk.blockyanim",
+          "BlendingDuration": 0.2,
+          "Speed": 1.5,
+          "Looping": false
+        }
+      ]
+    }
+  }
+}

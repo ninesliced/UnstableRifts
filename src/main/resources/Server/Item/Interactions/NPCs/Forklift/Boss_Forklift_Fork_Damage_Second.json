@@ -1,0 +1,34 @@
+{
+  "Parent": "DamageEntityParent",
+  "DamageCalculator": {
+    "Type": "Absolute",
+    "BaseDamage": {
+      "Physical": 11
+    },
+    "RandomPercentageModifier": 0.1
+  },
+  "Effects": {
+    "CameraEffect": "Boss_Impact_Heavy"
+  },
+  "DamageEffects": {
+    "Knockback": {
+      "Type": "Point",
+      "VelocityConfig": {
+        "AirResistance": 0.97,
+        "AirResistanceMax": 0.96,
+        "GroundResistance": 0.94,
+        "GroundResistanceMax": 0.3,
+        "Threshold": 3.0
+      },
+      "Force": 2.5,
+      "VelocityType": "Set"
+    },
+    "WorldSoundEventId": "SFX_Unarmed_Impact",
+    "LocalSoundEventId": "SFX_Unarmed_Impact",
+    "WorldParticles": [
+      {
+        "SystemId": "Impact_Blade_01"
+      }
+    ]
+  }
+}

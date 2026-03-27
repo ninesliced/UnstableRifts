@@ -1,0 +1,41 @@
+{
+  "Model": "Items/barrels/Radioactive_Barrel/Radioactive_Barrel.blockymodel",
+  "Texture": "Items/barrels/Radioactive_Barrel/Radioactive_Barrel.png",
+  "EyeHeight": 1.28,
+  "HitBox": {
+    "Max": {
+      "X": 0.5,
+      "Y": 1.22,
+      "Z": 0.5
+    },
+    "Min": {
+      "X": -0.5,
+      "Y": 0,
+      "Z": -0.5
+    }
+  },
+  "MinScale": 2.3,
+  "MaxScale": 2.55,
+  "AnimationSets": {
+    "Idle": {
+      "Animations": [
+        {
+          "Animation": "Items/Animations/Spin_Roll/Spin_Roll_Left.blockyanim",
+          "BlendingDuration": 0
+        }
+      ]
+    }
+  },
+  "Trails": [
+    {
+      "TrailId": "Acid",
+      "TargetNodeName": "Barril",
+      "RotationOffset": {
+        "Yaw": 45,
+        "Pitch": 45,
+        "Roll": 45
+      }
+    }
+  ],
+  "Particles": []
+}

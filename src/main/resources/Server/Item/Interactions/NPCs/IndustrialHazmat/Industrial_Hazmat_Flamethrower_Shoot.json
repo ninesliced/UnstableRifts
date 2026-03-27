@@ -1,0 +1,60 @@
+{
+  "Type": "Parallel",
+  "Interactions": [
+    {
+      "Interactions": [
+        {
+          "Type": "ApplyEffect",
+          "EffectId": "FlamethrowerSource"
+        },
+        {
+          "Type": "Simple",
+          "RunTime": 0.3,
+          "Effects": {
+            "Particles": [
+              {
+                "PositionOffset": {
+                  "X": 0,
+                  "Y": 1.4,
+                  "Z": 3.7
+                },
+                "RotationOffset": {
+                  "Pitch": 0,
+                  "Roll": 0,
+                  "Yaw": 180
+                },
+                "SystemId": "Flamethrower"
+              }
+            ],
+            "ItemPlayerAnimationsId": "Rifle",
+            "ItemAnimationId": "Shoot",
+            "ClearAnimationOnFinish": true
+          }
+        }
+      ]
+    },
+    {
+      "Interactions": [
+        {
+          "Type": "Selector",
+          "RunTime": 0.3,
+          "Selector": {
+            "Id": "Stab",
+            "TestLineOfSight": true,
+            "ExtendTop": 0.4,
+            "ExtendLeft": 0.4,
+            "ExtendRight": 0.4,
+            "ExtendBottom": 0.4,
+            "StartDistance": 0.25,
+            "EndDistance": 6
+          },
+          "HitEntity": {
+            "Interactions": [
+              "Industrial_Hazmat_Flamethrower_Damage"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

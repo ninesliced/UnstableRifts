@@ -1,0 +1,7 @@
+{
+  "Type": "CameraShake",
+  "CameraShake": "Boss_Impact_Heavy",
+  "Intensity": {
+    "Value": 0.12
+  }
+}

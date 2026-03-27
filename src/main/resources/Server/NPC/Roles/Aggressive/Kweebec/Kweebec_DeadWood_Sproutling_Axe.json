@@ -1,0 +1,15 @@
+{
+  "Type": "Variant",
+  "Reference": "Template_Kweebec_DeadWood",
+  "Modify": {
+    "Appearance": "Kweebec_DeadWood_Sproutling",
+    "Weapons": [
+      "Weapon_Axe_Crude"
+    ],
+    "DefaultHotbarSlot": 0,
+    "AttackSequence": "Component_Instruction_Attack_Sequence_Kweebec_DeadWood_Axe",
+    "AttackDistance": 2.2,
+    "MemoriesNameOverride": "Kweebec_DeadWood_Sproutling_Axe",
+    "NameTranslationKey": "bettermobs.npcRoles.Kweebec_DeadWood_Sproutling_Axe.name"
+  }
+}

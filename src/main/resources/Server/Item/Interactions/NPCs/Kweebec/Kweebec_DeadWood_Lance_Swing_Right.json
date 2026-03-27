@@ -1,0 +1,78 @@
+{
+  "Type": "Simple",
+  "Effects": {
+    "ItemPlayerAnimationsId": "Kweebec_Spear",
+    "ItemAnimationId": "SwingRight"
+  },
+  "$Comment": "Prepare Delay",
+  "RunTime": 0.223,
+  "Next": {
+    "Type": "Parallel",
+    "Interactions": [
+      {
+        "Interactions": [
+          {
+            "Type": "Selector",
+            "RunTime": 0.111,
+            "Selector": {
+              "Id": "Horizontal",
+              "Direction": "ToRight",
+              "TestLineOfSight": true,
+              "ExtendTop": 0.5,
+              "ExtendBottom": 0.5,
+              "StartDistance": 0.5,
+              "EndDistance": 3,
+              "Length": 90,
+              "RollOffset": 0,
+              "YawStartOffset": -60
+            },
+            "HitEntity": {
+              "Interactions": [
+                {
+                  "Type": "Replace",
+                  "DefaultValue": {
+                    "Interactions": [
+                      "Kweebec_DeadWood_Lance_Damage"
+                    ]
+                  },
+                  "Var": "Melee_Damage"
+                }
+              ]
+            },
+            "Next": {
+              "Type": "Simple",
+              "RunTime": 0.223
+            }
+          }
+        ]
+      },
+      {
+        "Interactions": [
+          {
+            "Type": "Simple",
+            "RunTime": 0.223,
+            "Effects": {
+              "Trails": [
+                {
+                  "PositionOffset": {
+                    "X": 1.4,
+                    "Y": 0,
+                    "Z": 0
+                  },
+                  "RotationOffset": {
+                    "Pitch": 0,
+                    "Roll": 90,
+                    "Yaw": 0
+                  },
+                  "TargetNodeName": "Handle",
+                  "TrailId": "Small_Default"
+                }
+              ],
+              "WorldSoundEventId": "SFX_Light_Melee_T2_Swing"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

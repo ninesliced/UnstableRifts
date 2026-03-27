@@ -1,0 +1,62 @@
+{
+  "Type": "Simple",
+  "Effects": {
+    "ItemPlayerAnimationsId": "Default",
+    "ItemAnimationId": "SwingRight"
+  },
+  "$Comment": "Prepare Delay",
+  "RunTime": 0.167,
+  "Next": {
+    "Type": "Parallel",
+    "Interactions": [
+      {
+        "Interactions": [
+          {
+            "Type": "Selector",
+            "RunTime": 0.083,
+            "Selector": {
+              "Id": "Horizontal",
+              "Direction": "ToRight",
+              "TestLineOfSight": true,
+              "ExtendTop": 0.5,
+              "ExtendBottom": 0.5,
+              "StartDistance": 0.4,
+              "EndDistance": 2.1,
+              "Length": 55,
+              "RollOffset": 25,
+              "YawStartOffset": -35
+            },
+            "HitEntity": {
+              "Interactions": [
+                {
+                  "Type": "Replace",
+                  "DefaultValue": {
+                    "Interactions": [
+                      "Kweebec_DeadWood_Sword_Damage"
+                    ]
+                  },
+                  "Var": "Melee_Damage"
+                }
+              ]
+            },
+            "Next": {
+              "Type": "Simple",
+              "RunTime": 0.167
+            }
+          }
+        ]
+      },
+      {
+        "Interactions": [
+          {
+            "Type": "Simple",
+            "RunTime": 0.166,
+            "Effects": {
+              "WorldSoundEventId": "SFX_Light_Melee_T2_Swing"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

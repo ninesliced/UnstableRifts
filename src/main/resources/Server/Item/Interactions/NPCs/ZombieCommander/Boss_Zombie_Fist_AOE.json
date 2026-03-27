@@ -1,0 +1,73 @@
+{
+  "Type": "Simple",
+  "RunTime": 2.2,
+  "Effects": {
+    "ItemPlayerAnimationsId": "Zombie_Default",
+    "ItemAnimationId": "SwingDouble",
+    "WorldSoundEventId": "SFX_Unarmed_Swing",
+    "MovementEffects": {
+      "DisableAll": true
+    },
+    "Particles": [
+      {
+        "SystemId": "Boss_Zone_Warning_Effect",
+        "TargetEntityPart": "Entity"
+      }
+    ]
+  },
+  "Next": {
+    "Type": "Parallel",
+    "Interactions": [
+      {
+        "Interactions": [
+          {
+            "Type": "Selector",
+            "RunTime": 0.35,
+            "Selector": {
+              "Id": "AOECircle",
+              "Range": 4.5
+            },
+            "HitEntity": {
+              "Interactions": [
+                {
+                  "Type": "Replace",
+                  "Var": "Fist_AOE_Damage",
+                  "DefaultOk": true,
+                  "DefaultValue": {
+                    "Interactions": [
+                      "Boss_Zombie_Fist_AOE_Damage"
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "Interactions": [
+          {
+            "Type": "Simple",
+            "RunTime": 0.35,
+            "Effects": {
+              "ItemAnimationId": "SwingDouble",
+              "WorldSoundEventId": "SFX_Unarmed_Swing",
+              "Particles": [
+                {
+                  "SystemId": "Boss_Zone_Impact_Effect",
+                  "TargetEntityPart": "Entity"
+                },
+                {
+                  "SystemId": "Impact_Mace_Charged",
+                  "TargetEntityPart": "Entity",
+                  "TargetNodeName": "Hip",
+                  "Scale": 1.6
+                }
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

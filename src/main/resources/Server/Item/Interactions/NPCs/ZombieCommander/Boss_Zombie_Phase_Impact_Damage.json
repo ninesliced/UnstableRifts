@@ -1,0 +1,29 @@
+{
+  "Parent": "DamageEntityParent",
+  "DamageCalculator": {
+    "Type": "Absolute",
+    "BaseDamage": {
+      "Physical": 38
+    },
+    "RandomPercentageModifier": 0.1
+  },
+  "Effects": {
+    "CameraEffect": "Boss_Impact_Heavy"
+  },
+  "DamageEffects": {
+    "Knockback": {
+      "Force": 1,
+      "RelativeX": 0,
+      "RelativeZ": 0.4,
+      "VelocityY": 1.5,
+      "VelocityType": "Set"
+    },
+    "WorldSoundEventId": "SFX_Mace_T2_Impact",
+    "LocalSoundEventId": "SFX_Mace_T2_Impact",
+    "WorldParticles": [
+      {
+        "SystemId": "Impact_Mace_Charged"
+      }
+    ]
+  }
+}

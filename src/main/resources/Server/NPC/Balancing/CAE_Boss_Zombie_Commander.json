@@ -1,0 +1,189 @@
+{
+  "Type": "CombatActionEvaluator",
+  "Debug": "DisplayState",
+  "TargetMemoryDuration": 14,
+  "CombatActionEvaluator": {
+    "RunConditions": [
+      {
+        "Type": "TimeSinceLastUsed",
+        "Curve": {
+          "ResponseCurve": "Linear",
+          "XRange": [0, 4]
+        }
+      },
+      {
+        "Type": "Randomiser",
+        "MinValue": 0.85,
+        "MaxValue": 1
+      }
+    ],
+    "MinRunUtility": 0.5,
+    "MinActionUtility": 0.005,
+    "AvailableActions": {
+      "ZoneImpact": {
+        "Type": "Ability",
+        "Description": "Ground slam AOE zone attack",
+        "Target": "Hostile",
+        "AttackDistanceRange": [1, 6],
+        "PostExecuteDistanceRange": [2, 4],
+        "Ability": "Root_Boss_Zombie_Phase_Impact",
+        "WeaponSlot": 0,
+        "WeightCoefficient": 2.2,
+        "Conditions": [
+          {
+            "Type": "TargetDistance",
+            "Curve": {
+              "ResponseCurve": "SimpleDescendingLogistic",
+              "XRange": [0, 8]
+            }
+          },
+          {
+            "Type": "TimeSinceLastUsed",
+            "Curve": {
+              "Type": "Switch",
+              "SwitchPoint": 4
+            }
+          },
+          {
+            "Type": "Randomiser",
+            "MinValue": 0.7,
+            "MaxValue": 1
+          }
+        ]
+      },
+      "FistSweepAOE": {
+        "Type": "Ability",
+        "Description": "Spinning fist AOE attack",
+        "Target": "Hostile",
+        "AttackDistanceRange": [1, 4.5],
+        "PostExecuteDistanceRange": [1.5, 3],
+        "Ability": "Root_Boss_Zombie_Fist_AOE",
+        "WeaponSlot": 0,
+        "WeightCoefficient": 1.8,
+        "Conditions": [
+          {
+            "Type": "TargetDistance",
+            "Curve": {
+              "ResponseCurve": "SimpleDescendingLogistic",
+              "XRange": [0, 6]
+            }
+          },
+          {
+            "Type": "TimeSinceLastUsed",
+            "Curve": {
+              "Type": "Switch",
+              "SwitchPoint": 3
+            }
+          },
+          {
+            "Type": "Randomiser",
+            "MinValue": 0.8,
+            "MaxValue": 1
+          }
+        ]
+      },
+      "LeapSlam": {
+        "Type": "Ability",
+        "Description": "Leap to distant target and slam the ground",
+        "Target": "Hostile",
+        "AttackDistanceRange": [2, 16],
+        "PostExecuteDistanceRange": [1, 3],
+        "Ability": "Root_Boss_Zombie_Leap_Attack",
+        "WeaponSlot": 0,
+        "WeightCoefficient": 2.6,
+        "InteractionVars": {
+          "Leap_Smash_Damage": {
+            "Interactions": [
+              {
+                "Parent": "Boss_Zombie_Leap_Smash_Damage"
+              }
+            ]
+          }
+        },
+        "Conditions": [
+          {
+            "Type": "TargetDistance",
+            "Curve": {
+              "ResponseCurve": "Linear",
+              "XRange": [2, 16]
+            }
+          },
+          {
+            "Type": "TimeSinceLastUsed",
+            "Curve": {
+              "Type": "Switch",
+              "SwitchPoint": 5
+            }
+          },
+          {
+            "Type": "Randomiser",
+            "MinValue": 0.78,
+            "MaxValue": 1
+          }
+        ]
+      },
+      "Strafe": {
+        "Type": "State",
+        "Description": "Circle around the target menacingly",
+        "State": "Combat",
+        "SubState": "Strafe",
+        "Target": "Hostile",
+        "PostExecuteDistanceRange": [2, 3.5],
+        "WeightCoefficient": 1.0,
+        "Conditions": [
+          {
+            "Type": "TimeSinceLastUsed",
+            "Curve": {
+              "Type": "Switch",
+              "SwitchPoint": 2
+            }
+          }
+        ]
+      }
+    },
+    "ActionSets": {
+      "Default": {
+        "Actions": ["ZoneImpact", "FistSweepAOE", "LeapSlam", "Strafe"],
+        "BasicAttacks": {
+          "Attacks": [
+            "Root_Boss_Zombie_Fist_AOE"
+          ],
+          "InteractionVars": {
+            "Boss_Zombie_Fist_AOE_Damage": {
+              "Interactions": [
+                {
+                  "Parent": "Boss_Zombie_Fist_AOE_Damage",
+                  "DamageCalculator": {
+                    "Type": "Absolute",
+                    "BaseDamage": {
+                      "Physical": 28
+                    },
+                    "RandomPercentageModifier": 0.15
+                  }
+                }
+              ]
+            }
+          },
+          "Randomise": false,
+          "UseProjectedDistance": true,
+          "MaxRange": 2.8,
+          "Timeout": 0.3,
+          "CooldownRange": [0.5, 0.8]
+        }
+      },
+      "Strafe": {
+        "Actions": ["ZoneImpact", "FistSweepAOE", "LeapSlam"],
+        "BasicAttacks": {
+          "Attacks": [
+            "Root_NPC_Attack_Melee"
+          ],
+          "Randomise": false,
+          "UseProjectedDistance": true,
+          "MaxRange": 2.5,
+          "Timeout": 0.3,
+          "CooldownRange": [0.4, 0.7]
+        }
+      }
+    }
+  }
+}

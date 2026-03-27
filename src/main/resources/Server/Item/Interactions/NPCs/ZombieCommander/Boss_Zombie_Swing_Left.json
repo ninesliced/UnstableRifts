@@ -1,0 +1,63 @@
+{
+  "Type": "Simple",
+  "Effects": {
+    "ItemPlayerAnimationsId": "Zombie_Default",
+    "ItemAnimationId": "SwingLeft"
+  },
+  "$Comment": "Wind-up before left swing",
+  "RunTime": 0.5,
+  "Next": {
+    "Type": "Parallel",
+    "Interactions": [
+      {
+        "Interactions": [
+          {
+            "Type": "Selector",
+            "RunTime": 0.25,
+            "Selector": {
+              "Id": "Horizontal",
+              "Direction": "ToLeft",
+              "TestLineOfSight": true,
+              "ExtendTop": 0.5,
+              "ExtendBottom": 2,
+              "StartDistance": 0.1,
+              "EndDistance": 5,
+              "Length": 120,
+              "RollOffset": -45,
+              "YawStartOffset": -70
+            },
+            "HitEntity": {
+              "Interactions": [
+                {
+                  "Type": "Replace",
+                  "DefaultValue": {
+                    "Interactions": [
+                      "Boss_Zombie_Swing_Damage"
+                    ]
+                  },
+                  "Var": ""
+                }
+              ]
+            },
+            "Next": {
+              "Type": "Simple",
+              "RunTime": 0.4
+            }
+          }
+        ]
+      },
+      {
+        "Interactions": [
+          {
+            "Type": "Simple",
+            "RunTime": 0.2,
+            "Effects": {
+              "ItemAnimationId": "SwingLeft",
+              "WorldSoundEventId": "SFX_Unarmed_Swing"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

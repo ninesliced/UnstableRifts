@@ -1,0 +1,61 @@
+{
+  "Type": "CombatActionEvaluator",
+  "TargetMemoryDuration": 16,
+  "CombatActionEvaluator": {
+    "RunConditions": [
+      {
+        "Type": "TimeSinceLastUsed",
+        "Curve": {
+          "ResponseCurve": "Linear",
+          "XRange": [0, 0.6]
+        }
+      },
+      {
+        "Type": "Randomiser",
+        "MinValue": 0.999,
+        "MaxValue": 1
+      }
+    ],
+    "MinRunUtility": 0.5,
+    "MinActionUtility": 0.01,
+    "AvailableActions": {
+      "LeapExplode": {
+        "Type": "Ability",
+        "Description": "Jump to hostile and detonate",
+        "Target": "Hostile",
+        "AttackDistanceRange": [2, 3],
+        "PostExecuteDistanceRange": [0, 1],
+        "Ability": "Root_BossNPC_Kweebec_Seedling_Leap_Explode",
+        "WeightCoefficient": 5.5,
+        "Conditions": [
+          {
+            "Type": "TargetDistance",
+            "Curve": {
+              "ResponseCurve": "Linear",
+              "XRange": [2, 3]
+            }
+          },
+          {
+            "Type": "TimeSinceLastUsed",
+            "Curve": {
+              "Type": "Switch",
+              "SwitchPoint": 0.35
+            }
+          }
+        ]
+      }
+    },
+    "ActionSets": {
+      "Default": {
+        "Actions": [
+          "LeapExplode"
+        ]
+      },
+      "Strafe": {
+        "Actions": [
+          "LeapExplode"
+        ]
+      }
+    }
+  }
+}

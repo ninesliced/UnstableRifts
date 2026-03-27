@@ -1,0 +1,140 @@
+{
+  "$Comment": "Double Turn: 1.25s total. Turns twice left to right. Back hit at 0.34s, front hit at 0.7s, finishes at 1.25s. Red zone warning.",
+  "Type": "Simple",
+  "RunTime": 0.0,
+  "Effects": {
+    "ItemPlayerAnimationsId": "Forklift_Default",
+    "ItemAnimationId": "TurnDouble",
+    "WorldSoundEventId": "SFX_Light_Melee_T2_Swing",
+    "MovementEffects": {
+      "DisableAll": true
+    },
+    "Particles": [
+      {
+        "SystemId": "Boss_Zone_Warning_Effect",
+        "TargetEntityPart": "Entity",
+        "Scale": 2.0
+      }
+    ]
+  },
+  "Next": {
+    "$Comment": "Wait until 0.34s for first hit (back area)",
+    "Type": "Simple",
+    "RunTime": 0.34,
+    "Next": {
+      "Type": "Parallel",
+      "Interactions": [
+        {
+          "$Comment": "First hit at 0.34s: back sweep (full circle, first pass)",
+          "Interactions": [
+            {
+              "Type": "Selector",
+              "RunTime": 0.28,
+              "Selector": {
+                "Id": "AOECircle",
+                "Range": 4.25
+              },
+              "HitEntity": {
+                "Interactions": [
+                  {
+                    "Type": "Replace",
+                    "Var": "Turn_Double_Damage",
+                    "DefaultOk": true,
+                    "DefaultValue": {
+                      "Interactions": [
+                        "Boss_Forklift_Turn_Double_Damage"
+                      ]
+                    }
+                  }
+                ]
+              },
+              "Next": {
+                "$Comment": "Wait until 0.7s for second hit (0.7 - 0.34 - 0.28 = 0.08s gap)",
+                "Type": "Simple",
+                "RunTime": 0.08,
+                "Next": {
+                  "Type": "Parallel",
+                  "Interactions": [
+                    {
+                      "$Comment": "Second hit at 0.7s: front sweep (second rotation pass)",
+                      "Interactions": [
+                        {
+                          "Type": "Selector",
+                          "RunTime": 0.28,
+                          "Selector": {
+                            "Id": "AOECircle",
+                            "Range": 4.25
+                          },
+                          "HitEntity": {
+                            "Interactions": [
+                              {
+                                "Type": "Replace",
+                                "Var": "Turn_Double_Damage",
+                                "DefaultOk": true,
+                                "DefaultValue": {
+                                  "Interactions": [
+                                    "Boss_Forklift_Turn_Double_Damage"
+                                  ]
+                                }
+                              }
+                            ]
+                          },
+                          "Next": {
+                            "$Comment": "Recovery (1.25 - 0.7 - 0.28 = 0.27s)",
+                            "Type": "Simple",
+                            "RunTime": 0.27
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "Interactions": [
+                        {
+                          "Type": "Simple",
+                          "RunTime": 0.63,
+                          "Effects": {
+                            "WorldSoundEventId": "SFX_Unarmed_Swing",
+                            "Particles": [
+                              {
+                                "SystemId": "Boss_Zone_Impact_Effect",
+                                "TargetEntityPart": "Entity"
+                              },
+                              {
+                                "SystemId": "Impact_Mace_Charged",
+                                "TargetEntityPart": "Entity",
+                                "TargetNodeName": "Hip",
+                                "Scale": 1.4
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "Interactions": [
+            {
+              "Type": "Simple",
+              "RunTime": 0.2,
+              "Effects": {
+                "ItemAnimationId": "TurnDouble",
+                "WorldSoundEventId": "SFX_Unarmed_Swing",
+                "Particles": [
+                  {
+                    "SystemId": "Boss_Zone_Impact_Effect",
+                    "TargetEntityPart": "Entity"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

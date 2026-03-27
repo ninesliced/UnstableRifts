@@ -1,0 +1,51 @@
+{
+  "Class": "Instruction",
+  "Interface": "Hytale.Instruction.AttackSequence",
+  "Parameters": {
+    "AttackDistance": {
+      "Value": 7,
+      "Description": "The distance at which the NPC will execute the flamethrower attack"
+    },
+    "CombatRelativeTurnSpeed": {
+      "Value": 1.9,
+      "Description": "Modifier that decides turn speed difference in combat"
+    }
+  },
+  "Content": {
+    "Sensor": {
+      "Type": "Target",
+      "Range": { "Compute": "AttackDistance" },
+      "Filters": [
+        {
+          "Type": "LineOfSight"
+        }
+      ]
+    },
+    "ActionsBlocking": true,
+    "Actions": [
+      {
+        "Type": "Attack",
+        "Attack": "Root_Industrial_Hazmat_Flamethrower_Shoot",
+        "AimingTimeRange": [1.5, 2.5],
+        "AttackPauseRange": [0.3, 0.3]
+      },
+      {
+        "Type": "Attack",
+        "Attack": "Root_Industrial_Hazmat_Flamethrower_Shoot",
+        "AttackPauseRange": [0.3, 0.3]
+      },
+      {
+        "Type": "Attack",
+        "Attack": "Root_Industrial_Hazmat_Flamethrower_Shoot",
+        "AttackPauseRange": [0.8, 1.4]
+      }
+    ],
+    "HeadMotion": {
+      "Type": "Aim",
+      "RelativeTurnSpeed": { "Compute": "CombatRelativeTurnSpeed" },
+      "HitProbability": 0.7,
+      "Spread": 0.5
+    }
+  },
+  "Type": "Component"
+}

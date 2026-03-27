@@ -1,0 +1,13 @@
+{
+  "Model": "NPC_Spawn_Marker",
+  "NPCs": [
+    {
+      "Name": "Industrial_Nosuit",
+      "Weight": 100,
+      "SpawnAfterGameTime": "P0D"
+    }
+  ],
+  "ExclusionRadius": 12,
+  "MaxDropHeight": 4,
+  "DeactivationDistance": 160
+}

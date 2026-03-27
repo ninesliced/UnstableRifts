@@ -1,0 +1,31 @@
+{
+  "Parent": "Weapon_Stick_Fire_Secondary_Damage",
+  "DamageCalculator": {
+    "BaseDamage": {
+      "Fire": 14
+    }
+  },
+  "DamageEffects": {
+    "Knockback": {
+      "Type": "Force",
+      "Direction": {
+        "X": 0,
+        "Y": 2.0,
+        "Z": -3.0
+      },
+      "Force": 6.0,
+      "VelocityType": "Add"
+    },
+    "WorldParticles": [
+      {
+        "SystemId": "Impact_Explosion"
+      }
+    ],
+    "WorldSoundEventId": "SFX_Staff_Flame_Flamethrower_Impact"
+  },
+  "Next": {
+    "Type": "ApplyEffect",
+    "EffectId": "Flame_Staff_Burn",
+    "Entity": "Target"
+  }
+}

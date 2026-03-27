@@ -1,0 +1,13 @@
+{
+  "Tags": {
+    "Attack": [
+      "Melee"
+    ]
+  },
+  "Cooldown": {
+    "Cooldown": 7.0
+  },
+  "Interactions": [
+    "Boss_Zombie_Leap_Force"
+  ]
+}

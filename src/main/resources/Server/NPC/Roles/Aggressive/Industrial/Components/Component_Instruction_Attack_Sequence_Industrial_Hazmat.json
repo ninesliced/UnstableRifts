@@ -1,0 +1,43 @@
+{
+  "Class": "Instruction",
+  "Interface": "Hytale.Instruction.AttackSequence",
+  "Parameters": {
+    "AttackDistance": {
+      "Value": 2.5,
+      "Description": "The distance at which an NPC will execute attacks"
+    },
+    "CombatRelativeTurnSpeed": {
+      "Value": 1.5,
+      "Description": "Modifier that decides turn speed difference in combat"
+    }
+  },
+  "Content": {
+    "Sensor": {
+      "Type": "Target",
+      "Range": { "Compute": "AttackDistance" },
+      "Filters": [
+        {
+          "Type": "LineOfSight"
+        }
+      ]
+    },
+    "ActionsBlocking": true,
+    "Actions": [
+      {
+        "Type": "Attack",
+        "Attack": "Root_Industrial_Hazmat_Attack",
+        "AttackPauseRange": [0.6, 1.0]
+      },
+      {
+        "Type": "Attack",
+        "Attack": "Root_Industrial_Hazmat_Attack",
+        "AttackPauseRange": [0.8, 1.3]
+      }
+    ],
+    "HeadMotion": {
+      "Type": "Aim",
+      "RelativeTurnSpeed": { "Compute": "CombatRelativeTurnSpeed" }
+    }
+  },
+  "Type": "Component"
+}

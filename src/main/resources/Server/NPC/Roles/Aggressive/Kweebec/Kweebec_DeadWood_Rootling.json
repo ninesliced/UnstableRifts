@@ -1,0 +1,8 @@
+{
+  "Type": "Variant",
+  "Reference": "Template_Kweebec_DeadWood",
+  "Modify": {
+    "MemoriesNameOverride": "Kweebec_DeadWood_Rootling",
+    "NameTranslationKey": "bettermobs.npcRoles.Kweebec_DeadWood_Rootling.name"
+  }
+}

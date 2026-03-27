@@ -1,0 +1,9 @@
+{
+  "Type": "Variant",
+  "Reference": "Template_Kweebec_DeadWood",
+  "Modify": {
+    "Appearance": "Kweebec_DeadWood_Sproutling",
+    "MemoriesNameOverride": "Kweebec_DeadWood_Sproutling",
+    "NameTranslationKey": "bettermobs.npcRoles.Kweebec_DeadWood_Sproutling.name"
+  }
+}

@@ -1,0 +1,139 @@
+{
+  "$Comment": "Single Turn Left: 0.75s total. Right-to-back damage first (sweeps right side), then at 0.44s left-to-front damage. Red zone warning.",
+  "Type": "Simple",
+  "RunTime": 0.0,
+  "Effects": {
+    "ItemPlayerAnimationsId": "Forklift_Default",
+    "ItemAnimationId": "TurnLeft",
+    "WorldSoundEventId": "SFX_Light_Melee_T2_Swing",
+    "MovementEffects": {
+      "DisableAll": true
+    },
+    "Particles": [
+      {
+        "SystemId": "Boss_Zone_Warning_Effect",
+        "TargetEntityPart": "Entity",
+        "Scale": 2.0
+      }
+    ]
+  },
+  "Next": {
+    "Type": "Parallel",
+    "Interactions": [
+      {
+        "$Comment": "First hit: right-to-back sweep immediately",
+        "Interactions": [
+          {
+            "Type": "Selector",
+            "RunTime": 0.24,
+            "Selector": {
+              "Id": "Horizontal",
+              "Direction": "ToRight",
+              "TestLineOfSight": true,
+              "ExtendTop": 1,
+              "ExtendBottom": 2,
+              "StartDistance": 0.1,
+              "EndDistance": 4.0,
+              "Length": 180,
+              "RollOffset": -30,
+              "YawStartOffset": 0
+            },
+            "HitEntity": {
+              "Interactions": [
+                {
+                  "Type": "Replace",
+                  "Var": "Turn_Damage",
+                  "DefaultOk": true,
+                  "DefaultValue": {
+                    "Interactions": [
+                      "Boss_Forklift_Turn_Damage"
+                    ]
+                  }
+                }
+              ]
+            },
+            "Next": {
+              "$Comment": "Wait until 0.44s for second hit (0.44 - 0.24 = 0.20s gap)",
+              "Type": "Simple",
+              "RunTime": 0.2,
+              "Next": {
+                "Type": "Parallel",
+                "Interactions": [
+                  {
+                    "$Comment": "Second hit at 0.44s: left-to-front sweep",
+                    "Interactions": [
+                      {
+                        "Type": "Selector",
+                        "RunTime": 0.24,
+                        "Selector": {
+                          "Id": "Horizontal",
+                          "Direction": "ToLeft",
+                          "TestLineOfSight": true,
+                          "ExtendTop": 1,
+                          "ExtendBottom": 2,
+                          "StartDistance": 0.1,
+                          "EndDistance": 4.0,
+                          "Length": 180,
+                          "RollOffset": -30,
+                          "YawStartOffset": 0
+                        },
+                        "HitEntity": {
+                          "Interactions": [
+                            {
+                              "Type": "Replace",
+                              "Var": "Turn_Damage",
+                              "DefaultOk": true,
+                              "DefaultValue": {
+                                "Interactions": [
+                                  "Boss_Forklift_Turn_Damage"
+                                ]
+                              }
+                            }
+                          ]
+                        },
+                        "Next": {
+                          "$Comment": "Recovery (0.75 - 0.44 - 0.24 = 0.07s)",
+                          "Type": "Simple",
+                          "RunTime": 0.07
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "Interactions": [
+                      {
+                        "Type": "Simple",
+                        "RunTime": 0.35,
+                        "Effects": {
+                          "WorldSoundEventId": "SFX_Unarmed_Swing",
+                          "Particles": [
+                            {
+                              "SystemId": "Boss_Zone_Impact_Effect",
+                              "TargetEntityPart": "Entity"
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      },
+      {
+        "Interactions": [
+          {
+            "Type": "Simple",
+            "RunTime": 0.2,
+            "Effects": {
+              "ItemAnimationId": "TurnLeft",
+              "WorldSoundEventId": "SFX_Unarmed_Swing"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

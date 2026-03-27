@@ -1,0 +1,92 @@
+{
+  "FirstPerson": {
+    "Duration": 2.5,
+    "EaseIn": {
+      "Time": 0.05,
+      "Type": "Linear"
+    },
+    "EaseOut": {
+      "Time": 0.4,
+      "Type": "Linear"
+    },
+    "Offset": {
+      "X": [],
+      "Y": [
+        {
+          "Frequency": 3.0,
+          "Amplitude": 0.15,
+          "Type": "Sin"
+        }
+      ],
+      "Z": []
+    },
+    "Rotation": {
+      "Pitch": [
+        {
+          "Frequency": 4.0,
+          "Amplitude": 0.3,
+          "Type": "Sin"
+        }
+      ],
+      "Yaw": [
+        {
+          "Frequency": 6.0,
+          "Amplitude": 0.2,
+          "Type": "Sin"
+        }
+      ],
+      "Roll": [
+        {
+          "Frequency": 8.0,
+          "Amplitude": 0.6,
+          "Type": "Sin"
+        }
+      ]
+    }
+  },
+  "ThirdPerson": {
+    "Duration": 2.5,
+    "EaseIn": {
+      "Time": 0.05,
+      "Type": "Linear"
+    },
+    "EaseOut": {
+      "Time": 0.4,
+      "Type": "Linear"
+    },
+    "Offset": {
+      "X": [],
+      "Y": [
+        {
+          "Frequency": 3.0,
+          "Amplitude": 0.1,
+          "Type": "Sin"
+        }
+      ],
+      "Z": []
+    },
+    "Rotation": {
+      "Pitch": [
+        {
+          "Frequency": 4.0,
+          "Amplitude": 0.2,
+          "Type": "Sin"
+        }
+      ],
+      "Yaw": [
+        {
+          "Frequency": 6.0,
+          "Amplitude": 0.15,
+          "Type": "Sin"
+        }
+      ],
+      "Roll": [
+        {
+          "Frequency": 8.0,
+          "Amplitude": 0.5,
+          "Type": "Sin"
+        }
+      ]
+    }
+  }
+}

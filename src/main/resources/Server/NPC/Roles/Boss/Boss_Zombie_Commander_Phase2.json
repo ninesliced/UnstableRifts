@@ -1,0 +1,59 @@
+{
+  "Type": "Variant",
+  "Reference": "Template_Boss_Zombie",
+  "Modify": {
+    "Appearance": "Zombie_Aberrant_Big",
+    "DropList": "Drop_Zombie_Aberrant_Big",
+    "MaxHealth": 900,
+    "MaxSpeed": 6,
+    "ViewRange": 20,
+    "ViewSector": 270,
+    "HearingRange": 14,
+    "AbsoluteDetectionRange": 8,
+    "AlertedRange": 50,
+    "Attack": "Root_Boss_Zombie_Commander_Attack",
+    "LeapAttack": "Root_Boss_Zombie_Medium_Leap_Attack",
+    "FarLeapAttack": "Root_Boss_Zombie_Leap_Attack",
+    "LeapDistance": 3.0,
+    "AttackDistance": 2.6,
+    "DesiredAttackDistanceRange": [1.6, 2.2],
+    "AttackPauseRange": [0.4, 0.8],
+    "CombatAttackPostDelay": [0.2, 0.45],
+    "CombatBackOffAfterAttack": false,
+    "CombatRelativeTurnSpeed": 2.0,
+    "CombatBehaviorDistance": 16,
+    "CombatDirectWeight": 12,
+    "CombatAlwaysMovingWeight": 8,
+    "CombatStrafeWeight": 8,
+    "CombatStrafingDurationRange": [0.8, 1.5],
+    "CombatStrafingFrequencyRange": [1.5, 2.5],
+    "ChaseRelativeSpeed": 0.85,
+    "CombatMovingRelativeSpeed": 0.65,
+    "CombatBackwardsRelativeSpeed": 0.35,
+    "SummonKind": "Zombie",
+    "SummonCountRange": [2, 3],
+    "SummonDistanceRange": [3, 6],
+    "SummonDelayRange": [0, 0],
+    "SummonCooldownRange": [16, 22],
+    "SummonCastTimeRange": [1.2, 1.8],
+    "SummonAnimation": "Alerted",
+    "Weapons": [],
+    "DefaultHotbarSlot": 0,
+    "DefaultPlayerAttitude": "Hostile",
+    "DisableDamageGroups": ["Self"],
+    "LeashDistance": 60,
+    "HardLeashDistance": 300,
+    "IsMemory": true,
+    "MemoriesCategory": "Undead",
+    "MemoriesNameOverride": "Boss_Zombie_Commander",
+    "NameTranslationKey": {
+      "Compute": "NameTranslationKey"
+    }
+  },
+  "Parameters": {
+    "NameTranslationKey": {
+      "Value": "bossnpc.npcRoles.Boss_Zombie_Commander.name",
+      "Description": "Translation key for NPC name display"
+    }
+  }
+}

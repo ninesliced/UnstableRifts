@@ -1,0 +1,11 @@
+{
+  "Interactions": [
+    "Boss_Forklift_Turn_Single",
+    "Boss_Forklift_Turn_Single_R"
+  ],
+  "Tags": {
+    "Attack": [
+      "Melee"
+    ]
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "Type": "ApplyForce",
+  "Force": 200,
+  "Direction": {
+    "X": 0,
+    "Y": 0.8,
+    "Z": -10
+  },
+  "AdjustVertical": false,
+  "Effects": {
+    "ItemAnimationId": "Jump",
+    "WorldSoundEventId": "SFX_Bomb_Fuse"
+  },
+  "ChangeVelocityType": "Add",
+  "WaitForGround": true,
+  "WaitForCollision": false,
+  "RaycastHeightOffset": 0.5,
+  "RaycastDistance": 3,
+  "VelocityConfig": {
+    "AirResistance": 0.99,
+    "AirResistanceMax": 0.97,
+    "GroundResistance": 0.9,
+    "GroundResistanceMax": 0.75,
+    "Threshold": 3.0,
+    "Style": "Linear"
+  },
+  "GroundCheckDelay": 0.3,
+  "RunTime": 1.5,
+  "GroundNext": {
+    "Type": "Replace",
+    "Var": "Rootling_Explode",
+    "DefaultOk": true,
+    "DefaultValue": {
+      "Interactions": [
+        "Kweebec_Seedling_Explode",
+        "Kweebec_Seedling_Remove_Self"
+      ]
+    }
+  },
+  "VerticalClamp": [
+    -20,
+    10
+  ]
+}

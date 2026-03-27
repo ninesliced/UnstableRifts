@@ -1,0 +1,70 @@
+{
+  "Animations": {
+    "ForkStab": {
+      "ThirdPerson": "NPC/Boss/Forklift/Animations/attack_fork.blockyanim",
+      "ThirdPersonMoving": "NPC/Boss/Forklift/Animations/attack_fork.blockyanim",
+      "Speed": 1,
+      "Looping": false
+    },
+    "TurnLeft": {
+      "ThirdPerson": "NPC/Boss/Forklift/Animations/attack_turning_single.blockyanim",
+      "ThirdPersonMoving": "NPC/Boss/Forklift/Animations/attack_turning_single.blockyanim",
+      "Speed": 1,
+      "Looping": false
+    },
+    "TurnRight": {
+      "ThirdPerson": "NPC/Boss/Forklift/Animations/attack_turning_single_r.blockyanim",
+      "ThirdPersonMoving": "NPC/Boss/Forklift/Animations/attack_turning_single_r.blockyanim",
+      "Speed": 1,
+      "Looping": false
+    },
+    "TurnDouble": {
+      "ThirdPerson": "NPC/Boss/Forklift/Animations/attack_turning_double.blockyanim",
+      "ThirdPersonMoving": "NPC/Boss/Forklift/Animations/attack_turning_double.blockyanim",
+      "Speed": 1,
+      "Looping": false
+    },
+    "JumpStart": {
+      "ThirdPerson": "NPC/Boss/Forklift/Animations/jump_start.blockyanim",
+      "ThirdPersonMoving": "NPC/Boss/Forklift/Animations/jump_start.blockyanim",
+      "Speed": 1,
+      "Looping": false
+    },
+    "JumpAir": {
+      "ThirdPerson": "NPC/Boss/Forklift/Animations/jump.blockyanim",
+      "ThirdPersonMoving": "NPC/Boss/Forklift/Animations/jump.blockyanim",
+      "Speed": 1,
+      "Looping": true
+    },
+    "JumpArrive": {
+      "ThirdPerson": "NPC/Boss/Forklift/Animations/jump_arrives.blockyanim",
+      "ThirdPersonMoving": "NPC/Boss/Forklift/Animations/jump_arrives.blockyanim",
+      "Speed": 1,
+      "Looping": false
+    },
+    "Dash": {
+      "ThirdPerson": "NPC/Boss/Forklift/Animations/dash.blockyanim",
+      "ThirdPersonMoving": "NPC/Boss/Forklift/Animations/dash.blockyanim",
+      "Speed": 1,
+      "Looping": true
+    },
+    "SwingDouble": {
+      "ThirdPerson": "NPC/Boss/Forklift/Animations/attack_fork.blockyanim",
+      "ThirdPersonMoving": "NPC/Boss/Forklift/Animations/attack_fork.blockyanim",
+      "Speed": 1,
+      "Looping": false
+    }
+  },
+  "WiggleWeights": {
+    "Pitch": 2,
+    "PitchDeceleration": 0.1,
+    "Roll": 0.1,
+    "RollDeceleration": 0.1,
+    "X": 3,
+    "XDeceleration": 0.1,
+    "Y": 0.1,
+    "YDeceleration": 0.1,
+    "Z": 0.1,
+    "ZDeceleration": 0.1
+  }
+}

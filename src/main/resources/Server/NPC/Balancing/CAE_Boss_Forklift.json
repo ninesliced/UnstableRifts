@@ -1,0 +1,309 @@
+{
+  "Type": "CombatActionEvaluator",
+  "TargetMemoryDuration": 14,
+  "CombatActionEvaluator": {
+    "RunConditions": [
+      {
+        "Type": "TimeSinceLastUsed",
+        "Curve": {
+          "ResponseCurve": "Linear",
+          "XRange": [0, 4]
+        }
+      },
+      {
+        "Type": "Randomiser",
+        "MinValue": 0.7,
+        "MaxValue": 1
+      }
+    ],
+    "MinRunUtility": 0.5,
+    "MinActionUtility": 0.005,
+    "AvailableActions": {
+      "ForkAttack": {
+        "Type": "Ability",
+        "Description": "Fork stab attack - double hit frontal cone",
+        "Target": "Hostile",
+        "SubState": "Default",
+        "RequireAiming": false,
+        "WeaponSlot": 0,
+        "AttackDistanceRange": [1, 4],
+        "PostExecuteDistanceRange": [1.5, 3],
+        "Ability": "Root_Boss_Forklift_Fork_Attack",
+        "WeightCoefficient": 2.2,
+        "Conditions": [
+          {
+            "Type": "TargetDistance",
+            "Curve": {
+              "ResponseCurve": "SimpleDescendingLogistic",
+              "XRange": [0, 4.5]
+            }
+          },
+          {
+            "Type": "TimeSinceLastUsed",
+            "Curve": {
+              "Type": "Switch",
+              "SwitchPoint": 3.0
+            }
+          },
+          {
+            "Type": "Randomiser",
+            "MinValue": 0.55,
+            "MaxValue": 1
+          }
+        ]
+      },
+      "TurnSingle": {
+        "Type": "Ability",
+        "Description": "Single turn sweep - hits all around in circle",
+        "Target": "Hostile",
+        "SubState": "Default",
+        "RequireAiming": false,
+        "WeaponSlot": 0,
+        "AttackDistanceRange": [1, 4],
+        "PostExecuteDistanceRange": [1.5, 3],
+        "Ability": "Root_Boss_Forklift_Turn_Single",
+        "WeightCoefficient": 2.5,
+        "Conditions": [
+          {
+            "Type": "TargetDistance",
+            "Curve": {
+              "ResponseCurve": "SimpleDescendingLogistic",
+              "XRange": [0, 5]
+            }
+          },
+          {
+            "Type": "TimeSinceLastUsed",
+            "Curve": {
+              "Type": "Switch",
+              "SwitchPoint": 3
+            }
+          },
+          {
+            "Type": "Randomiser",
+            "MinValue": 0.6,
+            "MaxValue": 1
+          }
+        ]
+      },
+      "TurnDouble": {
+        "Type": "Ability",
+        "Description": "Double turn sweep - wide AOE circle damage, hits twice",
+        "Target": "Hostile",
+        "SubState": "Default",
+        "RequireAiming": false,
+        "WeaponSlot": 0,
+        "AttackDistanceRange": [1, 5],
+        "PostExecuteDistanceRange": [2, 4],
+        "Ability": "Root_Boss_Forklift_Turn_Double",
+        "WeightCoefficient": 2.8,
+        "Conditions": [
+          {
+            "Type": "TargetDistance",
+            "Curve": {
+              "ResponseCurve": "SimpleDescendingLogistic",
+              "XRange": [0, 6]
+            }
+          },
+          {
+            "Type": "TimeSinceLastUsed",
+            "Curve": {
+              "Type": "Switch",
+              "SwitchPoint": 4
+            }
+          },
+          {
+            "Type": "Randomiser",
+            "MinValue": 0.6,
+            "MaxValue": 1
+          }
+        ]
+      },
+      "LeapSlam": {
+        "Type": "Ability",
+        "Description": "Leap to distant target and slam on landing with large AOE",
+        "Target": "Hostile",
+        "SubState": "Default",
+        "RequireAiming": false,
+        "WeaponSlot": 0,
+        "AttackDistanceRange": [3, 16],
+        "PostExecuteDistanceRange": [1, 3],
+        "Ability": "Root_Boss_Forklift_Leap_Attack",
+        "WeightCoefficient": 1.6,
+        "InteractionVars": {
+          "Leap_Smash_Damage": {
+            "Interactions": [
+              {
+                "Parent": "Boss_Forklift_Leap_Smash_Damage"
+              }
+            ]
+          }
+        },
+        "Conditions": [
+          {
+            "Type": "TargetDistance",
+            "Curve": {
+              "ResponseCurve": "Linear",
+              "XRange": [2, 16]
+            }
+          },
+          {
+            "Type": "TimeSinceLastUsed",
+            "Curve": {
+              "Type": "Switch",
+              "SwitchPoint": 6
+            }
+          },
+          {
+            "Type": "Randomiser",
+            "MinValue": 0.65,
+            "MaxValue": 1
+          }
+        ]
+      },
+      "BarrelToss": {
+        "Type": "Ability",
+        "Description": "Use the fork to launch a radioactive barrel-like hazard toward distant players",
+        "Target": "Hostile",
+        "SubState": "Default",
+        "RequireAiming": true,
+        "WeaponSlot": 0,
+        "AttackDistanceRange": [8, 18],
+        "PostExecuteDistanceRange": [6, 10],
+        "Ability": "Root_Boss_Forklift_Barrel_Toss",
+        "WeightCoefficient": 3.0,
+        "Conditions": [
+          {
+            "Type": "TargetDistance",
+            "Curve": {
+              "ResponseCurve": "Linear",
+              "XRange": [8, 18]
+            }
+          },
+          {
+            "Type": "TimeSinceLastUsed",
+            "Curve": {
+              "Type": "Switch",
+              "SwitchPoint": 5
+            }
+          },
+          {
+            "Type": "Randomiser",
+            "MinValue": 0.68,
+            "MaxValue": 1
+          }
+        ]
+      },
+      "DashCharge": {
+        "Type": "Ability",
+        "Description": "Long fast dash attack for distant targets in a straight lane",
+        "Target": "Hostile",
+        "SubState": "Default",
+        "RequireAiming": true,
+        "WeaponSlot": 0,
+        "AttackDistanceRange": [8, 18],
+        "PostExecuteDistanceRange": [3, 8],
+        "Ability": "Root_Boss_Forklift_Dash_Attack",
+        "WeightCoefficient": 2.6,
+        "Conditions": [
+          {
+            "Type": "TargetDistance",
+            "Curve": {
+              "ResponseCurve": "Linear",
+              "XRange": [8, 18]
+            }
+          },
+          {
+            "Type": "TimeSinceLastUsed",
+            "Curve": {
+              "Type": "Switch",
+              "SwitchPoint": 5
+            }
+          },
+          {
+            "Type": "Randomiser",
+            "MinValue": 0.65,
+            "MaxValue": 1
+          }
+        ]
+      },
+      "Strafe": {
+        "Type": "State",
+        "Description": "Circle around the target menacingly",
+        "State": "Combat",
+        "SubState": "Strafe",
+        "Target": "Hostile",
+        "PostExecuteDistanceRange": [2, 3.5],
+        "WeightCoefficient": 1.4,
+        "Conditions": [
+          {
+            "Type": "TimeSinceLastUsed",
+            "Curve": {
+              "Type": "Switch",
+              "SwitchPoint": 2
+            }
+          }
+        ]
+      }
+    },
+    "ActionSets": {
+      "Default": {
+        "Actions": ["ForkAttack", "TurnSingle", "TurnDouble", "LeapSlam", "BarrelToss", "DashCharge", "Strafe"],
+        "BasicAttacks": {
+          "Attacks": [
+            "Root_Boss_Forklift_Fork_Attack"
+          ],
+          "InteractionVars": {
+            "Fork_Damage": {
+              "Interactions": [
+                {
+                  "Parent": "Boss_Forklift_Fork_Damage",
+                  "DamageCalculator": {
+                    "Type": "Absolute",
+                    "BaseDamage": {
+                      "Physical": 30
+                    },
+                    "RandomPercentageModifier": 0.1
+                  }
+                }
+              ]
+            }
+          },
+          "Randomise": false,
+          "UseProjectedDistance": true,
+          "MaxRange": 3.5,
+          "Timeout": 0.3,
+          "CooldownRange": [0.5, 0.8]
+        }
+      },
+      "Strafe": {
+        "Actions": ["ForkAttack", "TurnSingle", "TurnDouble", "LeapSlam", "BarrelToss", "DashCharge"],
+        "BasicAttacks": {
+          "Attacks": [
+            "Root_Boss_Forklift_Fork_Attack"
+          ],
+          "InteractionVars": {
+            "Fork_Damage": {
+              "Interactions": [
+                {
+                  "Parent": "Boss_Forklift_Fork_Damage",
+                  "DamageCalculator": {
+                    "Type": "Absolute",
+                    "BaseDamage": {
+                      "Physical": 30
+                    },
+                    "RandomPercentageModifier": 0.1
+                  }
+                }
+              ]
+            }
+          },
+          "Randomise": false,
+          "UseProjectedDistance": true,
+          "MaxRange": 3.2,
+          "Timeout": 0.3,
+          "CooldownRange": [0.4, 0.7]
+        }
+      }
+    }
+  }
+}

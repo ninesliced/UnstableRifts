@@ -1,0 +1,73 @@
+{
+  "Type": "Simple",
+  "Effects": {
+    "ItemPlayerAnimationsId": "Zombie_Default",
+    "ItemAnimationId": "SwingDouble",
+    "ClearAnimationOnFinish": false,
+    "CameraEffect": "Boss_Impact_Heavy"
+  },
+  "RunTime": 0.1,
+  "Next": {
+    "Type": "Parallel",
+    "Interactions": [
+      {
+        "Interactions": [
+          {
+            "Type": "Selector",
+            "RunTime": 0.05,
+            "Selector": {
+              "Id": "AOECylinder",
+              "Range": 4,
+              "Offset": {
+                "Y": -1
+              },
+              "Height": 2.5
+            },
+            "HitEntity": {
+              "Interactions": [
+                {
+                  "Type": "Replace",
+                  "DefaultValue": {
+                    "Interactions": [
+                      "Boss_Zombie_Leap_Smash_Damage"
+                    ]
+                  },
+                  "Var": "Leap_Smash_Damage"
+                }
+              ]
+            },
+            "Next": {
+              "Type": "Simple",
+              "RunTime": 0.6
+            }
+          }
+        ]
+      },
+      {
+        "Interactions": [
+          {
+            "Type": "Simple",
+            "RunTime": 0.15,
+            "Effects": {
+              "WorldSoundEventId": "SFX_Mace_T2_Impact",
+              "CameraEffect": "Boss_Impact_Heavy",
+              "Particles": [
+                {
+                  "SystemId": "Boss_Zone_Impact_Effect",
+                  "TargetEntityPart": "Entity"
+                },
+                {
+                  "SystemId": "Impact_Mace_Charged",
+                  "PositionOffset": {
+                    "Y": 0.5
+                  },
+                  "TargetEntityPart": "Entity"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

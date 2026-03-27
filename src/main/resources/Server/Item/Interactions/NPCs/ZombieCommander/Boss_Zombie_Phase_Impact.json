@@ -1,0 +1,78 @@
+{
+  "Type": "Simple",
+  "RunTime": 0.0,
+  "Effects": {
+    "WorldSoundEventId": "SFX_Light_Melee_T2_Swing",
+    "MovementEffects": {
+      "DisableAll": true
+    }
+  },
+  "Next": {
+    "Type": "Simple",
+    "RunTime": 1.2,
+    "Effects": {
+      "ItemPlayerAnimationsId": "Zombie_Default",
+      "ItemAnimationId": "Bite",
+      "Particles": [
+        {
+          "SystemId": "Boss_Zone_Warning_Effect",
+          "TargetEntityPart": "Entity"
+        }
+      ]
+    },
+    "Next": {
+      "Type": "Parallel",
+      "Interactions": [
+        {
+          "Interactions": [
+            {
+              "Type": "Selector",
+              "RunTime": 0.35,
+              "Selector": {
+                "Id": "AOECircle",
+                "Range": 5
+              },
+              "HitEntity": {
+                "Interactions": [
+                  {
+                    "Type": "Replace",
+                    "Var": "Phase_Impact_Damage",
+                    "DefaultOk": true,
+                    "DefaultValue": {
+                      "Interactions": [
+                        "Boss_Zombie_Phase_Impact_Damage"
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "Interactions": [
+            {
+              "Type": "Simple",
+              "RunTime": 0.35,
+              "Effects": {
+                "WorldSoundEventId": "SFX_Mace_T2_Signature_Impact",
+                "CameraEffect": "Boss_Impact_Heavy",
+                "Particles": [
+                  {
+                    "SystemId": "Boss_Zone_Impact_Effect",
+                    "TargetEntityPart": "Entity"
+                  },
+                  {
+                    "SystemId": "Impact_Mace_Charged",
+                    "TargetEntityPart": "Entity",
+                    "TargetNodeName": "Hip"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

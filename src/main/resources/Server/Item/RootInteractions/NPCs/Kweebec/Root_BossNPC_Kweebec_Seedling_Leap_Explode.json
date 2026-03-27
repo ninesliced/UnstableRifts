@@ -1,0 +1,13 @@
+{
+  "Tags": {
+    "Attack": [
+      "Melee"
+    ]
+  },
+  "Cooldown": {
+    "Cooldown": 1.6
+  },
+  "Interactions": [
+    "Kweebec_Seedling_Leap_Force"
+  ]
+}

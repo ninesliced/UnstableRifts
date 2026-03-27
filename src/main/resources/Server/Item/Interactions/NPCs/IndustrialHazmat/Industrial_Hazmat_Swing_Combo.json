@@ -1,0 +1,78 @@
+{
+  "Type": "Simple",
+  "Effects": {
+    "ItemPlayerAnimationsId": "Industrial_Hazmat_Default",
+    "ItemAnimationId": "SwingCombo",
+    "WorldSoundEventId": "SFX_Unarmed_Swing"
+  },
+  "$Comment": "Left-right combo, 2.5s total. Left arm hits at 0.65s, right arm hits at 1.7s.",
+  "RunTime": 0.65,
+  "Next": {
+    "Type": "Selector",
+    "RunTime": 0.1,
+    "Selector": {
+      "Id": "Horizontal",
+      "Direction": "ToLeft",
+      "TestLineOfSight": true,
+      "ExtendTop": 0.5,
+      "ExtendBottom": 0.5,
+      "StartDistance": 0.2,
+      "EndDistance": 2.5,
+      "Length": 60,
+      "RollOffset": 0,
+      "YawStartOffset": -45
+    },
+    "HitEntity": {
+      "Interactions": [
+        {
+          "Type": "Replace",
+          "DefaultValue": {
+            "Interactions": [
+              "NPC_Attack_Melee_Damage"
+            ]
+          },
+          "Var": "Melee_Damage"
+        }
+      ]
+    },
+    "Next": {
+      "Type": "Simple",
+      "$Comment": "Gap between left hit (0.65s) and right hit (1.7s)",
+      "RunTime": 0.95,
+      "Next": {
+        "Type": "Selector",
+        "RunTime": 0.1,
+        "Selector": {
+          "Id": "Horizontal",
+          "Direction": "ToRight",
+          "TestLineOfSight": true,
+          "ExtendTop": 0.5,
+          "ExtendBottom": 0.5,
+          "StartDistance": 0.2,
+          "EndDistance": 2.5,
+          "Length": 60,
+          "RollOffset": 0,
+          "YawStartOffset": -45
+        },
+        "HitEntity": {
+          "Interactions": [
+            {
+              "Type": "Replace",
+              "DefaultValue": {
+                "Interactions": [
+                  "NPC_Attack_Melee_Damage"
+                ]
+              },
+              "Var": "Melee_Damage2"
+            }
+          ]
+        },
+        "Next": {
+          "Type": "Simple",
+          "$Comment": "Recovery after right hit to fill 2.5s total",
+          "RunTime": 0.7
+        }
+      }
+    }
+  }
+}

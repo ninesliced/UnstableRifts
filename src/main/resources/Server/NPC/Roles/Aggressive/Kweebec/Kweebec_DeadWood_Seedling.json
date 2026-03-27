@@ -1,0 +1,9 @@
+{
+  "Type": "Variant",
+  "Reference": "Template_Kweebec_DeadWood",
+  "Modify": {
+    "Appearance": "Kweebec_DeadWood_Seedling",
+    "MemoriesNameOverride": "Kweebec_DeadWood_Seedling",
+    "NameTranslationKey": "bettermobs.npcRoles.Kweebec_DeadWood_Seedling.name"
+  }
+}

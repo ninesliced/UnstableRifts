@@ -1,0 +1,43 @@
+{
+  "Class": "Instruction",
+  "Interface": "Hytale.Instruction.AttackSequence",
+  "Parameters": {
+    "AttackDistance": {
+      "Value": 2.5,
+      "Description": "The distance at which an NPC will execute attacks"
+    },
+    "CombatRelativeTurnSpeed": {
+      "Value": 1.9,
+      "Description": "Modifier that decides turn speed difference in combat"
+    }
+  },
+  "Content": {
+    "Sensor": {
+      "Type": "Target",
+      "Range": { "Compute": "AttackDistance" },
+      "Filters": [
+        {
+          "Type": "LineOfSight"
+        }
+      ]
+    },
+    "ActionsBlocking": true,
+    "Actions": [
+      {
+        "Type": "Attack",
+        "Attack": "Kweebec_DeadWood_Sword_Swing_Left",
+        "AttackPauseRange": [0.7, 1.2]
+      },
+      {
+        "Type": "Attack",
+        "Attack": "Kweebec_DeadWood_Sword_Swing_Right",
+        "AttackPauseRange": [0.7, 1.2]
+      }
+    ],
+    "HeadMotion": {
+      "Type": "Aim",
+      "RelativeTurnSpeed": { "Compute": "CombatRelativeTurnSpeed" }
+    }
+  },
+  "Type": "Component"
+}
