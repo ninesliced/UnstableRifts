@@ -140,7 +140,7 @@ public final class AimAssistHelper {
 
             if (blockingBlock != null) {
                 Vector3d blockCenter = new Vector3d(blockingBlock.x + 0.5, blockingBlock.y + 0.5, blockingBlock.z + 0.5);
-                double blockDistSq = dev.ninesliced.shotcave.JomlCompat.distanceSquared(muzzle, blockCenter);
+                double blockDistSq = muzzle.distanceSquared(blockCenter);
                 double targetDistSq = dist * dist;
                 if (blockDistSq + 1.0E-6 < targetDistSq) {
                     continue;
@@ -166,7 +166,7 @@ public final class AimAssistHelper {
             blendedHorizZ /= blendedHorizLen;
 
             Vector3d out = new Vector3d(blendedHorizX * targetHorizLen, dirY, blendedHorizZ * targetHorizLen);
-            if (dev.ninesliced.shotcave.JomlCompat.lengthSquared(out) > 1.0E-8) {
+            if (out.lengthSquared() > 1.0E-8) {
                 out.normalize();
                 return out;
             }
@@ -284,7 +284,7 @@ public final class AimAssistHelper {
                         || blockingBlock.z != candidate.blockZ) {
                     // There's a different block in the way — check if it's closer
                     Vector3d blockCenter = new Vector3d(blockingBlock.x + 0.5, blockingBlock.y + 0.5, blockingBlock.z + 0.5);
-                    double blockDistSq = dev.ninesliced.shotcave.JomlCompat.distanceSquared(muzzle, blockCenter);
+                    double blockDistSq = muzzle.distanceSquared(blockCenter);
                     double targetDistSq = dist * dist;
                     if (blockDistSq + 1.0E-6 < targetDistSq) {
                         continue; // Blocked by another solid block
@@ -307,7 +307,7 @@ public final class AimAssistHelper {
             blendedHorizZ /= blendedHorizLen;
 
             Vector3d out = new Vector3d(blendedHorizX * targetHorizLen, dirY, blendedHorizZ * targetHorizLen);
-            if (dev.ninesliced.shotcave.JomlCompat.lengthSquared(out) > 1.0E-8) {
+            if (out.lengthSquared() > 1.0E-8) {
                 out.normalize();
                 return out;
             }
@@ -447,7 +447,7 @@ public final class AimAssistHelper {
                         (int) Math.ceil(dist));
                 if (blockingBlock != null) {
                     Vector3d bc = new Vector3d(blockingBlock.x + 0.5, blockingBlock.y + 0.5, blockingBlock.z + 0.5);
-                    double blockDistSq = dev.ninesliced.shotcave.JomlCompat.distanceSquared(muzzle, bc);
+                    double blockDistSq = muzzle.distanceSquared(bc);
                     double targetDistSq = dist * dist;
                     // If blocking block is closer AND is not in the same position as a destructible block target
                     if (blockDistSq + 1.0E-6 < targetDistSq) {
@@ -472,7 +472,7 @@ public final class AimAssistHelper {
             bz /= bLen;
 
             Vector3d out = new Vector3d(bx * targetHorizLen, dirY, bz * targetHorizLen);
-            if (dev.ninesliced.shotcave.JomlCompat.lengthSquared(out) > 1.0E-8) {
+            if (out.lengthSquared() > 1.0E-8) {
                 out.normalize();
                 return out;
             }

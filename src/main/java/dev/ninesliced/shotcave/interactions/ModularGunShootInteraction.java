@@ -457,7 +457,13 @@ public final class ModularGunShootInteraction extends SimpleInteraction {
             return new Vector3d(0.0, 0.0, 1.0);
         }
 
-        Vector3d direction = dev.ninesliced.shotcave.JomlCompat.lookDirection(headRotation.getRotation().yaw(), headRotation.getRotation().pitch());
+        float yaw = headRotation.getRotation().yaw();
+        float pitch = headRotation.getRotation().pitch();
+        double horizontal = Math.cos(pitch);
+        Vector3d direction = new Vector3d(
+                horizontal * -Math.sin(yaw),
+                Math.sin(pitch),
+                horizontal * -Math.cos(yaw));
         return applySpread(direction, effectiveSpread);
     }
 
@@ -470,7 +476,7 @@ public final class ModularGunShootInteraction extends SimpleInteraction {
             direction.x += random.nextDouble(-spreadRadians, spreadRadians);
             direction.y += random.nextDouble(-spreadRadians, spreadRadians);
             direction.z += random.nextDouble(-spreadRadians, spreadRadians);
-            if (dev.ninesliced.shotcave.JomlCompat.lengthSquared(direction) > 0.000001) {
+            if (direction.lengthSquared() > 0.000001) {
                 direction.normalize();
             }
         }
@@ -488,7 +494,7 @@ public final class ModularGunShootInteraction extends SimpleInteraction {
         final double[] entityHitDistanceSq = new double[] { Double.MAX_VALUE };
 
         Vector2d minMax = new Vector2d();
-        Vector3d searchCenter = dev.ninesliced.shotcave.JomlCompat.addScaled(new Vector3d(from), direction, (double) effectiveRange * 0.5);
+        Vector3d searchCenter = new Vector3d(from).fma((double) effectiveRange * 0.5, direction);
         Selector.selectNearbyEntities(commandBuffer, searchCenter, (double) effectiveRange * 0.6, candidate -> {
             if (!candidate.isValid()) {
                 return;
@@ -522,7 +528,7 @@ public final class ModularGunShootInteraction extends SimpleInteraction {
             double hitX = from.x + direction.x * t;
             double hitY = from.y + direction.y * t;
             double hitZ = from.z + direction.z * t;
-            double hitDistanceSq = dev.ninesliced.shotcave.JomlCompat.distanceSquared(from, hitX, hitY, hitZ);
+            double hitDistanceSq = from.distanceSquared(hitX, hitY, hitZ);
             if (hitDistanceSq >= entityHitDistanceSq[0]) {
                 return;
             }
@@ -546,7 +552,7 @@ public final class ModularGunShootInteraction extends SimpleInteraction {
 
         if (block != null) {
             Vector3d blockHitPos = new Vector3d((double) block.x + 0.5, (double) block.y + 0.5, (double) block.z + 0.5);
-            double blockDistanceSq = dev.ninesliced.shotcave.JomlCompat.distanceSquared(from, blockHitPos);
+            double blockDistanceSq = from.distanceSquared(blockHitPos);
             if (entityHitRef[0] == null || blockDistanceSq < entityHitDistanceSq[0]) {
                 BlockPosition raw = new BlockPosition(block.x, block.y, block.z);
                 return new ShotHit(blockHitPos, null, raw);
@@ -557,7 +563,7 @@ public final class ModularGunShootInteraction extends SimpleInteraction {
             return new ShotHit(entityHitPos[0], entityHitRef[0], null);
         }
 
-        Vector3d miss = dev.ninesliced.shotcave.JomlCompat.addScaled(new Vector3d(from), direction, (double) effectiveRange);
+        Vector3d miss = new Vector3d(from).fma((double) effectiveRange, direction);
         return new ShotHit(miss, null, null);
     }
 
@@ -596,7 +602,7 @@ public final class ModularGunShootInteraction extends SimpleInteraction {
             @Nonnull CommandBuffer<EntityStore> commandBuffer,
             int trailR, int trailG, int trailB) {
         Vector3d delta = new Vector3d(to).sub(from);
-        double distance = dev.ninesliced.shotcave.JomlCompat.distance(from, to);
+        double distance = from.distance(to);
         if (distance <= 0.001) {
             spawnTrailParticle(new Vector3d(from), 0.0f, 0.0f, commandBuffer, trailR, trailG, trailB);
             return;
@@ -609,7 +615,7 @@ public final class ModularGunShootInteraction extends SimpleInteraction {
         int steps = Math.max(1, (int) Math.ceil(distance / this.trailStepDistance));
         for (int i = 0; i <= steps; i++) {
             double t = (double) i / (double) steps;
-            Vector3d point = dev.ninesliced.shotcave.JomlCompat.addScaled(new Vector3d(from), delta, t);
+            Vector3d point = new Vector3d(from).fma(t, delta);
             spawnTrailParticle(point, yaw, pitch, commandBuffer, trailR, trailG, trailB);
         }
     }
@@ -685,7 +691,7 @@ public final class ModularGunShootInteraction extends SimpleInteraction {
 
         Vector3d direction = new Vector3d(targetTransform.getPosition()).sub(attackerTransform.getPosition());
         direction.y = 0.0;
-        if (dev.ninesliced.shotcave.JomlCompat.lengthSquared(direction) <= 0.000001) {
+        if (direction.lengthSquared() <= 0.000001) {
             HeadRotation attackerHeadRotation = commandBuffer.getComponent(attacker, HeadRotation.getComponentType());
             if (attackerHeadRotation == null) {
                 return;

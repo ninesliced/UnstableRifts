@@ -323,7 +323,7 @@ public final class ChainLightningInteraction extends SimpleInstantInteraction {
                 return;
             }
 
-            double d = dev.ninesliced.shotcave.JomlCompat.distanceSquared(from, pos);
+            double d = from.distanceSquared(pos);
             if (d < bestDistanceSq[0]) {
                 bestDistanceSq[0] = d;
                 best[0] = candidate;
@@ -405,14 +405,14 @@ public final class ChainLightningInteraction extends SimpleInstantInteraction {
             @Nonnull Vector3d from,
             @Nonnull Vector3d direction,
             int effectiveMaxDistance) {
-        Vector3d missPosition = dev.ninesliced.shotcave.JomlCompat.addScaled(new Vector3d(from), direction, (double) effectiveMaxDistance);
+        Vector3d missPosition = new Vector3d(from).fma((double) effectiveMaxDistance, direction);
 
         final Vector3d[] entityHitPos = new Vector3d[] { null };
         final Ref<EntityStore>[] entityHitRef = new Ref[] { null };
         final double[] entityHitDistanceSq = new double[] { Double.MAX_VALUE };
 
         Vector2d minMax = new Vector2d();
-        Vector3d searchCenter = dev.ninesliced.shotcave.JomlCompat.addScaled(new Vector3d(from), direction, (double) effectiveMaxDistance * 0.5);
+        Vector3d searchCenter = new Vector3d(from).fma((double) effectiveMaxDistance * 0.5, direction);
         Selector.selectNearbyEntities(commandBuffer, searchCenter, (double) effectiveMaxDistance * 0.6, candidate -> {
             if (!candidate.isValid()) {
                 return;
@@ -446,7 +446,7 @@ public final class ChainLightningInteraction extends SimpleInstantInteraction {
             double hitX = from.x + direction.x * t;
             double hitY = from.y + direction.y * t;
             double hitZ = from.z + direction.z * t;
-            double hitDistanceSq = dev.ninesliced.shotcave.JomlCompat.distanceSquared(from, hitX, hitY, hitZ);
+            double hitDistanceSq = from.distanceSquared(hitX, hitY, hitZ);
             if (hitDistanceSq >= entityHitDistanceSq[0]) {
                 return;
             }
@@ -462,7 +462,7 @@ public final class ChainLightningInteraction extends SimpleInstantInteraction {
 
         if (block != null) {
             Vector3d blockHitPos = new Vector3d((double) block.x + 0.5, (double) block.y + 0.5, (double) block.z + 0.5);
-            double blockDistanceSq = dev.ninesliced.shotcave.JomlCompat.distanceSquared(from, blockHitPos);
+            double blockDistanceSq = from.distanceSquared(blockHitPos);
             if (entityHitRef[0] == null || blockDistanceSq < entityHitDistanceSq[0]) {
                 BlockPosition bp = new BlockPosition(block.x, block.y, block.z);
                 return new RaycastHit(blockHitPos, null, bp);
@@ -484,8 +484,14 @@ public final class ChainLightningInteraction extends SimpleInstantInteraction {
             return new Vector3d(0.0, 0.0, 1.0);
         }
 
-        Vector3d direction = dev.ninesliced.shotcave.JomlCompat.lookDirection(headRotation.getRotation().yaw(), headRotation.getRotation().pitch());
-        if (dev.ninesliced.shotcave.JomlCompat.lengthSquared(direction) <= 0.000001) {
+        float yaw = headRotation.getRotation().yaw();
+        float pitch = headRotation.getRotation().pitch();
+        double horizontal = Math.cos(pitch);
+        Vector3d direction = new Vector3d(
+                horizontal * -Math.sin(yaw),
+                Math.sin(pitch),
+                horizontal * -Math.cos(yaw));
+        if (direction.lengthSquared() <= 0.000001) {
             return new Vector3d(0.0, 0.0, 1.0);
         }
         return direction;
@@ -516,7 +522,7 @@ public final class ChainLightningInteraction extends SimpleInstantInteraction {
             @Nonnull Vector3d to,
             @Nonnull CommandBuffer<EntityStore> commandBuffer) {
         Vector3d delta = new Vector3d(to).sub(from);
-        double distance = dev.ninesliced.shotcave.JomlCompat.distance(from, to);
+        double distance = from.distance(to);
         if (distance <= 0.001) {
             spawnLineParticle(new Vector3d(from), 0.0f, 0.0f, 0.0f, commandBuffer);
             return;
@@ -529,7 +535,7 @@ public final class ChainLightningInteraction extends SimpleInstantInteraction {
         int steps = Math.max(1, (int) Math.ceil(distance / this.beamStepDistance));
         for (int i = 0; i <= steps; i++) {
             double t = (double) i / (double) steps;
-            Vector3d point = dev.ninesliced.shotcave.JomlCompat.addScaled(new Vector3d(from), delta, t);
+            Vector3d point = new Vector3d(from).fma(t, delta);
             spawnLineParticle(point, yaw, pitch, 0.0f, commandBuffer);
         }
     }

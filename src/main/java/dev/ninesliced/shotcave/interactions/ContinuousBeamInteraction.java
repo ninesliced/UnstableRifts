@@ -545,8 +545,14 @@ public final class ContinuousBeamInteraction extends ChargingInteraction {
             return new Vector3d(0.0d, 0.0d, 1.0d);
         }
 
-        Vector3d direction = dev.ninesliced.shotcave.JomlCompat.lookDirection(headRotation.getRotation().yaw(), headRotation.getRotation().pitch());
-        if (dev.ninesliced.shotcave.JomlCompat.lengthSquared(direction) <= EPSILON) {
+        float yaw = headRotation.getRotation().yaw();
+        float pitch = headRotation.getRotation().pitch();
+        double horizontal = Math.cos(pitch);
+        Vector3d direction = new Vector3d(
+                horizontal * -Math.sin(yaw),
+                Math.sin(pitch),
+                horizontal * -Math.cos(yaw));
+        if (direction.lengthSquared() <= EPSILON) {
             return new Vector3d(0.0d, 0.0d, 1.0d);
         }
         return direction;
@@ -563,7 +569,7 @@ public final class ContinuousBeamInteraction extends ChargingInteraction {
         final double[] entityHitDistanceSq = new double[] { Double.MAX_VALUE };
 
         Vector2d minMax = new Vector2d();
-        Vector3d searchCenter = dev.ninesliced.shotcave.JomlCompat.addScaled(new Vector3d(from), direction, (double) effectiveRange * 0.5d);
+        Vector3d searchCenter = new Vector3d(from).fma((double) effectiveRange * 0.5d, direction);
         Selector.selectNearbyEntities(commandBuffer, searchCenter, (double) effectiveRange * 0.6d, candidate -> {
             if (!candidate.isValid()) {
                 return;
@@ -598,7 +604,7 @@ public final class ContinuousBeamInteraction extends ChargingInteraction {
             double hitX = from.x + direction.x * hitDistance;
             double hitY = from.y + direction.y * hitDistance;
             double hitZ = from.z + direction.z * hitDistance;
-            double hitDistanceSq = dev.ninesliced.shotcave.JomlCompat.distanceSquared(from, hitX, hitY, hitZ);
+            double hitDistanceSq = from.distanceSquared(hitX, hitY, hitZ);
             if (hitDistanceSq >= entityHitDistanceSq[0]) {
                 return;
             }
@@ -622,7 +628,7 @@ public final class ContinuousBeamInteraction extends ChargingInteraction {
 
         if (block != null) {
             Vector3d blockHitPos = new Vector3d((double) block.x + 0.5d, (double) block.y + 0.5d, (double) block.z + 0.5d);
-            double blockDistanceSq = dev.ninesliced.shotcave.JomlCompat.distanceSquared(from, blockHitPos);
+            double blockDistanceSq = from.distanceSquared(blockHitPos);
             if (entityHitRef[0] == null || blockDistanceSq < entityHitDistanceSq[0]) {
                 return new ShotHit(blockHitPos, null, new BlockPosition(block.x, block.y, block.z));
             }
@@ -632,7 +638,7 @@ public final class ContinuousBeamInteraction extends ChargingInteraction {
             return new ShotHit(entityHitPos[0], entityHitRef[0], null);
         }
 
-        return new ShotHit(dev.ninesliced.shotcave.JomlCompat.addScaled(new Vector3d(from), direction, (double) effectiveRange), null, null);
+        return new ShotHit(new Vector3d(from).fma((double) effectiveRange, direction), null, null);
     }
 
     private void forkHitInteraction(@Nonnull InteractionContext context,
@@ -676,7 +682,7 @@ public final class ContinuousBeamInteraction extends ChargingInteraction {
         }
 
         Vector3d delta = new Vector3d(to).sub(from);
-        double distance = dev.ninesliced.shotcave.JomlCompat.distance(from, to);
+        double distance = from.distance(to);
         if (distance <= EPSILON) {
             spawnBeamParticle(new Vector3d(from), 0.0f, 0.0f, commandBuffer, beamR, beamG, beamB);
             return;
@@ -688,7 +694,7 @@ public final class ContinuousBeamInteraction extends ChargingInteraction {
         int steps = Math.max(1, (int) Math.ceil(distance / this.beamStepDistance));
         for (int i = 0; i <= steps; i++) {
             double t = (double) i / (double) steps;
-            Vector3d point = dev.ninesliced.shotcave.JomlCompat.addScaled(new Vector3d(from), delta, t);
+            Vector3d point = new Vector3d(from).fma(t, delta);
             spawnBeamParticle(point, yaw, pitch, commandBuffer, beamR, beamG, beamB);
         }
     }
@@ -762,7 +768,7 @@ public final class ContinuousBeamInteraction extends ChargingInteraction {
 
         Vector3d direction = new Vector3d(targetTransform.getPosition()).sub(attackerTransform.getPosition());
         direction.y = 0.0d;
-        if (dev.ninesliced.shotcave.JomlCompat.lengthSquared(direction) <= EPSILON) {
+        if (direction.lengthSquared() <= EPSILON) {
             HeadRotation attackerHeadRotation = commandBuffer.getComponent(attacker, HeadRotation.getComponentType());
             if (attackerHeadRotation == null) {
                 return;
