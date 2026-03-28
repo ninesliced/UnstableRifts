@@ -2,6 +2,7 @@ package dev.ninesliced.shotcave.systems;
 
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Ref;
+import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.asset.type.entityeffect.config.EntityEffect;
 import com.hypixel.hytale.server.core.asset.type.entityeffect.config.OverlapBehavior;
 import com.hypixel.hytale.server.core.asset.type.entityeffect.config.RemovalBehavior;
@@ -50,6 +51,10 @@ public final class DamageEffectRuntime {
                              float durationSeconds,
                              float damagePerTick) {
         if (effect == DamageEffect.NONE) {
+            return;
+        }
+
+        if (commandBuffer.getComponent(target, Player.getComponentType()) != null) {
             return;
         }
 
