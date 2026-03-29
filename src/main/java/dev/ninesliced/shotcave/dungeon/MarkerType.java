@@ -14,15 +14,15 @@ public enum MarkerType {
     MOB_SPAWN_POINT("Shotcave_Mob_Spawn_Point"),
     /** Runtime mob spawner (spawns mobs while players are nearby). */
     MOB_SPAWNER("Shotcave_Mob_Spawner"),
-    /** Portal entry — teleports the player to the linked exit. */
+    /** Portal entry — configurable marker for Next Level or Closest Exit behavior. */
     PORTAL("Shotcave_Portal"),
-    /** Portal exit — destination of a portal teleport. */
+    /** Portal exit — destination marker used by Closest Exit portals. */
     PORTAL_EXIT("Shotcave_Portal_Exit"),
-    /** Unified door marker — default, no mode set. */
+    /** Unified door marker — mode is saved via DoorData on the block. */
     DOOR("Shotcave_Door"),
-    /** Key door variant — requires a key to unlock. */
+    /** Legacy key door marker — kept for backward compatibility. */
     DOOR_KEY("Shotcave_Door_Key"),
-    /** Activator door variant — unlocked by completing challenges. */
+    /** Legacy activator door marker — kept for backward compatibility. */
     DOOR_ACTIVATOR("Shotcave_Door_Activator"),
     /** Mob activator — kill a specific mob to complete a challenge. */
     MOB_ACTIVATOR("Shotcave_Mob_Activator"),
@@ -78,4 +78,3 @@ public enum MarkerType {
         return true; // All markers are removed after paste
     }
 }
-

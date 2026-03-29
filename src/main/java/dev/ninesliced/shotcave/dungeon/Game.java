@@ -157,16 +157,17 @@ public final class Game {
         return currentLevelIndex + 1 < levels.size();
     }
 
-    public long getMoney() {
+    public synchronized long getMoney() {
         return money;
     }
 
-    public void setMoney(long money) {
+    public synchronized void setMoney(long money) {
         this.money = money;
     }
 
-    public void addMoney(long amount) {
+    public synchronized long addMoney(long amount) {
         this.money += amount;
+        return this.money;
     }
 
     public int getTeamKeys() {

@@ -24,6 +24,8 @@ import dev.ninesliced.shotcave.dungeon.Game;
 import dev.ninesliced.shotcave.dungeon.GameManager;
 import dev.ninesliced.shotcave.dungeon.GameState;
 import dev.ninesliced.shotcave.dungeon.Level;
+import dev.ninesliced.shotcave.dungeon.PortalMode;
+import dev.ninesliced.shotcave.dungeon.PortalService;
 import dev.ninesliced.shotcave.dungeon.RoomData;
 import dev.ninesliced.shotcave.dungeon.RoomType;
 
@@ -59,7 +61,6 @@ public final class DungeonTickSystem extends EntityTickingSystem<EntityStore> {
     private static final long LOGIC_UPDATE_INTERVAL_MS = 200L;
     private static final long HUD_UPDATE_INTERVAL_MS = 400L;
     private static final long PORTAL_ENTRY_ARM_DELAY_MS = 1500L;
-    private static final double PORTAL_REENTRY_DISTANCE = 1.75D;
 
     private final Map<UUID, Long> lastLogicUpdateByParty = new ConcurrentHashMap<>();
     private final Map<UUID, Long> lastHudUpdateByPlayer = new ConcurrentHashMap<>();
@@ -67,10 +68,8 @@ public final class DungeonTickSystem extends EntityTickingSystem<EntityStore> {
     private final Map<UUID, RoomData> playerCurrentRoom = new ConcurrentHashMap<>();
     /** Tracks how far each player has walked inside the boss room. */
     private final Map<UUID, BossEntryProgress> bossEntryProgressByPlayer = new ConcurrentHashMap<>();
-    /** Players must step off an active portal once before re-entering can trigger it. */
-    private final Set<UUID> playersReadyForPortalEntry = ConcurrentHashMap.newKeySet();
-    /** Tracks which portal activation each player has already been reset for. */
-    private final Map<UUID, Long> lastPortalActivationSeenByPlayer = new ConcurrentHashMap<>();
+    /** Last time each player was observed off any active portal pad footprint. */
+    private final Map<UUID, Long> lastPortalStepOffAtByPlayer = new ConcurrentHashMap<>();
     /** Prevents double-trigger of portal teleport per party. */
     private final Set<UUID> partiesInTransit = ConcurrentHashMap.newKeySet();
 
@@ -100,8 +99,7 @@ public final class DungeonTickSystem extends EntityTickingSystem<EntityStore> {
             lastHudUpdateByPlayer.remove(playerRef.getUuid());
             playerCurrentRoom.remove(playerRef.getUuid());
             bossEntryProgressByPlayer.remove(playerRef.getUuid());
-            playersReadyForPortalEntry.remove(playerRef.getUuid());
-            lastPortalActivationSeenByPlayer.remove(playerRef.getUuid());
+            lastPortalStepOffAtByPlayer.remove(playerRef.getUuid());
             gameManager.normalizeOutsideDungeonState(playerRef, player, null, commandBuffer);
             shotcave.getCameraService().restoreDefault(playerRef);
             DungeonInfoHud.hideHud(player, playerRef);
@@ -114,8 +112,7 @@ public final class DungeonTickSystem extends EntityTickingSystem<EntityStore> {
                 && game.getState() != GameState.TRANSITIONING) {
             lastHudUpdateByPlayer.remove(playerRef.getUuid());
             bossEntryProgressByPlayer.remove(playerRef.getUuid());
-            playersReadyForPortalEntry.remove(playerRef.getUuid());
-            lastPortalActivationSeenByPlayer.remove(playerRef.getUuid());
+            lastPortalStepOffAtByPlayer.remove(playerRef.getUuid());
             gameManager.normalizeOutsideDungeonState(playerRef, player, game, commandBuffer);
             shotcave.getCameraService().restoreDefault(playerRef);
             DungeonInfoHud.hideHud(player, playerRef);
@@ -126,8 +123,7 @@ public final class DungeonTickSystem extends EntityTickingSystem<EntityStore> {
         if (game.getInstanceWorld() == null || player.getWorld() != game.getInstanceWorld()) {
             lastHudUpdateByPlayer.remove(playerRef.getUuid());
             bossEntryProgressByPlayer.remove(playerRef.getUuid());
-            playersReadyForPortalEntry.remove(playerRef.getUuid());
-            lastPortalActivationSeenByPlayer.remove(playerRef.getUuid());
+            lastPortalStepOffAtByPlayer.remove(playerRef.getUuid());
             gameManager.normalizeOutsideDungeonState(playerRef, player, game, commandBuffer);
             shotcave.getCameraService().restoreDefault(playerRef);
             DungeonInfoHud.hideHud(player, playerRef);
@@ -158,12 +154,11 @@ public final class DungeonTickSystem extends EntityTickingSystem<EntityStore> {
             bossEntryProgressByPlayer.remove(playerRef.getUuid());
         }
 
-        // Check portal collision when portals are active (TRANSITIONING state).
-        if (game.isPortalsActive()) {
+        // Check portal collision whenever any spawned portal is active in the current level.
+        if (level != null && shotcave.getPortalService().hasActivePortals(level)) {
             checkPortalCollision(ref, store, game, shotcave, gameManager, playerRef.getUuid());
         } else {
-            playersReadyForPortalEntry.remove(playerRef.getUuid());
-            lastPortalActivationSeenByPlayer.remove(playerRef.getUuid());
+            lastPortalStepOffAtByPlayer.remove(playerRef.getUuid());
         }
 
         // Run shared dungeon logic once per party cadence instead of once per entity.
@@ -173,8 +168,8 @@ public final class DungeonTickSystem extends EntityTickingSystem<EntityStore> {
 
         if (level == null) return;
 
-        // Track mob deaths and award money
-        trackMobDeaths(game, level, config);
+        // Track mob deaths and resolve room clear state.
+        trackMobDeaths(game, level);
 
         // Update active challenges
         updateChallenges(game, level, shotcave);
@@ -242,21 +237,7 @@ public final class DungeonTickSystem extends EntityTickingSystem<EntityStore> {
         }
     }
 
-    private void trackMobDeaths(@Nonnull Game game, @Nonnull Level level, @Nonnull DungeonConfig config) {
-        DungeonConfig.LevelConfig levelConfig = null;
-        String selector = game.getCurrentLevelSelector();
-        if (selector != null && !selector.isBlank()) {
-            levelConfig = config.findLevel(selector);
-        }
-        if (levelConfig == null && game.getCurrentLevelIndex() < config.getLevels().size()) {
-            levelConfig = config.getLevels().get(game.getCurrentLevelIndex());
-        }
-
-        int moneyPerKill = levelConfig != null ? levelConfig.getMoneyPerKill() : 10;
-
-        // Update kill tracking for all rooms (detects valid→invalid transitions)
-        level.updateMobTracking();
-
+    private void trackMobDeaths(@Nonnull Game game, @Nonnull Level level) {
         for (RoomData room : level.getRooms()) {
             if (room.isCleared()) continue;
 
@@ -278,15 +259,6 @@ public final class DungeonTickSystem extends EntityTickingSystem<EntityStore> {
                             "Room cleared! Doors are now open.", "#a9f5b3");
                 }
             }
-        }
-
-        int currentAlive = level.getAliveMobCount();
-        int totalSpawned = level.getTotalSpawnedMobs();
-        int killed = totalSpawned - currentAlive;
-        long expectedMoney = (long) killed * moneyPerKill;
-        long moneyToAdd = expectedMoney - game.getMoney();
-        if (moneyToAdd > 0) {
-            game.addMoney(moneyToAdd);
         }
     }
 
@@ -335,9 +307,6 @@ public final class DungeonTickSystem extends EntityTickingSystem<EntityStore> {
                                        @Nonnull Shotcave shotcave,
                                        @Nonnull GameManager gameManager,
                                        @Nonnull UUID playerId) {
-        if (game.getState() != GameState.TRANSITIONING) return;
-        if (partiesInTransit.contains(game.getPartyId())) return;
-
         Level level = game.getCurrentLevel();
         if (level == null) return;
 
@@ -348,49 +317,61 @@ public final class DungeonTickSystem extends EntityTickingSystem<EntityStore> {
         int bx = (int) Math.floor(pos.x);
         int by = (int) Math.floor(pos.y);
         int bz = (int) Math.floor(pos.z);
-        long activatedAt = game.getPortalsActivatedAt();
-
-        Long previousActivation = lastPortalActivationSeenByPlayer.put(playerId, activatedAt);
-        if (previousActivation == null || previousActivation.longValue() != activatedAt) {
-            playersReadyForPortalEntry.remove(playerId);
-        }
-
-        if (System.currentTimeMillis() - activatedAt < PORTAL_ENTRY_ARM_DELAY_MS) {
+        PortalService.ActivePortal activePortal = shotcave.getPortalService().getActivePortalAt(level, bx, by, bz);
+        if (activePortal == null) {
+            lastPortalStepOffAtByPlayer.put(playerId, System.currentTimeMillis());
             return;
         }
 
-        boolean onPortal = shotcave.getPortalService().isPlayerOnPortal(level, bx, by, bz);
-        if (!shotcave.getPortalService().isPlayerNearPortal(level, pos, PORTAL_REENTRY_DISTANCE)) {
-            playersReadyForPortalEntry.add(playerId);
+        if (System.currentTimeMillis() - activePortal.activatedAt() < PORTAL_ENTRY_ARM_DELAY_MS) {
             return;
         }
 
-        if (!onPortal) {
+        // Prevent auto-trigger when a portal appears under a player: they must
+        // have been observed off the pad at least once after this activation.
+        long lastStepOffAt = lastPortalStepOffAtByPlayer.getOrDefault(playerId, Long.MIN_VALUE);
+        if (lastStepOffAt <= activePortal.activatedAt()) {
             return;
         }
 
-        if (!playersReadyForPortalEntry.contains(playerId)) {
-            return;
-        }
-
-        playersReadyForPortalEntry.remove(playerId);
+        lastPortalStepOffAtByPlayer.put(playerId, Long.MIN_VALUE);
         LOGGER.info("Portal collision accepted for party " + game.getPartyId()
                 + " player=" + playerId
                 + " pos=" + pos
-                + " activatedAt=" + activatedAt
-                + " onPortal=" + onPortal
+                + " portalMode=" + activePortal.portal().mode()
+                + " activatedAt=" + activePortal.activatedAt()
                 + " state=" + game.getState());
-        if (partiesInTransit.add(game.getPartyId())) {
-            World world = game.getInstanceWorld();
-            if (world != null) {
-                UUID partyId = game.getPartyId();
-                world.execute(() -> {
-                    gameManager.onPortalEntered(game, playerId);
-                    partiesInTransit.remove(partyId);
-                });
-            } else {
-                partiesInTransit.remove(game.getPartyId());
+
+        if (activePortal.portal().mode() == PortalMode.NEXT_LEVEL) {
+            if (game.getState() != GameState.TRANSITIONING) {
+                return;
             }
+            if (partiesInTransit.contains(game.getPartyId())) return;
+
+            if (partiesInTransit.add(game.getPartyId())) {
+                World world = game.getInstanceWorld();
+                if (world != null) {
+                    UUID partyId = game.getPartyId();
+                    world.execute(() -> {
+                        gameManager.onPortalEntered(game, playerId);
+                        partiesInTransit.remove(partyId);
+                    });
+                } else {
+                    partiesInTransit.remove(game.getPartyId());
+                }
+            }
+            return;
+        }
+
+        World world = game.getInstanceWorld();
+        RoomData sourceRoom = level.findRoomAt(bx, by, bz);
+        RoomData fallbackRoom = activePortal.room();
+        if (sourceRoom == null) {
+            sourceRoom = fallbackRoom;
+        }
+        if (world != null) {
+            RoomData currentRoom = sourceRoom;
+            world.execute(() -> gameManager.onClosestExitPortalEntered(game, playerId, currentRoom, fallbackRoom));
         }
     }
 
@@ -453,11 +434,16 @@ public final class DungeonTickSystem extends EntityTickingSystem<EntityStore> {
             shotcave.getGameManager().broadcastToPartyPublic(game.getPartyId(),
                     "The room has been sealed! Defeat all enemies to escape!", "#ff6b6b");
 
-            // Paste lock door prefab at room anchor.
+            // Lock the room entrance at the anchor, and seal every outbound exit spawner.
             World world = game.getInstanceWorld();
             if (world != null && levelConfig != null) {
                 DungeonConfig.LevelConfig lc = levelConfig;
-                world.execute(() -> DungeonGenerator.pasteLockDoor(world, lc, room, room.getAnchor(), room.getRotation()));
+                room.setDoorsSealed(true);
+                world.execute(() -> {
+                    DungeonGenerator.pasteConfiguredDoorMarkers(world, lc, room);
+                    DungeonGenerator.pasteLockDoor(world, lc, room, room.getAnchor(), room.getRotation());
+                    DungeonGenerator.pasteSealDoorsAtRoomExits(world, lc, room);
+                });
             }
 
             // Spawn pinned mobs on room entry (deferred from level start).
@@ -520,10 +506,10 @@ public final class DungeonTickSystem extends EntityTickingSystem<EntityStore> {
                         }
                     }
                     case MOB_ACTIVATOR -> {
-                        // Complete if the spawned mob is no longer valid (dead).
+                        // Complete when the summoned mob has actually died.
                         if (obj.isMobSpawned()) {
                             Ref<EntityStore> mobRef = obj.getSpawnedMob();
-                            if (mobRef == null || !mobRef.isValid()) {
+                            if (room.isMobDefeated(mobRef)) {
                                 obj.complete();
                             }
                         }
@@ -591,7 +577,7 @@ public final class DungeonTickSystem extends EntityTickingSystem<EntityStore> {
             Ref<EntityStore> ref = result != null ? result.first() : null;
             if (ref != null) {
                 obj.setSpawnedMob(ref);
-                room.addSpawnedMob(ref);
+                room.addSpawnedMob(ref, false);
             }
         } catch (Exception e) {
             // Failed to spawn — mark as completed to not block progression.

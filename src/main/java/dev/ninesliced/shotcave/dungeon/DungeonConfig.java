@@ -314,9 +314,6 @@ public class DungeonConfig {
         @SerializedName("nextLevel")
         private String nextLevel;
 
-        @SerializedName("moneyPerKill")
-        private int moneyPerKill = 10;
-
         /** Block type used for sealed doors. */
         @SerializedName("doorBlock")
         private String doorBlock = "Stone_Brick_Wall";
@@ -362,10 +359,6 @@ public class DungeonConfig {
         @Nullable
         public String getNextLevel() {
             return nextLevel != null && !nextLevel.isBlank() ? nextLevel.trim() : null;
-        }
-
-        public int getMoneyPerKill() {
-            return moneyPerKill;
         }
 
         @Nonnull
@@ -456,6 +449,9 @@ public class DungeonConfig {
         @SerializedName("lockDoor")
         private List<String> lockDoor = new ArrayList<>();
 
+        @SerializedName("sealDoor")
+        private List<String> sealDoor = new ArrayList<>();
+
         @SerializedName("branch")
         private List<String> branch = new ArrayList<>();
 
@@ -469,6 +465,7 @@ public class DungeonConfig {
         @Nonnull public List<String> getKeyDoor()     { return keyDoor != null ? keyDoor : Collections.emptyList(); }
         @Nonnull public List<String> getActivationDoor() { return activationDoor != null ? activationDoor : Collections.emptyList(); }
         @Nonnull public List<String> getLockDoor()    { return lockDoor != null ? lockDoor : Collections.emptyList(); }
+        @Nonnull public List<String> getSealDoor()    { return sealDoor != null ? sealDoor : Collections.emptyList(); }
         @Nonnull public List<String> getBranch()      { return branch != null ? branch : Collections.emptyList(); }
 
         /**
@@ -504,6 +501,7 @@ public class DungeonConfig {
             merged.keyDoor   = mergeGlobs(this.getKeyDoor(), other.getKeyDoor());
             merged.activationDoor = mergeGlobs(this.getActivationDoor(), other.getActivationDoor());
             merged.lockDoor  = mergeGlobs(this.getLockDoor(), other.getLockDoor());
+            merged.sealDoor  = mergeGlobs(this.getSealDoor(), other.getSealDoor());
             merged.branch    = mergeGlobs(this.getBranch(), other.getBranch());
             return merged;
         }
@@ -530,6 +528,7 @@ public class DungeonConfig {
             keyDoor   = sanitizeGlobList(keyDoor);
             activationDoor = sanitizeGlobList(activationDoor);
             lockDoor  = sanitizeGlobList(lockDoor);
+            sealDoor  = sanitizeGlobList(sealDoor);
             branch    = sanitizeGlobList(branch);
         }
     }

@@ -22,7 +22,19 @@
       "Id": "shotcave_portal"
     },
     "Flags": {
-      "IsUsable": false
+      "IsUsable": true
+    },
+    "Interactions": {
+      "Use": {
+        "Interactions": [
+          {
+            "Type": "OpenCustomUI",
+            "Page": {
+              "Id": "ShotcavePortalConfig"
+            }
+          }
+        ]
+      }
     },
     "BlockParticleSetId": "Stone",
     "BlockSoundSetId": "Stone"

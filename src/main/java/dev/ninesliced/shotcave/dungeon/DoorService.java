@@ -79,9 +79,23 @@ public final class DoorService {
     public void onPlayerEnterRoom(@Nonnull RoomData room, @Nonnull Game game,
                                    @Nonnull Level level, @Nonnull World world, @Nonnull String doorBlock) {
         if (!room.isLocked() || room.isCleared() || room.isDoorsSealed()) return;
-        if (room.getDoorPositions().isEmpty()) return;
+        if (!hasSealTargets(room)) return;
 
         sealRoomAndChildEntrances(room, level, world, doorBlock);
+    }
+
+    private boolean hasSealTargets(@Nonnull RoomData room) {
+        if (!room.getDoorPositions().isEmpty()) {
+            return true;
+        }
+
+        for (RoomData child : room.getChildren()) {
+            if (!child.getDoorPositions().isEmpty()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

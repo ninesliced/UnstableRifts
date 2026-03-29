@@ -117,6 +117,11 @@ public final class GameManager {
      * until PlayerReady so the engine does not overwrite restored containers.
      */
     private final Set<UUID> pendingReadyRecoveryPlayers = ConcurrentHashMap.newKeySet();
+    /**
+     * Maps each dungeon mob UUID to the room it belongs to.
+     * Populated when mobs are spawned; used by MobDeathTrackingSystem to route kill events.
+     */
+    private final ConcurrentHashMap<UUID, RoomData> dungeonMobRegistry = new ConcurrentHashMap<>();
 
     public GameManager(@Nonnull Shotcave plugin) {
         this.plugin = plugin;
@@ -373,6 +378,52 @@ public final class GameManager {
     }
 
     /**
+     * Teleports a player from a Closest Exit portal to the nearest ancestor room
+     * that contains one or more portal exit markers.
+     */
+    public void onClosestExitPortalEntered(@Nonnull Game game,
+                                           @Nonnull UUID playerId,
+                                           @Nonnull RoomData sourceRoom,
+                                           @Nullable RoomData fallbackRoom) {
+        Vector3i exitPos = plugin.getPortalService().resolveClosestExitDestination(sourceRoom);
+        RoomData resolvedSourceRoom = sourceRoom;
+        if (exitPos == null && fallbackRoom != null && fallbackRoom != sourceRoom) {
+            exitPos = plugin.getPortalService().resolveClosestExitDestination(fallbackRoom);
+            if (exitPos != null) {
+                resolvedSourceRoom = fallbackRoom;
+            }
+        }
+
+        if (exitPos == null) {
+            LOGGER.warning("Closest Exit portal used in room " + sourceRoom.getAnchor()
+                    + (fallbackRoom != null && fallbackRoom != sourceRoom
+                    ? " (fallback owner " + fallbackRoom.getAnchor() + ")"
+                    : "")
+                    + " but no ancestor room contains portal exit markers.");
+            return;
+        }
+
+        PlayerRef playerRef = Universe.get().getPlayer(playerId);
+        if (playerRef == null) {
+            return;
+        }
+
+        Ref<EntityStore> ref = playerRef.getReference();
+        if (ref == null || !ref.isValid()) {
+            return;
+        }
+
+        Store<EntityStore> playerStore = ref.getStore();
+        Vector3d destination = new Vector3d(exitPos.x + 0.5, exitPos.y + 1.0, exitPos.z + 0.5);
+        Teleport tp = Teleport.createForPlayer(destination, new Rotation3f());
+        playerStore.putComponent(ref, Teleport.getComponentType(), tp);
+
+        LOGGER.info("Closest Exit portal teleported player " + playerId
+                + " from room " + resolvedSourceRoom.getAnchor()
+                + " to exit " + exitPos);
+    }
+
+    /**
      * Generates the next level, teleports all players to its entrance, and starts it.
      */
     private void advanceToNextLevel(@Nonnull Game game) {
@@ -542,6 +593,12 @@ public final class GameManager {
         plugin.getPartyManager().closePartyForSystem(game.getPartyId(), "The dungeon run ended, so the party was closed.");
         PartyUiPage.refreshOpenPages();
 
+        // Remove all mob registry entries belonging to this game's rooms.
+        java.util.Set<RoomData> gameRooms = new java.util.HashSet<>();
+        for (Level level : game.getLevels()) {
+            gameRooms.addAll(level.getRooms());
+        }
+        dungeonMobRegistry.values().removeIf(gameRooms::contains);
 
         LOGGER.info("Game ended for party " + game.getPartyId() + " (forced=" + forced + ")");
     }
@@ -1492,6 +1549,29 @@ public final class GameManager {
     }
 
     // ────────────────────────────────────────────────
+    //  Mob death registry
+    // ────────────────────────────────────────────────
+
+    /**
+     * Registers a dungeon mob UUID so that kill events can be routed to its room.
+     * Called immediately after a mob is successfully spawned with countsTowardCounter=true.
+     */
+    public void registerDungeonMob(@Nonnull UUID uuid, @Nonnull RoomData room) {
+        dungeonMobRegistry.put(uuid, room);
+    }
+
+    /**
+     * Called by MobDeathTrackingSystem when an NPC entity is permanently removed
+     * (RemoveReason.REMOVE). Increments the kill counter for the owning room.
+     */
+    public void onDungeonMobKilled(@Nonnull UUID uuid) {
+        RoomData room = dungeonMobRegistry.remove(uuid);
+        if (room != null) {
+            room.onMobKilled();
+        }
+    }
+
+    // ────────────────────────────────────────────────
     //  Mob spawning
     // ────────────────────────────────────────────────
 
@@ -1505,6 +1585,11 @@ public final class GameManager {
         Random random = new Random();
 
         for (RoomData room : level.getRooms()) {
+            int plannedMobCount = room.getMobsToSpawn().size()
+                    + room.getPinnedMobSpawns().size()
+                    + room.getPrefabMobMarkerPositions().size();
+            room.setExpectedMobCount(plannedMobCount);
+
             // Spawn pinned mobs at their exact block positions (from configured spawners).
             // Locked rooms defer pinned spawns until room entry.
             if (!room.isLocked()) {
@@ -1514,8 +1599,6 @@ public final class GameManager {
             List<String> mobs = room.getMobsToSpawn();
             List<Vector3i> allPoints = room.getMobSpawnPoints();
             if (mobs.isEmpty() || allPoints.isEmpty()) continue;
-
-            room.setExpectedMobCount(mobs.size());
 
             // Randomly pick which spawn points to use (as many as there are mobs)
             List<Vector3i> chosen = new ArrayList<>(allPoints);
@@ -1557,6 +1640,10 @@ public final class GameManager {
                         if (mobRef != null) {
                             room.addSpawnedMob(mobRef);
                             totalSpawned++;
+                            UUIDComponent uuidComp = store.getComponent(mobRef, UUIDComponent.getComponentType());
+                            if (uuidComp != null) {
+                                registerDungeonMob(uuidComp.getUuid(), room);
+                            }
                         }
                     } catch (Exception e) {
                         LOGGER.log(java.util.logging.Level.WARNING, "Failed to spawn mob: " + mobId, e);
@@ -1582,12 +1669,15 @@ public final class GameManager {
                 Ref<EntityStore> mobRef = mobResult != null ? mobResult.first() : null;
                 if (mobRef != null) {
                     room.addSpawnedMob(mobRef);
+                    UUIDComponent uuidComp = store.getComponent(mobRef, UUIDComponent.getComponentType());
+                    if (uuidComp != null) {
+                        registerDungeonMob(uuidComp.getUuid(), room);
+                    }
                 }
             } catch (Exception e) {
                 LOGGER.log(java.util.logging.Level.WARNING, "Failed to spawn pinned mob: " + p.mobId(), e);
             }
         }
-        room.setExpectedMobCount(room.getExpectedMobCount() + pinned.size());
     }
 
     /**

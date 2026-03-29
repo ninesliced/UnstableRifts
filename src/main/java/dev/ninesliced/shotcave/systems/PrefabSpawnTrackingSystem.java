@@ -9,12 +9,14 @@ import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.tick.EntityTickingSystem;
 import org.joml.Vector3d;
 import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
+import com.hypixel.hytale.server.core.entity.UUIDComponent;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.components.SpawnMarkerReference;
 import com.hypixel.hytale.server.npc.entities.NPCEntity;
 import dev.ninesliced.shotcave.Shotcave;
 import dev.ninesliced.shotcave.dungeon.Game;
+import dev.ninesliced.shotcave.dungeon.GameManager;
 import dev.ninesliced.shotcave.dungeon.Level;
 import dev.ninesliced.shotcave.dungeon.RoomData;
 
@@ -76,6 +78,11 @@ public final class PrefabSpawnTrackingSystem extends EntityTickingSystem<EntityS
         Ref<EntityStore> npcRef = archetypeChunk.getReferenceTo(index);
         if (npcRef.isValid()) {
             room.addSpawnedMob(npcRef);
+            GameManager gameManager = shotcave.getGameManager();
+            UUIDComponent uuidComp = store.getComponent(npcRef, UUIDComponent.getComponentType());
+            if (uuidComp != null) {
+                gameManager.registerDungeonMob(uuidComp.getUuid(), room);
+            }
         }
     }
 

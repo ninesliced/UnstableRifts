@@ -33,18 +33,23 @@ public class TopCameraService {
     private static final float HALF_PI = (float) (Math.PI / 2.0);
 
     private final Map<UUID, Boolean> enabled = new ConcurrentHashMap<>();
+    // Manual /shotcave topcamera toggles should survive dungeon cleanup resets.
+    private final Map<UUID, Boolean> persistentEnabled = new ConcurrentHashMap<>();
     private final Set<UUID> pendingEnable = ConcurrentHashMap.newKeySet();
     private final Map<UUID, Integer> lastRoomRotation = new ConcurrentHashMap<>();
 
     public void registerDisabledByDefault(@Nonnull PlayerRef playerRef) {
-        enabled.put(playerRef.getUuid(), false);
-        pendingEnable.remove(playerRef.getUuid());
+        UUID playerId = playerRef.getUuid();
+        enabled.put(playerId, false);
+        persistentEnabled.put(playerId, false);
+        pendingEnable.remove(playerId);
     }
 
     public void enableByDefault(@Nonnull PlayerRef playerRef) {
-        enabled.put(playerRef.getUuid(), true);
-        pendingEnable.remove(playerRef.getUuid());
-        applyTopCamera(playerRef);
+        UUID playerId = playerRef.getUuid();
+        persistentEnabled.put(playerId, true);
+        pendingEnable.remove(playerId);
+        setResolvedState(playerRef, true, true);
     }
 
     public void scheduleEnableOnNextReady(@Nonnull PlayerRef playerRef) {
@@ -53,18 +58,27 @@ public class TopCameraService {
     }
 
     public void cancelDeferredEnable(@Nonnull PlayerRef playerRef) {
-        enabled.put(playerRef.getUuid(), false);
-        pendingEnable.remove(playerRef.getUuid());
+        UUID playerId = playerRef.getUuid();
+        boolean hadPending = pendingEnable.remove(playerId);
+        boolean keepEnabled = persistentEnabled.getOrDefault(playerId, false);
+        boolean hadRoomRotation = lastRoomRotation.remove(playerId) != null;
+        setResolvedState(playerRef, keepEnabled, keepEnabled && (hadPending || hadRoomRotation));
     }
 
     public void clearState(@Nonnull PlayerRef playerRef) {
-        enabled.remove(playerRef.getUuid());
-        pendingEnable.remove(playerRef.getUuid());
-        lastRoomRotation.remove(playerRef.getUuid());
+        UUID playerId = playerRef.getUuid();
+        enabled.remove(playerId);
+        persistentEnabled.remove(playerId);
+        pendingEnable.remove(playerId);
+        lastRoomRotation.remove(playerId);
     }
 
     public boolean toggle(@Nonnull PlayerRef playerRef) {
-        return setEnabled(playerRef, !enabled.getOrDefault(playerRef.getUuid(), false));
+        UUID playerId = playerRef.getUuid();
+        boolean nextEnabled = !enabled.getOrDefault(playerId, false);
+        persistentEnabled.put(playerId, nextEnabled);
+        pendingEnable.remove(playerId);
+        return setResolvedState(playerRef, nextEnabled, false);
     }
 
     public boolean isEnabled(@Nonnull UUID uuid) {
@@ -72,26 +86,16 @@ public class TopCameraService {
     }
 
     public boolean setEnabled(@Nonnull PlayerRef playerRef, boolean enable) {
-        enabled.put(playerRef.getUuid(), enable);
-        if (enable) {
-            pendingEnable.remove(playerRef.getUuid());
-            applyTopCamera(playerRef);
-        } else {
-            pendingEnable.remove(playerRef.getUuid());
-            resetCamera(playerRef);
-        }
-        return enable;
+        pendingEnable.remove(playerRef.getUuid());
+        return setResolvedState(playerRef, enable, false);
     }
 
     public void restoreDefault(@Nonnull PlayerRef playerRef) {
         UUID playerId = playerRef.getUuid();
-        boolean wasEnabled = enabled.getOrDefault(playerId, false);
         boolean hadPending = pendingEnable.remove(playerId);
-        enabled.put(playerId, false);
-        lastRoomRotation.remove(playerId);
-        if (wasEnabled || hadPending) {
-            resetCamera(playerRef);
-        }
+        boolean shouldStayEnabled = persistentEnabled.getOrDefault(playerId, false);
+        boolean hadRoomRotation = lastRoomRotation.remove(playerId) != null;
+        setResolvedState(playerRef, shouldStayEnabled, shouldStayEnabled && (hadPending || hadRoomRotation));
     }
 
     public void refreshMovementProfile(@Nonnull PlayerRef playerRef) {
@@ -179,6 +183,24 @@ public class TopCameraService {
         };
     }
 
+    private boolean setResolvedState(@Nonnull PlayerRef playerRef, boolean enable, boolean forceReapply) {
+        UUID playerId = playerRef.getUuid();
+        boolean wasEnabled = enabled.getOrDefault(playerId, false);
+        enabled.put(playerId, enable);
+
+        if (enable) {
+            if (forceReapply || !wasEnabled) {
+                applyTopCamera(playerRef);
+            }
+            return true;
+        }
+
+        if (forceReapply || wasEnabled) {
+            resetCamera(playerRef);
+        }
+        return false;
+    }
+
     private void resetCamera(@Nonnull PlayerRef playerRef) {
         playerRef.getPacketHandler().writeNoCache(new SetServerCamera(ClientCameraView.Custom, false, null));
 
@@ -186,7 +208,7 @@ public class TopCameraService {
         restoreDefaultMovement(playerRef);
     }
 
-     private void disableSprintForce(@Nonnull PlayerRef playerRef) {
+    private void disableSprintForce(@Nonnull PlayerRef playerRef) {
         Map<ClientFeature, Boolean> features = new EnumMap<>(ClientFeature.class);
         features.put(ClientFeature.SprintForce, false);
         playerRef.getPacketHandler().writeNoCache(new UpdateFeatures(features));

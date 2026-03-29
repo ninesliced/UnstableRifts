@@ -4,15 +4,16 @@ import com.hypixel.hytale.component.Ref;
 import org.joml.Vector3d;
 import org.joml.Vector3i;
 import com.hypixel.hytale.server.core.entity.UUIDComponent;
+import com.hypixel.hytale.server.core.modules.entitystats.EntityStatMap;
+import com.hypixel.hytale.server.core.modules.entitystats.EntityStatValue;
+import com.hypixel.hytale.server.core.modules.entitystats.asset.DefaultEntityStatTypes;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -25,9 +26,10 @@ public final class RoomData {
     private final Vector3i anchor;
     private final int rotation;
     private final List<Vector3i> spawnerPositions;
+    private final List<ExitSpawner> exitSpawners = new ArrayList<>();
     private final List<Vector3d> prefabMobMarkerPositions;
     private final List<String> mobsToSpawn;
-    private final List<Ref<EntityStore>> spawnedMobs = new ArrayList<>();
+    private final List<TrackedMob> trackedMobs = new ArrayList<>();
     private final List<RoomData> children = new ArrayList<>();
 
     private int branchDepth;
@@ -36,7 +38,7 @@ public final class RoomData {
     private final List<Vector3i> mobSpawnPoints = new ArrayList<>();
     private final List<PinnedMobSpawn> pinnedMobSpawns = new ArrayList<>();
     private final List<Vector3i> keySpawnerPositions = new ArrayList<>();
-    private final List<Vector3i> portalPositions = new ArrayList<>();
+    private final List<PortalMarker> portals = new ArrayList<>();
     private final List<Vector3i> portalExitPositions = new ArrayList<>();
 
     // ── Door & lock system ──
@@ -47,10 +49,11 @@ public final class RoomData {
     private boolean hasMobClearActivator = false;
     private boolean locked = false;
     private boolean doorsSealed = false;
-    private DoorMode doorMode = DoorMode.NONE;
+    private DoorMode doorMode = DoorMode.ACTIVATOR;
 
     // ── Portal ──
     private boolean portalSpawned = false;
+    private long portalSpawnedAt = 0L;
 
     // ── Challenge system ──
     private boolean challengeActive = false;
@@ -78,12 +81,12 @@ public final class RoomData {
     private int boundsMinY, boundsMaxY;
     private boolean hasBounds = false;
 
-    /** How many mobs were assigned to this room (set once during distribution). */
+    private static final float HEALTH_EPSILON = 0.001f;
+
+    /** How many mobs were assigned to this room (including deferred room mobs). */
     private int expectedMobCount = 0;
-    /** Mobs confirmed killed: ref was observed valid then became invalid. */
-    private int confirmedKills = 0;
-    /** Refs we have seen as valid at least once (so we can detect valid→invalid transitions). */
-    private final Set<Ref<EntityStore>> seenAlive = new HashSet<>();
+    /** How many tracked mobs have been confirmed killed via RemoveReason.REMOVE events. */
+    private volatile int confirmedKillCount = 0;
 
     @Nullable
     private RoomData parent;
@@ -136,6 +139,15 @@ public final class RoomData {
     }
 
     @Nonnull
+    public List<ExitSpawner> getExitSpawners() {
+        return Collections.unmodifiableList(exitSpawners);
+    }
+
+    public void addExitSpawner(@Nonnull Vector3i position, int rotation) {
+        exitSpawners.add(new ExitSpawner(position, rotation));
+    }
+
+    @Nonnull
     public List<Vector3d> getPrefabMobMarkerPositions() {
         return Collections.unmodifiableList(prefabMobMarkerPositions);
     }
@@ -151,38 +163,27 @@ public final class RoomData {
 
     @Nonnull
     public List<Ref<EntityStore>> getSpawnedMobs() {
-        return spawnedMobs;
+        List<Ref<EntityStore>> refs = new ArrayList<>(trackedMobs.size());
+        for (TrackedMob mob : trackedMobs) {
+            refs.add(mob.ref);
+        }
+        return refs;
     }
 
     public void addSpawnedMob(@Nonnull Ref<EntityStore> ref) {
-        UUID refUuid = null;
-        if (ref.isValid()) {
-            try {
-                UUIDComponent uuidComponent = ref.getStore().getComponent(ref, UUIDComponent.getComponentType());
-                if (uuidComponent != null) {
-                    refUuid = uuidComponent.getUuid();
-                }
-            } catch (Exception e) {
-                // Ref may have become invalid between check and access
-            }
+        UUID refUuid = tryResolveUuid(ref);
+        TrackedMob existing = findTrackedMob(ref, refUuid);
+        if (existing != null) {
+            existing.ref = ref;
+            existing.updateDeathState();
+            return;
         }
+        trackedMobs.add(new TrackedMob(refUuid, ref));
+    }
 
-        for (Ref<EntityStore> existing : spawnedMobs) {
-            if (existing == ref) {
-                return;
-            }
-            if (refUuid != null && existing.isValid()) {
-                try {
-                    UUIDComponent existingUuidComponent = existing.getStore().getComponent(existing, UUIDComponent.getComponentType());
-                    if (existingUuidComponent != null && refUuid.equals(existingUuidComponent.getUuid())) {
-                        return;
-                    }
-                } catch (Exception e) {
-                    // Existing ref may have become invalid during iteration
-                }
-            }
-        }
-        spawnedMobs.add(ref);
+    /** Kept for call-site compatibility — the boolean is no longer used. */
+    public void addSpawnedMob(@Nonnull Ref<EntityStore> ref, boolean ignored) {
+        addSpawnedMob(ref);
     }
 
     public boolean hasPrefabMobMarkerNear(@Nonnull Vector3d position, double maxDistanceSq) {
@@ -225,26 +226,38 @@ public final class RoomData {
     }
 
     public void setExpectedMobCount(int count) {
-        this.expectedMobCount = count;
+        this.expectedMobCount = Math.max(0, count);
     }
 
     public int getExpectedMobCount() {
         return expectedMobCount;
     }
 
-    /**
-     * Tick-level update: detect mobs that transitioned from valid to invalid
-     * (i.e. they died while their chunk was loaded). Mobs in unloaded chunks
-     * are never marked as "seen alive", so they won't be miscounted as dead.
-     */
     public void updateMobTracking() {
-        for (Ref<EntityStore> mob : spawnedMobs) {
-            if (mob.isValid()) {
-                seenAlive.add(mob);
-            } else if (seenAlive.remove(mob)) {
-                confirmedKills++;
-            }
+        for (TrackedMob mob : trackedMobs) {
+            mob.updateDeathState();
         }
+    }
+
+    public boolean isMobDefeated(@Nullable Ref<EntityStore> ref) {
+        if (ref == null) {
+            return true;
+        }
+        UUID refUuid = tryResolveUuid(ref);
+        TrackedMob tracked = findTrackedMob(ref, refUuid);
+        if (tracked != null) {
+            tracked.updateDeathState();
+            return tracked.dead || !tracked.ref.isValid();
+        }
+        return !ref.isValid() || isMobDead(ref);
+    }
+
+    /**
+     * Called when a dungeon mob belonging to this room is confirmed killed
+     * (entity removed with RemoveReason.REMOVE).
+     */
+    public void onMobKilled() {
+        confirmedKillCount++;
     }
 
     /**
@@ -254,14 +267,14 @@ public final class RoomData {
         if (expectedMobCount == 0) {
             return true;
         }
-        return confirmedKills >= expectedMobCount;
+        return confirmedKillCount >= expectedMobCount;
     }
 
     /**
      * Count of mobs still alive in this room (expected minus confirmed kills).
      */
     public int getAliveMobCount() {
-        return Math.max(0, expectedMobCount - confirmedKills);
+        return Math.max(0, expectedMobCount - confirmedKillCount);
     }
 
     public int getBranchDepth() {
@@ -305,11 +318,24 @@ public final class RoomData {
 
     @Nonnull
     public List<Vector3i> getPortalPositions() {
-        return portalPositions;
+        List<Vector3i> positions = new ArrayList<>(portals.size());
+        for (PortalMarker portal : portals) {
+            positions.add(portal.position());
+        }
+        return positions;
+    }
+
+    @Nonnull
+    public List<PortalMarker> getPortals() {
+        return Collections.unmodifiableList(portals);
     }
 
     public void addPortalPosition(@Nonnull Vector3i pos) {
-        portalPositions.add(pos);
+        addPortal(pos, PortalMode.NEXT_LEVEL);
+    }
+
+    public void addPortal(@Nonnull Vector3i pos, @Nonnull PortalMode mode) {
+        portals.add(new PortalMarker(pos, mode));
     }
 
     @Nonnull
@@ -327,6 +353,25 @@ public final class RoomData {
 
     public void setPortalSpawned(boolean portalSpawned) {
         this.portalSpawned = portalSpawned;
+    }
+
+    public long getPortalSpawnedAt() {
+        return portalSpawnedAt;
+    }
+
+    public void setPortalSpawnedAt(long portalSpawnedAt) {
+        this.portalSpawnedAt = portalSpawnedAt;
+    }
+
+    @Nullable
+    public PortalMarker findPortalAt(int bx, int by, int bz) {
+        for (PortalMarker portal : portals) {
+            Vector3i pos = portal.position();
+            if (pos.x == bx && pos.z == bz && (pos.y == by || pos.y == by - 1)) {
+                return portal;
+            }
+        }
+        return null;
     }
 
     // ── Door & lock system ──
@@ -506,6 +551,10 @@ public final class RoomData {
 
     // ── Pinned mob spawns (from configured Shotcave_Mob_Spawner blocks) ──
 
+    public record ExitSpawner(@Nonnull Vector3i position, int rotation) {}
+
+    public record PortalMarker(@Nonnull Vector3i position, @Nonnull PortalMode mode) {}
+
     public record PinnedMobSpawn(@Nonnull Vector3i position, @Nonnull String mobId) {}
 
     public void addPinnedMobSpawn(@Nonnull Vector3i position, @Nonnull String mobId) {
@@ -515,6 +564,75 @@ public final class RoomData {
     @Nonnull
     public List<PinnedMobSpawn> getPinnedMobSpawns() {
         return pinnedMobSpawns;
+    }
+
+    @Nullable
+    private TrackedMob findTrackedMob(@Nonnull Ref<EntityStore> ref, @Nullable UUID refUuid) {
+        for (TrackedMob mob : trackedMobs) {
+            if (refUuid != null && refUuid.equals(mob.uuid)) {
+                return mob;
+            }
+            if (mob.ref == ref) {
+                return mob;
+            }
+        }
+        return null;
+    }
+
+    @Nullable
+    private UUID tryResolveUuid(@Nonnull Ref<EntityStore> ref) {
+        if (!ref.isValid()) {
+            return null;
+        }
+        try {
+            UUIDComponent uuidComponent = ref.getStore().getComponent(ref, UUIDComponent.getComponentType());
+            return uuidComponent != null ? uuidComponent.getUuid() : null;
+        } catch (Exception ignored) {
+            return null;
+        }
+    }
+
+    private static boolean isMobDead(@Nonnull Ref<EntityStore> ref) {
+        if (!ref.isValid()) {
+            return false;
+        }
+        try {
+            EntityStatMap statMap = ref.getStore().getComponent(ref, EntityStatMap.getComponentType());
+            if (statMap == null) {
+                return false;
+            }
+            int healthIdx = DefaultEntityStatTypes.getHealth();
+            EntityStatValue healthStat = healthIdx >= 0 ? statMap.get(healthIdx) : null;
+            if (healthStat == null) {
+                return false;
+            }
+            return healthStat.get() <= (healthStat.getMin() + HEALTH_EPSILON);
+        } catch (Exception ignored) {
+            return false;
+        }
+    }
+
+    private static final class TrackedMob {
+        @Nullable
+        private final UUID uuid;
+        @Nonnull
+        private Ref<EntityStore> ref;
+        private boolean dead;
+
+        private TrackedMob(@Nullable UUID uuid, @Nonnull Ref<EntityStore> ref) {
+            this.uuid = uuid;
+            this.ref = ref;
+            updateDeathState();
+        }
+
+        private void updateDeathState() {
+            if (dead) {
+                return;
+            }
+            if (isMobDead(ref)) {
+                dead = true;
+            }
+        }
     }
 
     @Nonnull

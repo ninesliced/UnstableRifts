@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────
-//  Shotcave — Door Configuration (Level Designer)
+//  Shotcave — Portal Configuration (Level Designer)
 // ─────────────────────────────────────────────
 
 @PanelBg = #1a1e26(0.92);
@@ -16,27 +16,26 @@
   Pressed: (Background: @BtnBg, LabelStyle: @BtnLabelStyle)
 );
 
-Group #DoorConfigRoot {
+Group #PortalConfigRoot {
   Anchor: (Left: 0, Top: 0, Right: 0, Bottom: 0);
 
-  // Overlay background
   Group {
     Anchor: (Left: 0, Top: 0, Right: 0, Bottom: 0);
     Background: #000000(0.5);
   }
 
-  Group #DoorConfigCenter {
-    Anchor: (Width: 300, Height: 220);
+  Group #PortalConfigCenter {
+    Anchor: (Width: 320, Height: 220);
     LayoutMode: Middle;
 
-    Group #DoorConfigPanel {
-      Anchor: (Width: 300, Height: 220);
+    Group #PortalConfigPanel {
+      Anchor: (Width: 320, Height: 220);
       Background: @PanelBg;
       LayoutMode: Top;
       Padding: (Horizontal: 20, Vertical: 16);
 
-      Label #DoorConfigTitle {
-        Text: "DOOR CONFIGURATION";
+      Label #PortalConfigTitle {
+        Text: "PORTAL CONFIGURATION";
         Anchor: (Height: 28);
         Style: LabelStyle(
           FontSize: 15,
@@ -49,13 +48,13 @@ Group #DoorConfigRoot {
       }
 
       Label #CurrentModeLabel {
-        Text: "Current mode: ACTIVATOR";
+        Text: "Current mode: NEXT_LEVEL";
         Anchor: (Height: 24, Top: 8);
         Style: LabelStyle(FontSize: 13, TextColor: @ValueColor, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center);
       }
 
       Label {
-        Text: "Select the door mode:";
+        Text: "Select the portal mode:";
         Anchor: (Height: 24, Top: 8);
         Style: LabelStyle(FontSize: 12, TextColor: @LabelColor, HorizontalAlignment: Center, VerticalAlignment: Center);
       }
@@ -65,15 +64,15 @@ Group #DoorConfigRoot {
         LayoutMode: Left;
         Padding: (Horizontal: 10);
 
-        TextButton #KeyDoorBtn {
-          Text: "KEY DOOR";
-          Anchor: (Width: 120, Height: 36);
+        TextButton #NextLevelPortalBtn {
+          Text: "NEXT LEVEL";
+          Anchor: (Width: 130, Height: 36);
           Style: @BtnStyle;
         }
 
-        TextButton #ActivatorDoorBtn {
-          Text: "ACTIVATOR DOOR";
-          Anchor: (Width: 120, Height: 36, Left: 10);
+        TextButton #ClosestExitPortalBtn {
+          Text: "CLOSEST EXIT";
+          Anchor: (Width: 130, Height: 36, Left: 10);
           Style: @BtnStyle;
         }
       }

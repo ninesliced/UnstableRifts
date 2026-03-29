@@ -5,11 +5,14 @@ import org.joml.Vector3i;
 import com.hypixel.hytale.server.core.universe.world.World;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.logging.Logger;
 
 /**
  * Manages portal block placement and removal in dungeon rooms,
- * and provides collision detection for portal teleportation.
+ * and provides collision detection and destination resolution for portal teleportation.
  */
 public final class PortalService {
 
@@ -28,7 +31,7 @@ public final class PortalService {
 
         // If no portal positions were marked in the prefab, use a fallback position
         // based on the room's bounds (center) or anchor ONLY for boss rooms.
-        if (room.getPortalPositions().isEmpty()) {
+        if (room.getPortals().isEmpty()) {
             if (room.getType() == RoomType.BOSS) {
                 Vector3i fallback;
                 if (room.hasBounds()) {
@@ -41,14 +44,15 @@ public final class PortalService {
                     Vector3i anchor = room.getAnchor();
                     fallback = new Vector3i(anchor.x + 5, anchor.y + 1, anchor.z + 5);
                 }
-                room.addPortalPosition(fallback);
+                room.addPortal(fallback, PortalMode.NEXT_LEVEL);
                 LOGGER.info("Room " + room.getType() + " at " + room.getAnchor() + " has no portal markers. Using fallback at " + fallback);
             } else {
                 return;
             }
         }
 
-        for (Vector3i pos : room.getPortalPositions()) {
+        for (RoomData.PortalMarker portal : room.getPortals()) {
+            Vector3i pos = portal.position();
             try {
                 world.setBlock(pos.x, pos.y, pos.z, PORTAL_BLOCK, 0);
             } catch (Exception e) {
@@ -56,6 +60,7 @@ public final class PortalService {
             }
         }
         room.setPortalSpawned(true);
+        room.setPortalSpawnedAt(System.currentTimeMillis());
     }
 
     /**
@@ -72,44 +77,86 @@ public final class PortalService {
             }
         }
         room.setPortalSpawned(false);
+        room.setPortalSpawnedAt(0L);
     }
 
     /**
-     * Checks if a block position matches any portal position in the boss room.
-     * Checks exact Y and Y-1 to account for player feet vs block placement.
+     * Returns true if the level currently has at least one spawned portal block.
      */
-    public boolean isPlayerOnPortal(@Nonnull Level level, int bx, int by, int bz) {
-        RoomData bossRoom = level.getBossRoom();
-        if (bossRoom == null || !bossRoom.isPortalSpawned()) return false;
-
-        for (Vector3i pos : bossRoom.getPortalPositions()) {
-            if (pos.x == bx && pos.z == bz && (pos.y == by || pos.y == by - 1)) {
+    public boolean hasActivePortals(@Nonnull Level level) {
+        for (RoomData room : level.getRooms()) {
+            if (room.isPortalSpawned() && !room.getPortals().isEmpty()) {
                 return true;
             }
         }
         return false;
+    }
+
+    /**
+     * Finds the active portal a player is standing on, if any.
+     * Checks exact Y and Y-1 to account for player feet vs block placement.
+     */
+    @Nullable
+    public ActivePortal getActivePortalAt(@Nonnull Level level, int bx, int by, int bz) {
+        for (RoomData room : level.getRooms()) {
+            if (!room.isPortalSpawned()) {
+                continue;
+            }
+            RoomData.PortalMarker portal = room.findPortalAt(bx, by, bz);
+            if (portal != null) {
+                return new ActivePortal(room, portal, room.getPortalSpawnedAt());
+            }
+        }
+        return null;
     }
 
     /**
      * Returns true while the player is still within the portal's immediate area.
-     * Used to force players to step away from a freshly spawned boss portal
+     * Used to force players to step away from a freshly spawned portal
      * before re-entering can trigger the level transition.
      */
     public boolean isPlayerNearPortal(@Nonnull Level level, @Nonnull Vector3d playerPos, double horizontalRadius) {
-        RoomData bossRoom = level.getBossRoom();
-        if (bossRoom == null || !bossRoom.isPortalSpawned()) return false;
-
         double maxDistanceSq = horizontalRadius * horizontalRadius;
-        for (Vector3i pos : bossRoom.getPortalPositions()) {
-            double centerX = pos.x + 0.5;
-            double centerZ = pos.z + 0.5;
-            double dx = playerPos.x - centerX;
-            double dz = playerPos.z - centerZ;
-            double dy = Math.abs(playerPos.y - (pos.y + 1.0));
-            if (dx * dx + dz * dz <= maxDistanceSq && dy <= 2.0) {
-                return true;
+        for (RoomData room : level.getRooms()) {
+            if (!room.isPortalSpawned()) {
+                continue;
+            }
+            for (RoomData.PortalMarker portal : room.getPortals()) {
+                Vector3i pos = portal.position();
+                double centerX = pos.x + 0.5;
+                double centerZ = pos.z + 0.5;
+                double dx = playerPos.x - centerX;
+                double dz = playerPos.z - centerZ;
+                double dy = Math.abs(playerPos.y - (pos.y + 1.0));
+                if (dx * dx + dz * dz <= maxDistanceSq && dy <= 2.0) {
+                    return true;
+                }
             }
         }
         return false;
+    }
+
+    /**
+     * Walks up the room parent chain until it finds portal exit markers.
+     * If the resolved room has multiple exits, one is chosen at random.
+     */
+    @Nullable
+    public Vector3i resolveClosestExitDestination(@Nonnull RoomData sourceRoom) {
+        for (RoomData cursor = sourceRoom; cursor != null; cursor = cursor.getParent()) {
+            List<Vector3i> exits = cursor.getPortalExitPositions();
+            if (!exits.isEmpty()) {
+                return exits.get(ThreadLocalRandom.current().nextInt(exits.size()));
+            }
+        }
+        return null;
+    }
+
+    public record ActivePortal(@Nonnull RoomData room,
+                               @Nonnull RoomData.PortalMarker portal,
+                               long activatedAt) {
+        public long activationToken() {
+            Vector3i pos = portal.position();
+            return activatedAt ^ (31L * pos.x) ^ (131L * pos.y) ^ (521L * pos.z);
+        }
     }
 }

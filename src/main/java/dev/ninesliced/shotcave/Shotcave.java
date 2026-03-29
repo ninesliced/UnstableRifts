@@ -26,6 +26,7 @@ import dev.ninesliced.shotcave.command.PartyCommand;
 import dev.ninesliced.shotcave.command.ShotcaveCommand;
 import dev.ninesliced.shotcave.crate.CrateBreakDropSystem;
 import dev.ninesliced.shotcave.dungeon.DoorConfigPageSupplier;
+import dev.ninesliced.shotcave.dungeon.DoorData;
 import dev.ninesliced.shotcave.dungeon.DoorService;
 import dev.ninesliced.shotcave.crate.DestructibleBlockConfig;
 import dev.ninesliced.shotcave.dungeon.DungeonConfig;
@@ -33,6 +34,8 @@ import dev.ninesliced.shotcave.dungeon.DungeonInstanceService;
 import dev.ninesliced.shotcave.dungeon.GameManager;
 import dev.ninesliced.shotcave.dungeon.MobSpawnerConfigPageSupplier;
 import dev.ninesliced.shotcave.dungeon.MobSpawnerData;
+import dev.ninesliced.shotcave.dungeon.PortalConfigPageSupplier;
+import dev.ninesliced.shotcave.dungeon.PortalData;
 import dev.ninesliced.shotcave.dungeon.PortalService;
 import dev.ninesliced.shotcave.dungeon.map.DungeonMapService;
 import dev.ninesliced.shotcave.inventory.InventoryLockService;
@@ -72,6 +75,7 @@ import dev.ninesliced.shotcave.party.PartyManager;
 import dev.ninesliced.shotcave.party.ShotcavePartyPageSupplier;
 import dev.ninesliced.shotcave.systems.ActiveSlotHudUpdateSystem;
 import dev.ninesliced.shotcave.systems.DungeonTickSystem;
+import dev.ninesliced.shotcave.systems.MobDeathTrackingSystem;
 import dev.ninesliced.shotcave.systems.PrefabSpawnTrackingSystem;
 import dev.ninesliced.shotcave.systems.DeathComponent;
 import dev.ninesliced.shotcave.systems.DamageEffectComponent;
@@ -81,6 +85,7 @@ import dev.ninesliced.shotcave.systems.SummonedEffectComponent;
 import dev.ninesliced.shotcave.systems.MeleeBlockBreakSystem;
 import dev.ninesliced.shotcave.systems.MeleeDamageEffectSystem;
 import dev.ninesliced.shotcave.systems.SummonedNPCDamageEffectSystem;
+import dev.ninesliced.shotcave.systems.CreativeFallDamageSystem;
 import dev.ninesliced.shotcave.systems.VoidSafetySystem;
 import dev.ninesliced.shotcave.systems.DeathAggroSuppressionSystem;
 import dev.ninesliced.shotcave.systems.DeathPlayerAddedSystem;
@@ -141,6 +146,7 @@ public class Shotcave extends JavaPlugin {
         this.getCodecRegistry(OpenCustomUIInteraction.PAGE_CODEC)
                 .register("ShotcavePartyPortal", ShotcavePartyPageSupplier.class, ShotcavePartyPageSupplier.CODEC)
                 .register("ShotcaveDoorConfig", DoorConfigPageSupplier.class, DoorConfigPageSupplier.CODEC)
+                .register("ShotcavePortalConfig", PortalConfigPageSupplier.class, PortalConfigPageSupplier.CODEC)
                 .register("ShotcaveMobSpawnerConfig", MobSpawnerConfigPageSupplier.class, MobSpawnerConfigPageSupplier.CODEC);
 
         this.getCodecRegistry(Interaction.CODEC)
@@ -168,6 +174,16 @@ public class Shotcave extends JavaPlugin {
         ComponentType<ChunkStore, MobSpawnerData> mobSpawnerDataType =
                 this.getChunkStoreRegistry().registerComponent(MobSpawnerData.class, "MobSpawnerData", MobSpawnerData.CODEC);
         MobSpawnerData.setComponentType(mobSpawnerDataType);
+
+        // Door block component — persists door mode in prefabs on a single door marker block.
+        ComponentType<ChunkStore, DoorData> doorDataType =
+                this.getChunkStoreRegistry().registerComponent(DoorData.class, "DoorData", DoorData.CODEC);
+        DoorData.setComponentType(doorDataType);
+
+        // Portal block component — persists portal mode in prefabs on a single portal marker block.
+        ComponentType<ChunkStore, PortalData> portalDataType =
+                this.getChunkStoreRegistry().registerComponent(PortalData.class, "PortalData", PortalData.CODEC);
+        PortalData.setComponentType(portalDataType);
 
         WeaponRegistry.registerAll();
         ArmorRegistry.registerAll();
@@ -202,6 +218,7 @@ public class Shotcave extends JavaPlugin {
         this.getEntityStoreRegistry().registerSystem(new ActiveSlotHudUpdateSystem());
         this.getEntityStoreRegistry().registerSystem(new DungeonTickSystem());
         this.getEntityStoreRegistry().registerSystem(new PrefabSpawnTrackingSystem());
+        this.getEntityStoreRegistry().registerSystem(new MobDeathTrackingSystem());
 
         ComponentType<EntityStore, PlayerRef> playerRefComponentType = PlayerRef.getComponentType();
         ComponentType<EntityStore, TransformComponent> transformComponentType = TransformComponent.getComponentType();
@@ -213,6 +230,7 @@ public class Shotcave extends JavaPlugin {
 
         this.getEntityStoreRegistry().registerSystem(
                 new DeathPlayerAddedSystem(playerRefComponentType, deathComponentType));
+        this.getEntityStoreRegistry().registerSystem(new CreativeFallDamageSystem());
         this.getEntityStoreRegistry().registerSystem(new DungeonLethalDamageSystem());
         this.getEntityStoreRegistry().registerSystem(new PlayerDeathSystem());
         this.getEntityStoreRegistry().registerSystem(new ReviveTickSystem());

@@ -763,6 +763,14 @@ public class DungeonGenerator {
         RoomData roomData = new RoomData(type, pastePos, rot,
                 spawnerPositions, mobMarkerPositions, mobs, branchDepth, branchId);
 
+        for (SpawnerLocal spawner : data.spawners) {
+            int wx = pastePos.x + rotX(spawner.x, spawner.z, rot);
+            int wy = pastePos.y + spawner.y;
+            int wz = pastePos.z + rotZ(spawner.x, spawner.z, rot);
+            int exitRotation = (rot + spawner.rot) & 3;
+            roomData.addExitSpawner(new Vector3i(wx, wy, wz), exitRotation);
+        }
+
         for (MarkerLocal marker : data.markers) {
             int wx = pastePos.x + rotX(marker.x, marker.z, rot);
             int wy = pastePos.y + marker.y;
@@ -772,16 +780,19 @@ public class DungeonGenerator {
             switch (marker.type) {
                 case MOB_SPAWN_POINT, MOB_SPAWNER -> roomData.addMobSpawnPoint(worldPos);
                 case KEY_SPAWNER -> roomData.addKeySpawnerPosition(worldPos);
-                case PORTAL -> roomData.addPortalPosition(worldPos);
+                case PORTAL -> roomData.addPortal(worldPos, marker.portalMode);
                 case PORTAL_EXIT -> roomData.addPortalExitPosition(worldPos);
-                case DOOR -> roomData.addDoorPosition(worldPos);
+                case DOOR -> {
+                    roomData.addDoorPosition(worldPos);
+                    roomData.setDoorMode(marker.doorMode);
+                }
                 case DOOR_KEY -> {
                     roomData.addDoorPosition(worldPos);
-                    roomData.setDoorMode(DoorMode.KEY);
+                    roomData.setDoorMode(marker.doorMode);
                 }
                 case DOOR_ACTIVATOR -> {
                     roomData.addDoorPosition(worldPos);
-                    roomData.setDoorMode(DoorMode.ACTIVATOR);
+                    roomData.setDoorMode(marker.doorMode);
                 }
                 case LOCK_ROOM -> roomData.setLocked(true);
                 case ACTIVATION_ZONE -> roomData.addActivationZonePosition(worldPos);
@@ -1063,25 +1074,30 @@ public class DungeonGenerator {
                         spawners.add(new SpawnerLocal(x, y, z, sRot));
                     } else if (markerType != null) {
                         isMarker = true;
-                        markers.add(new MarkerLocal(x, y, z, markerType));
+                        JsonObject serializedComponents = getSerializedBlockComponents(b);
+                        markers.add(new MarkerLocal(
+                                x,
+                                y,
+                                z,
+                                markerType,
+                                readDoorMode(markerType, serializedComponents),
+                                readPortalMode(markerType, serializedComponents)
+                        ));
                         // Read MobSpawnerData from block components if present
                         if (markerType == MarkerType.MOB_SPAWNER) {
-                            JsonObject comps = b.getAsJsonObject("components");
-                            if (comps != null) {
-                                JsonObject inner = comps.getAsJsonObject("Components");
-                                if (inner != null) {
-                                    JsonObject msd = inner.getAsJsonObject("MobSpawnerData");
-                                    if (msd != null) {
-                                        String entries = msd.has("MobEntries") ? msd.get("MobEntries").getAsString() : "";
-                                        int count = 1;
-                                        if (msd.has("SpawnCount")) {
-                                            try { count = Integer.parseInt(msd.get("SpawnCount").getAsString()); }
-                                            catch (NumberFormatException ignored) {}
-                                        }
-                                        if (!entries.isEmpty()) {
-                                            configuredSpawners.add(new ConfiguredSpawnerLocal(x, y, z, entries, count));
-                                        }
+                            JsonObject mobSpawnerData = getSerializedComponent(serializedComponents, "MobSpawnerData");
+                            if (mobSpawnerData != null) {
+                                String entries = getSerializedString(mobSpawnerData, "MobEntries");
+                                int count = 1;
+                                String rawCount = getSerializedString(mobSpawnerData, "SpawnCount");
+                                if (rawCount != null) {
+                                    try {
+                                        count = Integer.parseInt(rawCount);
+                                    } catch (NumberFormatException ignored) {
                                     }
+                                }
+                                if (entries != null && !entries.isEmpty()) {
+                                    configuredSpawners.add(new ConfiguredSpawnerLocal(x, y, z, entries, count));
                                 }
                             }
                         }
@@ -1125,6 +1141,53 @@ public class DungeonGenerator {
             LOGGER.at(Level.WARNING).withCause(e).log("Failed to read prefab: %s", path);
             return null;
         }
+    }
+
+    @Nullable
+    private static JsonObject getSerializedBlockComponents(@Nonnull JsonObject block) {
+        JsonObject components = block.getAsJsonObject("components");
+        return components != null ? components.getAsJsonObject("Components") : null;
+    }
+
+    @Nullable
+    private static JsonObject getSerializedComponent(@Nullable JsonObject serializedComponents, @Nonnull String componentId) {
+        return serializedComponents != null ? serializedComponents.getAsJsonObject(componentId) : null;
+    }
+
+    @Nullable
+    private static String getSerializedString(@Nullable JsonObject component, @Nonnull String key) {
+        if (component == null || !component.has(key)) {
+            return null;
+        }
+        return component.get(key).getAsString();
+    }
+
+    @Nonnull
+    private static DoorMode readDoorMode(@Nonnull MarkerType markerType, @Nullable JsonObject serializedComponents) {
+        String serializedMode = getSerializedString(getSerializedComponent(serializedComponents, "DoorData"), "Mode");
+        if (serializedMode != null && !serializedMode.isBlank()) {
+            return DoorData.parseMode(serializedMode);
+        }
+
+        return switch (markerType) {
+            case DOOR_KEY -> DoorMode.KEY;
+            case DOOR, DOOR_ACTIVATOR -> DoorMode.ACTIVATOR;
+            default -> DoorMode.ACTIVATOR;
+        };
+    }
+
+    @Nonnull
+    private static PortalMode readPortalMode(@Nonnull MarkerType markerType, @Nullable JsonObject serializedComponents) {
+        if (markerType != MarkerType.PORTAL) {
+            return PortalMode.NEXT_LEVEL;
+        }
+
+        String serializedMode = getSerializedString(getSerializedComponent(serializedComponents, "PortalData"), "Mode");
+        if (serializedMode != null && !serializedMode.isBlank()) {
+            return PortalData.parseMode(serializedMode);
+        }
+
+        return PortalMode.NEXT_LEVEL;
     }
 
     private void pasteAndRegister(@Nonnull World world, @Nonnull Store<EntityStore> store,
@@ -1175,42 +1238,100 @@ public class DungeonGenerator {
         }
     }
 
-    /**
-     * Paste a lock door prefab on top of a locked room at the room's anchor position.
-     */
-    /**
-     * Paste a lock door prefab at the given position. Can be called at runtime (room entry).
-     */
-    /**
-     * Paste a lock door prefab at the given position. Can be called at runtime (room entry).
-     * Records all pasted block positions on the RoomData so they can be removed on clear.
-     */
     public static void pasteLockDoor(@Nonnull World world, @Nonnull DungeonConfig.LevelConfig levelConfig,
                                      @Nonnull RoomData room, @Nonnull Vector3i pastePos, int rot) {
-        List<Path> lockDoorPaths = DungeonConfig.resolveGlobs(levelConfig.getRoomPools().getLockDoor());
-        if (lockDoorPaths.isEmpty()) {
-            LOGGER.at(Level.WARNING).log("No lockDoor prefabs configured, skipping lock door paste at %s", pastePos);
+        pasteTrackedDoorPrefab(world, room, pastePos, rot,
+                DungeonConfig.resolveGlobs(levelConfig.getRoomPools().getLockDoor()),
+                "lockDoor");
+    }
+
+    public static boolean pasteSealDoorsAtRoomExits(@Nonnull World world,
+                                                    @Nonnull DungeonConfig.LevelConfig levelConfig,
+                                                    @Nonnull RoomData room) {
+        if (room.getExitSpawners().isEmpty()) {
+            return false;
+        }
+
+        int trackedBlocksBefore = room.getLockDoorBlockPositions().size();
+        for (RoomData.ExitSpawner exitSpawner : room.getExitSpawners()) {
+            pasteTrackedDoorPrefab(world, room, exitSpawner.position(), exitSpawner.rotation(),
+                    DungeonConfig.resolveGlobs(levelConfig.getRoomPools().getSealDoor()),
+                    "sealDoor");
+        }
+
+        return room.getLockDoorBlockPositions().size() > trackedBlocksBefore;
+    }
+
+    public static boolean pasteConfiguredDoorMarkers(@Nonnull World world,
+                                                     @Nonnull DungeonConfig.LevelConfig levelConfig,
+                                                     @Nonnull RoomData room) {
+        int trackedBlocksBefore = room.getLockDoorBlockPositions().size();
+        pasteConfiguredDoorMarkersForTarget(world, levelConfig, room, room);
+        for (RoomData child : room.getChildren()) {
+            pasteConfiguredDoorMarkersForTarget(world, levelConfig, room, child);
+        }
+        return room.getLockDoorBlockPositions().size() > trackedBlocksBefore;
+    }
+
+    private static void pasteConfiguredDoorMarkersForTarget(@Nonnull World world,
+                                                            @Nonnull DungeonConfig.LevelConfig levelConfig,
+                                                            @Nonnull RoomData trackingRoom,
+                                                            @Nonnull RoomData targetRoom) {
+        if (targetRoom.getDoorPositions().isEmpty()) {
             return;
         }
+
+        List<String> globs = switch (targetRoom.getDoorMode()) {
+            case KEY -> levelConfig.getRoomPools().getKeyDoor();
+            case ACTIVATOR -> levelConfig.getRoomPools().getActivationDoor();
+        };
+        List<Path> doorPaths = DungeonConfig.resolveGlobs(globs);
+        if (doorPaths.isEmpty()) {
+            return;
+        }
+
+        String doorKind = targetRoom.getDoorMode() == DoorMode.KEY ? "keyDoorMarker" : "activationDoorMarker";
+        for (Vector3i pos : targetRoom.getDoorPositions()) {
+            pasteTrackedDoorPrefab(world, trackingRoom, pos, targetRoom.getRotation(), doorPaths, doorKind);
+        }
+    }
+
+    private static void pasteTrackedDoorPrefab(@Nonnull World world,
+                                               @Nonnull RoomData room,
+                                               @Nonnull Vector3i pastePos,
+                                               int rot,
+                                               @Nonnull List<Path> doorPaths,
+                                               @Nonnull String doorKind) {
+        if (doorPaths.isEmpty()) {
+            LOGGER.at(Level.WARNING).log("No %s prefabs configured, skipping door paste at %s", doorKind, pastePos);
+            return;
+        }
+
         Random random = new Random();
-        Path doorPath = DungeonConfig.pickRandom(random, lockDoorPaths);
+        Path doorPath = DungeonConfig.pickRandom(random, doorPaths);
+        if (doorPath == null) {
+            LOGGER.at(Level.WARNING).log("Failed to choose %s prefab for %s", doorKind, pastePos);
+            return;
+        }
+
         PrefabData doorData = readPrefabData(doorPath);
         if (doorData == null) {
-            LOGGER.at(Level.WARNING).log("Failed to read lock door prefab: %s", doorPath);
+            LOGGER.at(Level.WARNING).log("Failed to read %s prefab: %s", doorKind, doorPath);
             return;
         }
+
         try {
             IPrefabBuffer rawBuffer = DungeonConfig.loadBuffer(doorPath);
             if (rawBuffer == null) {
-                LOGGER.at(Level.WARNING).log("Failed to load lock door buffer: %s", doorPath);
+                LOGGER.at(Level.WARNING).log("Failed to load %s buffer: %s", doorKind, doorPath);
                 return;
             }
+
             IPrefabBuffer buffer = new SpawnerFilteredBuffer(rawBuffer, pastePos.y);
             Store<EntityStore> store = world.getEntityStore().getStore();
             PrefabUtil.paste(buffer, world, pastePos, toEngineRotation(rot),
                     true, random, 0, false, false, true, store);
 
-            // Record block positions so we can remove them when the room is cleared.
             for (BlockLocal block : doorData.blocks) {
                 if (block.isMarker) continue;
                 int wx = pastePos.x + rotX(block.x, block.z, rot);
@@ -1219,10 +1340,10 @@ public class DungeonGenerator {
                 room.addLockDoorBlockPosition(new Vector3i(wx, wy, wz));
             }
 
-            LOGGER.at(Level.INFO).log("Pasted lock door %s at %s rot=%d (%d blocks tracked)",
-                    doorPath.getFileName(), pastePos, rot, room.getLockDoorBlockPositions().size());
+            LOGGER.at(Level.INFO).log("Pasted %s %s at %s rot=%d (%d blocks tracked)",
+                    doorKind, doorPath.getFileName(), pastePos, rot, room.getLockDoorBlockPositions().size());
         } catch (Exception e) {
-            LOGGER.at(Level.WARNING).withCause(e).log("Failed to paste lock door at %s", pastePos);
+            LOGGER.at(Level.WARNING).withCause(e).log("Failed to paste %s at %s", doorKind, pastePos);
         }
     }
 
@@ -1303,7 +1424,10 @@ public class DungeonGenerator {
     private record BlockLocal(int x, int y, int z, String name, boolean isMarker) {
     }
 
-    private record MarkerLocal(int x, int y, int z, @Nonnull MarkerType type) {
+    private record MarkerLocal(int x, int y, int z,
+                               @Nonnull MarkerType type,
+                               @Nonnull DoorMode doorMode,
+                               @Nonnull PortalMode portalMode) {
     }
 
     private record PrefabMobMarkerLocal(double x, double y, double z, @Nonnull String mobId) {

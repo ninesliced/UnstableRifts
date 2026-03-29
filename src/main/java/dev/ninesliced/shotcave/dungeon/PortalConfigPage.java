@@ -29,19 +29,19 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * Door configuration UI page for level designers.
- * Shows the current door mode and persists it through DoorData on Shotcave_Door.
+ * Portal configuration UI page for level designers.
+ * Persists the selected PortalMode through PortalData on Shotcave_Portal.
  */
-public final class DoorConfigPage extends InteractiveCustomUIPage<DoorConfigPage.DoorEventData> {
+public final class PortalConfigPage extends InteractiveCustomUIPage<PortalConfigPage.PortalEventData> {
 
-    private static final String LAYOUT_PATH = "Pages/Shotcave/DoorConfig.ui";
-    private static final String DOOR_BLOCK_ID = MarkerType.DOOR.getBlockName();
+    private static final String LAYOUT_PATH = "Pages/Shotcave/PortalConfig.ui";
+    private static final String PORTAL_BLOCK_ID = MarkerType.PORTAL.getBlockName();
 
     @Nullable
     private final BlockPosition blockPos;
 
-    public DoorConfigPage(@Nonnull PlayerRef playerRef, @Nullable BlockPosition blockPos) {
-        super(playerRef, CustomPageLifetime.CanDismissOrCloseThroughInteraction, DoorEventData.CODEC);
+    public PortalConfigPage(@Nonnull PlayerRef playerRef, @Nullable BlockPosition blockPos) {
+        super(playerRef, CustomPageLifetime.CanDismissOrCloseThroughInteraction, PortalEventData.CODEC);
         this.blockPos = blockPos;
     }
 
@@ -52,19 +52,19 @@ public final class DoorConfigPage extends InteractiveCustomUIPage<DoorConfigPage
                       @Nonnull Store<EntityStore> store) {
         ui.append(LAYOUT_PATH);
 
-        DoorMode currentMode = loadFromBlockEntity(store);
+        PortalMode currentMode = loadFromBlockEntity(store);
         ui.set("#CurrentModeLabel.Text", "Current mode: " + currentMode.name());
 
         events.addEventBinding(
                 CustomUIEventBindingType.Activating,
-                "#KeyDoorBtn",
-                new EventData().put(DoorEventData.KEY_MODE, DoorMode.KEY.name()),
+                "#NextLevelPortalBtn",
+                new EventData().put(PortalEventData.KEY_MODE, PortalMode.NEXT_LEVEL.name()),
                 false
         );
         events.addEventBinding(
                 CustomUIEventBindingType.Activating,
-                "#ActivatorDoorBtn",
-                new EventData().put(DoorEventData.KEY_MODE, DoorMode.ACTIVATOR.name()),
+                "#ClosestExitPortalBtn",
+                new EventData().put(PortalEventData.KEY_MODE, PortalMode.CLOSEST_EXIT.name()),
                 false
         );
     }
@@ -72,16 +72,16 @@ public final class DoorConfigPage extends InteractiveCustomUIPage<DoorConfigPage
     @Override
     public void handleDataEvent(@Nonnull Ref<EntityStore> ref,
                                 @Nonnull Store<EntityStore> store,
-                                @Nonnull DoorEventData data) {
-        DoorMode mode = DoorData.parseMode(data.mode);
+                                @Nonnull PortalEventData data) {
+        PortalMode mode = PortalData.parseMode(data.mode);
         saveToBlockEntity(store, mode);
 
         try {
             NotificationUtil.sendNotification(
                     this.playerRef.getPacketHandler(),
-                    Message.raw("Door mode set to: " + mode.name()),
+                    Message.raw("Portal mode set to: " + mode.name()),
                     null,
-                    "door_config");
+                    "portal_config");
         } catch (Exception e) {
             // Best-effort
         }
@@ -93,35 +93,37 @@ public final class DoorConfigPage extends InteractiveCustomUIPage<DoorConfigPage
     }
 
     @Nonnull
-    private DoorMode loadFromBlockEntity(@Nonnull Store<EntityStore> store) {
+    private PortalMode loadFromBlockEntity(@Nonnull Store<EntityStore> store) {
         if (blockPos == null) {
-            return DoorMode.ACTIVATOR;
+            return PortalMode.NEXT_LEVEL;
         }
 
         World world = store.getExternalData().getWorld();
         if (world == null) {
-            return DoorMode.ACTIVATOR;
+            return PortalMode.NEXT_LEVEL;
         }
 
         long chunkIndex = ChunkUtil.indexChunkFromBlock(blockPos.x, blockPos.z);
         WorldChunk chunk = world.getChunkIfInMemory(chunkIndex);
         if (chunk == null) {
-            return DoorMode.ACTIVATOR;
+            return PortalMode.NEXT_LEVEL;
         }
 
         Holder<ChunkStore> holder = chunk.getBlockComponentHolder(blockPos.x, blockPos.y, blockPos.z);
         if (holder != null) {
-            DoorData data = holder.getComponent(DoorData.getComponentType());
+            PortalData data = holder.getComponent(PortalData.getComponentType());
             if (data != null) {
                 return data.parseMode();
             }
         }
 
         BlockType blockType = chunk.getBlockType(blockPos.x, blockPos.y, blockPos.z);
-        return blockType != null ? parseLegacyBlockMode(blockType.getId()) : DoorMode.ACTIVATOR;
+        return blockType != null && PORTAL_BLOCK_ID.equals(blockType.getId())
+                ? PortalMode.NEXT_LEVEL
+                : PortalMode.NEXT_LEVEL;
     }
 
-    private void saveToBlockEntity(@Nonnull Store<EntityStore> store, @Nonnull DoorMode mode) {
+    private void saveToBlockEntity(@Nonnull Store<EntityStore> store, @Nonnull PortalMode mode) {
         if (blockPos == null) {
             return;
         }
@@ -139,34 +141,23 @@ public final class DoorConfigPage extends InteractiveCustomUIPage<DoorConfigPage
 
         int rotation = chunk.getRotationIndex(blockPos.x, blockPos.y, blockPos.z);
         BlockType blockType = chunk.getBlockType(blockPos.x, blockPos.y, blockPos.z);
-        if (blockType == null || !DOOR_BLOCK_ID.equals(blockType.getId())) {
-            world.setBlock(blockPos.x, blockPos.y, blockPos.z, DOOR_BLOCK_ID, rotation);
+        if (blockType == null || !PORTAL_BLOCK_ID.equals(blockType.getId())) {
+            world.setBlock(blockPos.x, blockPos.y, blockPos.z, PORTAL_BLOCK_ID, rotation);
             blockType = chunk.getBlockType(blockPos.x, blockPos.y, blockPos.z);
         }
         if (blockType == null) {
             return;
         }
 
-        DoorData doorData = new DoorData(DoorData.serializeMode(mode));
+        PortalData portalData = new PortalData(PortalData.serializeMode(mode));
         Holder<ChunkStore> holder = ChunkStore.REGISTRY.newHolder();
-        holder.putComponent(DoorData.getComponentType(), doorData);
+        holder.putComponent(PortalData.getComponentType(), portalData);
         chunk.setState(blockPos.x, blockPos.y, blockPos.z, blockType, rotation, holder);
     }
 
-    @Nonnull
-    private static DoorMode parseLegacyBlockMode(@Nullable String blockId) {
-        if ("Shotcave_Door_Key".equals(blockId)) {
-            return DoorMode.KEY;
-        }
-        if ("Shotcave_Door_Activator".equals(blockId)) {
-            return DoorMode.ACTIVATOR;
-        }
-        return DoorMode.ACTIVATOR;
-    }
-
-    public static final class DoorEventData {
+    public static final class PortalEventData {
         static final String KEY_MODE = "Mode";
-        static final BuilderCodec<DoorEventData> CODEC = BuilderCodec.<DoorEventData>builder(DoorEventData.class, DoorEventData::new)
+        static final BuilderCodec<PortalEventData> CODEC = BuilderCodec.<PortalEventData>builder(PortalEventData.class, PortalEventData::new)
                 .append(new KeyedCodec<>(KEY_MODE, Codec.STRING), (d, v) -> d.mode = v, d -> d.mode).add()
                 .build();
 

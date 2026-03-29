@@ -17,7 +17,9 @@ import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.core.util.NotificationUtil;
 import com.hypixel.hytale.logger.HytaleLogger;
+import dev.ninesliced.shotcave.Shotcave;
 import dev.ninesliced.shotcave.ShotcaveLog;
+import dev.ninesliced.shotcave.dungeon.Game;
 import dev.ninesliced.shotcave.pickup.ItemPickupConfig;
 import dev.ninesliced.shotcave.pickup.ItemPickupTracker;
 
@@ -27,8 +29,8 @@ import java.util.List;
 
 /**
  * Tick system that auto-collects nearby coin entities for players.
- * Coins bypass inventory and increment the player's score via
- * {@link CoinScoreService}.
+ * Coins bypass inventory and increase the active dungeon team's money pool.
+ * Falls back to the legacy personal score tracker outside active dungeon runs.
  */
 public final class CoinCollectionSystem extends EntityTickingSystem<EntityStore> {
 
@@ -118,18 +120,17 @@ public final class CoinCollectionSystem extends EntityTickingSystem<EntityStore>
         }
 
         for (ItemPickupTracker.TrackedItem tracked : toCollect) {
-            collectCoin(tracked, player, playerRef, playerEntityRef, store, commandBuffer);
+            collectCoin(tracked, playerRef, store, commandBuffer);
         }
     }
 
     /**
-     * Collects a single coin: removes entity, increments score, sends notification.
+     * Collects a single coin: removes entity, increments shared dungeon money,
+     * and sends a notification.
      * Does NOT use generatePickedUpItem() to avoid infinite re-tracking loops.
      */
     private static void collectCoin(@Nonnull ItemPickupTracker.TrackedItem tracked,
-            @Nonnull Player player,
             @Nonnull PlayerRef playerRef,
-            @Nonnull Ref<EntityStore> playerEntityRef,
             @Nonnull Store<EntityStore> store,
             @Nonnull CommandBuffer<EntityStore> commandBuffer) {
 
@@ -158,13 +159,22 @@ public final class CoinCollectionSystem extends EntityTickingSystem<EntityStore>
 
         commandBuffer.removeEntity(coinRef, RemoveReason.REMOVE);
 
-        int newTotal = CoinScoreService.addCoins(playerRef.getUuid(), quantity);
+        String totalLabel = "Total";
+        long newTotal;
+        Shotcave shotcave = Shotcave.getInstance();
+        Game game = shotcave != null ? shotcave.getGameManager().findGameForPlayer(playerRef.getUuid()) : null;
+        if (game != null) {
+            newTotal = game.addMoney(quantity);
+            totalLabel = "Team Total";
+        } else {
+            newTotal = CoinScoreService.addCoins(playerRef.getUuid(), quantity);
+        }
 
         try {
             NotificationUtil.sendNotification(
                     playerRef.getPacketHandler(),
                     Message.raw("+" + quantity + " Coin" + (quantity != 1 ? "s" : "")
-                            + "  (Total: " + newTotal + ")"),
+                            + "  (" + totalLabel + ": " + newTotal + ")"),
                     null,
                     "coin_collected");
         } catch (Exception e) {
