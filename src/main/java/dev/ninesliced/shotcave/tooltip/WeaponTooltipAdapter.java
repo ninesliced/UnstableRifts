@@ -2,6 +2,7 @@ package dev.ninesliced.shotcave.tooltip;
 
 import com.hypixel.hytale.protocol.ComponentUpdate;
 import com.hypixel.hytale.protocol.EntityUpdate;
+import com.hypixel.hytale.protocol.EquipmentUpdate;
 import com.hypixel.hytale.protocol.InventorySection;
 import com.hypixel.hytale.protocol.ItemBase;
 import com.hypixel.hytale.protocol.ItemUpdate;
@@ -14,10 +15,17 @@ import com.hypixel.hytale.protocol.packets.entities.EntityUpdates;
 import com.hypixel.hytale.protocol.packets.interaction.SyncInteractionChain;
 import com.hypixel.hytale.protocol.packets.interaction.SyncInteractionChains;
 import com.hypixel.hytale.protocol.packets.inventory.UpdatePlayerInventory;
+import com.hypixel.hytale.protocol.packets.player.MouseInteraction;
+import com.hypixel.hytale.server.core.entity.entities.Player;
+import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.io.adapter.PlayerPacketFilter;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
+import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import com.hypixel.hytale.component.Ref;
+import com.hypixel.hytale.component.Store;
 import dev.ninesliced.shotcave.ShotcavePacketIds;
 import dev.ninesliced.shotcave.guns.WeaponDefinitions;
+import org.bson.BsonDocument;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -62,6 +70,8 @@ public final class WeaponTooltipAdapter implements PlayerPacketFilter {
             processEntityUpdates(playerRef, (EntityUpdates) packet);
         } else if (id == ShotcavePacketIds.SYNC_INTERACTION_CHAINS) {
             processInboundChains((SyncInteractionChains) packet);
+        } else if (id == ShotcavePacketIds.MOUSE_INTERACTION) {
+            translateMouseInteraction((com.hypixel.hytale.protocol.packets.player.MouseInteraction) packet);
         }
         return false; // never block packets
     }
@@ -122,7 +132,7 @@ public final class WeaponTooltipAdapter implements PlayerPacketFilter {
     }
 
     // ═══════════════════════════════════════════════════════════════════
-    //  OUTBOUND — rewrite dropped‑item entity updates to virtual IDs
+    //  OUTBOUND — rewrite dropped‑item and equipment entity updates
     // ═══════════════════════════════════════════════════════════════════
 
     private void processEntityUpdates(@Nonnull PlayerRef playerRef,
@@ -133,21 +143,47 @@ public final class WeaponTooltipAdapter implements PlayerPacketFilter {
         Map<String, ItemBase> pendingItems = new HashMap<>();
         Map<String, String>   pendingTranslations = new HashMap<>();
 
+        // Resolve the EntityStore so we can look up remote players for
+        // EquipmentUpdate virtualisation.
+        EntityStore entityStore = null;
+        if (playerRef.isValid() && playerRef.getReference() != null) {
+            Store<EntityStore> s = playerRef.getReference().getStore();
+            if (s != null) entityStore = s.getExternalData();
+        }
+
         for (EntityUpdate entityUpdate : packet.updates) {
             if (entityUpdate.updates == null) continue;
             for (ComponentUpdate comp : entityUpdate.updates) {
-                if (!(comp instanceof ItemUpdate itemUpdate)) continue;
+                if (comp instanceof ItemUpdate itemUpdate) {
+                    // Dropped item entities — the packet object is shared
+                    // across recipients, so a previous player's adapter may
+                    // have already rewritten itemId to a virtual ID.
+                    String itemId = itemUpdate.item.itemId;
+                    if (itemId == null || itemId.isEmpty()) continue;
 
-                String itemId = itemUpdate.item.itemId;
-                if (itemId == null || itemId.isEmpty()) continue;
-                if (WeaponVirtualItems.isVirtual(itemId)) continue;
-                if (WeaponDefinitions.getById(itemId) == null) continue;
+                    String baseItemId;
+                    boolean alreadyVirtual = WeaponVirtualItems.isVirtual(itemId);
+                    if (alreadyVirtual) {
+                        baseItemId = WeaponVirtualItems.getBaseItemId(itemId);
+                    } else {
+                        baseItemId = itemId;
+                    }
+                    if (baseItemId == null) continue;
+                    if (WeaponDefinitions.getById(baseItemId) == null) continue;
 
-                String virtualId = WeaponVirtualItems.processWeaponSlot(
-                        uuid, itemId, itemUpdate.item.metadata,
-                        pendingItems, pendingTranslations);
-                if (virtualId != null) {
-                    itemUpdate.item.itemId = virtualId;
+                    String virtualId = WeaponVirtualItems.processWeaponSlot(
+                            uuid, baseItemId, itemUpdate.item.metadata,
+                            pendingItems, pendingTranslations);
+                    if (virtualId != null && !alreadyVirtual) {
+                        itemUpdate.item.itemId = virtualId;
+                    }
+                } else if (comp instanceof EquipmentUpdate equipUpdate && entityStore != null) {
+                    // Player equipment broadcast — virtualise the held
+                    // weapon so OTHER players see the correct quality
+                    // glow and model instead of an unknown virtual ID.
+                    virtualizeEquipmentWeapon(uuid, equipUpdate,
+                            entityUpdate.networkId, entityStore,
+                            pendingItems, pendingTranslations);
                 }
             }
         }
@@ -163,6 +199,58 @@ public final class WeaponTooltipAdapter implements PlayerPacketFilter {
         if (!pendingTranslations.isEmpty()) {
             playerRef.getPacketHandler().writeNoCache(
                     new UpdateTranslations(UpdateType.AddOrUpdate, pendingTranslations));
+        }
+    }
+
+    /**
+     * Rewrites {@link EquipmentUpdate#rightHandItemId} to a virtual weapon
+     * ID so the recipient's client renders the correct quality glow and
+     * tooltip for another player's held weapon.
+     */
+    private static void virtualizeEquipmentWeapon(
+            @Nonnull UUID recipientUuid,
+            @Nonnull EquipmentUpdate equipment,
+            int networkId,
+            @Nonnull EntityStore entityStore,
+            @Nonnull Map<String, ItemBase> pendingItems,
+            @Nonnull Map<String, String> pendingTranslations) {
+
+        String itemId = equipment.rightHandItemId;
+        if (itemId == null || itemId.isEmpty()) return;
+
+        // Shared packet: a previous player's adapter may have already
+        // rewritten this field to a virtual ID.
+        String baseItemId;
+        boolean alreadyVirtual = WeaponVirtualItems.isVirtual(itemId);
+        if (alreadyVirtual) {
+            baseItemId = WeaponVirtualItems.getBaseItemId(itemId);
+        } else {
+            baseItemId = itemId;
+        }
+        if (baseItemId == null) return;
+        if (WeaponDefinitions.getById(baseItemId) == null) return;
+
+        // Resolve network entity → Player component → held‑item metadata
+        Ref<EntityStore> entityRef = entityStore.getRefFromNetworkId(networkId);
+        if (entityRef == null || !entityRef.isValid()) return;
+
+        Store<EntityStore> store = entityRef.getStore();
+        Player player = store.getComponent(entityRef, Player.getComponentType());
+        if (player == null) return;
+
+        ItemStack heldItem = player.getInventory().getItemInHand();
+        if (heldItem == null) return;
+        // Sanity check: make sure the inventory agrees with the packet
+        if (!baseItemId.equals(heldItem.getItemId())) return;
+
+        BsonDocument doc = heldItem.getMetadata();
+        String metadataJson = doc != null ? doc.toJson() : null;
+
+        String virtualId = WeaponVirtualItems.processWeaponSlot(
+                recipientUuid, baseItemId, metadataJson,
+                pendingItems, pendingTranslations);
+        if (virtualId != null && !alreadyVirtual) {
+            equipment.rightHandItemId = virtualId;
         }
     }
 
@@ -186,6 +274,12 @@ public final class WeaponTooltipAdapter implements PlayerPacketFilter {
             for (SyncInteractionChain fork : chain.newForks) {
                 if (fork != null) translateChainIds(fork);
             }
+        }
+    }
+
+    private static void translateMouseInteraction(@Nonnull MouseInteraction packet) {
+        if (packet.itemInHandId != null && WeaponVirtualItems.isVirtual(packet.itemInHandId)) {
+            packet.itemInHandId = WeaponVirtualItems.getBaseItemId(packet.itemInHandId);
         }
     }
 

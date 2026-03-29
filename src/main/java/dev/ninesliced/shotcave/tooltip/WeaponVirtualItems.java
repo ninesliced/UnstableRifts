@@ -126,15 +126,19 @@ public final class WeaponVirtualItems {
         TRANSLATION_CACHE.computeIfAbsent(virtualId,
                 k -> createTranslations(k, def, fRarity, fEffect, fMods));
 
+        // If ItemBase creation failed (base item not in asset map), do NOT
+        // rewrite the packet to use the virtual ID — the client has no
+        // definition for it and would render the item as invalid/unknown.
+        ItemBase base = ITEM_CACHE.get(virtualId);
+        if (base == null) {
+            return null;
+        }
 
         Set<String> sent = SENT_PER_PLAYER.computeIfAbsent(playerUuid,
                 k -> ConcurrentHashMap.newKeySet());
 
         if (sent.add(virtualId)) {
-            ItemBase base = ITEM_CACHE.get(virtualId);
-            if (base != null) {
-                pendingItems.put(virtualId, base);
-            }
+            pendingItems.put(virtualId, base);
             Map<String, String> tr = TRANSLATION_CACHE.get(virtualId);
             if (tr != null) {
                 pendingTranslations.putAll(tr);

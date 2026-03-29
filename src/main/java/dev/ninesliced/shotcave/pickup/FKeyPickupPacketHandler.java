@@ -313,14 +313,16 @@ public final class FKeyPickupPacketHandler implements PlayerPacketWatcher {
             }
         }
 
-        // Sync inventory to client.
+        // Sync inventory to client — use write() (not writeNoCache) so the
+        // outbound tooltip adapters apply virtual item IDs and send the
+        // UpdateItems/UpdateTranslations definitions ahead of this packet.
         InventoryComponent.Storage storageComp = store.getComponent(playerEntityRef, InventoryComponent.Storage.getComponentType());
         InventoryComponent.Armor armorComp = store.getComponent(playerEntityRef, InventoryComponent.Armor.getComponentType());
         InventoryComponent.Utility utilityComp = store.getComponent(playerEntityRef, InventoryComponent.Utility.getComponentType());
         InventoryComponent.Tool toolComp = store.getComponent(playerEntityRef, InventoryComponent.Tool.getComponentType());
         InventoryComponent.Backpack backpackComp = store.getComponent(playerEntityRef, InventoryComponent.Backpack.getComponentType());
 
-        playerRef.getPacketHandler().writeNoCache(new UpdatePlayerInventory(
+        playerRef.getPacketHandler().write(new UpdatePlayerInventory(
                 storageComp != null ? storageComp.getInventory().toPacket() : null,
                 armorComp != null ? armorComp.getInventory().toPacket() : null,
                 hotbar.toPacket(),
@@ -375,7 +377,7 @@ public final class FKeyPickupPacketHandler implements PlayerPacketWatcher {
         InventoryComponent.Tool toolComp = store.getComponent(playerEntityRef, InventoryComponent.Tool.getComponentType());
         InventoryComponent.Backpack backpackComp = store.getComponent(playerEntityRef, InventoryComponent.Backpack.getComponentType());
 
-        playerRef.getPacketHandler().writeNoCache(new UpdatePlayerInventory(
+        playerRef.getPacketHandler().write(new UpdatePlayerInventory(
                 storageComp != null ? storageComp.getInventory().toPacket() : null,
                 armorInv.toPacket(),
                 hotbarComp != null ? hotbarComp.getInventory().toPacket() : null,
