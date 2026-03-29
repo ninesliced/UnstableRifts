@@ -453,6 +453,15 @@ public final class GameManager {
             return;
         }
 
+        // Cancel ongoing generation if the game is still generating
+        if (game.getState() == GameState.GENERATING) {
+            CompletableFuture<World> genFuture = game.getGenerationFuture();
+            if (genFuture != null && !genFuture.isDone()) {
+                genFuture.cancel(true);
+                LOGGER.info("Cancelled generation future for party " + game.getPartyId());
+            }
+        }
+
         game.setState(GameState.COMPLETE);
         game.clearDeadPlayers();
         showAllPartyMembers(game.getPartyId());

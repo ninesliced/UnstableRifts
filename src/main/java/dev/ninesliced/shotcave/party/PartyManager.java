@@ -118,6 +118,10 @@ public final class PartyManager {
             return ActionResult.error("You are already in that party.");
         }
 
+        if (this.plugin.getGameManager().hasActiveGame(target.id)) {
+            return ActionResult.error("That party is currently in a dungeon run. You cannot join.");
+        }
+
         boolean invited = consumeInvite(playerRef.getUuid(), target.id);
         if (target.privacy == PartyPrivacy.PRIVATE && !invited) {
             return ActionResult.error("That party is private. You need an invite.");
@@ -379,6 +383,11 @@ public final class PartyManager {
                     3, java.util.concurrent.TimeUnit.SECONDS
             );
         }).exceptionally(throwable -> {
+            if (throwable instanceof java.util.concurrent.CancellationException
+                    || (throwable.getCause() instanceof java.util.concurrent.CancellationException)) {
+                // Generation was cancelled (e.g. party disbanded during generation) — no need to broadcast
+                return null;
+            }
             broadcast(party, "Failed to start dungeon: " + throwable.getMessage(), true);
             return null;
         });
