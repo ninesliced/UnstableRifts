@@ -20,6 +20,7 @@ import com.hypixel.hytale.logger.HytaleLogger;
 import dev.ninesliced.shotcave.ShotcaveLog;
 import dev.ninesliced.shotcave.pickup.ItemPickupConfig;
 import dev.ninesliced.shotcave.pickup.ItemPickupTracker;
+import dev.ninesliced.shotcave.systems.DeathComponent;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
@@ -71,6 +72,12 @@ public final class CoinCollectionSystem extends EntityTickingSystem<EntityStore>
 
         PlayerRef playerRef = store.getComponent(playerEntityRef, PlayerRef.getComponentType());
         if (playerRef == null || !playerRef.isValid()) {
+            return;
+        }
+
+        // Dead/ghost players cannot collect coins.
+        DeathComponent death = store.getComponent(playerEntityRef, DeathComponent.getComponentType());
+        if (death != null && death.isDead()) {
             return;
         }
 

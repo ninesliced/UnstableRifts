@@ -28,6 +28,7 @@ import dev.ninesliced.shotcave.armor.ArmorDefinition;
 import dev.ninesliced.shotcave.armor.ArmorDefinitions;
 import dev.ninesliced.shotcave.armor.ArmorSetTracker;
 import dev.ninesliced.shotcave.inventory.InventoryLockService;
+import dev.ninesliced.shotcave.systems.DeathComponent;
 
 import javax.annotation.Nonnull;
 
@@ -74,6 +75,13 @@ public final class ItemPickupInteraction extends SimpleInstantInteraction {
 
         Player playerComponent = commandBuffer.getComponent(ref, Player.getComponentType());
         if (playerComponent == null) {
+            context.getState().state = InteractionState.Failed;
+            return;
+        }
+
+        // Dead/ghost players cannot pick up items.
+        DeathComponent death = commandBuffer.getComponent(ref, DeathComponent.getComponentType());
+        if (death != null && death.isDead()) {
             context.getState().state = InteractionState.Failed;
             return;
         }
