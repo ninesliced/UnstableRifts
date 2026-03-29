@@ -265,36 +265,87 @@
 					]
 				},
 				{
-					"Reference": "Component_Instruction_Clear_Status_Animation"
+					"$Comment": "Switch target to whoever is attacking us and mark them as hostile.",
+					"Continue": true,
+					"Sensor": {
+						"Type": "Damage",
+						"Combat": true,
+						"TargetSlot": "LockedTarget"
+					},
+					"Actions": [
+						{
+							"Type": "OverrideAttitude",
+							"Attitude": "Hostile",
+							"Duration": 60
+						},
+						{
+							"Type": "AddToHostileTargetMemory"
+						}
+					]
 				},
 				{
-					"Reference": "Component_Instruction_Target_Adjusted_Attack_Melee",
-					"Modify": {
-						"TargetSwitchTimer": [5, 5],
-						"AttackSequence": { "Compute": "AttackSequence" },
-						"AttackDistance": { "Compute": "AttackDistance" },
-						"TargetRange": 4,
-						"CombatRelativeTurnSpeed": { "Compute": "CombatRelativeTurnSpeed" }
-					}
+					"$Comment": "Only continue combat if a valid hostile target can be detected or is remembered. Ghost/dead players with IGNORE attitude are filtered out.",
+					"Sensor": {
+						"Type": "Or",
+						"Sensors": [
+							{
+								"Reference": "Component_Sensor_Standard_Detection",
+								"Modify": {
+									"ViewRange": { "Compute": "AlertedRange" },
+									"ViewSector": { "Compute": "ViewSector" },
+									"HearingRange": { "Compute": "HearingRange" },
+									"AbsoluteDetectionRange": { "Compute": "AbsoluteDetectionRange" },
+									"Attitudes": ["Hostile"]
+								}
+							},
+							{
+								"Type": "HasHostileTargetMemory"
+							}
+						]
+					},
+					"Instructions": [
+						{
+							"Reference": "Component_Instruction_Clear_Status_Animation"
+						},
+						{
+							"Reference": "Component_Instruction_Target_Adjusted_Attack_Melee",
+							"Modify": {
+								"TargetSwitchTimer": [2, 4],
+								"AttackSequence": { "Compute": "AttackSequence" },
+								"AttackDistance": { "Compute": "AttackDistance" },
+								"TargetRange": 4,
+								"CombatRelativeTurnSpeed": { "Compute": "CombatRelativeTurnSpeed" }
+							}
+						},
+						{
+							"Reference": "Component_Instruction_Soft_Leash",
+							"Modify": {
+								"_ExportStates": ["ReturnHome"],
+								"LeashDistance": { "Compute": "LeashDistance" },
+								"LeashMinPlayerDistance": { "Compute": "LeashMinPlayerDistance" },
+								"LeashTimer": { "Compute": "LeashTimer" },
+								"HardLeashDistance": { "Compute": "HardLeashDistance" }
+							}
+						},
+						{
+							"Reference": "Component_Instruction_Intelligent_Chase",
+							"Modify": {
+								"_ExportStates": ["Search", "ReturnHome", "ReturnHome"],
+								"ViewRange": { "Compute": "AlertedRange" },
+								"HearingRange": { "Compute": "HearingRange" },
+								"RelativeSpeed": { "Compute": "RelativeChaseSpeed" }
+							}
+						}
+					]
 				},
 				{
-					"Reference": "Component_Instruction_Soft_Leash",
-					"Modify": {
-						"_ExportStates": ["ReturnHome"],
-						"LeashDistance": { "Compute": "LeashDistance" },
-						"LeashMinPlayerDistance": { "Compute": "LeashMinPlayerDistance" },
-						"LeashTimer": { "Compute": "LeashTimer" },
-						"HardLeashDistance": { "Compute": "HardLeashDistance" }
-					}
-				},
-				{
-					"Reference": "Component_Instruction_Intelligent_Chase",
-					"Modify": {
-						"_ExportStates": ["Search", "ReturnHome", "ReturnHome"],
-						"ViewRange": { "Compute": "AlertedRange" },
-						"HearingRange": { "Compute": "HearingRange" },
-						"RelativeSpeed": { "Compute": "RelativeChaseSpeed" }
-					}
+					"$Comment": "No valid hostile target found (ghost/dead/gone) - go to search.",
+					"Actions": [
+						{
+							"Type": "State",
+							"State": "Search"
+						}
+					]
 				}
 			]
 		},
@@ -304,6 +355,23 @@
 				"State": "Search"
 			},
 			"Instructions": [
+				{
+					"$Comment": "Re-enter chase if attacked during search.",
+					"Sensor": {
+						"Type": "Damage",
+						"Combat": true,
+						"TargetSlot": "LockedTarget"
+					},
+					"Actions": [
+						{
+							"Type": "AddToHostileTargetMemory"
+						},
+						{
+							"Type": "State",
+							"State": "Chase"
+						}
+					]
+				},
 				{
 					"Continue": true,
 					"Sensor": {

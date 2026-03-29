@@ -213,7 +213,7 @@
       "Description": "How long the NPC should search for lost target."
     },
     "TargetSwitchTimer": {
-      "Value": [5, 5],
+      "Value": [3, 5],
       "Description": "Minimum time locked onto a single target."
     },
     "TargetRange": {
@@ -693,6 +693,39 @@
               ]
             },
             {
+              "$Comment": "Escape combat if no hostile target can be detected and none remembered (e.g. all targets are ghost/dead).",
+              "Sensor": {
+                "Type": "And",
+                "Sensors": [
+                  {
+                    "Type": "Not",
+                    "Sensor": {
+                      "Reference": "Component_Sensor_Standard_Detection",
+                      "Modify": {
+                        "ViewRange": { "Compute": "AlertedRange" },
+                        "ViewSector": { "Compute": "ViewSector" },
+                        "HearingRange": { "Compute": "HearingRange" },
+                        "AbsoluteDetectionRange": { "Compute": "AbsoluteDetectionRange" },
+                        "Attitudes": ["Hostile"]
+                      }
+                    }
+                  },
+                  {
+                    "Type": "Not",
+                    "Sensor": {
+                      "Type": "HasHostileTargetMemory"
+                    }
+                  }
+                ]
+              },
+              "Actions": [
+                {
+                  "Type": "State",
+                  "State": "Search.Confused"
+                }
+              ]
+            },
+            {
               "$Comment": "Chase substate: target is too far, run to them.",
               "Sensor": {
                 "Type": "State",
@@ -1106,6 +1139,24 @@
               }
             },
             {
+              "$Comment": "Track damage sources for target switching.",
+              "Continue": true,
+              "Sensor": {
+                "Type": "Damage",
+                "Combat": true
+              },
+              "Actions": [
+                {
+                  "Type": "OverrideAttitude",
+                  "Attitude": "Hostile",
+                  "Duration": 60
+                },
+                {
+                  "Type": "AddToHostileTargetMemory"
+                }
+              ]
+            },
+            {
               "$Comment": "Target swapping.",
               "Reference": "Component_Instruction_Combat_Target_Swap",
               "Modify": {
@@ -1114,6 +1165,12 @@
                 },
                 "TargetRange": {
                   "Compute": "TargetRange"
+                },
+                "NextTargetRangeView": {
+                  "Compute": "ViewRange"
+                },
+                "NextTargetRangeHearing": {
+                  "Compute": "HearingRange"
                 }
               }
             },
