@@ -72,7 +72,7 @@
 			"Description": "Melee attack sequence"
 		},
 		"AttackDistance": {
-			"Value": 2,
+			"Value": 2.4,
 			"Description": "Distance at which attacks are executed"
 		},
 		"TargetGroups": {

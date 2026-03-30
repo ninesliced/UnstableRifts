@@ -7,7 +7,7 @@
     ],
     "DefaultHotbarSlot": 0,
     "AttackSequence": "Component_Instruction_Attack_Sequence_Kweebec_DeadWood_Sword",
-    "AttackDistance": 2.0,
+    "AttackDistance": 2.4,
     "MemoriesNameOverride": "Kweebec_DeadWood_Rootling_Sword",
     "NameTranslationKey": "bettermobs.npcRoles.Kweebec_DeadWood_Rootling_Sword.name"
   }

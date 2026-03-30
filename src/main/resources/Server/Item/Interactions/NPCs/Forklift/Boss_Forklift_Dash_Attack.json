@@ -38,7 +38,7 @@
                     "ExtendRight": 1.8,
                     "ExtendBottom": 1.0,
                     "StartDistance": 0.0,
-                    "EndDistance": 2.8
+                    "EndDistance": 3.36
                   },
                   "HitEntity": {
                     "Interactions": [
@@ -68,7 +68,7 @@
                   "RunTime": 0.24,
                   "Selector": {
                     "Id": "AOECircle",
-                    "Range": 2.0
+                    "Range": 2.4
                   },
                   "HitEntity": {
                     "Interactions": [

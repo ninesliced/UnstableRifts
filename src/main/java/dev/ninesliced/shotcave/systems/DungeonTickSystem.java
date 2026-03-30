@@ -576,6 +576,7 @@ public final class DungeonTickSystem extends EntityTickingSystem<EntityStore> {
             var result = NPCPlugin.get().spawnNPC(store, mobId, null, spawnPos, Rotation3f.ZERO);
             Ref<EntityStore> ref = result != null ? result.first() : null;
             if (ref != null) {
+                KweebecScaleHelper.applyScale(store, ref, mobId);
                 obj.setSpawnedMob(ref);
                 room.addSpawnedMob(ref, false);
             }

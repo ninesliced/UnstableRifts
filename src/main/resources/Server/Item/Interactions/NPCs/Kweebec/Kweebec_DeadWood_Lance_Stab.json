@@ -21,8 +21,8 @@
               "ExtendLeft": 0.5,
               "ExtendRight": 0.5,
               "ExtendBottom": 0.5,
-              "StartDistance": 0.5,
-              "EndDistance": 3.5
+              "StartDistance": 0.75,
+              "EndDistance": 5.25
             },
             "HitEntity": {
               "Interactions": [

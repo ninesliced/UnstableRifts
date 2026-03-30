@@ -20,8 +20,8 @@
               "TestLineOfSight": true,
               "ExtendTop": 0.5,
               "ExtendBottom": 0.5,
-              "StartDistance": 0.5,
-              "EndDistance": 3,
+              "StartDistance": 0.75,
+              "EndDistance": 4.5,
               "Length": 90,
               "RollOffset": 0,
               "YawStartOffset": -60

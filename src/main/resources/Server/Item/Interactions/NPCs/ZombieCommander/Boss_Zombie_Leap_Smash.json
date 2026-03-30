@@ -17,11 +17,11 @@
             "RunTime": 0.05,
             "Selector": {
               "Id": "AOECylinder",
-              "Range": 4,
+              "Range": 4.8,
               "Offset": {
                 "Y": -1
               },
-              "Height": 2.5
+              "Height": 3.0
             },
             "HitEntity": {
               "Interactions": [

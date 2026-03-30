@@ -23,7 +23,7 @@
         "Type": "Ability",
         "Description": "Jump to hostile and detonate",
         "Target": "Hostile",
-        "AttackDistanceRange": [2, 3],
+        "AttackDistanceRange": [6, 9],
         "PostExecuteDistanceRange": [0, 1],
         "Ability": "Root_BossNPC_Kweebec_Seedling_Leap_Explode",
         "WeightCoefficient": 5.5,

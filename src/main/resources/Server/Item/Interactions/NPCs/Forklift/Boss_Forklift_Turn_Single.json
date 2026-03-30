@@ -33,7 +33,7 @@
               "ExtendTop": 1,
               "ExtendBottom": 2,
               "StartDistance": 0.1,
-              "EndDistance": 4.0,
+              "EndDistance": 4.8,
               "Length": 180,
               "RollOffset": -30,
               "YawStartOffset": 0
@@ -72,7 +72,7 @@
                           "ExtendTop": 1,
                           "ExtendBottom": 2,
                           "StartDistance": 0.1,
-                          "EndDistance": 4.0,
+                          "EndDistance": 4.8,
                           "Length": 180,
                           "RollOffset": -30,
                           "YawStartOffset": 0

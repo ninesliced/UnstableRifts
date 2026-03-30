@@ -24,7 +24,7 @@
         "Type": "Ability",
         "Description": "Ground slam AOE zone attack",
         "Target": "Hostile",
-        "AttackDistanceRange": [1, 6],
+        "AttackDistanceRange": [1.2, 7.2],
         "PostExecuteDistanceRange": [2, 4],
         "Ability": "Root_Boss_Zombie_Phase_Impact",
         "WeaponSlot": 0,
@@ -55,7 +55,7 @@
         "Type": "Ability",
         "Description": "Spinning fist AOE attack",
         "Target": "Hostile",
-        "AttackDistanceRange": [1, 4.5],
+        "AttackDistanceRange": [1.2, 5.4],
         "PostExecuteDistanceRange": [1.5, 3],
         "Ability": "Root_Boss_Zombie_Fist_AOE",
         "WeaponSlot": 0,
@@ -86,7 +86,7 @@
         "Type": "Ability",
         "Description": "Leap to distant target and slam the ground",
         "Target": "Hostile",
-        "AttackDistanceRange": [2, 16],
+        "AttackDistanceRange": [2.4, 19.2],
         "PostExecuteDistanceRange": [1, 3],
         "Ability": "Root_Boss_Zombie_Leap_Attack",
         "WeaponSlot": 0,
@@ -166,7 +166,7 @@
           },
           "Randomise": false,
           "UseProjectedDistance": true,
-          "MaxRange": 2.8,
+          "MaxRange": 3.36,
           "Timeout": 0.3,
           "CooldownRange": [0.5, 0.8]
         }
@@ -179,7 +179,7 @@
           ],
           "Randomise": false,
           "UseProjectedDistance": true,
-          "MaxRange": 2.5,
+          "MaxRange": 3.0,
           "Timeout": 0.3,
           "CooldownRange": [0.4, 0.7]
         }

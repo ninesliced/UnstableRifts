@@ -66,6 +66,7 @@ import dev.ninesliced.shotcave.party.PartyUiPage;
 import dev.ninesliced.shotcave.systems.DeathComponent;
 import dev.ninesliced.shotcave.systems.DeathMovementController;
 import dev.ninesliced.shotcave.systems.DeathStateController;
+import dev.ninesliced.shotcave.systems.KweebecScaleHelper;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.IOException;
@@ -1658,6 +1659,7 @@ public final class GameManager {
                         var mobResult = NPCPlugin.get().spawnNPC(store, mobId, null, spawnPos, Rotation3f.ZERO);
                         Ref<EntityStore> mobRef = mobResult != null ? mobResult.first() : null;
                         if (mobRef != null) {
+                            KweebecScaleHelper.applyScale(store, mobRef, mobId);
                             room.addSpawnedMob(mobRef);
                             totalSpawned++;
                             UUIDComponent uuidComp = store.getComponent(mobRef, UUIDComponent.getComponentType());
@@ -1688,6 +1690,7 @@ public final class GameManager {
                 var mobResult = NPCPlugin.get().spawnNPC(store, p.mobId(), null, spawnPos, Rotation3f.ZERO);
                 Ref<EntityStore> mobRef = mobResult != null ? mobResult.first() : null;
                 if (mobRef != null) {
+                    KweebecScaleHelper.applyScale(store, mobRef, p.mobId());
                     room.addSpawnedMob(mobRef);
                     UUIDComponent uuidComp = store.getComponent(mobRef, UUIDComponent.getComponentType());
                     if (uuidComp != null) {

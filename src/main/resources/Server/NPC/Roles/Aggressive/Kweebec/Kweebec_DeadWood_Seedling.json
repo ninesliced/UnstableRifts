@@ -3,6 +3,7 @@
   "Reference": "Template_Kweebec_DeadWood",
   "Modify": {
     "Appearance": "Kweebec_DeadWood_Seedling",
+    "AttackDistance": 4.5,
     "MemoriesNameOverride": "Kweebec_DeadWood_Seedling",
     "NameTranslationKey": "bettermobs.npcRoles.Kweebec_DeadWood_Seedling.name"
   }

@@ -77,6 +77,11 @@ public final class PrefabSpawnTrackingSystem extends EntityTickingSystem<EntityS
 
         Ref<EntityStore> npcRef = archetypeChunk.getReferenceTo(index);
         if (npcRef.isValid()) {
+            // Apply Kweebec scale if applicable
+            NPCEntity npcEntity = archetypeChunk.getComponent(index, NPCEntity.getComponentType());
+            if (npcEntity != null) {
+                KweebecScaleHelper.applyScale(store, npcRef, npcEntity.getRoleName());
+            }
             room.addSpawnedMob(npcRef);
             GameManager gameManager = shotcave.getGameManager();
             UUIDComponent uuidComp = store.getComponent(npcRef, UUIDComponent.getComponentType());

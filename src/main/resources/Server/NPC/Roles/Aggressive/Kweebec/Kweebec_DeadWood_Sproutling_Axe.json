@@ -8,7 +8,7 @@
     ],
     "DefaultHotbarSlot": 0,
     "AttackSequence": "Component_Instruction_Attack_Sequence_Kweebec_DeadWood_Axe",
-    "AttackDistance": 2.2,
+    "AttackDistance": 3.3,
     "MemoriesNameOverride": "Kweebec_DeadWood_Sproutling_Axe",
     "NameTranslationKey": "bettermobs.npcRoles.Kweebec_DeadWood_Sproutling_Axe.name"
   }

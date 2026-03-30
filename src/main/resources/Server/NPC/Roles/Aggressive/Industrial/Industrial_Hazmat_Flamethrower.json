@@ -6,7 +6,7 @@
       "Flamethrower_Shotcave"
     ],
     "AttackSequence": "Component_Instruction_Attack_Sequence_Industrial_Hazmat_Flamethrower",
-    "AttackDistance": 7,
+    "AttackDistance": 8.4,
     "MemoriesNameOverride": "Industrial_Hazmat_Flamethrower",
     "NameTranslationKey": "bettermobs.npcRoles.Industrial_Hazmat_Flamethrower.name"
   }

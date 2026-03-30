@@ -8,7 +8,7 @@
     ],
     "DefaultHotbarSlot": 0,
     "AttackSequence": "Component_Instruction_Attack_Sequence_Kweebec_DeadWood_Lance",
-    "AttackDistance": 3.25,
+    "AttackDistance": 4.875,
     "MemoriesNameOverride": "Kweebec_DeadWood_Sproutling_Lance",
     "NameTranslationKey": "bettermobs.npcRoles.Kweebec_DeadWood_Sproutling_Lance.name"
   }

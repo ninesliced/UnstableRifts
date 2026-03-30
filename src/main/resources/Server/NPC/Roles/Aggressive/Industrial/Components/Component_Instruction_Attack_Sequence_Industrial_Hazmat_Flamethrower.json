@@ -3,7 +3,7 @@
   "Interface": "Hytale.Instruction.AttackSequence",
   "Parameters": {
     "AttackDistance": {
-      "Value": 7,
+      "Value": 8.4,
       "Description": "The distance at which the NPC will execute the flamethrower attack"
     },
     "CombatRelativeTurnSpeed": {

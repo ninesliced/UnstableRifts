@@ -84,6 +84,7 @@ import dev.ninesliced.shotcave.systems.DamageEffectVisualCleanupSystem;
 import dev.ninesliced.shotcave.systems.SummonedEffectComponent;
 import dev.ninesliced.shotcave.systems.MeleeBlockBreakSystem;
 import dev.ninesliced.shotcave.systems.MeleeDamageEffectSystem;
+import dev.ninesliced.shotcave.systems.ScaledNPCDamageSystem;
 import dev.ninesliced.shotcave.systems.SummonedNPCDamageEffectSystem;
 import dev.ninesliced.shotcave.systems.CreativeFallDamageSystem;
 import dev.ninesliced.shotcave.systems.VoidSafetySystem;
@@ -265,6 +266,9 @@ public class Shotcave extends JavaPlugin {
 
         // Melee weapon effect/modifier system — applies SC_Effect DoT and WEAPON_DAMAGE scaling
         this.getEntityStoreRegistry().registerSystem(new MeleeDamageEffectSystem());
+
+        // Scaled NPC damage — multiplies damage dealt by scaled-up NPCs (Kweebecs)
+        this.getEntityStoreRegistry().registerSystem(new ScaledNPCDamageSystem());
 
         // Ensure destructible blocks (crates, barrels) break on melee hit
         this.getEntityStoreRegistry().registerSystem(new MeleeBlockBreakSystem());

@@ -3,7 +3,7 @@
   "Interface": "Hytale.Instruction.AttackSequence",
   "Parameters": {
     "AttackDistance": {
-      "Value": 2.5,
+      "Value": 3.0,
       "Description": "The distance at which an NPC will execute attacks"
     },
     "CombatRelativeTurnSpeed": {
