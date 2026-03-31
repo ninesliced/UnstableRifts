@@ -1,5 +1,5 @@
 {
-  "itemId": "Weapon_Kweebec_Launcher_Shotcave",
+  "itemId": "Weapon_Kweebec_Launcher_UnstableRifts",
   "displayName": "Kweebec Launcher",
   "category": "SUMMONING",
   "minRarity": "EPIC",
@@ -16,18 +16,18 @@
     "mobLifetime": 600
   },
   "primary": {
-    "id": "Shotcave_Kweebec_Launcher",
+    "id": "UnstableRifts_Kweebec_Launcher",
     "cooldown": 1.5,
     "requireAmmo": true,
-    "shotId": "Shotcave_Kweebec_Launcher_Shot",
-    "reloadId": "Shotcave_Kweebec_Launcher_Reload"
+    "shotId": "UnstableRifts_Kweebec_Launcher_Shot",
+    "reloadId": "UnstableRifts_Kweebec_Launcher_Reload"
   },
   "reload": {
-    "id": "Shotcave_Kweebec_Launcher_Reload",
+    "id": "UnstableRifts_Kweebec_Launcher_Reload",
     "cooldown": 3.0,
     "runTime": 2.5,
     "amount": 0,
-    "nextId": "Shotcave_Update_Hud",
+    "nextId": "UnstableRifts_Update_Hud",
     "worldSfx": "SFX_Staff_Ice_Shoot",
     "localSfx": "SFX_Staff_Ice_Shoot",
     "maxAmmo": 50

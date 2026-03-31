@@ -1,0 +1,28 @@
+{
+  "TranslationProperties": {
+    "Name": "server.items.Weapon_Crystal_Blunderbuss_Lightning_UnstableRifts.name"
+  },
+  "Categories": [
+    "Items.Weapons"
+  ],
+  "Icon": "Icons/ItemsGenerated/Lightning_Crystal_Blunderbuss.png",
+  "Model": "Items/Weapons/UnstableRifts/Crystal_blunderbuss/CRYSTAL_BLUNDERBUSS.blockymodel",
+  "Texture": "Items/Weapons/UnstableRifts/Crystal_blunderbuss/lightning/LIGHTNING_BLUNDERBUSS_TEXTURE.png",
+  "PlayerAnimationsId": "Rifle",
+  "Interactions": {
+    "Primary": "Root_UnstableRifts_Crystal_Blunderbuss_Lightning_Primary",
+    "Secondary": "Root_UnstableRifts_Crystal_Blunderbuss_Reload"
+  },
+  "Weapon": {},
+  "Tags": {
+    "Type": [
+      "Weapon"
+    ],
+    "Family": [
+      "Gun"
+    ],
+    "Pickup": [
+      "FKey"
+    ]
+  }
+}

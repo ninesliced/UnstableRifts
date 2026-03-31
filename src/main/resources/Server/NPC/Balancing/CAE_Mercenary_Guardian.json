@@ -7,7 +7,10 @@
         "Type": "TimeSinceLastUsed",
         "Curve": {
           "ResponseCurve": "Linear",
-          "XRange": [0, 8]
+          "XRange": [
+            0,
+            8
+          ]
         }
       },
       {
@@ -25,7 +28,10 @@
         "State": "Combat",
         "SubState": "Strafe",
         "Target": "Hostile",
-        "PostExecuteDistanceRange": [1.5, 2.3],
+        "PostExecuteDistanceRange": [
+          1.5,
+          2.3
+        ],
         "WeightCoefficient": 1.8,
         "Conditions": [
           {
@@ -43,7 +49,10 @@
         "State": "Combat",
         "SubState": "Strafe",
         "Target": "Friendly",
-        "PostExecuteDistanceRange": [0.8, 1.8],
+        "PostExecuteDistanceRange": [
+          0.8,
+          1.8
+        ],
         "WeightCoefficient": 2.8,
         "Conditions": [
           {
@@ -66,8 +75,14 @@
         "Target": "Hostile",
         "AbilityType": "Secondary",
         "OffhandSlot": 0,
-        "AttackDistanceRange": [0.5, 10],
-        "PostExecuteDistanceRange": [1.2, 1.8],
+        "AttackDistanceRange": [
+          0.5,
+          10
+        ],
+        "PostExecuteDistanceRange": [
+          1.2,
+          1.8
+        ],
         "Ability": "Root_NPC_Shield_Block",
         "SubState": "Default",
         "ChargeFor": 1.8,
@@ -77,7 +92,10 @@
             "Type": "RecentSustainedDamage",
             "Curve": {
               "ResponseCurve": "InverseExponential",
-              "XRange": [0, 4]
+              "XRange": [
+                0,
+                4
+              ]
             }
           },
           {
@@ -94,7 +112,10 @@
         "Description": "Drink health potion",
         "Target": "Self",
         "WeaponSlot": 1,
-        "AttackDistanceRange": [1, 1],
+        "AttackDistanceRange": [
+          1,
+          1
+        ],
         "Ability": "Root_Secondary_Consume_Potion",
         "WeightCoefficient": 2.6,
         "Conditions": [
@@ -181,7 +202,10 @@
           "UseProjectedDistance": true,
           "MaxRange": 2.8,
           "Timeout": 0.5,
-          "CooldownRange": [0.4, 0.8]
+          "CooldownRange": [
+            0.4,
+            0.8
+          ]
         },
         "Actions": [
           "GuardFriendlyCritical",
@@ -200,7 +224,10 @@
           "UseProjectedDistance": true,
           "MaxRange": 2.6,
           "Timeout": 0.5,
-          "CooldownRange": [0.5, 0.9]
+          "CooldownRange": [
+            0.5,
+            0.9
+          ]
         },
         "Actions": [
           "GuardFriendlyCritical",

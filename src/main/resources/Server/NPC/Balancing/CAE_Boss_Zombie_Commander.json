@@ -8,7 +8,10 @@
         "Type": "TimeSinceLastUsed",
         "Curve": {
           "ResponseCurve": "Linear",
-          "XRange": [0, 4]
+          "XRange": [
+            0,
+            4
+          ]
         }
       },
       {
@@ -24,8 +27,14 @@
         "Type": "Ability",
         "Description": "Ground slam AOE zone attack",
         "Target": "Hostile",
-        "AttackDistanceRange": [1.2, 7.2],
-        "PostExecuteDistanceRange": [2, 4],
+        "AttackDistanceRange": [
+          1.2,
+          7.2
+        ],
+        "PostExecuteDistanceRange": [
+          2,
+          4
+        ],
         "Ability": "Root_Boss_Zombie_Phase_Impact",
         "WeaponSlot": 0,
         "WeightCoefficient": 2.2,
@@ -34,7 +43,10 @@
             "Type": "TargetDistance",
             "Curve": {
               "ResponseCurve": "SimpleDescendingLogistic",
-              "XRange": [0, 8]
+              "XRange": [
+                0,
+                8
+              ]
             }
           },
           {
@@ -55,8 +67,14 @@
         "Type": "Ability",
         "Description": "Spinning fist AOE attack",
         "Target": "Hostile",
-        "AttackDistanceRange": [1.2, 5.4],
-        "PostExecuteDistanceRange": [1.5, 3],
+        "AttackDistanceRange": [
+          1.2,
+          5.4
+        ],
+        "PostExecuteDistanceRange": [
+          1.5,
+          3
+        ],
         "Ability": "Root_Boss_Zombie_Fist_AOE",
         "WeaponSlot": 0,
         "WeightCoefficient": 1.8,
@@ -65,7 +83,10 @@
             "Type": "TargetDistance",
             "Curve": {
               "ResponseCurve": "SimpleDescendingLogistic",
-              "XRange": [0, 6]
+              "XRange": [
+                0,
+                6
+              ]
             }
           },
           {
@@ -86,8 +107,14 @@
         "Type": "Ability",
         "Description": "Leap to distant target and slam the ground",
         "Target": "Hostile",
-        "AttackDistanceRange": [2.4, 19.2],
-        "PostExecuteDistanceRange": [1, 3],
+        "AttackDistanceRange": [
+          2.4,
+          19.2
+        ],
+        "PostExecuteDistanceRange": [
+          1,
+          3
+        ],
         "Ability": "Root_Boss_Zombie_Leap_Attack",
         "WeaponSlot": 0,
         "WeightCoefficient": 2.6,
@@ -105,7 +132,10 @@
             "Type": "TargetDistance",
             "Curve": {
               "ResponseCurve": "Linear",
-              "XRange": [2, 16]
+              "XRange": [
+                2,
+                16
+              ]
             }
           },
           {
@@ -128,7 +158,10 @@
         "State": "Combat",
         "SubState": "Strafe",
         "Target": "Hostile",
-        "PostExecuteDistanceRange": [2, 3.5],
+        "PostExecuteDistanceRange": [
+          2,
+          3.5
+        ],
         "WeightCoefficient": 1.0,
         "Conditions": [
           {
@@ -143,7 +176,12 @@
     },
     "ActionSets": {
       "Default": {
-        "Actions": ["ZoneImpact", "FistSweepAOE", "LeapSlam", "Strafe"],
+        "Actions": [
+          "ZoneImpact",
+          "FistSweepAOE",
+          "LeapSlam",
+          "Strafe"
+        ],
         "BasicAttacks": {
           "Attacks": [
             "Root_Boss_Zombie_Fist_AOE"
@@ -168,11 +206,18 @@
           "UseProjectedDistance": true,
           "MaxRange": 3.36,
           "Timeout": 0.3,
-          "CooldownRange": [0.5, 0.8]
+          "CooldownRange": [
+            0.5,
+            0.8
+          ]
         }
       },
       "Strafe": {
-        "Actions": ["ZoneImpact", "FistSweepAOE", "LeapSlam"],
+        "Actions": [
+          "ZoneImpact",
+          "FistSweepAOE",
+          "LeapSlam"
+        ],
         "BasicAttacks": {
           "Attacks": [
             "Root_NPC_Attack_Melee"
@@ -181,7 +226,10 @@
           "UseProjectedDistance": true,
           "MaxRange": 3.0,
           "Timeout": 0.3,
-          "CooldownRange": [0.4, 0.7]
+          "CooldownRange": [
+            0.4,
+            0.7
+          ]
         }
       }
     }

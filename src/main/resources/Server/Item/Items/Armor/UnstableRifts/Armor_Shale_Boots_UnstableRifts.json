@@ -1,0 +1,15 @@
+{
+  "Parent": "Armor_Iron_Legs",
+  "TranslationProperties": {
+    "Name": "server.items.Armor_Shale_Boots_UnstableRifts.name"
+  },
+  "MaxDurability": 0,
+  "Tags": {
+    "Type": [
+      "Armor"
+    ],
+    "Pickup": [
+      "FKey"
+    ]
+  }
+}

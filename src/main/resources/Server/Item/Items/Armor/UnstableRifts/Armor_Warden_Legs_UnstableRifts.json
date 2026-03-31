@@ -1,0 +1,15 @@
+{
+  "Parent": "Armor_Steel_Hands",
+  "TranslationProperties": {
+    "Name": "server.items.Armor_Warden_Legs_UnstableRifts.name"
+  },
+  "MaxDurability": 0,
+  "Tags": {
+    "Type": [
+      "Armor"
+    ],
+    "Pickup": [
+      "FKey"
+    ]
+  }
+}

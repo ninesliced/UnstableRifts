@@ -1,0 +1,15 @@
+{
+  "Parent": "Armor_Adamantite_Chest",
+  "TranslationProperties": {
+    "Name": "server.items.Armor_Void_Chest_UnstableRifts.name"
+  },
+  "MaxDurability": 0,
+  "Tags": {
+    "Type": [
+      "Armor"
+    ],
+    "Pickup": [
+      "FKey"
+    ]
+  }
+}

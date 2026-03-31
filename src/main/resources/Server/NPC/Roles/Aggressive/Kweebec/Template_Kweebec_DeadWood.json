@@ -3,8 +3,14 @@
   "StartState": "Idle",
   "DefaultNPCAttitude": "Ignore",
   "DefaultPlayerAttitude": "Hostile",
-  "AttitudeGroup": { "Compute": "AttitudeGroup" },
-  "BusyStates": [ "Chase", "Search", "ReturnHome" ],
+  "AttitudeGroup": {
+    "Compute": "AttitudeGroup"
+  },
+  "BusyStates": [
+    "Chase",
+    "Search",
+    "ReturnHome"
+  ],
   "Parameters": {
     "Appearance": {
       "Value": "Kweebec_DeadWood",
@@ -43,7 +49,10 @@
       "Description": "Minimum player distance before leash can force return"
     },
     "LeashTimer": {
-      "Value": [8, 8],
+      "Value": [
+        8,
+        8
+      ],
       "Description": "Time spent out of leash range before returning"
     },
     "HardLeashDistance": {
@@ -51,7 +60,7 @@
       "Description": "Absolute max distance from spawn"
     },
     "DropList": {
-      "Value": "Drop_Shotcave_DeadWood_Combat",
+      "Value": "Drop_UnstableRifts_DeadWood_Combat",
       "Description": "Drop items"
     },
     "MaxSpeed": {
@@ -80,11 +89,16 @@
       "Description": "Distance at which attacks are executed"
     },
     "TargetGroups": {
-      "Value": ["Kweebec_DeadWood"],
+      "Value": [
+        "Kweebec_DeadWood"
+      ],
       "Description": "Beacon target groups"
     },
     "DisableDamageGroups": {
-      "Value": ["Self", "Kweebec_DeadWood"],
+      "Value": [
+        "Self",
+        "Kweebec_DeadWood"
+      ],
       "Description": "Groups not to take damage from"
     },
     "AttitudeGroup": {
@@ -116,19 +130,35 @@
       "Description": "Translation key for NPC name display"
     }
   },
-  "IsMemory": { "Compute": "IsMemory" },
-  "MemoriesCategory": { "Compute": "MemoriesCategory" },
-  "MemoriesNameOverride": { "Compute": "MemoriesNameOverride" },
-  "Appearance": { "Compute": "Appearance" },
-  "DropList": { "Compute": "DropList" },
-  "DisableDamageGroups": { "Compute": "DisableDamageGroups" },
-  "HotbarItems": { "Compute": "Weapons" },
+  "IsMemory": {
+    "Compute": "IsMemory"
+  },
+  "MemoriesCategory": {
+    "Compute": "MemoriesCategory"
+  },
+  "MemoriesNameOverride": {
+    "Compute": "MemoriesNameOverride"
+  },
+  "Appearance": {
+    "Compute": "Appearance"
+  },
+  "DropList": {
+    "Compute": "DropList"
+  },
+  "DisableDamageGroups": {
+    "Compute": "DisableDamageGroups"
+  },
+  "HotbarItems": {
+    "Compute": "Weapons"
+  },
   "HotbarSize": 3,
   "KnockbackScale": 0.5,
   "MotionControllerList": [
     {
       "Type": "Walk",
-      "MaxWalkSpeed": { "Compute": "MaxSpeed" },
+      "MaxWalkSpeed": {
+        "Compute": "MaxSpeed"
+      },
       "Gravity": 10,
       "RunThreshold": 0.3,
       "MaxFallSpeed": 15,
@@ -137,7 +167,9 @@
       "MinJumpHeight": 0.8
     }
   ],
-  "MaxHealth": { "Compute": "MaxHealth" },
+  "MaxHealth": {
+    "Compute": "MaxHealth"
+  },
   "Instructions": [
     {
       "Continue": true,
@@ -150,7 +182,9 @@
           "Type": "Inventory",
           "Operation": "EquipHotbar",
           "UseTarget": false,
-          "Slot": { "Compute": "DefaultHotbarSlot" }
+          "Slot": {
+            "Compute": "DefaultHotbarSlot"
+          }
         }
       ]
     },
@@ -160,7 +194,9 @@
         "Type": "Beacon",
         "Message": "KweebecDeadWood_EnemyFound",
         "TargetSlot": "LockedTarget",
-        "Range": { "Compute": "HearingRange * 2" }
+        "Range": {
+          "Compute": "HearingRange * 2"
+        }
       },
       "Actions": [
         {
@@ -178,27 +214,46 @@
         {
           "Reference": "Component_Instruction_Damage_Check",
           "Modify": {
-            "_ExportStates": ["Chase", "Search"],
-            "AlertedRange": { "Compute": "AlertedRange" }
+            "_ExportStates": [
+              "Chase",
+              "Search"
+            ],
+            "AlertedRange": {
+              "Compute": "AlertedRange"
+            }
           }
         },
         {
           "Sensor": {
             "Reference": "Component_Sensor_Standard_Detection",
             "Modify": {
-              "ViewRange": { "Compute": "ViewRange" },
-              "ViewSector": { "Compute": "ViewSector" },
-              "HearingRange": { "Compute": "HearingRange" },
-              "AbsoluteDetectionRange": { "Compute": "AbsoluteDetectionRange" },
-              "Attitudes": ["Hostile"]
+              "ViewRange": {
+                "Compute": "ViewRange"
+              },
+              "ViewSector": {
+                "Compute": "ViewSector"
+              },
+              "HearingRange": {
+                "Compute": "HearingRange"
+              },
+              "AbsoluteDetectionRange": {
+                "Compute": "AbsoluteDetectionRange"
+              },
+              "Attitudes": [
+                "Hostile"
+              ]
             }
           },
           "Actions": [
             {
               "Type": "Beacon",
-              "Range": { "Compute": "HearingRange * 2" },
+              "Range": {
+                "Compute": "HearingRange * 2"
+              },
               "Message": "KweebecDeadWood_EnemyFound",
-              "TargetGroups": { "Compute": "TargetGroups" },
+              "TargetGroups": {
+                "Compute": "TargetGroups"
+              },
               "SendTargetSlot": "LockedTarget"
             },
             {
@@ -208,8 +263,12 @@
           ]
         },
         {
-          "Reference": { "Compute": "IdleMotionComponent" },
-          "Interfaces": ["Hytale.Instruction.Intelligent.Idle.Motion"]
+          "Reference": {
+            "Compute": "IdleMotionComponent"
+          },
+          "Interfaces": [
+            "Hytale.Instruction.Intelligent.Idle.Motion"
+          ]
         }
       ]
     },
@@ -228,9 +287,13 @@
           "Actions": [
             {
               "Type": "Beacon",
-              "Range": { "Compute": "HearingRange * 2" },
+              "Range": {
+                "Compute": "HearingRange * 2"
+              },
               "Message": "KweebecDeadWood_EnemyFound",
-              "TargetGroups": { "Compute": "TargetGroups" },
+              "TargetGroups": {
+                "Compute": "TargetGroups"
+              },
               "SendTargetSlot": "LockedTarget"
             }
           ]
@@ -262,11 +325,21 @@
               {
                 "Reference": "Component_Sensor_Standard_Detection",
                 "Modify": {
-                  "ViewRange": { "Compute": "AlertedRange" },
-                  "ViewSector": { "Compute": "ViewSector" },
-                  "HearingRange": { "Compute": "HearingRange" },
-                  "AbsoluteDetectionRange": { "Compute": "AbsoluteDetectionRange" },
-                  "Attitudes": ["Hostile"]
+                  "ViewRange": {
+                    "Compute": "AlertedRange"
+                  },
+                  "ViewSector": {
+                    "Compute": "ViewSector"
+                  },
+                  "HearingRange": {
+                    "Compute": "HearingRange"
+                  },
+                  "AbsoluteDetectionRange": {
+                    "Compute": "AbsoluteDetectionRange"
+                  },
+                  "Attitudes": [
+                    "Hostile"
+                  ]
                 }
               },
               {
@@ -281,30 +354,59 @@
             {
               "Reference": "Component_Instruction_Target_Adjusted_Attack_Melee",
               "Modify": {
-                "TargetSwitchTimer": [2, 4],
-                "AttackSequence": { "Compute": "AttackSequence" },
-                "AttackDistance": { "Compute": "AttackDistance" },
+                "TargetSwitchTimer": [
+                  2,
+                  4
+                ],
+                "AttackSequence": {
+                  "Compute": "AttackSequence"
+                },
+                "AttackDistance": {
+                  "Compute": "AttackDistance"
+                },
                 "TargetRange": 4,
-                "CombatRelativeTurnSpeed": { "Compute": "CombatRelativeTurnSpeed" }
+                "CombatRelativeTurnSpeed": {
+                  "Compute": "CombatRelativeTurnSpeed"
+                }
               }
             },
             {
               "Reference": "Component_Instruction_Soft_Leash",
               "Modify": {
-                "_ExportStates": ["ReturnHome"],
-                "LeashDistance": { "Compute": "LeashDistance" },
-                "LeashMinPlayerDistance": { "Compute": "LeashMinPlayerDistance" },
-                "LeashTimer": { "Compute": "LeashTimer" },
-                "HardLeashDistance": { "Compute": "HardLeashDistance" }
+                "_ExportStates": [
+                  "ReturnHome"
+                ],
+                "LeashDistance": {
+                  "Compute": "LeashDistance"
+                },
+                "LeashMinPlayerDistance": {
+                  "Compute": "LeashMinPlayerDistance"
+                },
+                "LeashTimer": {
+                  "Compute": "LeashTimer"
+                },
+                "HardLeashDistance": {
+                  "Compute": "HardLeashDistance"
+                }
               }
             },
             {
               "Reference": "Component_Instruction_Intelligent_Chase",
               "Modify": {
-                "_ExportStates": ["Search", "ReturnHome", "ReturnHome"],
-                "ViewRange": { "Compute": "AlertedRange" },
-                "HearingRange": { "Compute": "HearingRange" },
-                "RelativeSpeed": { "Compute": "RelativeChaseSpeed" }
+                "_ExportStates": [
+                  "Search",
+                  "ReturnHome",
+                  "ReturnHome"
+                ],
+                "ViewRange": {
+                  "Compute": "AlertedRange"
+                },
+                "HearingRange": {
+                  "Compute": "HearingRange"
+                },
+                "RelativeSpeed": {
+                  "Compute": "RelativeChaseSpeed"
+                }
               }
             }
           ]
@@ -352,9 +454,13 @@
           "Actions": [
             {
               "Type": "Beacon",
-              "Range": { "Compute": "HearingRange * 2" },
+              "Range": {
+                "Compute": "HearingRange * 2"
+              },
               "Message": "KweebecDeadWood_EnemyFound",
-              "TargetGroups": { "Compute": "TargetGroups" },
+              "TargetGroups": {
+                "Compute": "TargetGroups"
+              },
               "SendTargetSlot": "LockedTarget"
             }
           ]
@@ -362,10 +468,21 @@
         {
           "Reference": "Component_Instruction_Generic_Search",
           "Modify": {
-            "_ExportStates": ["Chase", "Chase", "Search", "Idle"],
-            "ViewRange": { "Compute": "ViewRange" },
-            "ViewSector": { "Compute": "ViewSector" },
-            "HearingRange": { "Compute": "HearingRange" }
+            "_ExportStates": [
+              "Chase",
+              "Chase",
+              "Search",
+              "Idle"
+            ],
+            "ViewRange": {
+              "Compute": "ViewRange"
+            },
+            "ViewSector": {
+              "Compute": "ViewSector"
+            },
+            "HearingRange": {
+              "Compute": "HearingRange"
+            }
           }
         }
       ]
@@ -379,7 +496,9 @@
         {
           "Sensor": {
             "Type": "Leash",
-            "Range": { "Compute": "LeashDistance * 0.3" }
+            "Range": {
+              "Compute": "LeashDistance * 0.3"
+            }
           },
           "BodyMotion": {
             "Type": "Seek",
@@ -400,5 +519,7 @@
       ]
     }
   ],
-  "NameTranslationKey": { "Compute": "NameTranslationKey" }
+  "NameTranslationKey": {
+    "Compute": "NameTranslationKey"
+  }
 }

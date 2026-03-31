@@ -1,0 +1,15 @@
+{
+  "Parent": "Armor_Iron_Head",
+  "TranslationProperties": {
+    "Name": "server.items.Armor_Shale_Head_UnstableRifts.name"
+  },
+  "MaxDurability": 0,
+  "Tags": {
+    "Type": [
+      "Armor"
+    ],
+    "Pickup": [
+      "FKey"
+    ]
+  }
+}

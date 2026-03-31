@@ -1,0 +1,41 @@
+{
+  "TranslationProperties": {
+    "Name": "server.items.UnstableRifts_Mob_Clear_Activator.name",
+    "Description": "server.items.UnstableRifts_Mob_Clear_Activator.description"
+  },
+  "Icon": "Icons/ItemsGenerated/UnstableRifts_Marker_Mob_Clear_Activator.png",
+  "Quality": "Technical",
+  "Categories": [
+    "Tool.Block"
+  ],
+  "BlockType": {
+    "DrawType": "Cube",
+    "Textures": [
+      {
+        "Weight": 1,
+        "All": "BlockTextures/UnstableRifts_Marker_Mob_Clear_Activator.png"
+      }
+    ],
+    "Opacity": "Transparent",
+    "Group": "@Tech",
+    "State": {
+      "Id": "unstablerifts_mob_clear_activator"
+    },
+    "Flags": {
+      "IsUsable": false
+    },
+    "BlockParticleSetId": "Stone",
+    "BlockSoundSetId": "Stone"
+  },
+  "PlayerAnimationsId": "Block",
+  "Tags": {
+    "Type": [
+      "DungeonMarker",
+      "UnstableRifts"
+    ],
+    "Marker": [
+      "MobClearActivator"
+    ]
+  },
+  "ItemSoundSetId": "ISS_Blocks_Stone"
+}

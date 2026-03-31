@@ -1,0 +1,86 @@
+{
+  "Type": "Generic",
+  "Appearance": "UnstableRifts_Void_Portal",
+  "DefaultNPCAttitude": "Ignore",
+  "DefaultPlayerAttitude": "Ignore",
+  "AttitudeGroup": "Empty",
+  "Invulnerable": true,
+  "KnockbackScale": 0,
+  "DisableDamageGroups": [
+    "Player",
+    "Self"
+  ],
+  "MotionControllerList": [
+    {
+      "Type": "Walk",
+      "MaxWalkSpeed": 1,
+      "Gravity": 10,
+      "MaxFallSpeed": 15,
+      "Acceleration": 1
+    }
+  ],
+  "MaxHealth": {
+    "Compute": "MaxHealth"
+  },
+  "Parameters": {
+    "MaxHealth": {
+      "Value": 1,
+      "Description": "Portal health (invulnerable)."
+    },
+    "DespawnTimer": {
+      "Value": 5,
+      "Description": "Portal lasts 5 seconds before despawning."
+    }
+  },
+  "Instructions": [
+    {
+      "Continue": true,
+      "Instructions": [
+        {
+          "Continue": true,
+          "Sensor": {
+            "Type": "Any",
+            "Once": true
+          },
+          "Actions": [
+            {
+              "Type": "TimerStart",
+              "Name": "DespawnTimer",
+              "StartValueRange": {
+                "Compute": "makeRange(DespawnTimer)"
+              },
+              "RestartValueRange": {
+                "Compute": "makeRange(DespawnTimer)"
+              }
+            }
+          ]
+        },
+        {
+          "Sensor": {
+            "Type": "Timer",
+            "Name": "DespawnTimer",
+            "State": "Stopped"
+          },
+          "Actions": [
+            {
+              "Type": "Despawn"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Instructions": [
+        {
+          "Sensor": {
+            "Type": "Any"
+          },
+          "BodyMotion": {
+            "Type": "Nothing"
+          }
+        }
+      ]
+    }
+  ],
+  "NameTranslationKey": "server.npcRoles.UnstableRifts_Void_Portal.name"
+}

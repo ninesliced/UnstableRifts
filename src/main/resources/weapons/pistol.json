@@ -1,5 +1,5 @@
 {
-  "itemId": "Weapon_Pistol_Shotcave",
+  "itemId": "Weapon_Pistol_UnstableRifts",
   "displayName": "Pistol",
   "category": "LASER",
   "minRarity": "BASIC",
@@ -11,24 +11,24 @@
     "knockback": 0
   },
   "primary": {
-    "id": "Shotcave_Pistol_Primary",
+    "id": "UnstableRifts_Pistol_Primary",
     "cooldown": 0.2,
     "requireAmmo": true,
-    "shotId": "Shotcave_Pistol_Shot",
-    "reloadId": "Shotcave_Pistol_Reload"
+    "shotId": "UnstableRifts_Pistol_Shot",
+    "reloadId": "UnstableRifts_Pistol_Reload"
   },
   "reload": {
-    "id": "Shotcave_Pistol_Reload",
+    "id": "UnstableRifts_Pistol_Reload",
     "cooldown": 0.7,
     "runTime": 0.65,
     "amount": 0,
-    "nextId": "Shotcave_Update_Hud",
+    "nextId": "UnstableRifts_Update_Hud",
     "worldSfx": "SFX_Blunderbuss_Fire",
     "localSfx": "SFX_Blunderbuss_Fire_Local",
     "maxAmmo": 120
   },
   "damage": {
-    "id": "Shotcave_Pistol_Projectile_Hit",
+    "id": "UnstableRifts_Pistol_Projectile_Hit",
     "amount": 14,
     "type": "Projectile",
     "worldSfx": "SFX_Blunderbuss_Hit",
@@ -37,6 +37,6 @@
     "particleYOffset": 0.8
   },
   "extraRoots": [
-    "Shotcave_Projectile_Miss"
+    "UnstableRifts_Projectile_Miss"
   ]
 }

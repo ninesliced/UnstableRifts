@@ -16,31 +16,63 @@
     "FarLeapAttack": "Root_Boss_Zombie_Leap_Attack",
     "LeapDistance": 3.6,
     "AttackDistance": 3.12,
-    "DesiredAttackDistanceRange": [1.92, 2.64],
-    "AttackPauseRange": [0.4, 0.8],
-    "CombatAttackPostDelay": [0.2, 0.45],
+    "DesiredAttackDistanceRange": [
+      1.92,
+      2.64
+    ],
+    "AttackPauseRange": [
+      0.4,
+      0.8
+    ],
+    "CombatAttackPostDelay": [
+      0.2,
+      0.45
+    ],
     "CombatBackOffAfterAttack": false,
     "CombatRelativeTurnSpeed": 2.0,
     "CombatBehaviorDistance": 16,
     "CombatDirectWeight": 12,
     "CombatAlwaysMovingWeight": 8,
     "CombatStrafeWeight": 8,
-    "CombatStrafingDurationRange": [0.8, 1.5],
-    "CombatStrafingFrequencyRange": [1.5, 2.5],
+    "CombatStrafingDurationRange": [
+      0.8,
+      1.5
+    ],
+    "CombatStrafingFrequencyRange": [
+      1.5,
+      2.5
+    ],
     "ChaseRelativeSpeed": 0.85,
     "CombatMovingRelativeSpeed": 0.65,
     "CombatBackwardsRelativeSpeed": 0.35,
     "SummonKind": "Zombie",
-    "SummonCountRange": [2, 3],
-    "SummonDistanceRange": [3, 6],
-    "SummonDelayRange": [0, 0],
-    "SummonCooldownRange": [16, 22],
-    "SummonCastTimeRange": [1.2, 1.8],
+    "SummonCountRange": [
+      2,
+      3
+    ],
+    "SummonDistanceRange": [
+      3,
+      6
+    ],
+    "SummonDelayRange": [
+      0,
+      0
+    ],
+    "SummonCooldownRange": [
+      16,
+      22
+    ],
+    "SummonCastTimeRange": [
+      1.2,
+      1.8
+    ],
     "SummonAnimation": "Alerted",
     "Weapons": [],
     "DefaultHotbarSlot": 0,
     "DefaultPlayerAttitude": "Hostile",
-    "DisableDamageGroups": ["Self"],
+    "DisableDamageGroups": [
+      "Self"
+    ],
     "LeashDistance": 60,
     "HardLeashDistance": 300,
     "IsMemory": true,

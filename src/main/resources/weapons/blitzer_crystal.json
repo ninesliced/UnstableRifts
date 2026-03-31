@@ -1,5 +1,5 @@
 {
-  "itemId": "Weapon_Blitzer_Crystal_Shotcave",
+  "itemId": "Weapon_Blitzer_Crystal_UnstableRifts",
   "displayName": "Blitzer Crystal",
   "category": "LASER",
   "minRarity": "BASIC",
@@ -12,24 +12,24 @@
     "knockback": 0
   },
   "primary": {
-    "id": "Shotcave_Blitzer_Crystal_Primary",
+    "id": "UnstableRifts_Blitzer_Crystal_Primary",
     "cooldown": 3.0,
     "requireAmmo": true,
-    "shotId": "Shotcave_Blitzer_Crystal_Shot",
-    "reloadId": "Shotcave_Blitzer_Crystal_Reload"
+    "shotId": "UnstableRifts_Blitzer_Crystal_Shot",
+    "reloadId": "UnstableRifts_Blitzer_Crystal_Reload"
   },
   "reload": {
-    "id": "Shotcave_Blitzer_Crystal_Reload",
+    "id": "UnstableRifts_Blitzer_Crystal_Reload",
     "cooldown": 1.4,
     "runTime": 1.25,
     "amount": 0,
-    "nextId": "Shotcave_Update_Hud",
+    "nextId": "UnstableRifts_Update_Hud",
     "worldSfx": "SFX_Rifle_Fire",
     "localSfx": "SFX_Rifle_Fire_Local",
     "maxAmmo": 50
   },
   "damage": {
-    "id": "Shotcave_Blitzer_Crystal_Beam_Damage",
+    "id": "UnstableRifts_Blitzer_Crystal_Beam_Damage",
     "amount": 8,
     "type": "Projectile",
     "worldSfx": "SFX_Arrow_FullCharge_Hit",
@@ -38,6 +38,6 @@
     "particleYOffset": 0
   },
   "extraRoots": [
-    "Shotcave_Projectile_Miss"
+    "UnstableRifts_Projectile_Miss"
   ]
 }

@@ -1,0 +1,28 @@
+{
+  "TranslationProperties": {
+    "Name": "server.items.Weapon_Crystal_Musket_Void_UnstableRifts.name"
+  },
+  "Categories": [
+    "Items.Weapons"
+  ],
+  "Icon": "Icons/ItemsGenerated/Void_Crystal_Musket.png",
+  "Model": "Items/Weapons/UnstableRifts/Musket/MUSKET_CRYSTAL.blockymodel",
+  "Texture": "Items/Weapons/UnstableRifts/Musket/VOID_MUSKET_TEXTURE.png",
+  "PlayerAnimationsId": "Rifle",
+  "Interactions": {
+    "Primary": "Root_UnstableRifts_Crystal_Musket_Void_Primary",
+    "Secondary": "Root_UnstableRifts_Crystal_Musket_Reload"
+  },
+  "Weapon": {},
+  "Tags": {
+    "Type": [
+      "Weapon"
+    ],
+    "Family": [
+      "Gun"
+    ],
+    "Pickup": [
+      "FKey"
+    ]
+  }
+}

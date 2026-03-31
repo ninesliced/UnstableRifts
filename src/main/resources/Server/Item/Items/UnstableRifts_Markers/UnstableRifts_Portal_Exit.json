@@ -1,0 +1,41 @@
+{
+  "TranslationProperties": {
+    "Name": "server.items.UnstableRifts_Portal_Exit.name",
+    "Description": "server.items.UnstableRifts_Portal_Exit.description"
+  },
+  "Icon": "Icons/ItemsGenerated/UnstableRifts_Marker_Portal_Exit.png",
+  "Quality": "Technical",
+  "Categories": [
+    "Tool.Block"
+  ],
+  "BlockType": {
+    "DrawType": "Cube",
+    "Textures": [
+      {
+        "Weight": 1,
+        "All": "BlockTextures/UnstableRifts_Marker_Portal_Exit.png"
+      }
+    ],
+    "Opacity": "Transparent",
+    "Group": "@Tech",
+    "State": {
+      "Id": "unstablerifts_portal_exit"
+    },
+    "Flags": {
+      "IsUsable": false
+    },
+    "BlockParticleSetId": "Stone",
+    "BlockSoundSetId": "Stone"
+  },
+  "PlayerAnimationsId": "Block",
+  "Tags": {
+    "Type": [
+      "DungeonMarker",
+      "UnstableRifts"
+    ],
+    "Marker": [
+      "PortalExit"
+    ]
+  },
+  "ItemSoundSetId": "ISS_Blocks_Stone"
+}

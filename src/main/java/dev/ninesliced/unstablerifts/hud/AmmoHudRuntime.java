@@ -1,0 +1,108 @@
+package dev.ninesliced.unstablerifts.hud;
+
+import com.hypixel.hytale.component.Ref;
+import com.hypixel.hytale.server.core.HytaleServer;
+import com.hypixel.hytale.server.core.entity.entities.Player;
+import com.hypixel.hytale.server.core.entity.movement.MovementStatesComponent;
+import com.hypixel.hytale.server.core.event.events.player.PlayerDisconnectEvent;
+import com.hypixel.hytale.server.core.inventory.ItemStack;
+import com.hypixel.hytale.server.core.universe.PlayerRef;
+import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import dev.ninesliced.unstablerifts.UnstableRifts;
+import dev.ninesliced.unstablerifts.player.OnlinePlayers;
+
+import javax.annotation.Nonnull;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+
+/**
+ * Keeps ammo HUD synchronized outside of interactions.
+ */
+public final class AmmoHudRuntime {
+    private ScheduledFuture<?> hudPollTask;
+
+    public void start(@Nonnull UnstableRifts plugin) {
+        plugin.getEventRegistry().registerGlobal(PlayerDisconnectEvent.class, this::onPlayerDisconnect);
+        startHudPoller();
+    }
+
+    public void stop() {
+        if (this.hudPollTask != null) {
+            this.hudPollTask.cancel(false);
+            this.hudPollTask = null;
+        }
+    }
+
+    public void onPlayerConnect(@Nonnull PlayerRef playerRef) {
+        AmmoHudService.clear(playerRef);
+        refreshHeldItemHud(playerRef);
+    }
+
+    private void onPlayerDisconnect(@Nonnull PlayerDisconnectEvent event) {
+        AmmoHudService.clear(event.getPlayerRef());
+    }
+
+    private void startHudPoller() {
+        if (this.hudPollTask != null) {
+            this.hudPollTask.cancel(false);
+        }
+        this.hudPollTask = HytaleServer.SCHEDULED_EXECUTOR.scheduleAtFixedRate(this::pollPlayersHud, 200L, 200L, TimeUnit.MILLISECONDS);
+    }
+
+    private void pollPlayersHud() {
+        for (PlayerRef playerRef : OnlinePlayers.snapshot()) {
+            refreshHeldItemHud(playerRef);
+        }
+    }
+
+    private void refreshHeldItemHud(@Nonnull PlayerRef playerRef) {
+        if (!playerRef.isValid()) {
+            return;
+        }
+        Ref<EntityStore> ref = playerRef.getReference();
+        if (ref == null || !ref.isValid()) {
+            return;
+        }
+        ref.getStore().getExternalData().getWorld().execute(() -> {
+            if (!ref.isValid()) {
+                return;
+            }
+            Player player = ref.getStore().getComponent(ref, Player.getComponentType());
+            if (player == null || player.wasRemoved()) {
+                return;
+            }
+
+            boolean crouching = false;
+            MovementStatesComponent movementStates = ref.getStore().getComponent(
+                    ref, MovementStatesComponent.getComponentType());
+            if (movementStates != null) {
+                crouching = movementStates.getMovementStates().crouching;
+            }
+
+            ItemStack heldItem = null;
+            if (player.getInventory() != null) {
+                heldItem = player.getInventory().getItemInHand();
+            }
+            AmmoHudService.updateForHeldItem(player, playerRef, heldItem, crouching, ref);
+        });
+    }
+
+    private void refreshHeldItemHud(@Nonnull Player player) {
+        Ref<EntityStore> ref = player.getReference();
+        if (ref == null || !ref.isValid()) {
+            return;
+        }
+
+        PlayerRef playerRef = ref.getStore().getComponent(ref, PlayerRef.getComponentType());
+        if (playerRef == null || !playerRef.isValid()) {
+            return;
+        }
+
+        ItemStack heldItem = null;
+        if (player.getInventory() != null) {
+            heldItem = player.getInventory().getItemInHand();
+        }
+
+        AmmoHudService.updateForHeldItem(player, playerRef, heldItem);
+    }
+}

@@ -1,0 +1,56 @@
+{
+  "Type": "ModularGunShoot",
+  "RunTime": 0.05,
+  "Effects": {
+    "ItemAnimationId": "Shoot",
+    "WorldSoundEventId": "SFX_Handgun_Fire",
+    "LocalSoundEventId": "SFX_Handgun_Fire_Local",
+    "FirstPersonParticles": [
+      {
+        "SystemId": "RifleShooting",
+        "PositionOffset": {
+          "X": -0.08,
+          "Z": 0.9,
+          "Y": 0.1
+        },
+        "RotationOffset": {
+          "Yaw": 0,
+          "Pitch": 90
+        }
+      }
+    ],
+    "Particles": [
+      {
+        "SystemId": "RifleShooting",
+        "PositionOffset": {
+          "Z": 0.85,
+          "Y": 0.15
+        },
+        "RotationOffset": {
+          "Pitch": 90
+        }
+      }
+    ]
+  },
+  "DamageRoot": "Root_UnstableRifts_Pistol_Projectile_Hit",
+  "MissRoot": "Root_UnstableRifts_Projectile_Miss",
+  "Range": 45,
+  "Pellets": 1,
+  "SpreadDegrees": 0.35,
+  "TrailParticleId": "UnstableRifts_ElectricBeam",
+  "TrailStepDistance": 0.9,
+  "TrailScale": 0.18,
+  "TrailColorR": 255,
+  "TrailColorG": 255,
+  "TrailColorB": 255,
+  "ImpactParticleId": "RifleShooting_Impact",
+  "ImpactParticleScale": 0.4,
+  "MuzzleHeightOffset": 1.35,
+  "MuzzleForwardOffset": -1.3,
+  "MuzzleRightOffset": 0.35,
+  "UseAmmo": true,
+  "MaxAmmo": 120,
+  "AmmoPerShot": 1,
+  "AimAssist": true,
+  "Next": "UnstableRifts_Update_Hud"
+}

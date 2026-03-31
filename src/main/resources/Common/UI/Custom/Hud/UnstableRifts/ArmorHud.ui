@@ -1,0 +1,225 @@
+// ─────────────────────────────────────────────
+//  UnstableRifts — Armor Status HUD
+//  Always-visible compact HUD to the right of the weapon HUD
+//  Shows set info, piece count, ability charge; expands on crouch
+// ─────────────────────────────────────────────
+
+@DimText = #8a9bb0;
+@BrightText = #e8ecf0;
+@BarTrack = #1a1f2a;
+@PanelBg = #0c0f14(0.85);
+@ModGreen = #3e9049;
+@AccentDefault = #6b7d94;
+@SepColor = #1e2535;
+@SetBonusColor = #bb8a2c;
+@ReadyColor = #3e9049;
+@ActiveColor = #d4534a;
+@AbilityBar = #7aa8d4;
+
+@StatLabelStyle = LabelStyle(FontSize: 11, TextColor: @DimText, HorizontalAlignment: Start, VerticalAlignment: Center);
+@StatValueStyle = LabelStyle(FontSize: 11, TextColor: @BrightText, RenderBold: true, HorizontalAlignment: Start, VerticalAlignment: Center);
+@StatModStyle = LabelStyle(FontSize: 11, TextColor: @ModGreen, HorizontalAlignment: Start, VerticalAlignment: Center);
+@ModSlotStyle = LabelStyle(FontSize: 10, TextColor: @ModGreen, HorizontalAlignment: Start, VerticalAlignment: Center);
+
+Group #ArmorHudRoot {
+  Anchor: (Left: 0, Top: 0, Right: 0, Bottom: 0);
+  HitTestVisible: false;
+
+  // ── Container — right of weapon HUD, bottom-aligned ──
+  Group #ArmorRoot {
+    Anchor: (Width: 220, Height: 400, Bottom: 74, Left: 304);
+    LayoutMode: Top;
+    Visible: false;
+
+    Group { FlexWeight: 1; }
+
+    Group #ArmorPanel {
+      LayoutMode: Top;
+      Background: @AccentDefault;
+
+      Group {
+        Anchor: (Left: 3);
+        LayoutMode: Top;
+        Padding: (Horizontal: 10, Vertical: 8);
+        Background: @PanelBg;
+
+      // ── Set name + piece count (always visible) ──
+      Label #ArmorSetTitle {
+        Text: "ARMOR";
+        Anchor: (Height: 20);
+        Style: LabelStyle(
+          FontName: "Secondary",
+          FontSize: 13,
+          TextColor: @BrightText,
+          RenderUppercase: true,
+          RenderBold: true,
+          LetterSpacing: 0.5,
+          HorizontalAlignment: Start,
+          VerticalAlignment: Center,
+          ShrinkTextToFit: true,
+          MinShrinkTextToFitFontSize: 10
+        );
+      }
+
+      // ── Piece count row (always visible) ──
+      Group {
+        Anchor: (Height: 16, Top: 2);
+        LayoutMode: Left;
+
+        Label #ArmorPieceCount {
+          Text: "0/4";
+          Anchor: (Height: 16);
+          Style: LabelStyle(FontSize: 11, TextColor: @DimText, HorizontalAlignment: Start, VerticalAlignment: Center);
+        }
+      }
+
+      // ── Quick stat summary row (always visible) ──
+      Label #ArmorQuickStats {
+        Text: "";
+        Anchor: (Height: 16, Top: 1);
+        Visible: false;
+        Style: LabelStyle(FontSize: 10, TextColor: @ModGreen, HorizontalAlignment: Start, VerticalAlignment: Center);
+      }
+
+      // ── Ability charge section (always visible when set is complete) ──
+      Group #ArmorAbilitySection {
+        LayoutMode: Top;
+        Visible: false;
+
+      Group { Anchor: (Height: 1, Top: 5, Left: 0, Right: 0); Background: @SepColor; }
+
+      Group {
+        Anchor: (Height: 16, Top: 4);
+        LayoutMode: Left;
+
+        Label #ArmorAbilityName {
+          Text: "";
+          Anchor: (Height: 16);
+          Style: LabelStyle(FontSize: 10, TextColor: @DimText, RenderUppercase: true, HorizontalAlignment: Start, VerticalAlignment: Center);
+        }
+
+        Label #ArmorAbilityStatus {
+          Text: "";
+          Anchor: (Height: 16, Left: 5);
+          Style: LabelStyle(FontSize: 10, TextColor: @BrightText, RenderBold: true, HorizontalAlignment: Start, VerticalAlignment: Center);
+        }
+      }
+
+      Group #ArmorAbilityBarTrack {
+        Anchor: (Height: 3, Top: 3, Left: 0, Right: 0);
+        Background: @BarTrack;
+
+        Group #ArmorAbilityBarFill {
+          Anchor: (Top: 0, Bottom: 0, Left: 0, Right: 0);
+          Background: @AbilityBar;
+        }
+      }
+      }
+
+      // ── Expanded stats section (visible when crouching) ──
+      Group #ArmorStatsSection {
+        LayoutMode: Top;
+        Visible: false;
+
+      Group { Anchor: (Height: 1, Top: 6, Left: 0, Right: 0); Background: @SepColor; }
+
+      Group #ArmorStatProtectionRow {
+        Anchor: (Height: 18, Top: 4);
+        LayoutMode: Left;
+        Label #ArmorStatProtectionLabel { Text: "Protection"; Anchor: (Width: 80, Height: 18); Style: @StatLabelStyle; }
+        Label #ArmorStatProtectionBase { Text: "0"; Anchor: (Width: 45, Height: 18); Style: @StatValueStyle; }
+        Label #ArmorStatProtectionMod { Text: ""; Anchor: (Height: 18); Style: @StatModStyle; }
+      }
+
+      Group #ArmorStatCloseDefRow {
+        Anchor: (Height: 18, Top: 1);
+        LayoutMode: Left;
+        Label #ArmorStatCloseDefLabel { Text: "Close Def"; Anchor: (Width: 80, Height: 18); Style: @StatLabelStyle; }
+        Label #ArmorStatCloseDefBase { Text: "0%"; Anchor: (Width: 45, Height: 18); Style: @StatValueStyle; }
+        Label #ArmorStatCloseDefMod { Text: ""; Anchor: (Height: 18); Style: @StatModStyle; }
+      }
+
+      Group #ArmorStatFarDefRow {
+        Anchor: (Height: 18, Top: 1);
+        LayoutMode: Left;
+        Label #ArmorStatFarDefLabel { Text: "Far Def"; Anchor: (Width: 80, Height: 18); Style: @StatLabelStyle; }
+        Label #ArmorStatFarDefBase { Text: "0%"; Anchor: (Width: 45, Height: 18); Style: @StatValueStyle; }
+        Label #ArmorStatFarDefMod { Text: ""; Anchor: (Height: 18); Style: @StatModStyle; }
+      }
+
+      Group #ArmorStatKnockbackRow {
+        Anchor: (Height: 18, Top: 1);
+        LayoutMode: Left;
+        Label #ArmorStatKnockbackLabel { Text: "Knockback"; Anchor: (Width: 80, Height: 18); Style: @StatLabelStyle; }
+        Label #ArmorStatKnockbackBase { Text: "0"; Anchor: (Width: 45, Height: 18); Style: @StatValueStyle; }
+        Label #ArmorStatKnockbackMod { Text: ""; Anchor: (Height: 18); Style: @StatModStyle; }
+      }
+
+      Group #ArmorStatSpikeDmgRow {
+        Anchor: (Height: 18, Top: 1);
+        LayoutMode: Left;
+        Label #ArmorStatSpikeDmgLabel { Text: "Spike Dmg"; Anchor: (Width: 80, Height: 18); Style: @StatLabelStyle; }
+        Label #ArmorStatSpikeDmgBase { Text: "0"; Anchor: (Width: 45, Height: 18); Style: @StatValueStyle; }
+        Label #ArmorStatSpikeDmgMod { Text: ""; Anchor: (Height: 18); Style: @StatModStyle; }
+      }
+
+      Group #ArmorStatMaxHPRow {
+        Anchor: (Height: 18, Top: 1);
+        LayoutMode: Left;
+        Label #ArmorStatMaxHPLabel { Text: "Max HP"; Anchor: (Width: 80, Height: 18); Style: @StatLabelStyle; }
+        Label #ArmorStatMaxHPBase { Text: "0"; Anchor: (Width: 45, Height: 18); Style: @StatValueStyle; }
+        Label #ArmorStatMaxHPMod { Text: ""; Anchor: (Height: 18); Style: @StatModStyle; }
+      }
+
+      Group #ArmorStatSpeedRow {
+        Anchor: (Height: 18, Top: 1);
+        LayoutMode: Left;
+        Label #ArmorStatSpeedLabel { Text: "Speed"; Anchor: (Width: 80, Height: 18); Style: @StatLabelStyle; }
+        Label #ArmorStatSpeedBase { Text: "0%"; Anchor: (Width: 45, Height: 18); Style: @StatValueStyle; }
+        Label #ArmorStatSpeedMod { Text: ""; Anchor: (Height: 18); Style: @StatModStyle; }
+      }
+
+      } // end #ArmorStatsSection
+
+      // ── Expanded modifier section (visible when crouching) ──
+      Group #ArmorModSection {
+        LayoutMode: Top;
+        Visible: false;
+
+      Group #ArmorModSeparator { Anchor: (Height: 1, Top: 4, Left: 0, Right: 0); Background: @SepColor; }
+      Label #ArmorMod0 { Text: ""; Anchor: (Height: 16, Top: 4); Style: @ModSlotStyle; }
+      Label #ArmorMod1 { Text: ""; Anchor: (Height: 16, Top: 1); Style: @ModSlotStyle; }
+      Label #ArmorMod2 { Text: ""; Anchor: (Height: 16, Top: 1); Style: @ModSlotStyle; }
+      Label #ArmorMod3 { Text: ""; Anchor: (Height: 16, Top: 1); Style: @ModSlotStyle; }
+      Label #ArmorMod4 { Text: ""; Anchor: (Height: 16, Top: 1); Style: @ModSlotStyle; }
+
+      } // end #ArmorModSection
+
+      // ── Expanded set bonus section (visible when crouching) ──
+      Group #ArmorSetBonusSection {
+        LayoutMode: Top;
+        Visible: false;
+
+      Group { Anchor: (Height: 1, Top: 4, Left: 0, Right: 0); Background: @SepColor; }
+      Label #ArmorSetBonusTitle {
+        Text: "Set Bonus";
+        Anchor: (Height: 18, Top: 3);
+        Style: LabelStyle(FontSize: 11, TextColor: @SetBonusColor, RenderBold: true, HorizontalAlignment: Start, VerticalAlignment: Center);
+      }
+      Label #ArmorSetBonusPartial {
+        Text: "";
+        Anchor: (Height: 16, Top: 1);
+        Style: LabelStyle(FontSize: 10, TextColor: @DimText, HorizontalAlignment: Start, VerticalAlignment: Center);
+      }
+      Label #ArmorSetBonusFull {
+        Text: "";
+        Anchor: (Height: 16, Top: 1);
+        Style: LabelStyle(FontSize: 10, TextColor: @SetBonusColor, HorizontalAlignment: Start, VerticalAlignment: Center);
+      }
+
+      } // end #ArmorSetBonusSection
+
+    }
+    }
+  }
+}

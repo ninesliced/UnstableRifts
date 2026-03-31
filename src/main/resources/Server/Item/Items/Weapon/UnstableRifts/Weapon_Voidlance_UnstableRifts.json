@@ -1,0 +1,28 @@
+{
+  "TranslationProperties": {
+    "Name": "server.items.Weapon_Voidlance_UnstableRifts.name"
+  },
+  "Categories": [
+    "Items.Weapons"
+  ],
+  "Icon": "Icons/ItemsGenerated/VOID_LANCE.png",
+  "Model": "Items/Weapons/UnstableRifts/Voidlance/VOID_LANCE_WIP_FIX.blockymodel",
+  "Texture": "Items/Weapons/UnstableRifts/Voidlance/VOID_LANCE_WIP_TEXTURE.png",
+  "PlayerAnimationsId": "Rifle",
+  "Interactions": {
+    "Primary": "Root_UnstableRifts_Voidlance_Primary",
+    "Secondary": "Root_UnstableRifts_Voidlance_Reload"
+  },
+  "Weapon": {},
+  "Tags": {
+    "Type": [
+      "Weapon"
+    ],
+    "Family": [
+      "Gun"
+    ],
+    "Pickup": [
+      "FKey"
+    ]
+  }
+}

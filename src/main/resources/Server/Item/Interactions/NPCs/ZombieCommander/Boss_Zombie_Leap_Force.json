@@ -51,5 +51,8 @@
       ]
     }
   },
-  "VerticalClamp": [-20, 10]
+  "VerticalClamp": [
+    -20,
+    10
+  ]
 }

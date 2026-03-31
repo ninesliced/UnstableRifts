@@ -25,15 +25,27 @@
     "_CombatConfig": "CAE_Mercenary_Guardian",
     "Attack": "Root_NPC_Attack_Melee",
     "AttackDistance": 3,
-    "DesiredAttackDistanceRange": [1.4, 2.2],
-    "AttackPauseRange": [0.35, 0.7],
+    "DesiredAttackDistanceRange": [
+      1.4,
+      2.2
+    ],
+    "AttackPauseRange": [
+      0.35,
+      0.7
+    ],
     "CombatBehaviorDistance": 12,
     "CombatRelativeTurnSpeed": 1.7,
     "CombatDirectWeight": 16,
     "CombatAlwaysMovingWeight": 8,
     "CombatStrafeWeight": 20,
-    "CombatStrafingDurationRange": [0.6, 1.4],
-    "CombatStrafingFrequencyRange": [0.5, 1.2],
+    "CombatStrafingDurationRange": [
+      0.6,
+      1.4
+    ],
+    "CombatStrafingFrequencyRange": [
+      0.5,
+      1.2
+    ],
     "CombatBackOffAfterAttack": false,
     "CombatMovingRelativeSpeed": 0.95,
     "CombatBackwardsRelativeSpeed": 0.7,

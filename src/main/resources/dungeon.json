@@ -1,42 +1,85 @@
 {
-  "dungeonName": "Shotcave",
+  "dungeonName": "UnstableRifts",
   "maxPartySize": 4,
   "bossWallBlock": "Stone_Brick_Wall",
   "startEquipment": [
-    "Weapon_Pistol_Shotcave",
-    "Weapon_Crystal_Sword_Shotcave"
+    "Weapon_Pistol_UnstableRifts",
+    "Weapon_Crystal_Sword_UnstableRifts"
   ],
   "levels": [
     {
-      "id": "shotcave",
+      "id": "unstablerifts",
       "name": "Kweebec",
       "rooms": {
-        "spawn":     ["Shotcave.Kweebec.Entrance.*"],
-        "corridor":  ["Shotcave.Kweebec.Room.*"],
-        "challenge": ["Shotcave.Kweebec.Challenge.*"],
-        "shop":      ["Shotcave.Kweebec.Shop.*"],
-        "wall":      ["Shotcave.Kweebec.Wall.*"],
-        "boss":      ["Shotcave.Kweebec.Boss.*"],
-        "keyDoor":    ["Shotcave.Kweebec.Doors.Kweebec_Key_Door"],
-        "activationDoor": ["Shotcave.Kweebec.Doors.Kweebec_Activation_Door"],
-        "lockDoor":   ["Shotcave.Kweebec.Doors.Kweebec_Lock_Door"],
-        "sealDoor":   ["Shotcave.Kweebec.Doors.Kweebec_Sealed_Door"],
-        "branch":     ["Shotcave.Kweebec.Branch.*"]
+        "spawn": [
+          "UnstableRifts.Kweebec.Entrance.*"
+        ],
+        "corridor": [
+          "UnstableRifts.Kweebec.Room.*"
+        ],
+        "challenge": [
+          "UnstableRifts.Kweebec.Challenge.*"
+        ],
+        "shop": [
+          "UnstableRifts.Kweebec.Shop.*"
+        ],
+        "wall": [
+          "UnstableRifts.Kweebec.Wall.*"
+        ],
+        "boss": [
+          "UnstableRifts.Kweebec.Boss.*"
+        ],
+        "keyDoor": [
+          "UnstableRifts.Kweebec.Doors.Kweebec_Key_Door"
+        ],
+        "activationDoor": [
+          "UnstableRifts.Kweebec.Doors.Kweebec_Activation_Door"
+        ],
+        "lockDoor": [
+          "UnstableRifts.Kweebec.Doors.Kweebec_Lock_Door"
+        ],
+        "sealDoor": [
+          "UnstableRifts.Kweebec.Doors.Kweebec_Sealed_Door"
+        ],
+        "branch": [
+          "UnstableRifts.Kweebec.Branch.*"
+        ]
       },
       "main": {
         "maxRooms": 6,
-        "challengeRooms": { "min": 2, "max": 2 },
+        "challengeRooms": {
+          "min": 2,
+          "max": 2
+        },
         "minimumCorridorLength": 1,
-        "mobsToSpawn":     { "min": 400, "max": 400 },
-        "treasureRooms":   { "min": 0, "max": 0 },
-        "shopRooms":       { "min": 1, "max": 1 }
+        "mobsToSpawn": {
+          "min": 400,
+          "max": 400
+        },
+        "treasureRooms": {
+          "min": 0,
+          "max": 0
+        },
+        "shopRooms": {
+          "min": 1,
+          "max": 1
+        }
       },
       "branch": {
-        "splitterCount": { "min": 1, "max": 1 },
+        "splitterCount": {
+          "min": 1,
+          "max": 1
+        },
         "maxRooms": 2,
-        "challengeRooms": { "min": 1, "max": 1 },
+        "challengeRooms": {
+          "min": 1,
+          "max": 1
+        },
         "minimumCorridorLength": 1,
-        "mobsToSpawn":     { "min": 50, "max": 100 }
+        "mobsToSpawn": {
+          "min": 50,
+          "max": 100
+        }
       },
       "mobs": {
         "Industrial_Nosuit": 3,

@@ -1,0 +1,56 @@
+{
+  "TranslationProperties": {
+    "Name": "UnstableRifts Dungeon Portal"
+  },
+  "BlockType": {
+    "DrawType": "Model",
+    "Material": "Solid",
+    "Opacity": "Transparent",
+    "CustomModel": "Blocks/Miscellaneous/Platform_MagicInactive.blockymodel",
+    "CustomModelTexture": [
+      {
+        "Texture": "Blocks/Miscellaneous/Platform_Magic_Blue2.png",
+        "Weight": 1
+      }
+    ],
+    "CustomModelAnimation": "Blocks/Miscellaneous/Platform_Magic_Idle.blockyanim",
+    "HitboxType": "Pad_Portal",
+    "BlockParticleSetId": "Stone",
+    "BlockSoundSetId": "Stone",
+    "VariantRotation": "NESW",
+    "Flags": {
+      "IsUsable": false
+    },
+    "Gathering": {
+      "Breaking": {
+        "GatherType": "Unbreakable"
+      }
+    },
+    "AmbientSoundEventId": "SFX_Portal_Neutral",
+    "Particles": [
+      {
+        "SystemId": "MagicPortal_Default",
+        "PositionOffset": {
+          "Y": 2.0
+        },
+        "Scale": 0.8
+      },
+      {
+        "SystemId": "MagicPortal_Stones",
+        "TargetEntityPart": "Self",
+        "TargetNodeName": "Debris"
+      }
+    ],
+    "Light": {
+      "Color": "#7cc",
+      "Radius": 4
+    }
+  },
+  "Tags": {
+    "Type": [
+      "UnstableRifts",
+      "Portal"
+    ]
+  },
+  "Quality": "Developer"
+}

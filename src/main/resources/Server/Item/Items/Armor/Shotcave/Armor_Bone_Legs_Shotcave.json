@@ -1,6 +1,0 @@
-{
-  "Parent": "Armor_Wood_Hands",
-  "TranslationProperties": { "Name": "server.items.Armor_Bone_Legs_Shotcave.name" },
-  "MaxDurability": 0,
-  "Tags": { "Type": ["Armor"], "Pickup": ["FKey"] }
-}

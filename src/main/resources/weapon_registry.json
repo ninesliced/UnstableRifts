@@ -1,7 +1,13 @@
 {
   "sharedInteractions": [
-    { "type": "UpdateAmmoHud", "id": "Shotcave_Update_Hud" },
-    { "type": "HideAmmoHud", "id": "Shotcave_Hide_Hud" }
+    {
+      "type": "UpdateAmmoHud",
+      "id": "UnstableRifts_Update_Hud"
+    },
+    {
+      "type": "HideAmmoHud",
+      "id": "UnstableRifts_Hide_Hud"
+    }
   ],
   "weapons": [
     "weapons/pistol.json",

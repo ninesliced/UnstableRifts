@@ -1,5 +1,5 @@
 {
-  "itemId": "Weapon_Rifle_Shotcave",
+  "itemId": "Weapon_Rifle_UnstableRifts",
   "displayName": "Rifle",
   "category": "BULLET",
   "minRarity": "BASIC",
@@ -13,24 +13,24 @@
     "precision": 24
   },
   "primary": {
-    "id": "Shotcave_Rifle_Primary",
+    "id": "UnstableRifts_Rifle_Primary",
     "cooldown": 1.0,
     "requireAmmo": true,
-    "shotId": "Shotcave_Rifle_Shot",
-    "reloadId": "Shotcave_Rifle_Reload"
+    "shotId": "UnstableRifts_Rifle_Shot",
+    "reloadId": "UnstableRifts_Rifle_Reload"
   },
   "reload": {
-    "id": "Shotcave_Rifle_Reload",
+    "id": "UnstableRifts_Rifle_Reload",
     "cooldown": 1.0,
     "runTime": 0.9,
     "amount": 0,
-    "nextId": "Shotcave_Update_Hud",
+    "nextId": "UnstableRifts_Update_Hud",
     "worldSfx": "SFX_Rifle_Fire",
     "localSfx": "SFX_Rifle_Fire_Local",
     "maxAmmo": 140
   },
   "damage": {
-    "id": "Shotcave_Rifle_Projectile_Hit",
+    "id": "UnstableRifts_Rifle_Projectile_Hit",
     "amount": 7,
     "type": "Projectile",
     "worldSfx": "SFX_Blunderbuss_Hit",
@@ -39,6 +39,6 @@
     "particleYOffset": 0.8
   },
   "extraRoots": [
-    "Shotcave_Projectile_Miss"
+    "UnstableRifts_Projectile_Miss"
   ]
 }

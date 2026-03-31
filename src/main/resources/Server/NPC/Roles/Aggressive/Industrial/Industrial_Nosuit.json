@@ -1,10 +1,12 @@
 {
-	"Type": "Variant",
-	"Reference": "Template_Industrial_Hazmat",
-	"Modify": {
-		"Appearance": "Industrial_Nosuit",
-		"MemoriesNameOverride": "Industrial_Nosuit",
-		"TargetGroups": ["Industrial_Nosuit"],
-		"NameTranslationKey": "bettermobs.npcRoles.Industrial_Nosuit.name"
-	}
+  "Type": "Variant",
+  "Reference": "Template_Industrial_Hazmat",
+  "Modify": {
+    "Appearance": "Industrial_Nosuit",
+    "MemoriesNameOverride": "Industrial_Nosuit",
+    "TargetGroups": [
+      "Industrial_Nosuit"
+    ],
+    "NameTranslationKey": "bettermobs.npcRoles.Industrial_Nosuit.name"
+  }
 }

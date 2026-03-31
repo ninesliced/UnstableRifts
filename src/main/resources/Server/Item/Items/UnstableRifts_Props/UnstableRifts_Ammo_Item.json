@@ -1,0 +1,40 @@
+{
+  "TranslationProperties": {
+    "Name": "server.items.UnstableRifts_Ammo_Item.name"
+  },
+  "Icon": "Icons/ItemsGenerated/UnstableRifts_Ammo_Item.png",
+  "Model": "Resources/Materials/Ingot.blockymodel",
+  "Texture": "Resources/Materials/Ingot_Textures/Gold.png",
+  "Scale": 0.7,
+  "PlayerAnimationsId": "Item",
+  "IconProperties": {
+    "Scale": 1,
+    "Translation": [
+      0,
+      -3
+    ],
+    "Rotation": [
+      22.5,
+      45,
+      22.5
+    ]
+  },
+  "Categories": [
+    "Items.Ingredients"
+  ],
+  "MaxStack": 1,
+  "Tags": {
+    "Type": [
+      "UnstableRifts",
+      "Ammo"
+    ],
+    "Pickup": [
+      "FKey"
+    ]
+  },
+  "ItemEntity": {
+    "ParticleSystemId": null
+  },
+  "ItemSoundSetId": "ISS_Items_Ingots",
+  "DropOnDeath": false
+}

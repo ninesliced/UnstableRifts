@@ -1,0 +1,53 @@
+{
+  "TranslationProperties": {
+    "Name": "server.items.UnstableRifts_Mob_Spawner.name",
+    "Description": "server.items.UnstableRifts_Mob_Spawner.description"
+  },
+  "Icon": "Icons/ItemsGenerated/UnstableRifts_Marker_Mob_Spawner.png",
+  "Quality": "Technical",
+  "Categories": [
+    "Tool.Block"
+  ],
+  "BlockType": {
+    "DrawType": "Cube",
+    "Textures": [
+      {
+        "Weight": 1,
+        "All": "BlockTextures/UnstableRifts_Marker_Mob_Spawner.png"
+      }
+    ],
+    "Opacity": "Transparent",
+    "Group": "@Tech",
+    "State": {
+      "Id": "unstablerifts_mob_spawner"
+    },
+    "Flags": {
+      "IsUsable": true
+    },
+    "Interactions": {
+      "Use": {
+        "Interactions": [
+          {
+            "Type": "OpenCustomUI",
+            "Page": {
+              "Id": "UnstableRiftsMobSpawnerConfig"
+            }
+          }
+        ]
+      }
+    },
+    "BlockParticleSetId": "Stone",
+    "BlockSoundSetId": "Stone"
+  },
+  "PlayerAnimationsId": "Block",
+  "Tags": {
+    "Type": [
+      "DungeonMarker",
+      "UnstableRifts"
+    ],
+    "Marker": [
+      "MobSpawner"
+    ]
+  },
+  "ItemSoundSetId": "ISS_Blocks_Stone"
+}

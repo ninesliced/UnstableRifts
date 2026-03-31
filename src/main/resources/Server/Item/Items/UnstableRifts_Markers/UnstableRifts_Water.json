@@ -1,0 +1,41 @@
+{
+  "TranslationProperties": {
+    "Name": "server.items.UnstableRifts_Water.name",
+    "Description": "server.items.UnstableRifts_Water.description"
+  },
+  "Icon": "Icons/ItemsGenerated/UnstableRifts_Marker_Water.png",
+  "Quality": "Technical",
+  "Categories": [
+    "Tool.Block"
+  ],
+  "BlockType": {
+    "DrawType": "Cube",
+    "Textures": [
+      {
+        "Weight": 1,
+        "All": "BlockTextures/UnstableRifts_Marker_Water.png"
+      }
+    ],
+    "Opacity": "Transparent",
+    "Group": "@Tech",
+    "State": {
+      "Id": "unstablerifts_water"
+    },
+    "Flags": {
+      "IsUsable": false
+    },
+    "BlockParticleSetId": "Stone",
+    "BlockSoundSetId": "Stone"
+  },
+  "PlayerAnimationsId": "Block",
+  "Tags": {
+    "Type": [
+      "DungeonMarker",
+      "UnstableRifts"
+    ],
+    "Marker": [
+      "Water"
+    ]
+  },
+  "ItemSoundSetId": "ISS_Blocks_Stone"
+}

@@ -1,0 +1,41 @@
+{
+  "TranslationProperties": {
+    "Name": "server.items.UnstableRifts_Red_Slime.name",
+    "Description": "server.items.UnstableRifts_Red_Slime.description"
+  },
+  "Icon": "Icons/ItemsGenerated/UnstableRifts_Marker_Red_Slime.png",
+  "Quality": "Technical",
+  "Categories": [
+    "Tool.Block"
+  ],
+  "BlockType": {
+    "DrawType": "Cube",
+    "Textures": [
+      {
+        "Weight": 1,
+        "All": "BlockTextures/UnstableRifts_Marker_Red_Slime.png"
+      }
+    ],
+    "Opacity": "Transparent",
+    "Group": "@Tech",
+    "State": {
+      "Id": "unstablerifts_red_slime"
+    },
+    "Flags": {
+      "IsUsable": false
+    },
+    "BlockParticleSetId": "Stone",
+    "BlockSoundSetId": "Stone"
+  },
+  "PlayerAnimationsId": "Block",
+  "Tags": {
+    "Type": [
+      "DungeonMarker",
+      "UnstableRifts"
+    ],
+    "Marker": [
+      "RedSlime"
+    ]
+  },
+  "ItemSoundSetId": "ISS_Blocks_Stone"
+}

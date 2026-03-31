@@ -14,7 +14,9 @@
   "Content": {
     "Sensor": {
       "Type": "Target",
-      "Range": { "Compute": "AttackDistance" },
+      "Range": {
+        "Compute": "AttackDistance"
+      },
       "Filters": [
         {
           "Type": "LineOfSight"
@@ -26,17 +28,25 @@
       {
         "Type": "Attack",
         "Attack": "Root_Industrial_Hazmat_Attack",
-        "AttackPauseRange": [0.6, 1.0]
+        "AttackPauseRange": [
+          0.6,
+          1.0
+        ]
       },
       {
         "Type": "Attack",
         "Attack": "Root_Industrial_Hazmat_Attack",
-        "AttackPauseRange": [0.8, 1.3]
+        "AttackPauseRange": [
+          0.8,
+          1.3
+        ]
       }
     ],
     "HeadMotion": {
       "Type": "Aim",
-      "RelativeTurnSpeed": { "Compute": "CombatRelativeTurnSpeed" }
+      "RelativeTurnSpeed": {
+        "Compute": "CombatRelativeTurnSpeed"
+      }
     }
   },
   "Type": "Component"

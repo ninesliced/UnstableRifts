@@ -1,0 +1,15 @@
+{
+  "Parent": "Armor_Copper_Legs",
+  "TranslationProperties": {
+    "Name": "server.items.Armor_Vine_Boots_UnstableRifts.name"
+  },
+  "MaxDurability": 0,
+  "Tags": {
+    "Type": [
+      "Armor"
+    ],
+    "Pickup": [
+      "FKey"
+    ]
+  }
+}

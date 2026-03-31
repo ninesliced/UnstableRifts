@@ -14,7 +14,9 @@
   "Content": {
     "Sensor": {
       "Type": "Target",
-      "Range": { "Compute": "AttackDistance" },
+      "Range": {
+        "Compute": "AttackDistance"
+      },
       "Filters": [
         {
           "Type": "LineOfSight"
@@ -26,17 +28,25 @@
       {
         "Type": "Attack",
         "Attack": "Kweebec_DeadWood_Sword_Swing_Left",
-        "AttackPauseRange": [0.7, 1.2]
+        "AttackPauseRange": [
+          0.7,
+          1.2
+        ]
       },
       {
         "Type": "Attack",
         "Attack": "Kweebec_DeadWood_Sword_Swing_Right",
-        "AttackPauseRange": [0.7, 1.2]
+        "AttackPauseRange": [
+          0.7,
+          1.2
+        ]
       }
     ],
     "HeadMotion": {
       "Type": "Aim",
-      "RelativeTurnSpeed": { "Compute": "CombatRelativeTurnSpeed" }
+      "RelativeTurnSpeed": {
+        "Compute": "CombatRelativeTurnSpeed"
+      }
     }
   },
   "Type": "Component"

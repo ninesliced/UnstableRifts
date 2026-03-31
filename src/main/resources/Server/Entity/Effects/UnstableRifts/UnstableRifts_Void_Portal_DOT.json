@@ -1,0 +1,29 @@
+{
+  "ApplicationEffects": {
+    "EntityBottomTint": "#1a0033",
+    "EntityTopTint": "#6600cc",
+    "Particles": [
+      {
+        "SystemId": "VoidImpact"
+      }
+    ]
+  },
+  "DamageCalculatorCooldown": 0.5,
+  "DamageCalculator": {
+    "BaseDamage": {
+      "Physical": 12
+    }
+  },
+  "DamageEffects": {
+    "WorldParticles": [
+      {
+        "SystemId": "VoidImpact",
+        "Scale": 0.5
+      }
+    ]
+  },
+  "OverlapBehavior": "Overwrite",
+  "Infinite": false,
+  "Debuff": true,
+  "Duration": 1
+}

@@ -20,7 +20,7 @@
     },
     "WorldSoundEventId": "SFX_Unarmed_Impact",
     "LocalSoundEventId": "SFX_Unarmed_Impact",
-    "WorldParticles": [ 
+    "WorldParticles": [
       {
         "SystemId": "Impact_Blade_01"
       }

@@ -1,6 +1,0 @@
-{
-  "Parent": "Armor_Wood_Chest",
-  "TranslationProperties": { "Name": "server.items.Armor_Bone_Chest_Shotcave.name" },
-  "MaxDurability": 0,
-  "Tags": { "Type": ["Armor"], "Pickup": ["FKey"] }
-}

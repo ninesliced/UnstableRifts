@@ -3,7 +3,7 @@
   "Reference": "Template_Industrial_Hazmat",
   "Modify": {
     "Weapons": [
-      "Flamethrower_Shotcave"
+      "Weapon_Flamethrower_UnstableRifts"
     ],
     "AttackSequence": "Component_Instruction_Attack_Sequence_Industrial_Hazmat_Flamethrower",
     "AttackDistance": 8.4,

@@ -1,0 +1,15 @@
+{
+  "Parent": "Armor_Adamantite_Hands",
+  "TranslationProperties": {
+    "Name": "server.items.Armor_Void_Legs_UnstableRifts.name"
+  },
+  "MaxDurability": 0,
+  "Tags": {
+    "Type": [
+      "Armor"
+    ],
+    "Pickup": [
+      "FKey"
+    ]
+  }
+}

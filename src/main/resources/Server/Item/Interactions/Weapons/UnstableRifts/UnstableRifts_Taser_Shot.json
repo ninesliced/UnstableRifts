@@ -1,0 +1,52 @@
+{
+  "Type": "ChainLightning",
+  "RunTime": 0.08,
+  "Effects": {
+    "ItemAnimationId": "Shoot",
+    "WorldSoundEventId": "SFX_Blunderbuss_Fire",
+    "LocalSoundEventId": "SFX_Blunderbuss_Fire_Local",
+    "FirstPersonParticles": [
+      {
+        "SystemId": "RifleShooting",
+        "PositionOffset": {
+          "X": -0.08,
+          "Z": 1.1,
+          "Y": -0.05
+        },
+        "RotationOffset": {
+          "Yaw": 0,
+          "Pitch": 90
+        }
+      }
+    ],
+    "Particles": [
+      {
+        "SystemId": "RifleShooting",
+        "PositionOffset": {
+          "Z": 0.9,
+          "Y": 0.1
+        },
+        "RotationOffset": {
+          "Pitch": 90
+        }
+      }
+    ]
+  },
+  "DamageRoot": "Root_UnstableRifts_Taser_Chain_Damage",
+  "MissRoot": "Root_UnstableRifts_Projectile_Miss",
+  "JumpRange": 5.0,
+  "MaxTargets": 5,
+  "IncludeInitialTarget": true,
+  "BeamParticleId": "UnstableRifts_ElectricBeam",
+  "BeamStepDistance": 0.6,
+  "BeamHeightOffset": 1.35,
+  "BeamForwardOffset": -2.3,
+  "BeamRightOffset": 0.35,
+  "BeamParticleScale": 0.35,
+  "MaxDistance": 30,
+  "AimAssist": true,
+  "UseAmmo": true,
+  "MaxAmmo": 80,
+  "AmmoPerShot": 1,
+  "Next": "UnstableRifts_Update_Hud"
+}

@@ -1,5 +1,5 @@
 {
-  "itemId": "Weapon_Taser_Shotcave",
+  "itemId": "Weapon_Taser_UnstableRifts",
   "displayName": "Taser",
   "category": "LASER",
   "lockedEffect": "ELECTRICITY",
@@ -12,24 +12,24 @@
     "knockback": 0
   },
   "primary": {
-    "id": "Shotcave_Taser_Primary",
+    "id": "UnstableRifts_Taser_Primary",
     "cooldown": 0.75,
     "requireAmmo": true,
-    "shotId": "Shotcave_Taser_Shot",
-    "reloadId": "Shotcave_Taser_Reload"
+    "shotId": "UnstableRifts_Taser_Shot",
+    "reloadId": "UnstableRifts_Taser_Reload"
   },
   "reload": {
-    "id": "Shotcave_Taser_Reload",
+    "id": "UnstableRifts_Taser_Reload",
     "cooldown": 1.0,
     "runTime": 0.9,
     "amount": 0,
-    "nextId": "Shotcave_Update_Hud",
+    "nextId": "UnstableRifts_Update_Hud",
     "worldSfx": "SFX_Blunderbuss_Fire",
     "localSfx": "SFX_Blunderbuss_Fire_Local",
     "maxAmmo": 80
   },
   "damage": {
-    "id": "Shotcave_Taser_Chain_Damage",
+    "id": "UnstableRifts_Taser_Chain_Damage",
     "amount": 10,
     "type": "Physical",
     "worldSfx": "SFX_Arrow_FullCharge_Hit",

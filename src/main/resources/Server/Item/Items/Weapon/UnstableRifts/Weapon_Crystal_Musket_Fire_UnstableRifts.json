@@ -1,0 +1,28 @@
+{
+  "TranslationProperties": {
+    "Name": "server.items.Weapon_Crystal_Musket_Fire_UnstableRifts.name"
+  },
+  "Categories": [
+    "Items.Weapons"
+  ],
+  "Icon": "Icons/ItemsGenerated/Fire_Crystal_Musket.png",
+  "Model": "Items/Weapons/UnstableRifts/Musket/MUSKET_CRYSTAL.blockymodel",
+  "Texture": "Items/Weapons/UnstableRifts/Musket/FIRE_MUSKET_TEXTURE_1.0.png",
+  "PlayerAnimationsId": "Rifle",
+  "Interactions": {
+    "Primary": "Root_UnstableRifts_Crystal_Musket_Fire_Primary",
+    "Secondary": "Root_UnstableRifts_Crystal_Musket_Reload"
+  },
+  "Weapon": {},
+  "Tags": {
+    "Type": [
+      "Weapon"
+    ],
+    "Family": [
+      "Gun"
+    ],
+    "Pickup": [
+      "FKey"
+    ]
+  }
+}

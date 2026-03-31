@@ -1,5 +1,5 @@
 {
-  "itemId": "Weapon_Crystal_Musket_Fire_Shotcave",
+  "itemId": "Weapon_Crystal_Musket_Fire_UnstableRifts",
   "displayName": "Musket",
   "category": "LASER",
   "lockedEffect": "FIRE",
@@ -12,24 +12,24 @@
     "knockback": 0
   },
   "primary": {
-    "id": "Shotcave_Crystal_Musket_Fire_Primary",
+    "id": "UnstableRifts_Crystal_Musket_Fire_Primary",
     "cooldown": 1.4,
     "requireAmmo": true,
-    "shotId": "Shotcave_Crystal_Musket_Shot",
-    "reloadId": "Shotcave_Crystal_Musket_Reload"
+    "shotId": "UnstableRifts_Crystal_Musket_Shot",
+    "reloadId": "UnstableRifts_Crystal_Musket_Reload"
   },
   "reload": {
-    "id": "Shotcave_Crystal_Musket_Reload",
+    "id": "UnstableRifts_Crystal_Musket_Reload",
     "cooldown": 1.25,
     "runTime": 1.2,
     "amount": 0,
-    "nextId": "Shotcave_Update_Hud",
+    "nextId": "UnstableRifts_Update_Hud",
     "worldSfx": "SFX_Rifle_Fire",
     "localSfx": "SFX_Rifle_Fire_Local",
     "maxAmmo": 50
   },
   "damage": {
-    "id": "Shotcave_Crystal_Musket_Projectile_Hit",
+    "id": "UnstableRifts_Crystal_Musket_Projectile_Hit",
     "amount": 52,
     "type": "Projectile",
     "worldSfx": "SFX_Rifle_Fire",

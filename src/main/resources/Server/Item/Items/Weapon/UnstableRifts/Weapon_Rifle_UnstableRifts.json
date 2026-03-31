@@ -1,0 +1,28 @@
+{
+  "TranslationProperties": {
+    "Name": "server.items.Weapon_Rifle_UnstableRifts.name"
+  },
+  "Categories": [
+    "Items.Weapons"
+  ],
+  "Icon": "Icons/ItemsGenerated/Weapon_Assault_Rifle.png",
+  "Model": "Items/Weapons/UnstableRifts/Rifle/Kinetic_Overunder_Rifle.blockymodel",
+  "Texture": "Items/Weapons/UnstableRifts/Rifle/Kinetic_Overunder.png",
+  "PlayerAnimationsId": "Rifle",
+  "Interactions": {
+    "Primary": "Root_UnstableRifts_Rifle_Primary",
+    "Secondary": "Root_UnstableRifts_Rifle_Reload"
+  },
+  "Weapon": {},
+  "Tags": {
+    "Type": [
+      "Weapon"
+    ],
+    "Family": [
+      "Gun"
+    ],
+    "Pickup": [
+      "FKey"
+    ]
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "Container": {
+    "Type": "Multiple",
+    "Containers": [
+      {
+        "Type": "Single",
+        "Item": {
+          "ItemId": "UnstableRifts_Props_Coin",
+          "QuantityMin": 3,
+          "QuantityMax": 7
+        }
+      },
+      {
+        "Type": "Choice",
+        "Containers": [
+          {
+            "Type": "Single",
+            "Weight": 25,
+            "Item": {
+              "ItemId": "Weapon_Voidlance_UnstableRifts",
+              "QuantityMin": 1,
+              "QuantityMax": 1
+            }
+          },
+          {
+            "Type": "Empty",
+            "Weight": 75
+          }
+        ]
+      }
+    ]
+  }
+}

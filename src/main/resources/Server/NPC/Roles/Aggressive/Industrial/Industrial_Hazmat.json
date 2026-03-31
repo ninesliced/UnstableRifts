@@ -1,7 +1,7 @@
 {
-	"Type": "Variant",
-	"Reference": "Template_Industrial_Hazmat",
-	"Modify": {
-		"NameTranslationKey": "bettermobs.npcRoles.Industrial_Hazmat.name"
-	}
+  "Type": "Variant",
+  "Reference": "Template_Industrial_Hazmat",
+  "Modify": {
+    "NameTranslationKey": "bettermobs.npcRoles.Industrial_Hazmat.name"
+  }
 }

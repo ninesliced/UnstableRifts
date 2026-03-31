@@ -1,0 +1,453 @@
+// ─────────────────────────────────────────────
+//  UnstableRifts — Party Status HUD
+//  Displays party members, health, and active effect
+// ─────────────────────────────────────────────
+
+@DimText = #6b7d94;
+@BrightText = #e8ecf0;
+@AccentGold = #d9c18a;
+@PanelBg = #0c0f14(0.78);
+@HealthBarBg = #1a1a2e(0.9);
+@HealthBarFill = #22c55e;
+@HealthBarLow = #ef4444;
+@EffectText = #c4b5fd;
+
+Group #PartyStatusRoot {
+  Anchor: (Left: 0, Top: 0, Right: 0, Bottom: 0);
+  HitTestVisible: false;
+
+  // ── Left-side column used to vertically center the fixed-size panel ──
+  Group #PartyStatusAnchor {
+    Anchor: (Width: 200, Left: 12, Top: 0, Bottom: 0);
+    LayoutMode: Middle;
+
+    Group #PartyStatusPanel {
+      Anchor: (Width: 200, Height: 310);
+      Background: @PanelBg;
+      LayoutMode: Top;
+      Padding: (Horizontal: 10, Vertical: 8);
+      Visible: true;
+
+      Label {
+      Text: "PARTY";
+      Anchor: (Height: 20);
+      Style: LabelStyle(
+        FontSize: 13,
+        TextColor: @AccentGold,
+        RenderBold: true,
+        RenderUppercase: true,
+        HorizontalAlignment: Center,
+        VerticalAlignment: Center
+      );
+      }
+
+      // ── Member 0 ──
+    Group #Member0 {
+      Anchor: (Height: 32, Top: 4);
+      LayoutMode: Top;
+      Visible: false;
+
+      Group {
+        Anchor: (Height: 14);
+        LayoutMode: Left;
+
+        Label #Member0Name {
+          Text: "Player";
+          Anchor: (Width: 110, Height: 14);
+          Style: LabelStyle(FontSize: 11, TextColor: @BrightText, HorizontalAlignment: Start, VerticalAlignment: Center);
+        }
+        Label #Member0Status {
+          Text: "Online";
+          Anchor: (Height: 14);
+          Style: LabelStyle(FontSize: 10, TextColor: #a9f5b3, HorizontalAlignment: End, VerticalAlignment: Center);
+        }
+      }
+
+      Group {
+        Anchor: (Height: 8, Top: 1);
+        LayoutMode: Left;
+
+        Group #Member0HealthBarBg {
+          Anchor: (Width: 100, Height: 6);
+          Background: @HealthBarBg;
+
+          Group #Member0HealthBar {
+            Anchor: (Top: 0, Bottom: 0, Left: 0, Right: 0);
+            Background: @HealthBarFill;
+          }
+        }
+
+        Label #Member0Health {
+          Text: "";
+          Anchor: (Width: 50, Height: 8);
+          Style: LabelStyle(FontSize: 8, TextColor: @DimText, HorizontalAlignment: Start, VerticalAlignment: Center);
+        }
+      }
+
+      Label #Member0Effect {
+        Text: "";
+        Anchor: (Height: 8, Top: 0);
+        Style: LabelStyle(FontSize: 8, TextColor: @EffectText, HorizontalAlignment: Start, VerticalAlignment: Center);
+        Visible: false;
+      }
+    }
+
+    // ── Member 1 ──
+    Group #Member1 {
+      Anchor: (Height: 32, Top: 2);
+      LayoutMode: Top;
+      Visible: false;
+
+      Group {
+        Anchor: (Height: 14);
+        LayoutMode: Left;
+
+        Label #Member1Name {
+          Text: "Player";
+          Anchor: (Width: 110, Height: 14);
+          Style: LabelStyle(FontSize: 11, TextColor: @BrightText, HorizontalAlignment: Start, VerticalAlignment: Center);
+        }
+        Label #Member1Status {
+          Text: "Online";
+          Anchor: (Height: 14);
+          Style: LabelStyle(FontSize: 10, TextColor: #a9f5b3, HorizontalAlignment: End, VerticalAlignment: Center);
+        }
+      }
+
+      Group {
+        Anchor: (Height: 8, Top: 1);
+        LayoutMode: Left;
+
+        Group #Member1HealthBarBg {
+          Anchor: (Width: 100, Height: 6);
+          Background: @HealthBarBg;
+
+          Group #Member1HealthBar {
+            Anchor: (Top: 0, Bottom: 0, Left: 0, Right: 0);
+            Background: @HealthBarFill;
+          }
+        }
+
+        Label #Member1Health {
+          Text: "";
+          Anchor: (Width: 50, Height: 8);
+          Style: LabelStyle(FontSize: 8, TextColor: @DimText, HorizontalAlignment: Start, VerticalAlignment: Center);
+        }
+      }
+
+      Label #Member1Effect {
+        Text: "";
+        Anchor: (Height: 8, Top: 0);
+        Style: LabelStyle(FontSize: 8, TextColor: @EffectText, HorizontalAlignment: Start, VerticalAlignment: Center);
+        Visible: false;
+      }
+    }
+
+    // ── Member 2 ──
+    Group #Member2 {
+      Anchor: (Height: 32, Top: 2);
+      LayoutMode: Top;
+      Visible: false;
+
+      Group {
+        Anchor: (Height: 14);
+        LayoutMode: Left;
+
+        Label #Member2Name {
+          Text: "Player";
+          Anchor: (Width: 110, Height: 14);
+          Style: LabelStyle(FontSize: 11, TextColor: @BrightText, HorizontalAlignment: Start, VerticalAlignment: Center);
+        }
+        Label #Member2Status {
+          Text: "Online";
+          Anchor: (Height: 14);
+          Style: LabelStyle(FontSize: 10, TextColor: #a9f5b3, HorizontalAlignment: End, VerticalAlignment: Center);
+        }
+      }
+
+      Group {
+        Anchor: (Height: 8, Top: 1);
+        LayoutMode: Left;
+
+        Group #Member2HealthBarBg {
+          Anchor: (Width: 100, Height: 6);
+          Background: @HealthBarBg;
+
+          Group #Member2HealthBar {
+            Anchor: (Top: 0, Bottom: 0, Left: 0, Right: 0);
+            Background: @HealthBarFill;
+          }
+        }
+
+        Label #Member2Health {
+          Text: "";
+          Anchor: (Width: 50, Height: 8);
+          Style: LabelStyle(FontSize: 8, TextColor: @DimText, HorizontalAlignment: Start, VerticalAlignment: Center);
+        }
+      }
+
+      Label #Member2Effect {
+        Text: "";
+        Anchor: (Height: 8, Top: 0);
+        Style: LabelStyle(FontSize: 8, TextColor: @EffectText, HorizontalAlignment: Start, VerticalAlignment: Center);
+        Visible: false;
+      }
+    }
+
+    // ── Member 3 ──
+    Group #Member3 {
+      Anchor: (Height: 32, Top: 2);
+      LayoutMode: Top;
+      Visible: false;
+
+      Group {
+        Anchor: (Height: 14);
+        LayoutMode: Left;
+
+        Label #Member3Name {
+          Text: "Player";
+          Anchor: (Width: 110, Height: 14);
+          Style: LabelStyle(FontSize: 11, TextColor: @BrightText, HorizontalAlignment: Start, VerticalAlignment: Center);
+        }
+        Label #Member3Status {
+          Text: "Online";
+          Anchor: (Height: 14);
+          Style: LabelStyle(FontSize: 10, TextColor: #a9f5b3, HorizontalAlignment: End, VerticalAlignment: Center);
+        }
+      }
+
+      Group {
+        Anchor: (Height: 8, Top: 1);
+        LayoutMode: Left;
+
+        Group #Member3HealthBarBg {
+          Anchor: (Width: 100, Height: 6);
+          Background: @HealthBarBg;
+
+          Group #Member3HealthBar {
+            Anchor: (Top: 0, Bottom: 0, Left: 0, Right: 0);
+            Background: @HealthBarFill;
+          }
+        }
+
+        Label #Member3Health {
+          Text: "";
+          Anchor: (Width: 50, Height: 8);
+          Style: LabelStyle(FontSize: 8, TextColor: @DimText, HorizontalAlignment: Start, VerticalAlignment: Center);
+        }
+      }
+
+      Label #Member3Effect {
+        Text: "";
+        Anchor: (Height: 8, Top: 0);
+        Style: LabelStyle(FontSize: 8, TextColor: @EffectText, HorizontalAlignment: Start, VerticalAlignment: Center);
+        Visible: false;
+      }
+    }
+
+    // ── Member 4 ──
+    Group #Member4 {
+      Anchor: (Height: 32, Top: 2);
+      LayoutMode: Top;
+      Visible: false;
+
+      Group {
+        Anchor: (Height: 14);
+        LayoutMode: Left;
+
+        Label #Member4Name {
+          Text: "Player";
+          Anchor: (Width: 110, Height: 14);
+          Style: LabelStyle(FontSize: 11, TextColor: @BrightText, HorizontalAlignment: Start, VerticalAlignment: Center);
+        }
+        Label #Member4Status {
+          Text: "Online";
+          Anchor: (Height: 14);
+          Style: LabelStyle(FontSize: 10, TextColor: #a9f5b3, HorizontalAlignment: End, VerticalAlignment: Center);
+        }
+      }
+
+      Group {
+        Anchor: (Height: 8, Top: 1);
+        LayoutMode: Left;
+
+        Group #Member4HealthBarBg {
+          Anchor: (Width: 100, Height: 6);
+          Background: @HealthBarBg;
+
+          Group #Member4HealthBar {
+            Anchor: (Top: 0, Bottom: 0, Left: 0, Right: 0);
+            Background: @HealthBarFill;
+          }
+        }
+
+        Label #Member4Health {
+          Text: "";
+          Anchor: (Width: 50, Height: 8);
+          Style: LabelStyle(FontSize: 8, TextColor: @DimText, HorizontalAlignment: Start, VerticalAlignment: Center);
+        }
+      }
+
+      Label #Member4Effect {
+        Text: "";
+        Anchor: (Height: 8, Top: 0);
+        Style: LabelStyle(FontSize: 8, TextColor: @EffectText, HorizontalAlignment: Start, VerticalAlignment: Center);
+        Visible: false;
+      }
+    }
+
+    // ── Member 5 ──
+    Group #Member5 {
+      Anchor: (Height: 32, Top: 2);
+      LayoutMode: Top;
+      Visible: false;
+
+      Group {
+        Anchor: (Height: 14);
+        LayoutMode: Left;
+
+        Label #Member5Name {
+          Text: "Player";
+          Anchor: (Width: 110, Height: 14);
+          Style: LabelStyle(FontSize: 11, TextColor: @BrightText, HorizontalAlignment: Start, VerticalAlignment: Center);
+        }
+        Label #Member5Status {
+          Text: "Online";
+          Anchor: (Height: 14);
+          Style: LabelStyle(FontSize: 10, TextColor: #a9f5b3, HorizontalAlignment: End, VerticalAlignment: Center);
+        }
+      }
+
+      Group {
+        Anchor: (Height: 8, Top: 1);
+        LayoutMode: Left;
+
+        Group #Member5HealthBarBg {
+          Anchor: (Width: 100, Height: 6);
+          Background: @HealthBarBg;
+
+          Group #Member5HealthBar {
+            Anchor: (Top: 0, Bottom: 0, Left: 0, Right: 0);
+            Background: @HealthBarFill;
+          }
+        }
+
+        Label #Member5Health {
+          Text: "";
+          Anchor: (Width: 50, Height: 8);
+          Style: LabelStyle(FontSize: 8, TextColor: @DimText, HorizontalAlignment: Start, VerticalAlignment: Center);
+        }
+      }
+
+      Label #Member5Effect {
+        Text: "";
+        Anchor: (Height: 8, Top: 0);
+        Style: LabelStyle(FontSize: 8, TextColor: @EffectText, HorizontalAlignment: Start, VerticalAlignment: Center);
+        Visible: false;
+      }
+    }
+
+    // ── Member 6 ──
+    Group #Member6 {
+      Anchor: (Height: 32, Top: 2);
+      LayoutMode: Top;
+      Visible: false;
+
+      Group {
+        Anchor: (Height: 14);
+        LayoutMode: Left;
+
+        Label #Member6Name {
+          Text: "Player";
+          Anchor: (Width: 110, Height: 14);
+          Style: LabelStyle(FontSize: 11, TextColor: @BrightText, HorizontalAlignment: Start, VerticalAlignment: Center);
+        }
+        Label #Member6Status {
+          Text: "Online";
+          Anchor: (Height: 14);
+          Style: LabelStyle(FontSize: 10, TextColor: #a9f5b3, HorizontalAlignment: End, VerticalAlignment: Center);
+        }
+      }
+
+      Group {
+        Anchor: (Height: 8, Top: 1);
+        LayoutMode: Left;
+
+        Group #Member6HealthBarBg {
+          Anchor: (Width: 100, Height: 6);
+          Background: @HealthBarBg;
+
+          Group #Member6HealthBar {
+            Anchor: (Top: 0, Bottom: 0, Left: 0, Right: 0);
+            Background: @HealthBarFill;
+          }
+        }
+
+        Label #Member6Health {
+          Text: "";
+          Anchor: (Width: 50, Height: 8);
+          Style: LabelStyle(FontSize: 8, TextColor: @DimText, HorizontalAlignment: Start, VerticalAlignment: Center);
+        }
+      }
+
+      Label #Member6Effect {
+        Text: "";
+        Anchor: (Height: 8, Top: 0);
+        Style: LabelStyle(FontSize: 8, TextColor: @EffectText, HorizontalAlignment: Start, VerticalAlignment: Center);
+        Visible: false;
+      }
+    }
+
+    // ── Member 7 ──
+    Group #Member7 {
+      Anchor: (Height: 32, Top: 2);
+      LayoutMode: Top;
+      Visible: false;
+
+      Group {
+        Anchor: (Height: 14);
+        LayoutMode: Left;
+
+        Label #Member7Name {
+          Text: "Player";
+          Anchor: (Width: 110, Height: 14);
+          Style: LabelStyle(FontSize: 11, TextColor: @BrightText, HorizontalAlignment: Start, VerticalAlignment: Center);
+        }
+        Label #Member7Status {
+          Text: "Online";
+          Anchor: (Height: 14);
+          Style: LabelStyle(FontSize: 10, TextColor: #a9f5b3, HorizontalAlignment: End, VerticalAlignment: Center);
+        }
+      }
+
+      Group {
+        Anchor: (Height: 8, Top: 1);
+        LayoutMode: Left;
+
+        Group #Member7HealthBarBg {
+          Anchor: (Width: 100, Height: 6);
+          Background: @HealthBarBg;
+
+          Group #Member7HealthBar {
+            Anchor: (Top: 0, Bottom: 0, Left: 0, Right: 0);
+            Background: @HealthBarFill;
+          }
+        }
+
+        Label #Member7Health {
+          Text: "";
+          Anchor: (Width: 50, Height: 8);
+          Style: LabelStyle(FontSize: 8, TextColor: @DimText, HorizontalAlignment: Start, VerticalAlignment: Center);
+        }
+      }
+
+      Label #Member7Effect {
+        Text: "";
+        Anchor: (Height: 8, Top: 0);
+        Style: LabelStyle(FontSize: 8, TextColor: @EffectText, HorizontalAlignment: Start, VerticalAlignment: Center);
+        Visible: false;
+      }
+    }
+  }
+}
+}

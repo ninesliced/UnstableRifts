@@ -48,7 +48,7 @@
                   "DefaultOk": true,
                   "DefaultValue": {
                     "Interactions": [
-                                   "Boss_Forklift_Fork_Damage_Second"
+                      "Boss_Forklift_Fork_Damage_Second"
                     ]
                   }
                 }

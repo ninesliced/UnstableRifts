@@ -1,0 +1,15 @@
+{
+  "Parent": "Armor_Mithril_Chest",
+  "TranslationProperties": {
+    "Name": "server.items.Armor_Crystal_Chest_UnstableRifts.name"
+  },
+  "MaxDurability": 0,
+  "Tags": {
+    "Type": [
+      "Armor"
+    ],
+    "Pickup": [
+      "FKey"
+    ]
+  }
+}

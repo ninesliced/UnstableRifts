@@ -1,0 +1,13 @@
+{
+  "Spawners": [
+    {
+      "SpawnerId": "UnstableRifts_Beam_Core"
+    },
+    {
+      "SpawnerId": "UnstableRifts_Beam_Glow"
+    }
+  ],
+  "CullDistance": 60.0,
+  "IsImportant": true,
+  "LifeSpan": 0.08
+}

@@ -19,15 +19,27 @@
     "_CombatConfig": "CAE_Kweebec_Seedling",
     "Attack": "Root_BossNPC_Kweebec_Seedling_Leap_Explode",
     "AttackDistance": 9,
-    "DesiredAttackDistanceRange": [6.0, 9.0],
-    "AttackPauseRange": [0.3, 0.6],
+    "DesiredAttackDistanceRange": [
+      6.0,
+      9.0
+    ],
+    "AttackPauseRange": [
+      0.3,
+      0.6
+    ],
     "CombatBehaviorDistance": 18,
     "CombatRelativeTurnSpeed": 2.0,
     "CombatDirectWeight": 14,
     "CombatAlwaysMovingWeight": 24,
     "CombatStrafeWeight": 2,
-    "CombatStrafingDurationRange": [0.3, 0.8],
-    "CombatStrafingFrequencyRange": [0.2, 0.8],
+    "CombatStrafingDurationRange": [
+      0.3,
+      0.8
+    ],
+    "CombatStrafingFrequencyRange": [
+      0.2,
+      0.8
+    ],
     "CombatMovingRelativeSpeed": 1.0,
     "CombatBackwardsRelativeSpeed": 0.7,
     "ChaseRelativeSpeed": 1.0,

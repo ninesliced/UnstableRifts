@@ -1,0 +1,73 @@
+// ─────────────────────────────────────────────
+//  UnstableRifts — Revive Prompt HUD
+//  Shows nearby revive prompt: key, target, action
+// ─────────────────────────────────────────────
+
+@DimText = #8a9bb0;
+@BrightText = #e8ecf0;
+@AccentGreen = #a9f5b3;
+@PanelBg = #0c0f14(0.85);
+@KeyBg = #2a3040;
+
+Group #RevivePromptHudRoot {
+  Anchor: (Left: 0, Top: 0, Right: 0, Bottom: 0);
+  HitTestVisible: false;
+
+  Group {
+    Anchor: (Bottom: 160, Left: 0, Right: 0, Height: 64);
+    LayoutMode: Center;
+
+    Group #RevivePromptRoot {
+      Anchor: (Width: 300, Height: 64);
+      Background: @PanelBg;
+      LayoutMode: Left;
+      Padding: (Horizontal: 12, Vertical: 10);
+      Visible: false;
+
+      Group #RevivePromptKeyHint {
+        Anchor: (Width: 22, Height: 20, Top: 12);
+        Background: @KeyBg;
+        LayoutMode: Center;
+
+        Label {
+          Text: "F";
+          Anchor: (Width: 22, Height: 20);
+          Style: LabelStyle(
+            FontName: "Mono",
+            FontSize: 13,
+            TextColor: @AccentGreen,
+            HorizontalAlignment: Center,
+            VerticalAlignment: Center
+          );
+        }
+      }
+
+      Group {
+        Anchor: (Height: 40, Left: 10, Top: 2);
+        LayoutMode: Top;
+
+        Label #RevivePromptTarget {
+          Text: "Teammate";
+          Anchor: (Height: 20);
+          Style: LabelStyle(
+            FontSize: 14,
+            TextColor: @BrightText,
+            HorizontalAlignment: Start,
+            VerticalAlignment: Center
+          );
+        }
+
+        Label #RevivePromptAction {
+          Text: "Revive";
+          Anchor: (Height: 18, Top: 2);
+          Style: LabelStyle(
+            FontSize: 12,
+            TextColor: @DimText,
+            HorizontalAlignment: Start,
+            VerticalAlignment: Center
+          );
+        }
+      }
+    }
+  }
+}

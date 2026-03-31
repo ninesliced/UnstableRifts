@@ -1,0 +1,113 @@
+// ─────────────────────────────────────────────
+//  UnstableRifts — Dungeon Info HUD
+//  Displays dungeon name, level, money, game time, mobs
+// ─────────────────────────────────────────────
+
+@DimText = #6b7d94;
+@BrightText = #e8ecf0;
+@AccentGold = #d9c18a;
+@PanelBg = #0c0f14(0.78);
+@LabelColor = #8fa4b8;
+@ValueColor = #e8ecf0;
+
+Group #DungeonInfoRoot {
+  Anchor: (Left: 0, Top: 0, Right: 0, Bottom: 0);
+  HitTestVisible: false;
+
+  // ── Right-side column used to vertically center the fixed-size panel ──
+  Group #DungeonInfoAnchor {
+    Anchor: (Width: 220, Right: 12, Top: 0, Bottom: 0);
+    LayoutMode: Middle;
+
+    Group #DungeonInfoPanel {
+      Anchor: (Width: 220, Height: 126);
+      Background: @PanelBg;
+      LayoutMode: Top;
+      Padding: (Horizontal: 12, Vertical: 8);
+      Visible: true;
+
+      // ── Dungeon Name ──
+      Label #DungeonNameLabel {
+        Text: "UNSTABLE RIFTS";
+        Anchor: (Height: 20);
+        Style: LabelStyle(
+          FontSize: 14,
+          TextColor: @AccentGold,
+          RenderBold: true,
+          RenderUppercase: true,
+          HorizontalAlignment: Center,
+          VerticalAlignment: Center
+        );
+      }
+
+      // ── Level Name ──
+      Group {
+      Anchor: (Height: 18, Top: 4);
+      LayoutMode: Left;
+
+      Label {
+        Text: "Level:";
+        Anchor: (Width: 70, Height: 18);
+        Style: LabelStyle(FontSize: 11, TextColor: @LabelColor, HorizontalAlignment: Start, VerticalAlignment: Center);
+      }
+      Label #LevelNameLabel {
+        Text: "—";
+        Anchor: (Height: 18);
+        Style: LabelStyle(FontSize: 12, TextColor: @ValueColor, RenderBold: true, HorizontalAlignment: Start, VerticalAlignment: Center);
+      }
+    }
+
+      // ── Money ──
+      Group {
+      Anchor: (Height: 18, Top: 2);
+      LayoutMode: Left;
+
+      Label {
+        Text: "Money:";
+        Anchor: (Width: 70, Height: 18);
+        Style: LabelStyle(FontSize: 11, TextColor: @LabelColor, HorizontalAlignment: Start, VerticalAlignment: Center);
+      }
+      Label #MoneyLabel {
+        Text: "0";
+        Anchor: (Height: 18);
+        Style: LabelStyle(FontSize: 12, TextColor: #ffd700, RenderBold: true, HorizontalAlignment: Start, VerticalAlignment: Center);
+      }
+    }
+
+      // ── Game Time ──
+      Group {
+      Anchor: (Height: 18, Top: 2);
+      LayoutMode: Left;
+
+      Label {
+        Text: "Game:";
+        Anchor: (Width: 70, Height: 18);
+        Style: LabelStyle(FontSize: 11, TextColor: @LabelColor, HorizontalAlignment: Start, VerticalAlignment: Center);
+      }
+      Label #GameTimeLabel {
+        Text: "00:00";
+        Anchor: (Height: 18);
+        Style: LabelStyle(FontName: "Mono", FontSize: 12, TextColor: @ValueColor, HorizontalAlignment: Start, VerticalAlignment: Center);
+      }
+    }
+
+      // ── Mob Counter ──
+      Group {
+      Anchor: (Height: 18, Top: 2);
+      LayoutMode: Left;
+
+      Label {
+        Text: "Mobs:";
+        Anchor: (Width: 70, Height: 18);
+        Style: LabelStyle(FontSize: 11, TextColor: @LabelColor, HorizontalAlignment: Start, VerticalAlignment: Center);
+      }
+      Label #MobCountLabel {
+        Text: "0 / 0";
+        Anchor: (Height: 18);
+        Style: LabelStyle(FontSize: 12, TextColor: @ValueColor, HorizontalAlignment: Start, VerticalAlignment: Center);
+      }
+      }
+    }
+  }
+}
+

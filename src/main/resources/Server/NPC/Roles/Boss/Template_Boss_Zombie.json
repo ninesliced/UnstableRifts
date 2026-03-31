@@ -36,7 +36,10 @@
       "Description": "A range within which the player can be seen/sensed when the NPC is alerted."
     },
     "AlertedTime": {
-      "Value": [0.5, 1],
+      "Value": [
+        0.5,
+        1
+      ],
       "Description": "How long to wait in an alerted state before switching to active combat."
     },
     "DropList": {
@@ -52,7 +55,9 @@
       "Description": "Relative speed at which run animation should be used."
     },
     "Weapons": {
-      "Value": ["Weapon_Sword_Iron"],
+      "Value": [
+        "Weapon_Sword_Iron"
+      ],
       "Description": "NPC Weapons."
     },
     "DefaultHotbarSlot": {
@@ -69,7 +74,10 @@
       "Description": "Default off-hand item slot."
     },
     "WakingPeriod": {
-      "Value": [0, 24],
+      "Value": [
+        0,
+        24
+      ],
       "Description": "The hour range this NPC is awake for."
     },
     "LeashDistance": {
@@ -81,7 +89,10 @@
       "Description": "The minimum distance from the player before the NPC will be willing to give up on the chase."
     },
     "LeashTimer": {
-      "Value": [3, 5],
+      "Value": [
+        3,
+        5
+      ],
       "Description": "How long the NPC must be too far before giving up."
     },
     "HardLeashDistance": {
@@ -109,11 +120,17 @@
       "Description": "The distance at which an NPC will execute attacks."
     },
     "DesiredAttackDistanceRange": {
-      "Value": [2, 3],
+      "Value": [
+        2,
+        3
+      ],
       "Description": "The distance within which the NPC wants to be from its target while attacking."
     },
     "AttackPauseRange": {
-      "Value": [1.5, 2.5],
+      "Value": [
+        1.5,
+        2.5
+      ],
       "Description": "The minimum time before an NPC can execute a second attack."
     },
     "CombatRelativeTurnSpeed": {
@@ -137,19 +154,31 @@
       "Description": "Weight for the combat strafing movement behavior."
     },
     "CombatStrafingDurationRange": {
-      "Value": [0.8, 1.5],
+      "Value": [
+        0.8,
+        1.5
+      ],
       "Description": "How long to strafe for."
     },
     "CombatStrafingFrequencyRange": {
-      "Value": [1.5, 2.5],
+      "Value": [
+        1.5,
+        2.5
+      ],
       "Description": "How frequently to strafe."
     },
     "CombatAttackPreDelay": {
-      "Value": [0.1, 0.2],
+      "Value": [
+        0.1,
+        0.2
+      ],
       "Description": "The time delay range before the NPC performs an attack."
     },
     "CombatAttackPostDelay": {
-      "Value": [0.8, 1.2],
+      "Value": [
+        0.8,
+        1.2
+      ],
       "Description": "The time delay range after the NPC performs an attack."
     },
     "CombatBackOffAfterAttack": {
@@ -157,11 +186,17 @@
       "Description": "Whether to back off after performing an attack."
     },
     "CombatBackOffDistanceRange": {
-      "Value": [3, 5],
+      "Value": [
+        3,
+        5
+      ],
       "Description": "How far to back off after performing an attack."
     },
     "CombatBackOffDurationRange": {
-      "Value": [1.5, 2.5],
+      "Value": [
+        1.5,
+        2.5
+      ],
       "Description": "How long to back off for after performing an attack."
     },
     "BlockAbility": {
@@ -193,7 +228,9 @@
       "Description": "Default attitude towards players."
     },
     "DisableDamageGroups": {
-      "Value": ["Self"],
+      "Value": [
+        "Self"
+      ],
       "Description": "Groups not to take damage from."
     },
     "MaxHealth": {
@@ -205,15 +242,24 @@
       "Description": "Range within which an NPC is willing to investigate."
     },
     "ConfusedTimeRange": {
-      "Value": [1, 2],
+      "Value": [
+        1,
+        2
+      ],
       "Description": "How long the NPC should act confused."
     },
     "SearchTimeRange": {
-      "Value": [10, 14],
+      "Value": [
+        10,
+        14
+      ],
       "Description": "How long the NPC should search for lost target."
     },
     "TargetSwitchTimer": {
-      "Value": [3, 5],
+      "Value": [
+        3,
+        5
+      ],
       "Description": "Minimum time locked onto a single target."
     },
     "TargetRange": {
@@ -241,39 +287,66 @@
       "Description": "The NPC role to summon in combat."
     },
     "SummonCountRange": {
-      "Value": [2, 3],
+      "Value": [
+        2,
+        3
+      ],
       "Description": "How many minions to summon per summon cycle."
     },
     "SummonCountRangePhase2": {
-      "Value": [4, 4],
+      "Value": [
+        4,
+        4
+      ],
       "Description": "How many minions to summon per summon cycle in phase 2 (<=50% HP)."
     },
     "SummonStartupCountRange": {
-      "Value": [2, 3],
+      "Value": [
+        2,
+        3
+      ],
       "Description": "How many minions to summon once at combat start."
     },
     "SummonDistanceRange": {
-      "Value": [3, 6],
+      "Value": [
+        3,
+        6
+      ],
       "Description": "Distance range used for spawn positions."
     },
     "SummonDelayRange": {
-      "Value": [0, 0],
+      "Value": [
+        0,
+        0
+      ],
       "Description": "Delay range before each spawned minion appears."
     },
     "SummonCooldownRange": {
-      "Value": [12, 12],
+      "Value": [
+        12,
+        12
+      ],
       "Description": "Timer range between summon casts while in phase 1 (>50% HP)."
     },
     "SummonCooldownRangePhase2": {
-      "Value": [16, 22],
+      "Value": [
+        16,
+        22
+      ],
       "Description": "Timer range between summon casts while in phase 2 (<=50% HP)."
     },
     "SummonStartupDelayRange": {
-      "Value": [2, 3],
+      "Value": [
+        2,
+        3
+      ],
       "Description": "Delay before the guaranteed combat-start summon fires."
     },
     "SummonCastTimeRange": {
-      "Value": [1.1, 1.5],
+      "Value": [
+        1.1,
+        1.5
+      ],
       "Description": "How long the boss channels summon while stationary."
     },
     "SummonAnimation": {
@@ -345,7 +418,9 @@
       "$Comment": "Always clear target and reset instructions when going back to idle.",
       "States": [
         {
-          "To": ["Idle"],
+          "To": [
+            "Idle"
+          ],
           "From": []
         }
       ],
@@ -362,7 +437,11 @@
       "$Comment": "Always equip main weapon when going to combat or alerted.",
       "States": [
         {
-          "To": ["Idle", "Alerted", "Combat"],
+          "To": [
+            "Idle",
+            "Alerted",
+            "Combat"
+          ],
           "From": []
         }
       ],
@@ -382,7 +461,9 @@
       "States": [
         {
           "To": [],
-          "From": ["Alerted"]
+          "From": [
+            "Alerted"
+          ]
         }
       ],
       "Actions": [
@@ -457,7 +538,9 @@
                   "AbsoluteDetectionRange": {
                     "Compute": "AbsoluteDetectionRange"
                   },
-                  "Attitudes": ["Hostile"]
+                  "Attitudes": [
+                    "Hostile"
+                  ]
                 }
               },
               "Actions": [
@@ -522,7 +605,9 @@
                   "AbsoluteDetectionRange": {
                     "Compute": "AbsoluteDetectionRange"
                   },
-                  "Attitudes": ["Hostile"]
+                  "Attitudes": [
+                    "Hostile"
+                  ]
                 }
               },
               "ActionsBlocking": true,
@@ -678,7 +763,10 @@
                     "Compute": "SummonKind"
                   },
                   "JoinFlock": true,
-                  "CountRange": [1, 1],
+                  "CountRange": [
+                    1,
+                    1
+                  ],
                   "DistanceRange": {
                     "Compute": "SummonDistanceRange"
                   },
@@ -702,11 +790,21 @@
                     "Sensor": {
                       "Reference": "Component_Sensor_Standard_Detection",
                       "Modify": {
-                        "ViewRange": { "Compute": "AlertedRange" },
-                        "ViewSector": { "Compute": "ViewSector" },
-                        "HearingRange": { "Compute": "HearingRange" },
-                        "AbsoluteDetectionRange": { "Compute": "AbsoluteDetectionRange" },
-                        "Attitudes": ["Hostile"]
+                        "ViewRange": {
+                          "Compute": "AlertedRange"
+                        },
+                        "ViewSector": {
+                          "Compute": "ViewSector"
+                        },
+                        "HearingRange": {
+                          "Compute": "HearingRange"
+                        },
+                        "AbsoluteDetectionRange": {
+                          "Compute": "AbsoluteDetectionRange"
+                        },
+                        "Attitudes": [
+                          "Hostile"
+                        ]
                       }
                     }
                   },
@@ -778,7 +876,10 @@
                       "Attack": {
                         "Compute": "FarLeapAttack"
                       },
-                      "AttackPauseRange": [0.45, 0.75]
+                      "AttackPauseRange": [
+                        0.45,
+                        0.75
+                      ]
                     }
                   ],
                   "HeadMotion": {
@@ -803,7 +904,10 @@
                             "RelativeTo": "Health",
                             "Stat": "Health",
                             "RelativeToTarget": "Max",
-                            "ValueRange": [0, 0.5]
+                            "ValueRange": [
+                              0,
+                              0.5
+                            ]
                           }
                         ]
                       },
@@ -829,7 +933,10 @@
                       "Attack": {
                         "Compute": "LeapAttack"
                       },
-                      "AttackPauseRange": [0.35, 0.55]
+                      "AttackPauseRange": [
+                        0.35,
+                        0.55
+                      ]
                     }
                   ],
                   "HeadMotion": {
@@ -843,7 +950,9 @@
                   "$Comment": "Return home if too far from spawn.",
                   "Reference": "Component_Instruction_Soft_Leash",
                   "Modify": {
-                    "_ExportStates": ["ReturnHome"],
+                    "_ExportStates": [
+                      "ReturnHome"
+                    ],
                     "LeashDistance": {
                       "Compute": "LeashDistance"
                     },
@@ -900,7 +1009,10 @@
                         "RelativeTo": "Health",
                         "Stat": "Health",
                         "RelativeToTarget": "Max",
-                        "ValueRange": [0.51, 1]
+                        "ValueRange": [
+                          0.51,
+                          1
+                        ]
                       }
                     ]
                   },
@@ -930,7 +1042,10 @@
                             "RelativeTo": "Health",
                             "Stat": "Health",
                             "RelativeToTarget": "Max",
-                            "ValueRange": [0, 0.6]
+                            "ValueRange": [
+                              0,
+                              0.6
+                            ]
                           }
                         ]
                       },
@@ -1023,7 +1138,10 @@
                         "RelativeTo": "Health",
                         "Stat": "Health",
                         "RelativeToTarget": "Max",
-                        "ValueRange": [0, 0.5]
+                        "ValueRange": [
+                          0,
+                          0.5
+                        ]
                       }
                     ]
                   },
@@ -1053,7 +1171,10 @@
                             "RelativeTo": "Health",
                             "Stat": "Health",
                             "RelativeToTarget": "Max",
-                            "ValueRange": [0, 0.6]
+                            "ValueRange": [
+                              0,
+                              0.6
+                            ]
                           }
                         ]
                       },
@@ -1205,7 +1326,10 @@
                   "Attack": {
                     "Compute": "FarLeapAttack"
                   },
-                  "AttackPauseRange": [0.45, 0.75]
+                  "AttackPauseRange": [
+                    0.45,
+                    0.75
+                  ]
                 }
               ],
               "HeadMotion": {
@@ -1230,7 +1354,10 @@
                         "RelativeTo": "Health",
                         "Stat": "Health",
                         "RelativeToTarget": "Max",
-                        "ValueRange": [0, 0.5]
+                        "ValueRange": [
+                          0,
+                          0.5
+                        ]
                       }
                     ]
                   },
@@ -1261,7 +1388,10 @@
                   "Attack": {
                     "Compute": "LeapAttack"
                   },
-                  "AttackPauseRange": [0.35, 0.55]
+                  "AttackPauseRange": [
+                    0.35,
+                    0.55
+                  ]
                 }
               ],
               "HeadMotion": {
@@ -1350,7 +1480,9 @@
                     "Sensors": [
                       {
                         "Type": "Nav",
-                        "NavStates": ["Defer"],
+                        "NavStates": [
+                          "Defer"
+                        ],
                         "ThrottleDuration": 3
                       },
                       {
@@ -1363,7 +1495,10 @@
                             "Type": "Not",
                             "Filter": {
                               "Type": "HeightDifference",
-                              "HeightDifference": [-2, 2]
+                              "HeightDifference": [
+                                -2,
+                                2
+                              ]
                             }
                           }
                         ]
@@ -1376,7 +1511,10 @@
               "Actions": [
                 {
                   "Type": "Timeout",
-                  "Delay": [0.8, 1.2]
+                  "Delay": [
+                    0.8,
+                    1.2
+                  ]
                 },
                 {
                   "Type": "State",
@@ -1388,7 +1526,9 @@
               "$Comment": "Leash check during combat.",
               "Reference": "Component_Instruction_Soft_Leash",
               "Modify": {
-                "_ExportStates": ["ReturnHome"],
+                "_ExportStates": [
+                  "ReturnHome"
+                ],
                 "LeashDistance": {
                   "Compute": "LeashDistance"
                 },
@@ -1464,7 +1604,10 @@
               "Actions": [
                 {
                   "Type": "Timeout",
-                  "Delay": [0.5, 0.5]
+                  "Delay": [
+                    0.5,
+                    0.5
+                  ]
                 },
                 {
                   "Type": "State",
@@ -1475,7 +1618,10 @@
             {
               "$Comment": "Execute combat-oriented movement (strafe, direct, charge).",
               "Type": "Random",
-              "ExecuteFor": [5, 5],
+              "ExecuteFor": [
+                5,
+                5
+              ],
               "Sensor": {
                 "Type": "Target",
                 "Range": {
@@ -1538,7 +1684,10 @@
                     "DesiredDistanceRange": {
                       "Compute": "DesiredAttackDistanceRange"
                     },
-                    "StrafingDurationRange": [0, 0],
+                    "StrafingDurationRange": [
+                      0,
+                      0
+                    ],
                     "RelativeForwardsSpeed": {
                       "Compute": "ChaseRelativeSpeed"
                     },
@@ -1672,7 +1821,11 @@
                   "Actions": [
                     {
                       "Type": "SpawnParticles",
-                      "Offset": [0, 2.1, 0],
+                      "Offset": [
+                        0,
+                        2.1,
+                        0
+                      ],
                       "ParticleSystem": "Question"
                     },
                     {
@@ -1729,7 +1882,10 @@
                       "AbsoluteDetectionRange": {
                         "Compute": "AbsoluteDetectionRange"
                       },
-                      "Attitudes": ["Hostile", "Neutral"]
+                      "Attitudes": [
+                        "Hostile",
+                        "Neutral"
+                      ]
                     }
                   },
                   "Actions": [
@@ -1790,7 +1946,10 @@
                       "AbsoluteDetectionRange": {
                         "Compute": "AbsoluteDetectionRange"
                       },
-                      "Attitudes": ["Hostile", "Neutral"]
+                      "Attitudes": [
+                        "Hostile",
+                        "Neutral"
+                      ]
                     }
                   },
                   "Actions": [
@@ -1806,7 +1965,10 @@
                     "Motions": [
                       {
                         "Type": "Timer",
-                        "Time": [3, 6],
+                        "Time": [
+                          3,
+                          6
+                        ],
                         "Motion": {
                           "Type": "Wander",
                           "MaxHeadingChange": 1,
@@ -1819,7 +1981,10 @@
                         "Motions": [
                           {
                             "Type": "Timer",
-                            "Time": [3, 6],
+                            "Time": [
+                              3,
+                              6
+                            ],
                             "Motion": {
                               "Type": "WanderInCircle",
                               "Radius": 10,
@@ -1829,7 +1994,10 @@
                           },
                           {
                             "Type": "Timer",
-                            "Time": [2, 3],
+                            "Time": [
+                              2,
+                              3
+                            ],
                             "Motion": {
                               "Type": "Nothing"
                             }

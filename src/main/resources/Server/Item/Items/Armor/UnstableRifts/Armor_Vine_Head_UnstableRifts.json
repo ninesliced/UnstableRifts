@@ -1,0 +1,15 @@
+{
+  "Parent": "Armor_Copper_Head",
+  "TranslationProperties": {
+    "Name": "server.items.Armor_Vine_Head_UnstableRifts.name"
+  },
+  "MaxDurability": 0,
+  "Tags": {
+    "Type": [
+      "Armor"
+    ],
+    "Pickup": [
+      "FKey"
+    ]
+  }
+}

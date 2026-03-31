@@ -1,5 +1,5 @@
 {
-  "itemId": "Weapon_Voidlance_Shotcave",
+  "itemId": "Weapon_Voidlance_UnstableRifts",
   "displayName": "Voidlance",
   "category": "BULLET",
   "lockedEffect": "VOID",
@@ -12,18 +12,18 @@
     "knockback": 0
   },
   "primary": {
-    "id": "Shotcave_Voidlance_Primary",
+    "id": "UnstableRifts_Voidlance_Primary",
     "cooldown": 1.2,
     "requireAmmo": true,
-    "shotId": "Shotcave_Voidlance_Shot",
-    "reloadId": "Shotcave_Voidlance_Reload"
+    "shotId": "UnstableRifts_Voidlance_Shot",
+    "reloadId": "UnstableRifts_Voidlance_Reload"
   },
   "reload": {
-    "id": "Shotcave_Voidlance_Reload",
+    "id": "UnstableRifts_Voidlance_Reload",
     "cooldown": 1.4,
     "runTime": 1.25,
     "amount": 0,
-    "nextId": "Shotcave_Update_Hud",
+    "nextId": "UnstableRifts_Update_Hud",
     "worldSfx": "SFX_Rifle_Fire",
     "localSfx": "SFX_Rifle_Fire_Local",
     "maxAmmo": 100

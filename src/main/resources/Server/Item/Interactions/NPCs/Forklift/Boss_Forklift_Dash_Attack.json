@@ -122,7 +122,10 @@
                   },
                   "GroundCheckDelay": 0.0,
                   "RunTime": 0.24,
-                  "VerticalClamp": [-1.2, 1.2],
+                  "VerticalClamp": [
+                    -1.2,
+                    1.2
+                  ],
                   "Next": {
                     "Type": "Simple",
                     "RunTime": 0.8

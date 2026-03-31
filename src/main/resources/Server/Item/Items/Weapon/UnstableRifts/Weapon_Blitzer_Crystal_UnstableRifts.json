@@ -1,0 +1,28 @@
+{
+  "TranslationProperties": {
+    "Name": "server.items.Weapon_Blitzer_Crystal_UnstableRifts.name"
+  },
+  "Categories": [
+    "Items.Weapons"
+  ],
+  "Icon": "Icons/ItemsGenerated/Blitzer_Crystal.png",
+  "Model": "Items/Weapons/UnstableRifts/Blitzer_Crystal/BLITZER_CRYSTAL.blockymodel",
+  "Texture": "Items/Weapons/UnstableRifts/Blitzer_Crystal/BLITZER_CRYSTAL.png",
+  "PlayerAnimationsId": "Rifle",
+  "Interactions": {
+    "Primary": "Root_UnstableRifts_Blitzer_Crystal_Primary",
+    "Secondary": "Root_UnstableRifts_Blitzer_Crystal_Reload"
+  },
+  "Weapon": {},
+  "Tags": {
+    "Type": [
+      "Weapon"
+    ],
+    "Family": [
+      "Gun"
+    ],
+    "Pickup": [
+      "FKey"
+    ]
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "TranslationProperties": {
+    "Name": "server.items.Weapon_Pistol_UnstableRifts.name"
+  },
+  "Categories": [
+    "Items.Weapons"
+  ],
+  "Icon": "Icons/ItemsGenerated/Weapon_Handgun.png",
+  "Model": "Items/Hypixel/Minigames/GunPvP/Weapons/Handguns/Handgun.blockymodel",
+  "Texture": "Items/Hypixel/Minigames/GunPvP/Weapons/Handguns/Handgun_Texture.png",
+  "PlayerAnimationsId": "Handgun",
+  "Interactions": {
+    "Primary": "Root_UnstableRifts_Pistol_Primary",
+    "Secondary": "Root_UnstableRifts_Pistol_Reload"
+  },
+  "Weapon": {},
+  "Tags": {
+    "Type": [
+      "Weapon"
+    ],
+    "Family": [
+      "Gun"
+    ],
+    "Pickup": [
+      "FKey"
+    ]
+  },
+  "Utility": {
+    "Compatible": true
+  }
+}

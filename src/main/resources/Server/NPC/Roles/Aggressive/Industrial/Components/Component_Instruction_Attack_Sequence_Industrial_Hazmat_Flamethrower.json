@@ -14,7 +14,9 @@
   "Content": {
     "Sensor": {
       "Type": "Target",
-      "Range": { "Compute": "AttackDistance" },
+      "Range": {
+        "Compute": "AttackDistance"
+      },
       "Filters": [
         {
           "Type": "LineOfSight"
@@ -26,23 +28,37 @@
       {
         "Type": "Attack",
         "Attack": "Root_Industrial_Hazmat_Flamethrower_Shoot",
-        "AimingTimeRange": [1.5, 2.5],
-        "AttackPauseRange": [0.3, 0.3]
+        "AimingTimeRange": [
+          1.5,
+          2.5
+        ],
+        "AttackPauseRange": [
+          0.3,
+          0.3
+        ]
       },
       {
         "Type": "Attack",
         "Attack": "Root_Industrial_Hazmat_Flamethrower_Shoot",
-        "AttackPauseRange": [0.3, 0.3]
+        "AttackPauseRange": [
+          0.3,
+          0.3
+        ]
       },
       {
         "Type": "Attack",
         "Attack": "Root_Industrial_Hazmat_Flamethrower_Shoot",
-        "AttackPauseRange": [0.8, 1.4]
+        "AttackPauseRange": [
+          0.8,
+          1.4
+        ]
       }
     ],
     "HeadMotion": {
       "Type": "Aim",
-      "RelativeTurnSpeed": { "Compute": "CombatRelativeTurnSpeed" },
+      "RelativeTurnSpeed": {
+        "Compute": "CombatRelativeTurnSpeed"
+      },
       "HitProbability": 0.7,
       "Spread": 0.5
     }

@@ -1,5 +1,5 @@
 {
-  "itemId": "Weapon_Crystal_Sword_Shotcave",
+  "itemId": "Weapon_Crystal_Sword_UnstableRifts",
   "displayName": "Crystal Sword",
   "category": "MELEE",
   "minRarity": "BASIC",
@@ -11,14 +11,14 @@
     "knockback": 1.5
   },
   "primary": {
-    "id": "Shotcave_Crystal_Sword_Primary",
+    "id": "UnstableRifts_Crystal_Sword_Primary",
     "cooldown": 0.25,
     "requireAmmo": false,
     "shotId": "",
     "reloadId": ""
   },
   "damage": {
-    "id": "Shotcave_Crystal_Sword_Hit",
+    "id": "UnstableRifts_Crystal_Sword_Hit",
     "amount": 8,
     "type": "Physical",
     "worldSfx": "SFX_Sword_T2_Impact",

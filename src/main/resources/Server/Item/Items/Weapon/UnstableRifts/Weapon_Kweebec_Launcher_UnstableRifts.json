@@ -1,0 +1,28 @@
+{
+  "TranslationProperties": {
+    "Name": "server.items.Weapon_Kweebec_Launcher_UnstableRifts.name"
+  },
+  "Categories": [
+    "Items.Weapons"
+  ],
+  "Icon": "Icons/ItemsGenerated/Kweebec_crystal_launcher.png",
+  "Model": "Items/Weapons/UnstableRifts/Kweebec_crystal_launcher/kweebec_crystal_launcher.blockymodel",
+  "Texture": "Items/Weapons/UnstableRifts/Kweebec_crystal_launcher/kweebec_crystal_launcher.png",
+  "PlayerAnimationsId": "Rifle",
+  "Interactions": {
+    "Primary": "Root_UnstableRifts_Kweebec_Launcher",
+    "Secondary": "Root_UnstableRifts_Kweebec_Launcher_Reload"
+  },
+  "Tags": {
+    "Type": [
+      "Weapon"
+    ],
+    "Family": [
+      "Gun"
+    ],
+    "Pickup": [
+      "FKey"
+    ]
+  },
+  "Weapon": {}
+}
