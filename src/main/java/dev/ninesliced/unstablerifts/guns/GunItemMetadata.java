@@ -182,8 +182,10 @@ public final class GunItemMetadata {
             return stack;
         }
 
-        ItemStack out = stack.withMetadata(MAX_AMMO_KEY, new BsonInt32(definition.baseMaxAmmo()));
-        return out.withMetadata(AMMO_KEY, new BsonInt32(definition.baseMaxAmmo()));
+        int baseMaxAmmo = definition.baseMaxAmmo();
+        int effectiveMaxAmmo = getEffectiveMaxAmmo(stack, baseMaxAmmo);
+        ItemStack out = stack.withMetadata(MAX_AMMO_KEY, new BsonInt32(baseMaxAmmo));
+        return out.withMetadata(AMMO_KEY, new BsonInt32(effectiveMaxAmmo));
     }
 
     // ── Low-level helpers ──────────────────────────────────────────────

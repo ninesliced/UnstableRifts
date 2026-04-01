@@ -490,7 +490,7 @@ public final class ContinuousBeamInteraction extends ChargingInteraction {
             crouching = movementStates.getMovementStates().crouching;
         }
 
-        AmmoHudService.updateForHeldItem(player, playerRef, context.getHeldItem(), crouching);
+        AmmoHudService.updateForHeldItem(player, playerRef, context.getHeldItem(), crouching, context.getEntity());
     }
 
     @Nullable

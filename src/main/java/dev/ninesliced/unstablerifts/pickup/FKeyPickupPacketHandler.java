@@ -29,6 +29,7 @@ import dev.ninesliced.unstablerifts.UnstableRifts;
 import dev.ninesliced.unstablerifts.armor.ArmorDefinition;
 import dev.ninesliced.unstablerifts.armor.ArmorDefinitions;
 import dev.ninesliced.unstablerifts.armor.ArmorSetTracker;
+import dev.ninesliced.unstablerifts.armor.ArmorStatResolver;
 import dev.ninesliced.unstablerifts.dungeon.*;
 import dev.ninesliced.unstablerifts.guns.GunItemMetadata;
 import dev.ninesliced.unstablerifts.guns.WeaponDefinition;
@@ -495,7 +496,12 @@ public final class FKeyPickupPacketHandler implements PlayerPacketWatcher {
             return;
         }
 
-        int effectiveMaxAmmo = GunItemMetadata.getEffectiveMaxAmmo(heldItem, baseMaxAmmo);
+        double armorAmmoCapacityBonus = 0.0;
+        InventoryComponent.Armor armorComp = store.getComponent(playerEntityRef, InventoryComponent.Armor.getComponentType());
+        if (armorComp != null) {
+            armorAmmoCapacityBonus = ArmorStatResolver.getTotalAmmoCapacityBonus(armorComp.getInventory());
+        }
+        int effectiveMaxAmmo = GunItemMetadata.getEffectiveMaxAmmo(heldItem, baseMaxAmmo, armorAmmoCapacityBonus);
         int currentAmmo = GunItemMetadata.getInt(heldItem, GunItemMetadata.AMMO_KEY, effectiveMaxAmmo);
 
         if (currentAmmo >= effectiveMaxAmmo) {
@@ -532,7 +538,7 @@ public final class FKeyPickupPacketHandler implements PlayerPacketWatcher {
 
         // Update ammo HUD.
         AmmoHudService.clear(playerRef);
-        AmmoHudService.updateForHeldItem(player, playerRef, updated);
+        AmmoHudService.updateForHeldItem(player, playerRef, updated, false, playerEntityRef);
 
         int refilled = effectiveMaxAmmo - currentAmmo;
         try {

@@ -108,10 +108,10 @@ public final class WeaponLootRoller {
                                   @Nonnull DamageEffect effect,
                                   @Nonnull List<WeaponModifier> modifiers) {
         ItemStack stack = new ItemStack(itemId, 1);
-        stack = GunItemMetadata.initializeFullAmmo(stack);
         stack = GunItemMetadata.setRarity(stack, rarity);
         stack = GunItemMetadata.setEffect(stack, effect);
         stack = GunItemMetadata.setModifiers(stack, modifiers);
+        stack = GunItemMetadata.initializeFullAmmo(stack);
         return stack;
     }
 

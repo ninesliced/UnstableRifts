@@ -48,6 +48,6 @@ public final class UpdateAmmoHudInteraction extends SimpleInstantInteraction {
         }
 
         ItemStack heldItem = context.getHeldItem();
-        AmmoHudService.updateForHeldItem(player, playerRef, heldItem, crouching);
+        AmmoHudService.updateForHeldItem(player, playerRef, heldItem, crouching, context.getEntity());
     }
 }
