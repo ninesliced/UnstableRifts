@@ -11,6 +11,21 @@
   "Texture": "Items/Weapons/UnstableRifts/Crystal_Sword/Crystal_Power_Sword_Blue.png",
   "PlayerAnimationsId": "Sword",
   "InteractionVars": {
+    "Swing_Left_Hit_Block": {
+      "Interactions": [
+        "UnstableRifts_Sword_Hit_Block"
+      ]
+    },
+    "Swing_Right_Hit_Block": {
+      "Interactions": [
+        "UnstableRifts_Sword_Hit_Block"
+      ]
+    },
+    "Swing_Down_Hit_Block": {
+      "Interactions": [
+        "UnstableRifts_Sword_Hit_Block"
+      ]
+    },
     "Swing_Left_Damage": {
       "Interactions": [
         {

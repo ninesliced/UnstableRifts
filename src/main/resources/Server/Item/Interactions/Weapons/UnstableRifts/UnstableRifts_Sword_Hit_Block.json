@@ -1,0 +1,18 @@
+{
+  "Type": "Serial",
+  "Interactions": [
+    {
+      "Type": "BreakSoftBlock"
+    },
+    {
+      "Type": "Condition",
+      "RequiredGameMode": "Adventure",
+      "Next": {
+        "Type": "BreakBlock"
+      },
+      "Failed": {
+        "Type": "Simple"
+      }
+    }
+  ]
+}
