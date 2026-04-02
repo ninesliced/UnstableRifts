@@ -22,7 +22,7 @@ import javax.annotation.Nullable;
  */
 public final class KweebecScaleHelper {
 
-    public static final float SEEDLING_SCALE = 3.0f;
+    public static final float SEEDLING_SCALE = 2.0f;
     public static final float SPROUTLING_SCALE = 1.5f;
     public static final float ROOTLING_SCALE = 1.2f;
     public static final float INDUSTRIAL_SCALE = 1.2f;
