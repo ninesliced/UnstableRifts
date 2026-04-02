@@ -27,7 +27,7 @@ Group #ArmorHudRoot {
 
   // ── Container — right of weapon HUD, bottom-aligned ──
   Group #ArmorRoot {
-    Anchor: (Width: 220, Height: 400, Bottom: 74, Left: 304);
+    Anchor: (Width: 220, Height: 400, Bottom: 40, Left: 1340);
     LayoutMode: Top;
     Visible: false;
 

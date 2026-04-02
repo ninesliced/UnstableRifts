@@ -21,7 +21,7 @@ public final class UnstableRiftsHud extends CustomUIHud {
     private static final String COLOR_LOW = "#d4534a";
     private static final String BAR_NORMAL = "#7aa8d4";
     private static final String BAR_LOW = "#d4534a";
-    private static final int BAR_WIDTH = 239;        // 270 - 3 accent - 14*2 padding
+    private static final int BAR_WIDTH = 283;        // 310 - 3 accent - 10 left pad - 14 right pad
     private static final int BAR_HEIGHT = 5;
 
     private final int ammo;
@@ -39,12 +39,15 @@ public final class UnstableRiftsHud extends CustomUIHud {
     private final List<WeaponModifier> modifiers;
     @Nullable
     private final String weaponName;
+    @Nullable
+    private final String weaponIconPath;
     private final boolean crouching;
 
     public UnstableRiftsHud(@Nonnull PlayerRef playerRef, int ammo, int baseMaxAmmo, int maxAmmo,
                             @Nonnull WeaponRarity rarity, @Nonnull DamageEffect effect,
                             @Nonnull WeaponCategory category, @Nullable WeaponDefinition definition,
                             @Nonnull List<WeaponModifier> modifiers, @Nullable String weaponName,
+                            @Nullable String weaponIconPath,
                             boolean crouching) {
         super(playerRef);
         this.ammo = Math.max(0, ammo);
@@ -56,6 +59,7 @@ public final class UnstableRiftsHud extends CustomUIHud {
         this.definition = definition;
         this.modifiers = modifiers;
         this.weaponName = weaponName;
+        this.weaponIconPath = weaponIconPath;
         this.crouching = crouching;
     }
 
@@ -89,6 +93,12 @@ public final class UnstableRiftsHud extends CustomUIHud {
     protected void build(@Nonnull UICommandBuilder ui) {
         ui.append(UI_PATH);
         ui.set("#UnstableRiftsAmmoRoot.Visible", true);
+
+        // Set weapon icon if available
+        if (weaponIconPath != null && !weaponIconPath.isBlank()) {
+            ui.set("#UnstableRiftsWeaponIcon.AssetPath", weaponIconPath);
+            ui.set("#UnstableRiftsWeaponIcon.Visible", true);
+        }
 
         String title = buildWeaponTitle();
         ui.set("#UnstableRiftsWeaponTitle.TextSpans", Message.raw(title));

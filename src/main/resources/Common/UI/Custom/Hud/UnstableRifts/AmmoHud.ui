@@ -23,7 +23,7 @@ Group #UnstableRiftsHudRoot {
 
   // ── Invisible wrapper — bottom-left, fixed max height ──
   Group #UnstableRiftsAmmoRoot {
-    Anchor: (Width: 270, Height: 420, Bottom: 74, Left: 24);
+    Anchor: (Width: 310, Height: 420, Bottom: 40, Left: 24);
     LayoutMode: Top;
     Visible: false;
 
@@ -39,13 +39,22 @@ Group #UnstableRiftsHudRoot {
       Group {
         Anchor: (Left: 3);
         LayoutMode: Top;
-        Padding: (Horizontal: 14, Vertical: 10);
+        Padding: (Left: 10, Right: 14, Top: 10, Bottom: 10);
         Background: @PanelBg;
 
-      // ── Weapon title ──
+      // ── Weapon title row (icon + name) ──
+      Group #UnstableRiftsWeaponTitleRow {
+        Anchor: (Height: 24);
+        LayoutMode: Left;
+
+        AssetImage #UnstableRiftsWeaponIcon {
+          Anchor: (Width: 22, Height: 22, Top: 1);
+          Visible: false;
+        }
+
       Label #UnstableRiftsWeaponTitle {
         Text: "WEAPON";
-        Anchor: (Height: 24);
+        Anchor: (Height: 24, Left: 4);
         Style: LabelStyle(
           FontName: "Secondary",
           FontSize: 15,
@@ -59,6 +68,8 @@ Group #UnstableRiftsHudRoot {
           MinShrinkTextToFitFontSize: 11
         );
       }
+
+      } // end #UnstableRiftsWeaponTitleRow
 
       // ── Subtitle: rarity + category + effect ──
       Group #UnstableRiftsCategoryRow {
