@@ -93,8 +93,7 @@
         "Kweebec_DeadWood_Sproutling_Lance": 5,
         "Kweebec_DeadWood_Seedling": 4,
         "Kweebec_Seedling": 3,
-        "Wolf_Radioactive": 5,
-        "Industrial_Hazmat_ToxicLauncher": 3
+        "Wolf_Radioactive": 5
       },
       "nextLevel": "desert"
     },

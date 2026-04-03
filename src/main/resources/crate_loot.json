@@ -3,7 +3,7 @@
     "UnstableRifts_Props_Crate_Level1": {
       "minRarity": "BASIC",
       "maxRarity": "RARE",
-      "weaponChance": 0.10,
+      "weaponChance": 0.35,
       "coinMin": 1,
       "coinMax": 3,
       "ammoChance": 0.10,
@@ -20,7 +20,7 @@
         "Weapon_Crystal_Musket_Lightning_UnstableRifts",
         "Weapon_Crystal_Musket_Void_UnstableRifts"
       ],
-      "armorChance": 0.1,
+      "armorChance": 0.30,
       "armorMinRarity": "BASIC",
       "armorMaxRarity": "RARE",
       "armorWhitelist": [
@@ -37,7 +37,7 @@
     "UnstableRifts_Props_Crate_Level2": {
       "minRarity": "UNCOMMON",
       "maxRarity": "EPIC",
-      "weaponChance": 0.20,
+      "weaponChance": 0.50,
       "coinMin": 2,
       "coinMax": 5,
       "ammoChance": 0.14,
@@ -60,7 +60,7 @@
         "Weapon_Crystal_Blunderbuss_Lightning_UnstableRifts",
         "Weapon_Crystal_Blunderbuss_Void_UnstableRifts"
       ],
-      "armorChance": 0.15,
+      "armorChance": 0.40,
       "armorMinRarity": "UNCOMMON",
       "armorMaxRarity": "EPIC",
       "armorWhitelist": [
@@ -85,7 +85,7 @@
     "UnstableRifts_Props_Crate_Level3": {
       "minRarity": "RARE",
       "maxRarity": "UNIQUE",
-      "weaponChance": 0.35,
+      "weaponChance": 0.65,
       "coinMin": 3,
       "coinMax": 7,
       "ammoChance": 0.20,
@@ -110,7 +110,7 @@
         "Weapon_Taser_UnstableRifts",
         "Weapon_Voidlance_UnstableRifts"
       ],
-      "armorChance": 0.25,
+      "armorChance": 0.55,
       "armorMinRarity": "RARE",
       "armorMaxRarity": "UNIQUE",
       "armorWhitelist": [
@@ -143,7 +143,7 @@
     "UnstableRifts_Props_Crate": {
       "minRarity": "BASIC",
       "maxRarity": "RARE",
-      "weaponChance": 0.10,
+      "weaponChance": 0.30,
       "coinMin": 1,
       "coinMax": 3,
       "ammoChance": 0.10,
@@ -160,7 +160,7 @@
         "Weapon_Crystal_Musket_Lightning_UnstableRifts",
         "Weapon_Crystal_Musket_Void_UnstableRifts"
       ],
-      "armorChance": 0.08,
+      "armorChance": 0.25,
       "armorMinRarity": "BASIC",
       "armorMaxRarity": "RARE",
       "armorWhitelist": [
@@ -177,7 +177,7 @@
     "UnstableRifts_Props_Crate_2x2": {
       "minRarity": "BASIC",
       "maxRarity": "EPIC",
-      "weaponChance": 0.25,
+      "weaponChance": 0.50,
       "coinMin": 3,
       "coinMax": 7,
       "ammoChance": 0.16,
@@ -200,7 +200,7 @@
         "Weapon_Crystal_Blunderbuss_Lightning_UnstableRifts",
         "Weapon_Crystal_Blunderbuss_Void_UnstableRifts"
       ],
-      "armorChance": 0.18,
+      "armorChance": 0.40,
       "armorMinRarity": "BASIC",
       "armorMaxRarity": "EPIC",
       "armorWhitelist": [

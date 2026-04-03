@@ -3,6 +3,7 @@
   "Reference": "Wolf_Black",
   "Modify": {
     "Appearance": "Wolf_Radioactive",
+    "DropList": "Drop_UnstableRifts_Wolf_Combat",
     "MaxHealth": 103,
     "FlockArray": [
       "Wolf_Radioactive"

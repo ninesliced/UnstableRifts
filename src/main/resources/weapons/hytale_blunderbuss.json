@@ -28,7 +28,7 @@
     "nextId": "UnstableRifts_Update_Hud",
     "worldSfx": "SFX_Blunderbuss_Load",
     "localSfx": "SFX_Blunderbuss_Load_Local",
-    "maxAmmo": 40
+    "maxAmmo": 60
   },
   "damage": {
     "id": "UnstableRifts_Blunderbuss_Projectile_Hit",

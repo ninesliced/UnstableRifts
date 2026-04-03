@@ -4,8 +4,8 @@
   "Modify": {
     "Appearance": "Forklift",
     "NameTranslationKey": "bettermobs.npcRoles.Boss_Forklift.name",
-    "MaxHealth": 1000,
-    "MaxSpeed": 5.25,
+    "MaxHealth": 2500,
+    "MaxSpeed": 7.5,
     "ViewRange": 22,
     "AlertedRange": 28,
     "AlertedTime": [
@@ -22,12 +22,12 @@
       0.6
     ],
     "LeapDistance": 7.2,
-    "ChaseRelativeSpeed": 1.15,
+    "ChaseRelativeSpeed": 1.35,
     "CombatStrafeWeight": 1,
     "CombatDirectWeight": 2,
     "CombatAlwaysMovingWeight": 6,
-    "CombatMovingRelativeSpeed": 1.08,
-    "CombatBackwardsRelativeSpeed": 0.9,
+    "CombatMovingRelativeSpeed": 1.3,
+    "CombatBackwardsRelativeSpeed": 1.1,
     "DesiredAttackDistanceRange": [
       2.4,
       4.2

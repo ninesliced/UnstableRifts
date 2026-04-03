@@ -171,6 +171,10 @@ public final class ArmorVirtualItems {
             entityConfig.particleSystemId = particleId;
             entityConfig.showItemParticles = true;
             clone.itemEntity = entityConfig;
+        } else {
+            ItemEntityConfig emptyConfig = new ItemEntityConfig();
+            emptyConfig.showItemParticles = false;
+            clone.itemEntity = emptyConfig;
         }
         return clone;
     }

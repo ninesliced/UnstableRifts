@@ -32,7 +32,7 @@
           "Parent": "Weapon_Sword_Primary_Swing_Left_Damage",
           "DamageCalculator": {
             "BaseDamage": {
-              "Physical": 8
+              "Physical": 18
             }
           },
           "DamageEffects": {
@@ -48,7 +48,7 @@
           "Parent": "Weapon_Sword_Primary_Swing_Right_Damage",
           "DamageCalculator": {
             "BaseDamage": {
-              "Physical": 8
+              "Physical": 18
             }
           },
           "DamageEffects": {
@@ -64,7 +64,7 @@
           "Parent": "Weapon_Sword_Primary_Swing_Down_Damage",
           "DamageCalculator": {
             "BaseDamage": {
-              "Physical": 14
+              "Physical": 18
             }
           },
           "DamageEffects": {

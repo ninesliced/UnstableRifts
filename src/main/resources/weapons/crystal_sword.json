@@ -19,7 +19,7 @@
   },
   "damage": {
     "id": "UnstableRifts_Crystal_Sword_Hit",
-    "amount": 8,
+    "amount": 18,
     "type": "Physical",
     "worldSfx": "SFX_Sword_T2_Impact",
     "localSfx": "SFX_Sword_T2_Impact",

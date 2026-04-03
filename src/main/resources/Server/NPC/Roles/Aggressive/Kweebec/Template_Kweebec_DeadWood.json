@@ -110,7 +110,7 @@
       "Description": "Turn speed modifier in combat"
     },
     "MaxHealth": {
-      "Value": 88,
+      "Value": 55,
       "Description": "Max health for the NPC"
     },
     "IsMemory": {
