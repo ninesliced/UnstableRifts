@@ -290,6 +290,7 @@ public class UnstableRifts extends JavaPlugin {
         this.getEntityStoreRegistry().registerSystem(new DungeonTickSystem());
         this.getEntityStoreRegistry().registerSystem(new PrefabSpawnTrackingSystem());
         this.getEntityStoreRegistry().registerSystem(new MobDeathTrackingSystem());
+        this.getEntityStoreRegistry().registerSystem(new NPCScaleHolderSystem());
 
         this.getEntityStoreRegistry().registerSystem(
                 new DeathPlayerAddedSystem(componentTypes.playerRefComponentType(), componentTypes.deathComponentType()));

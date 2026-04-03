@@ -30,7 +30,7 @@
   },
   "damage": {
     "id": "UnstableRifts_Crystal_Musket_Projectile_Hit",
-    "amount": 52,
+    "amount": 26,
     "type": "Projectile",
     "worldSfx": "SFX_Rifle_Fire",
     "localSfx": "SFX_Rifle_Fire_Local",

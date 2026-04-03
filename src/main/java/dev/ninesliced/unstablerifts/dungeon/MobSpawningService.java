@@ -160,7 +160,6 @@ public final class MobSpawningService {
             var mobResult = NPCPlugin.get().spawnNPC(store, mobId, null, position, Rotation3f.ZERO);
             Ref<EntityStore> mobRef = mobResult != null ? mobResult.first() : null;
             if (mobRef != null) {
-                KweebecScaleHelper.applyScale(store, mobRef, mobId);
                 room.addSpawnedMob(mobRef);
                 UUIDComponent uuidComp = store.getComponent(mobRef, UUIDComponent.getComponentType());
                 if (uuidComp != null) {

@@ -67,9 +67,7 @@ public final class DamageEffectRuntime {
             }
             activeEffect.apply(effect.ordinal(), Math.max(1, Math.round(durationSeconds * 1000.0f)), damagePerTick,
                     effect == DamageEffect.ICE);
-            if (!sameEffect) {
-                applyVisual(commandBuffer, target, effect, durationSeconds);
-            }
+            applyVisual(commandBuffer, target, effect, durationSeconds);
         } else {
             DamageEffectComponent newEffect = new DamageEffectComponent();
             newEffect.apply(effect.ordinal(), Math.max(1, Math.round(durationSeconds * 1000.0f)), damagePerTick,

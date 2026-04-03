@@ -33,8 +33,8 @@ public final class DamageEffectTickSystem extends EntityTickingSystem<EntityStor
 
     @Nonnull
     private final Set<Dependency<EntityStore>> dependencies = Set.of(
-            new SystemDependency<>(Order.BEFORE, NPCVelocityInstructionSystem.class),
-            new SystemDependency<>(Order.BEFORE, GenericVelocityInstructionSystem.class)
+            new SystemDependency<>(Order.AFTER, NPCVelocityInstructionSystem.class),
+            new SystemDependency<>(Order.AFTER, GenericVelocityInstructionSystem.class)
     );
 
     private static void applyMovementControl(@Nonnull CommandBuffer<EntityStore> commandBuffer,

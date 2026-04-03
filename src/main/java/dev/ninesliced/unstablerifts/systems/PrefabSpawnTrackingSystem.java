@@ -51,6 +51,7 @@ public final class PrefabSpawnTrackingSystem extends EntityTickingSystem<EntityS
             return;
         }
 
+        Ref<EntityStore> npcRef = archetypeChunk.getReferenceTo(index);
         SpawnMarkerReference spawnMarkerReference = archetypeChunk.getComponent(index, SpawnMarkerReference.getComponentType());
         if (spawnMarkerReference == null) {
             return;
@@ -71,13 +72,7 @@ public final class PrefabSpawnTrackingSystem extends EntityTickingSystem<EntityS
             return;
         }
 
-        Ref<EntityStore> npcRef = archetypeChunk.getReferenceTo(index);
         if (npcRef.isValid()) {
-            // Apply Kweebec scale if applicable
-            NPCEntity npcEntity = archetypeChunk.getComponent(index, NPCEntity.getComponentType());
-            if (npcEntity != null) {
-                KweebecScaleHelper.applyScale(store, npcRef, npcEntity.getRoleName());
-            }
             room.addSpawnedMob(npcRef);
             GameManager gameManager = unstablerifts.getGameManager();
             UUIDComponent uuidComp = store.getComponent(npcRef, UUIDComponent.getComponentType());

@@ -1,5 +1,6 @@
 package dev.ninesliced.unstablerifts.systems;
 
+import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.server.core.modules.entity.component.EntityScaleComponent;
@@ -74,6 +75,26 @@ public final class KweebecScaleHelper {
             existing.setScale(scale);
         } else {
             store.addComponent(mobRef, EntityScaleComponent.getComponentType(),
+                    new EntityScaleComponent(scale));
+        }
+    }
+
+    /**
+     * CommandBuffer-safe variant of {@link #applyScale} for use inside tick systems
+     * where the store is in processing mode and direct writes are not allowed.
+     */
+    public static void applyScale(@Nonnull Store<EntityStore> store,
+                                  @Nonnull CommandBuffer<EntityStore> commandBuffer,
+                                  @Nonnull Ref<EntityStore> mobRef,
+                                  @Nonnull String mobId) {
+        float scale = getScaleForRole(mobId);
+        if (scale <= 0f) return;
+
+        EntityScaleComponent existing = store.getComponent(mobRef, EntityScaleComponent.getComponentType());
+        if (existing != null) {
+            existing.setScale(scale);
+        } else {
+            commandBuffer.putComponent(mobRef, EntityScaleComponent.getComponentType(),
                     new EntityScaleComponent(scale));
         }
     }
