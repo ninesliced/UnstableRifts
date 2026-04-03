@@ -1,0 +1,77 @@
+// ─────────────────────────────────────────────
+//  UnstableRifts — Portal Prompt HUD
+//  Shows nearby portal confirmation text above
+//  the hotbar and requires F to activate.
+// ─────────────────────────────────────────────
+
+@DimText = #8a9bb0;
+@BrightText = #e8ecf0;
+@AccentTeal = #86f7de;
+@PanelBg = #0c0f14(0.85);
+@KeyBg = #2a3040;
+
+Group #PortalPromptHudRoot {
+  Anchor: (Left: 0, Top: 0, Right: 0, Bottom: 0);
+  HitTestVisible: false;
+
+  Group {
+    Anchor: (Bottom: 160, Left: 0, Right: 0, Height: 70);
+    LayoutMode: Center;
+
+    Group #PortalPromptRoot {
+      Anchor: (Width: 360, Height: 70);
+      Background: @PanelBg;
+      LayoutMode: Left;
+      Padding: (Horizontal: 12, Vertical: 10);
+      Visible: false;
+
+      Group #PortalPromptKeyHint {
+        Anchor: (Width: 24, Height: 22, Top: 14);
+        Background: @KeyBg;
+        LayoutMode: Center;
+
+        Label {
+          Text: "F";
+          Anchor: (Width: 24, Height: 22);
+          Style: LabelStyle(
+            FontName: "Secondary",
+            FontSize: 13,
+            TextColor: @AccentTeal,
+            RenderBold: true,
+            HorizontalAlignment: Center,
+            VerticalAlignment: Center
+          );
+        }
+      }
+
+      Group {
+        Anchor: (Height: 46, Left: 10, Top: 1);
+        LayoutMode: Top;
+
+        Label #PortalPromptTitle {
+          Text: "Portal";
+          Anchor: (Height: 24);
+          Style: LabelStyle(
+            FontName: "Secondary",
+            FontSize: 14,
+            TextColor: @BrightText,
+            RenderBold: true,
+            HorizontalAlignment: Start,
+            VerticalAlignment: Center
+          );
+        }
+
+        Label #PortalPromptDetail {
+          Text: "Teleport";
+          Anchor: (Height: 18, Top: 2);
+          Style: LabelStyle(
+            FontSize: 12,
+            TextColor: @DimText,
+            HorizontalAlignment: Start,
+            VerticalAlignment: Center
+          );
+        }
+      }
+    }
+  }
+}

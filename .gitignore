@@ -31,6 +31,7 @@ target/*
 .idea/
 .vscode/
 .claude/
+.codex
 UnstableRifts.code-workspace
 
 /server/

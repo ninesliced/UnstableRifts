@@ -1,0 +1,283 @@
+// ─────────────────────────────────────────────
+//  UnstableRifts — Room Configuration (Level Designer)
+// ─────────────────────────────────────────────
+
+@PanelBg = #1a1e26(0.92);
+@TitleColor = #d9c18a;
+@LabelColor = #8fa4b8;
+@ValueColor = #e8ecf0;
+@SectionColor = #c0a870;
+@BtnBg = #2a3040;
+@BtnHover = #3a4560;
+@BtnText = #e8ecf0;
+@OnColor = #66cc88;
+@OffColor = #8fa4b8;
+@BtnLabelStyle = LabelStyle(FontSize: 12, TextColor: @BtnText, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center);
+@BtnStyle = TextButtonStyle(
+  Default: (Background: @BtnBg, LabelStyle: @BtnLabelStyle),
+  Hovered: (Background: @BtnHover, LabelStyle: @BtnLabelStyle),
+  Pressed: (Background: @BtnBg, LabelStyle: @BtnLabelStyle)
+);
+@InputBg = #222838;
+
+Group #RoomConfigRoot {
+  Anchor: (Left: 0, Top: 0, Right: 0, Bottom: 0);
+
+  // Overlay background
+  Group {
+    Anchor: (Left: 0, Top: 0, Right: 0, Bottom: 0);
+    Background: #000000(0.5);
+  }
+
+  Group #RoomConfigCenter {
+    Anchor: (Width: 400, Height: 620);
+    LayoutMode: Middle;
+
+    Group #RoomConfigPanel {
+      Anchor: (Width: 400, Height: 620);
+      Background: @PanelBg;
+      LayoutMode: Top;
+      Padding: (Horizontal: 20, Vertical: 14);
+
+      // ── Title ──
+      Label {
+        Text: "ROOM CONFIGURATION";
+        Anchor: (Height: 28);
+        Style: LabelStyle(
+          FontSize: 15,
+          TextColor: @TitleColor,
+          RenderBold: true,
+          RenderUppercase: true,
+          HorizontalAlignment: Center,
+          VerticalAlignment: Center
+        );
+      }
+
+      // ── Lock the room on enter ──
+      Group {
+        Anchor: (Height: 30, Top: 10);
+        LayoutMode: Left;
+
+        Label {
+          Text: "Lock the room on enter";
+          Anchor: (Width: 230, Height: 28);
+          Style: LabelStyle(FontSize: 13, TextColor: @LabelColor, RenderBold: true, HorizontalAlignment: Start, VerticalAlignment: Center);
+        }
+
+        Label #LockRoomToggle {
+          Text: "OFF";
+          Anchor: (Width: 40, Height: 28);
+          Style: LabelStyle(FontSize: 12, TextColor: @OffColor, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center);
+        }
+
+        TextButton #LockRoomToggleBtn {
+          Text: "TOGGLE";
+          Anchor: (Width: 70, Height: 28);
+          Style: @BtnStyle;
+        }
+      }
+
+      // ── Must clear the room before unlock ──
+      Group {
+        Anchor: (Height: 30, Top: 4);
+        LayoutMode: Left;
+
+        Label {
+          Text: "Must clear the room before unlock";
+          Anchor: (Width: 230, Height: 28);
+          Style: LabelStyle(FontSize: 13, TextColor: @LabelColor, RenderBold: true, HorizontalAlignment: Start, VerticalAlignment: Center);
+        }
+
+        Label #MobClearToggle {
+          Text: "OFF";
+          Anchor: (Width: 40, Height: 28);
+          Style: LabelStyle(FontSize: 12, TextColor: @OffColor, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center);
+        }
+
+        TextButton #MobClearToggleBtn {
+          Text: "TOGGLE";
+          Anchor: (Width: 70, Height: 28);
+          Style: @BtnStyle;
+        }
+      }
+
+      // ── Separator ──
+      Group {
+        Anchor: (Height: 1, Top: 10);
+        Background: #3a4560;
+      }
+
+      // ═══ ENTER ROOM MESSAGE ═══
+      Label {
+        Text: "ENTER ROOM MESSAGE";
+        Anchor: (Height: 20, Top: 8);
+        Style: LabelStyle(FontSize: 11, TextColor: @SectionColor, RenderBold: true, RenderUppercase: true, HorizontalAlignment: Start, VerticalAlignment: Center);
+      }
+
+      Group {
+        Anchor: (Height: 28, Top: 2);
+        LayoutMode: Left;
+
+        Label {
+          Text: "Title";
+          Anchor: (Width: 55, Height: 28);
+          Style: LabelStyle(FontSize: 12, TextColor: @LabelColor, HorizontalAlignment: Start, VerticalAlignment: Center);
+        }
+
+        TextField #EnterTitleInput {
+          PlaceholderText: "...";
+          Anchor: (Width: 285, Height: 26);
+          Style: InputFieldStyle(FontSize: 12, TextColor: @ValueColor);
+          PlaceholderStyle: InputFieldStyle(FontSize: 12, TextColor: #556070);
+          Background: @InputBg;
+          Padding: (Left: 6, Right: 6);
+        }
+      }
+
+      Group {
+        Anchor: (Height: 28, Top: 2);
+        LayoutMode: Left;
+
+        Label {
+          Text: "Subtitle";
+          Anchor: (Width: 55, Height: 28);
+          Style: LabelStyle(FontSize: 12, TextColor: @LabelColor, HorizontalAlignment: Start, VerticalAlignment: Center);
+        }
+
+        TextField #EnterSubtitleInput {
+          PlaceholderText: "...";
+          Anchor: (Width: 285, Height: 26);
+          Style: InputFieldStyle(FontSize: 12, TextColor: @ValueColor);
+          PlaceholderStyle: InputFieldStyle(FontSize: 12, TextColor: #556070);
+          Background: @InputBg;
+          Padding: (Left: 6, Right: 6);
+        }
+      }
+
+      // ── Separator ──
+      Group {
+        Anchor: (Height: 1, Top: 8);
+        Background: #3a4560;
+      }
+
+      // ═══ UNLOCK ROOM MESSAGE ═══
+      Label {
+        Text: "UNLOCK ROOM MESSAGE";
+        Anchor: (Height: 20, Top: 8);
+        Style: LabelStyle(FontSize: 11, TextColor: @SectionColor, RenderBold: true, RenderUppercase: true, HorizontalAlignment: Start, VerticalAlignment: Center);
+      }
+
+      Group {
+        Anchor: (Height: 28, Top: 2);
+        LayoutMode: Left;
+
+        Label {
+          Text: "Title";
+          Anchor: (Width: 55, Height: 28);
+          Style: LabelStyle(FontSize: 12, TextColor: @LabelColor, HorizontalAlignment: Start, VerticalAlignment: Center);
+        }
+
+        TextField #UnlockTitleInput {
+          PlaceholderText: "...";
+          Anchor: (Width: 285, Height: 26);
+          Style: InputFieldStyle(FontSize: 12, TextColor: @ValueColor);
+          PlaceholderStyle: InputFieldStyle(FontSize: 12, TextColor: #556070);
+          Background: @InputBg;
+          Padding: (Left: 6, Right: 6);
+        }
+      }
+
+      Group {
+        Anchor: (Height: 28, Top: 2);
+        LayoutMode: Left;
+
+        Label {
+          Text: "Subtitle";
+          Anchor: (Width: 55, Height: 28);
+          Style: LabelStyle(FontSize: 12, TextColor: @LabelColor, HorizontalAlignment: Start, VerticalAlignment: Center);
+        }
+
+        TextField #UnlockSubtitleInput {
+          PlaceholderText: "...";
+          Anchor: (Width: 285, Height: 26);
+          Style: InputFieldStyle(FontSize: 12, TextColor: @ValueColor);
+          PlaceholderStyle: InputFieldStyle(FontSize: 12, TextColor: #556070);
+          Background: @InputBg;
+          Padding: (Left: 6, Right: 6);
+        }
+      }
+
+      // ── Separator ──
+      Group {
+        Anchor: (Height: 1, Top: 8);
+        Background: #3a4560;
+      }
+
+      // ═══ EXIT ROOM MESSAGE ═══
+      Label {
+        Text: "EXIT ROOM MESSAGE";
+        Anchor: (Height: 20, Top: 8);
+        Style: LabelStyle(FontSize: 11, TextColor: @SectionColor, RenderBold: true, RenderUppercase: true, HorizontalAlignment: Start, VerticalAlignment: Center);
+      }
+
+      Group {
+        Anchor: (Height: 28, Top: 2);
+        LayoutMode: Left;
+
+        Label {
+          Text: "Title";
+          Anchor: (Width: 55, Height: 28);
+          Style: LabelStyle(FontSize: 12, TextColor: @LabelColor, HorizontalAlignment: Start, VerticalAlignment: Center);
+        }
+
+        TextField #ExitTitleInput {
+          PlaceholderText: "...";
+          Anchor: (Width: 285, Height: 26);
+          Style: InputFieldStyle(FontSize: 12, TextColor: @ValueColor);
+          PlaceholderStyle: InputFieldStyle(FontSize: 12, TextColor: #556070);
+          Background: @InputBg;
+          Padding: (Left: 6, Right: 6);
+        }
+      }
+
+      Group {
+        Anchor: (Height: 28, Top: 2);
+        LayoutMode: Left;
+
+        Label {
+          Text: "Subtitle";
+          Anchor: (Width: 55, Height: 28);
+          Style: LabelStyle(FontSize: 12, TextColor: @LabelColor, HorizontalAlignment: Start, VerticalAlignment: Center);
+        }
+
+        TextField #ExitSubtitleInput {
+          PlaceholderText: "...";
+          Anchor: (Width: 285, Height: 26);
+          Style: InputFieldStyle(FontSize: 12, TextColor: @ValueColor);
+          PlaceholderStyle: InputFieldStyle(FontSize: 12, TextColor: #556070);
+          Background: @InputBg;
+          Padding: (Left: 6, Right: 6);
+        }
+      }
+
+      // ── Action Buttons ──
+      Group {
+        Anchor: (Height: 40, Top: 12);
+        LayoutMode: Left;
+        Padding: (Horizontal: 10);
+
+        TextButton #SaveBtn {
+          Text: "SAVE";
+          Anchor: (Width: 140, Height: 32);
+          Style: @BtnStyle;
+        }
+
+        TextButton #CloseBtn {
+          Text: "CLOSE";
+          Anchor: (Width: 140, Height: 32, Left: 10);
+          Style: @BtnStyle;
+        }
+      }
+    }
+  }
+}
