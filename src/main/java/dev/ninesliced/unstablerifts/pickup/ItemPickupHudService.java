@@ -38,6 +38,10 @@ public final class ItemPickupHudService {
                             boolean crouching,
                             @Nullable ItemStack itemStack) {
 
+        if (dev.ninesliced.unstablerifts.hud.HudVisibilityService.isHidden(playerRef.getUuid())) {
+            return;
+        }
+
         // Read weapon metadata from the ItemStack
         boolean isWeapon = false;
         boolean isArmor = false;

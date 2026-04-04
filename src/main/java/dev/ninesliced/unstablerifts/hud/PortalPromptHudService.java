@@ -24,6 +24,9 @@ public final class PortalPromptHudService {
                             @Nonnull PlayerRef playerRef,
                             @Nonnull String title,
                             @Nonnull String detail) {
+        if (HudVisibilityService.isHidden(playerRef.getUuid())) {
+            return;
+        }
         long state = computeState(title, detail);
         UUID uuid = playerRef.getUuid();
 

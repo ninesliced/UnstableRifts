@@ -18,6 +18,9 @@ public final class RevivePromptHudService {
     }
 
     public static void show(@Nonnull Player player, @Nonnull PlayerRef playerRef, @Nonnull String targetName) {
+        if (HudVisibilityService.isHidden(playerRef.getUuid())) {
+            return;
+        }
         long state = targetName.hashCode();
         UUID uuid = playerRef.getUuid();
 

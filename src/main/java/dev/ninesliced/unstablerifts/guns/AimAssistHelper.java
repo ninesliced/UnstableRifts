@@ -11,8 +11,10 @@ import com.hypixel.hytale.server.core.modules.entity.component.BoundingBox;
 import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.selector.Selector;
 import com.hypixel.hytale.server.core.universe.world.World;
+import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.core.util.TargetUtil;
+import com.hypixel.hytale.math.util.ChunkUtil;
 import dev.ninesliced.unstablerifts.crate.DestructibleBlockConfig;
 import org.joml.Vector3d;
 import org.joml.Vector3i;
@@ -31,6 +33,20 @@ public final class AimAssistHelper {
     private static final double XZ_CORRECTION_FACTOR = 0.35;
 
     private AimAssistHelper() {
+    }
+
+    /**
+     * Safe block type lookup that avoids triggering chunk state transitions
+     * during system ticks. Uses getChunkIfLoaded (already-ticking chunks only).
+     */
+    @Nullable
+    private static BlockType getBlockTypeSafe(@Nonnull World world, int x, int y, int z) {
+        if (y < 0 || y >= 320) return null;
+        long chunkIdx = ChunkUtil.indexChunkFromBlock(x, z);
+        WorldChunk chunk = world.getChunkIfLoaded(chunkIdx);
+        if (chunk == null) return null;
+        int blockId = chunk.getBlock(x, y, z);
+        return blockId == 0 ? null : BlockType.getAssetMap().getAsset(blockId);
     }
 
     /**
@@ -237,7 +253,7 @@ public final class AimAssistHelper {
                     double distSq = toBlockX * toBlockX + toBlockY * toBlockY + toBlockZ * toBlockZ;
                     if (distSq > range * range) continue;
 
-                    BlockType blockType = world.getBlockType(bx, by, bz);
+                    BlockType blockType = getBlockTypeSafe(world, bx, by, bz);
                     if (blockType == null) continue;
 
                     String blockTypeId = blockType.getId();
@@ -411,7 +427,7 @@ public final class AimAssistHelper {
                         double distSq = toX * toX + toY * toY + toZ * toZ;
                         if (distSq > rangeSq) continue;
 
-                        BlockType blockType = world.getBlockType(bx, by, bz);
+                        BlockType blockType = getBlockTypeSafe(world, bx, by, bz);
                         if (blockType == null) continue;
                         String blockTypeId = blockType.getId();
                         if (blockTypeId == null || !DestructibleBlockConfig.isDestructible(blockTypeId)) continue;
@@ -451,7 +467,7 @@ public final class AimAssistHelper {
                     double targetDistSq = dist * dist;
                     // If blocking block is closer AND is not in the same position as a destructible block target
                     if (blockDistSq + 1.0E-6 < targetDistSq) {
-                        BlockType bt = world.getBlockType(blockingBlock.x, blockingBlock.y, blockingBlock.z);
+                        BlockType bt = getBlockTypeSafe(world, blockingBlock.x, blockingBlock.y, blockingBlock.z);
                         if (bt == null || !DestructibleBlockConfig.isDestructible(bt.getId())) {
                             continue;
                         }

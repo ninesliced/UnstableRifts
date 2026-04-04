@@ -29,6 +29,7 @@ import dev.ninesliced.unstablerifts.dungeon.*;
 import dev.ninesliced.unstablerifts.dungeon.map.DungeonMapService;
 import dev.ninesliced.unstablerifts.guns.WeaponRegistry;
 import dev.ninesliced.unstablerifts.hud.AmmoHudRuntime;
+import dev.ninesliced.unstablerifts.hud.HudVisibilityService;
 import dev.ninesliced.unstablerifts.hud.PortalPromptHudService;
 import dev.ninesliced.unstablerifts.hud.RevivePromptHudRuntime;
 import dev.ninesliced.unstablerifts.interactions.*;
@@ -340,6 +341,7 @@ public class UnstableRifts extends JavaPlugin {
             WeaponVirtualItems.onPlayerDisconnect(event.getPlayerRef().getUuid());
             ArmorVirtualItems.onPlayerDisconnect(event.getPlayerRef().getUuid());
             armorSetTracker.removePlayer(event.getPlayerRef().getUuid());
+            HudVisibilityService.clear(event.getPlayerRef().getUuid());
         });
     }
 
