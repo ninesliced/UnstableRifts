@@ -39,9 +39,8 @@ public final class KweebecScaleHelper {
     public static float getScaleForRole(@Nullable String roleName) {
         if (roleName == null) return 0f;
 
-        // Kweebec tiers
+        // Kweebec DeadWood tiers only
         if (roleName.equals("Kweebec_DeadWood_Seedling")) return SEEDLING_SCALE;
-        if (roleName.equals("Kweebec_Seedling")) return SEEDLING_SCALE;
         if (roleName.startsWith("Kweebec_DeadWood_Sproutling")) return SPROUTLING_SCALE;
         if (roleName.startsWith("Kweebec_DeadWood_Rootling")) return ROOTLING_SCALE;
         // Bare template fallback (Kweebec_DeadWood without suffix)

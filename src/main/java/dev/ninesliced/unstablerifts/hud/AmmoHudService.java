@@ -48,6 +48,10 @@ public final class AmmoHudService {
                                          @Nullable ItemStack heldItem, boolean crouching,
                                          @Nullable Ref<EntityStore> ref) {
 
+        if (HudVisibilityService.isHidden(playerRef.getUuid())) {
+            return;
+        }
+
         boolean isWeapon = false;
 
         if (heldItem != null) {
@@ -249,7 +253,7 @@ public final class AmmoHudService {
         }
     }
 
-    private static void hideArmorHud(@Nonnull Player player, @Nonnull PlayerRef playerRef) {
+    static void hideArmorHud(@Nonnull Player player, @Nonnull PlayerRef playerRef) {
         UUID uuid = playerRef.getUuid();
         Long previous = LAST_ARMOR_STATE.get(uuid);
         if (previous != null && previous == STATE_HIDDEN) {

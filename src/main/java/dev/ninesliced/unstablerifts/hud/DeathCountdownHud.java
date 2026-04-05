@@ -34,6 +34,9 @@ public final class DeathCountdownHud extends CustomUIHud {
 
     public static void applyHud(@Nonnull Player player, @Nonnull PlayerRef playerRef,
                                 @Nonnull DeathCountdownHud hud) {
+        if (HudVisibilityService.isHidden(playerRef.getUuid())) {
+            return;
+        }
         MultiHudCompat.setHud(player, playerRef, HUD_ID, hud);
     }
 

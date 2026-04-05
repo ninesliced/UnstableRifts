@@ -18,10 +18,10 @@
     "UseCombatActionEvaluator": true,
     "_CombatConfig": "CAE_Kweebec_Seedling",
     "Attack": "Root_BossNPC_Kweebec_Seedling_Leap_Explode",
-    "AttackDistance": 9,
+    "AttackDistance": 2,
     "DesiredAttackDistanceRange": [
-      6.0,
-      9.0
+      1.0,
+      2.0
     ],
     "AttackPauseRange": [
       0.3,

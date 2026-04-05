@@ -2,6 +2,7 @@
   "Type": "Variant",
   "Reference": "Template_Industrial_Hazmat",
   "Modify": {
+    "Appearance": "Industrial_Hazmat_ToxicLauncher",
     "Weapons": [
       "Weapon_ToxicLauncher_UnstableRifts"
     ],

@@ -9,7 +9,7 @@
   "ItemLevel": 40,
   "Model": "Items/Weapons/UnstableRifts/Toxic_launcher/Model/Toxic_Launcher.blockymodel",
   "Texture": "Items/Weapons/UnstableRifts/Toxic_launcher/Model/HazmatLauncher.png",
-  "PlayerAnimationsId": "Rifle",
+  "PlayerAnimationsId": "Industrial_Hazmat_ToxicLauncher",
   "Weapon": {},
   "Tags": {
     "Family": ["Gun"],

@@ -52,6 +52,9 @@ public final class ChallengeHud extends CustomUIHud {
     }
 
     public static void applyHud(@Nonnull Player player, @Nonnull PlayerRef playerRef, @Nonnull ChallengeHud hud) {
+        if (HudVisibilityService.isHidden(playerRef.getUuid())) {
+            return;
+        }
         if (!MultiHudCompat.setHud(player, playerRef, HUD_ID, hud)) {
             // Fallback: cannot set secondary HUD without MultipleHUD
         }

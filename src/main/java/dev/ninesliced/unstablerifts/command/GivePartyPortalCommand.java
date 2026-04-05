@@ -6,7 +6,6 @@ import com.hypixel.hytale.protocol.packets.inventory.SetActiveSlot;
 import com.hypixel.hytale.protocol.packets.inventory.UpdatePlayerInventory;
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.command.system.CommandContext;
-import com.hypixel.hytale.server.core.command.system.CommandSender;
 import com.hypixel.hytale.server.core.command.system.basecommands.AbstractPlayerCommand;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.inventory.InventoryComponent;
@@ -37,7 +36,7 @@ public final class GivePartyPortalCommand extends AbstractPlayerCommand {
             return false;
         }
 
-        UUID uuid = ((CommandSender) player).getUuid();
+        UUID uuid = player.getUuid();
         Set<String> groups = permissions.getGroupsForUser(uuid);
         return groups.contains("OP") || permissions.hasPermission(uuid, ADMIN_PERMISSION);
     }

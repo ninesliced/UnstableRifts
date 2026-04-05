@@ -27,8 +27,8 @@
         "Description": "Jump to hostile and detonate",
         "Target": "Hostile",
         "AttackDistanceRange": [
-          6,
-          9
+          1,
+          2
         ],
         "PostExecuteDistanceRange": [
           0,

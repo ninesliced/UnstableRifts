@@ -1,4 +1,5 @@
 {
+  "Parent": "Rifle",
   "Animations": {
     "Shoot": {
       "ThirdPerson": "Characters/Animations/Toxic_launcher/Firing.blockyanim",
