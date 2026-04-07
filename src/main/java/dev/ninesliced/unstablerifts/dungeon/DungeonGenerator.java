@@ -684,12 +684,32 @@ public class DungeonGenerator {
                 mainConfig.getMinimumCorridorLength(),
                 mainConfig.getMaxRooms(), true);
 
+        int shopCount = mainConfig.getShopRooms().roll(random);
+        int shopsPlaced = 0;
+        if (shopCount > 0 && !resolvedPools.shop.isEmpty()) {
+            for (int i = 0; i < shopCount && !deadEndExits.isEmpty(); i++) {
+                TrackedExit exit = removeExitOnUnusedBranch(deadEndExits, specialRoomBranches, false);
+                if (exit == null) {
+                    LOGGER.at(Level.WARNING).log("No eligible dead-end exits left for shop distinct from %s",
+                            specialRoomBranches);
+                    break;
+                }
+                if (tryPlaceRoom(context, resolvedPools.shop, exit, deadEndExits,
+                        "Shop", false, RoomType.SHOP)) {
+                    shopsPlaced++;
+                    specialRoomBranches.add(exit.branchId());
+                } else {
+                    sealExit(context, exit.exit);
+                }
+            }
+        }
+        LOGGER.at(Level.INFO).log("Placed %d/%d shop rooms", shopsPlaced, shopCount);
+
         int treasureCount = mainConfig.getTreasureRooms().roll(random);
         int treasuresPlaced = 0;
         if (treasureCount > 0 && !resolvedPools.treasure.isEmpty()) {
-            Collections.shuffle(branchTerminalExits, random);
             for (int i = 0; i < treasureCount && !branchTerminalExits.isEmpty(); i++) {
-                TrackedExit exit = removeExitOnUnusedBranch(branchTerminalExits, specialRoomBranches, random);
+                TrackedExit exit = removeExitOnUnusedBranch(branchTerminalExits, specialRoomBranches, true);
                 if (exit == null) {
                     LOGGER.at(Level.WARNING).log("No eligible branch-terminal exits left for treasure distinct from %s",
                             specialRoomBranches);
@@ -706,28 +726,6 @@ public class DungeonGenerator {
             }
         }
         LOGGER.at(Level.INFO).log("Placed %d/%d treasure rooms", treasuresPlaced, treasureCount);
-
-        int shopCount = mainConfig.getShopRooms().roll(random);
-        int shopsPlaced = 0;
-        if (shopCount > 0 && !resolvedPools.shop.isEmpty()) {
-            Collections.shuffle(deadEndExits, random);
-            for (int i = 0; i < shopCount && !deadEndExits.isEmpty(); i++) {
-                TrackedExit exit = removeExitOnUnusedBranch(deadEndExits, specialRoomBranches, random);
-                if (exit == null) {
-                    LOGGER.at(Level.WARNING).log("No eligible dead-end exits left for shop distinct from %s",
-                            specialRoomBranches);
-                    break;
-                }
-                if (tryPlaceRoom(context, resolvedPools.shop, exit, deadEndExits,
-                        "Shop", false, RoomType.SHOP)) {
-                    shopsPlaced++;
-                    specialRoomBranches.add(exit.branchId());
-                } else {
-                    sealExit(context, exit.exit);
-                }
-            }
-        }
-        LOGGER.at(Level.INFO).log("Placed %d/%d shop rooms", shopsPlaced, shopCount);
 
         List<String> importantGlobs = levelConfig.getImportantRooms();
         int importantPlaced = 0;
@@ -1798,18 +1796,43 @@ public class DungeonGenerator {
     @Nullable
     private TrackedExit removeExitOnUnusedBranch(@Nonnull List<TrackedExit> exits,
                                                  @Nonnull Set<String> excludedBranchIds,
-                                                 @Nonnull Random random) {
-        List<Integer> eligibleIndices = new ArrayList<>();
+                                                 boolean preferLatestBranch) {
+        int chosenIndex = -1;
+        int chosenOrder = preferLatestBranch ? Integer.MIN_VALUE : Integer.MAX_VALUE;
+
         for (int i = 0; i < exits.size(); i++) {
-            if (!excludedBranchIds.contains(exits.get(i).branchId())) {
-                eligibleIndices.add(i);
+            TrackedExit exit = exits.get(i);
+            if (excludedBranchIds.contains(exit.branchId())) {
+                continue;
+            }
+
+            int order = branchProgressionOrder(exit.branchId());
+            if (chosenIndex < 0
+                    || (!preferLatestBranch && order < chosenOrder)
+                    || (preferLatestBranch && order > chosenOrder)) {
+                chosenIndex = i;
+                chosenOrder = order;
             }
         }
-        if (eligibleIndices.isEmpty()) {
+
+        if (chosenIndex < 0) {
             return null;
         }
-        int chosenIndex = eligibleIndices.get(random.nextInt(eligibleIndices.size()));
         return exits.remove(chosenIndex);
+    }
+
+    private int branchProgressionOrder(@Nonnull String branchId) {
+        if ("main".equals(branchId)) {
+            return 0;
+        }
+        if (branchId.startsWith("branch-")) {
+            try {
+                return Integer.parseInt(branchId.substring("branch-".length()));
+            } catch (NumberFormatException ignored) {
+                return Integer.MAX_VALUE;
+            }
+        }
+        return Integer.MAX_VALUE;
     }
 
     // ════════════════════════════════════════════════
