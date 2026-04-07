@@ -112,6 +112,7 @@ public class DungeonCommand extends AbstractCommand {
                         returnPoint,
                         levelConfig,
                         status -> context.sendMessage(Message.raw(status).color(status.startsWith("Dungeon ready") ? Color.GREEN : Color.YELLOW)),
+                        null,
                         null
                 );
 

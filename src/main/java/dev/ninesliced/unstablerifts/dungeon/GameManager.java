@@ -98,7 +98,7 @@ public final class GameManager {
 
     /**
      * Starts a new game for the given party.
-     * Creates the instance and begins background generation.
+     * Creates the instance and generates the full level chain before entry.
      */
     @Nonnull
     public CompletableFuture<Game> startGame(@Nonnull UUID partyId,
@@ -125,10 +125,12 @@ public final class GameManager {
             playerToParty.put(memberId, partyId);
         }
 
-        DungeonConfig.LevelConfig firstLevelConfig = plugin.getDungeonInstanceService().resolveLevel(levelSelector);
-        if (firstLevelConfig == null) {
-            firstLevelConfig = config.getLevels().get(0);
-        }
+        DungeonConfig.LevelConfig selectedFirstLevelConfig = plugin.getDungeonInstanceService().resolveLevel(levelSelector);
+        DungeonConfig.LevelConfig firstLevelConfig = selectedFirstLevelConfig != null
+                ? selectedFirstLevelConfig
+                : config.getLevels().get(0);
+        List<DungeonConfig.LevelConfig> upcomingLevels = collectUpcomingLevels(config, firstLevelConfig);
+        int totalLevels = upcomingLevels.size() + 1;
         Level firstLevel = new Level(firstLevelConfig.getName(), 0);
         game.addLevel(firstLevel);
         game.setCurrentLevelSelector(firstLevelConfig.getSelector());
@@ -137,13 +139,16 @@ public final class GameManager {
                 leaderWorld,
                 leaderReturnPoint,
                 firstLevelConfig,
-                status -> broadcastToParty(partyId, status),
+                status -> {
+                    if (status != null && status.contains("errors")) {
+                        broadcastToParty(partyId, status);
+                    }
+                },
+                levelProgress -> updateGenerationProgress(game, levelProgress / totalLevels),
                 mobSpawningService
         );
 
-        game.setGenerationFuture(worldFuture);
-
-        return worldFuture.thenApply(world -> {
+        CompletableFuture<World> readyWorldFuture = worldFuture.thenCompose(world -> {
             game.setInstanceWorld(world);
 
             Level generatedLevel = plugin.getDungeonInstanceService().getLastGeneratedLevel();
@@ -164,10 +169,29 @@ public final class GameManager {
                 LOGGER.info("Applied generated level graph '" + generatedLevel.getName()
                         + "' with " + generatedLevel.getRooms().size() + " rooms for party " + partyId);
             } else {
-                LOGGER.warning("No generated level graph was available for party " + partyId + "; using placeholder level state.");
+                return CompletableFuture.failedFuture(new IllegalStateException(
+                        "First dungeon level did not finish generating for party " + partyId + "."));
             }
 
-            game.setGenerationProgress(1.0f);
+            return generateRemainingLevelsBeforeEntry(
+                    game,
+                    world,
+                    upcomingLevels,
+                    totalLevels,
+                    status -> broadcastToParty(partyId, status)
+            ).thenApply(ignored -> world);
+        });
+
+        CompletableFuture<World> trackedReadyWorldFuture = readyWorldFuture.whenComplete((world, throwable) -> {
+            if (throwable != null) {
+                cleanupFailedGameStart(game);
+            }
+        });
+
+        game.setGenerationFuture(trackedReadyWorldFuture);
+
+        return trackedReadyWorldFuture.thenApply(world -> {
+            updateGenerationProgress(game, 1.0f);
             game.setState(GameState.READY);
             plugin.getDungeonMapService().buildMap(game);
             PartyUiPage.refreshOpenPages();
@@ -189,44 +213,29 @@ public final class GameManager {
     private static final int EARLY_SPAWN_ROOM_COUNT = 3;
 
     /**
-     * Background-generates all subsequent levels in the same world instance.
+     * Generates all subsequent levels in the same world instance before players enter.
      * Each level is placed at a large X offset to avoid collision with previous levels.
      * Generation is chained: each level starts generating only after the previous one completes.
      */
-    private void scheduleBackgroundLevelGeneration(@Nonnull Game game,
-                                                   @Nonnull World world,
-                                                   @Nonnull DungeonConfig.LevelConfig firstLevelConfig) {
-        DungeonConfig config = plugin.loadDungeonConfig();
-        DungeonConfig.LevelConfig currentConfig = firstLevelConfig;
-
-        // Collect the chain of levels to generate
-        List<DungeonConfig.LevelConfig> upcomingLevels = new ArrayList<>();
-        while (true) {
-            String nextSelector = currentConfig.getNextLevel();
-            if (nextSelector == null) break;
-            DungeonConfig.LevelConfig nextConfig = config.findLevel(nextSelector);
-            if (nextConfig == null) {
-                LOGGER.warning("Background generation: unknown nextLevel '" + nextSelector
-                        + "' referenced by '" + currentConfig.getSelector() + "'");
-                break;
-            }
-            upcomingLevels.add(nextConfig);
-            currentConfig = nextConfig;
-        }
-
+    @Nonnull
+    private CompletableFuture<Void> generateRemainingLevelsBeforeEntry(@Nonnull Game game,
+                                                                       @Nonnull World world,
+                                                                       @Nonnull List<DungeonConfig.LevelConfig> upcomingLevels,
+                                                                       int totalLevels,
+                                                                       @Nullable Consumer<String> statusConsumer) {
         if (upcomingLevels.isEmpty()) {
-            LOGGER.info("No subsequent levels to background-generate for party " + game.getPartyId());
-            return;
+            LOGGER.info("No subsequent levels to generate before entry for party " + game.getPartyId());
+            game.setBackgroundGenerating(false);
+            return CompletableFuture.completedFuture(null);
         }
 
         game.setBackgroundGenerating(true);
-        LOGGER.info("Scheduling background generation of " + upcomingLevels.size()
-                + " upcoming level(s) for party " + game.getPartyId());
+        LOGGER.info("Generating " + upcomingLevels.size()
+                + " additional level(s) before entry for party " + game.getPartyId());
 
-        // Chain generation sequentially: level 1 after level 0, level 2 after level 1, etc.
         CompletableFuture<Void> chain = CompletableFuture.completedFuture(null);
         for (int i = 0; i < upcomingLevels.size(); i++) {
-            final int levelIndex = i + 1; // level 0 is already generated
+            final int levelIndex = i + 1;
             final DungeonConfig.LevelConfig levelConfig = upcomingLevels.get(i);
 
             chain = chain.thenCompose(ignored -> {
@@ -234,9 +243,16 @@ public final class GameManager {
                     return CompletableFuture.completedFuture(null);
                 }
 
+                if (statusConsumer != null) {
+                    statusConsumer.accept("Generating level " + (levelIndex + 1) + "/" + totalLevels
+                            + ": " + levelConfig.getName() + "...");
+                }
+
                 Vector3i origin = new Vector3i(LEVEL_OFFSET_X * levelIndex, 128, 0);
                 return plugin.getDungeonInstanceService()
-                        .generateLevelInWorld(world, levelConfig, origin, levelIndex)
+                        .generateLevelInWorld(world, levelConfig, origin, levelIndex,
+                                levelProgress -> updateGenerationProgress(game,
+                                        (levelIndex + levelProgress) / totalLevels))
                         .thenAccept(generatedLevel -> {
                             game.setLevel(levelIndex, generatedLevel);
 
@@ -248,7 +264,8 @@ public final class GameManager {
                                         new Vector3d(anchor.x + 0.5, anchor.y + 1.0, anchor.z + 0.5));
                             }
 
-                            LOGGER.info("Background generated level '" + generatedLevel.getName()
+                            updateGenerationProgress(game, (levelIndex + 1.0f) / totalLevels);
+                            LOGGER.info("Generated level '" + generatedLevel.getName()
                                     + "' (index " + levelIndex + ") with " + generatedLevel.getRooms().size()
                                     + " rooms for party " + game.getPartyId());
                         });
@@ -259,11 +276,18 @@ public final class GameManager {
             game.setBackgroundGenerating(false);
             if (throwable != null) {
                 LOGGER.log(java.util.logging.Level.WARNING,
-                        "Background level generation failed for party " + game.getPartyId(), throwable);
+                        "Full dungeon generation failed for party " + game.getPartyId(), throwable);
             } else {
-                LOGGER.info("All background level generation complete for party " + game.getPartyId());
+                LOGGER.info("All dungeon levels generated before entry for party " + game.getPartyId());
             }
         });
+
+        return chain;
+    }
+
+    private void updateGenerationProgress(@Nonnull Game game, float progress) {
+        game.setGenerationProgress(progress);
+        PartyUiPage.refreshOpenPages();
     }
 
     /**
@@ -341,11 +365,6 @@ public final class GameManager {
             }
         });
 
-        // Start background generation of subsequent levels now that players are fully loaded.
-        DungeonConfig.LevelConfig currentLevelConfig = resolveCurrentLevelConfig(config, game);
-        if (currentLevelConfig != null) {
-            scheduleBackgroundLevelGeneration(game, world, currentLevelConfig);
-        }
     }
 
     /**
@@ -546,7 +565,7 @@ public final class GameManager {
 
             Vector3i origin = new Vector3i(LEVEL_OFFSET_X * nextIndex, 128, 0);
             plugin.getDungeonInstanceService()
-                    .generateLevelInWorld(world, nextLevelConfig, origin, nextIndex)
+                    .generateLevelInWorld(world, nextLevelConfig, origin, nextIndex, null)
                     .thenAccept(generatedLevel -> {
                         game.setLevel(nextIndex, generatedLevel);
                         RoomData entrance = generatedLevel.getEntranceRoom();
@@ -1795,6 +1814,39 @@ public final class GameManager {
         return nextLevelConfig;
     }
 
+    @Nonnull
+    private List<DungeonConfig.LevelConfig> collectUpcomingLevels(@Nonnull DungeonConfig config,
+                                                                  @Nonnull DungeonConfig.LevelConfig firstLevelConfig) {
+        List<DungeonConfig.LevelConfig> upcomingLevels = new ArrayList<>();
+        Set<String> visitedSelectors = new LinkedHashSet<>();
+
+        String firstSelector = firstLevelConfig.getSelector();
+        if (firstSelector != null && !firstSelector.isBlank()) {
+            visitedSelectors.add(firstSelector);
+        }
+
+        DungeonConfig.LevelConfig currentConfig = firstLevelConfig;
+        while (true) {
+            String nextLevelSelector = currentConfig.getNextLevel();
+            if (nextLevelSelector == null || nextLevelSelector.isBlank()) {
+                return upcomingLevels;
+            }
+
+            if (!visitedSelectors.add(nextLevelSelector)) {
+                throw new IllegalStateException("Dungeon level chain contains a loop at selector '" + nextLevelSelector + "'.");
+            }
+
+            DungeonConfig.LevelConfig nextLevelConfig = config.findLevel(nextLevelSelector);
+            if (nextLevelConfig == null) {
+                throw new IllegalStateException("Level '" + currentConfig.getSelector()
+                        + "' points to unknown nextLevel '" + nextLevelSelector + "'.");
+            }
+
+            upcomingLevels.add(nextLevelConfig);
+            currentConfig = nextLevelConfig;
+        }
+    }
+
     private boolean isDungeonJoinable(@Nonnull Game game) {
         return switch (game.getState()) {
             case READY, ACTIVE, BOSS, TRANSITIONING -> game.getInstanceWorld() != null;
@@ -1821,6 +1873,31 @@ public final class GameManager {
         LOGGER.info("No players remain inside dungeon instance for party " + game.getPartyId() + ". Ending run.");
         endGame(game, true);
         return true;
+    }
+
+    private void cleanupFailedGameStart(@Nonnull Game game) {
+        if (activeGames.remove(game.getPartyId()) == null) {
+            return;
+        }
+
+        game.setState(GameState.COMPLETE);
+        game.setBackgroundGenerating(false);
+        game.clearDisconnectedPlayers();
+        game.clearDisconnectedDungeonInventories();
+        game.clearDisconnectedPositions();
+
+        plugin.getDungeonMapService().cleanup(game.getPartyId());
+        plugin.getShopService().clearGame(game.getPartyId());
+
+        World instanceWorld = game.getInstanceWorld();
+        if (instanceWorld != null) {
+            instanceWorld.execute(() -> InstancesPlugin.safeRemoveInstance(instanceWorld));
+        }
+
+        playerToParty.entrySet().removeIf(e -> e.getValue().equals(game.getPartyId()));
+        PartyUiPage.refreshOpenPages();
+
+        LOGGER.warning("Cleaned up failed dungeon start for party " + game.getPartyId());
     }
 
     private void cleanupCompletedRun(@Nonnull Game game) {

@@ -8,6 +8,7 @@ import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.protocol.packets.interface_.CustomPageLifetime;
 import com.hypixel.hytale.protocol.packets.interface_.CustomUIEventBindingType;
 import com.hypixel.hytale.protocol.packets.interface_.Page;
+import com.hypixel.hytale.server.core.HytaleServer;
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.entity.entities.player.pages.InteractiveCustomUIPage;
@@ -27,13 +28,18 @@ import java.awt.*;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 public final class PartyUiPage extends InteractiveCustomUIPage<PartyUiPage.UiEventData> {
 
     private static final String LAYOUT_PATH = "Pages/UnstableRiftsParty/PartyPortal.ui";
     private static final String MEMBER_ITEM_PATH = "Pages/UnstableRiftsParty/PartyMemberItem.ui";
     private static final String PARTY_ITEM_PATH = "Pages/UnstableRiftsParty/PartyListItem.ui";
+    private static final long OPEN_PAGE_REFRESH_INTERVAL_MS = 1000L;
     private static final Map<UUID, PartyUiPage> OPEN_PAGES = new ConcurrentHashMap<>();
+    @Nullable
+    private static ScheduledFuture<?> openPageRefreshTask;
 
     private final UnstableRifts plugin;
 
@@ -43,8 +49,36 @@ public final class PartyUiPage extends InteractiveCustomUIPage<PartyUiPage.UiEve
     }
 
     public static void refreshOpenPages() {
+        if (OPEN_PAGES.isEmpty()) {
+            stopRefreshTaskIfIdle();
+            return;
+        }
+
         for (PartyUiPage page : new ArrayList<>(OPEN_PAGES.values())) {
             page.refreshIfOpen();
+        }
+    }
+
+    private static synchronized void ensureRefreshTaskRunning() {
+        if (openPageRefreshTask != null && !openPageRefreshTask.isCancelled()) {
+            return;
+        }
+
+        openPageRefreshTask = HytaleServer.SCHEDULED_EXECUTOR.scheduleAtFixedRate(
+                PartyUiPage::refreshOpenPages,
+                OPEN_PAGE_REFRESH_INTERVAL_MS,
+                OPEN_PAGE_REFRESH_INTERVAL_MS,
+                TimeUnit.MILLISECONDS
+        );
+    }
+
+    private static synchronized void stopRefreshTaskIfIdle() {
+        if (!OPEN_PAGES.isEmpty()) {
+            return;
+        }
+        if (openPageRefreshTask != null) {
+            openPageRefreshTask.cancel(false);
+            openPageRefreshTask = null;
         }
     }
 
@@ -59,6 +93,7 @@ public final class PartyUiPage extends InteractiveCustomUIPage<PartyUiPage.UiEve
                       @Nonnull UIEventBuilder events,
                       @Nonnull Store<EntityStore> store) {
         OPEN_PAGES.put(this.playerRef.getUuid(), this);
+        ensureRefreshTaskRunning();
         ui.append(LAYOUT_PATH);
         Player viewer = store.getComponent(ref, Player.getComponentType());
 
@@ -209,12 +244,14 @@ public final class PartyUiPage extends InteractiveCustomUIPage<PartyUiPage.UiEve
     @Override
     public void onDismiss(@Nonnull Ref<EntityStore> ref, @Nonnull Store<EntityStore> store) {
         OPEN_PAGES.remove(this.playerRef.getUuid(), this);
+        stopRefreshTaskIfIdle();
     }
 
     private void refreshIfOpen() {
         Ref<EntityStore> ref = this.playerRef.getReference();
         if (ref == null || !ref.isValid()) {
             OPEN_PAGES.remove(this.playerRef.getUuid(), this);
+            stopRefreshTaskIfIdle();
             return;
         }
 
@@ -222,12 +259,14 @@ public final class PartyUiPage extends InteractiveCustomUIPage<PartyUiPage.UiEve
         store.getExternalData().getWorld().execute(() -> {
             if (!ref.isValid()) {
                 OPEN_PAGES.remove(this.playerRef.getUuid(), this);
+                stopRefreshTaskIfIdle();
                 return;
             }
 
             Player player = store.getComponent(ref, Player.getComponentType());
             if (player == null || player.getPageManager().getCustomPage() != this) {
                 OPEN_PAGES.remove(this.playerRef.getUuid(), this);
+                stopRefreshTaskIfIdle();
                 return;
             }
 

@@ -41,6 +41,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 
 import static dev.ninesliced.unstablerifts.dungeon.RotationUtil.rotateLocalX;
@@ -70,6 +71,14 @@ public class DungeonGenerator {
     private static final int MAX_RETRIES = 5;
     private static final String KEY_ITEM_ID = "UnstableRifts_Key_Item";
     private static final double KEY_OVERLAP_RADIUS = 0.2;
+    private static final float INITIAL_PROGRESS = 0.02f;
+    private static final float SPAWN_PROGRESS = 0.08f;
+    private static final float ROOM_LAYOUT_START_PROGRESS = 0.08f;
+    private static final float ROOM_LAYOUT_END_PROGRESS = 0.72f;
+    private static final float DOOR_SETUP_PROGRESS = 0.80f;
+    private static final float MOB_SETUP_PROGRESS = 0.88f;
+    private static final float KEY_SETUP_PROGRESS = 0.94f;
+    private static final float PRESPAWN_PROGRESS = 0.98f;
 
     /**
      * Number of rooms (from spawn outward) to spawn mobs in during generation.
@@ -93,6 +102,9 @@ public class DungeonGenerator {
      */
     @Nullable
     private MobSpawningService mobSpawningService;
+    @Nullable
+    private Consumer<Float> progressConsumer;
+    private float lastReportedProgress = 0.0f;
 
     private static Rotation toEngineRotation(int rot) {
         return switch (rot & 3) {
@@ -605,6 +617,11 @@ public class DungeonGenerator {
         this.mobSpawningService = mobSpawningService;
     }
 
+    public void setProgressConsumer(@Nullable Consumer<Float> progressConsumer) {
+        this.progressConsumer = progressConsumer;
+        this.lastReportedProgress = 0.0f;
+    }
+
     /**
      * Generate a dungeon level in the given world at the default origin (0, 128, 0).
      */
@@ -624,6 +641,8 @@ public class DungeonGenerator {
                          @Nonnull Vector3i origin, int levelIndex) {
         Random random = new Random(seed);
         Store<EntityStore> store = world.getEntityStore().getStore();
+        GenerationProgressTracker progressTracker = new GenerationProgressTracker(this);
+        reportProgress(INITIAL_PROGRESS);
 
         dev.ninesliced.unstablerifts.dungeon.Level level = new dev.ninesliced.unstablerifts.dungeon.Level(levelConfig.getName(), levelIndex);
         this.generatedLevel = level;
@@ -637,7 +656,8 @@ public class DungeonGenerator {
                 levelConfig,
                 resolvedPools,
                 new HashSet<>(),
-                new BranchCounter()
+                new BranchCounter(),
+                progressTracker
         );
 
         LOGGER.at(Level.INFO).log("Generating dungeon '%s' seed=%d at origin=%s levelIndex=%d",
@@ -666,6 +686,7 @@ public class DungeonGenerator {
 
         Vector3i spawnPaste = new Vector3i(origin);
         pasteAndRegister(context, spawnPath, spawnData, spawnPaste, 0);
+        reportProgress(SPAWN_PROGRESS);
 
         RoomData spawnRoom = buildRoomData(level, RoomType.SPAWN, spawnData, spawnPaste, 0,
                 Collections.emptyList(), 0, "main");
@@ -685,6 +706,7 @@ public class DungeonGenerator {
                 mainConfig.getMaxRooms(), true);
 
         int shopCount = mainConfig.getShopRooms().roll(random);
+        context.progressTracker().addPlannedRooms(shopCount);
         int shopsPlaced = 0;
         if (shopCount > 0 && !resolvedPools.shop.isEmpty()) {
             for (int i = 0; i < shopCount && !deadEndExits.isEmpty(); i++) {
@@ -697,6 +719,7 @@ public class DungeonGenerator {
                 if (tryPlaceRoom(context, resolvedPools.shop, exit, deadEndExits,
                         "Shop", false, RoomType.SHOP)) {
                     shopsPlaced++;
+                    context.progressTracker().roomPlaced();
                     specialRoomBranches.add(exit.branchId());
                 } else {
                     sealExit(context, exit.exit);
@@ -706,6 +729,7 @@ public class DungeonGenerator {
         LOGGER.at(Level.INFO).log("Placed %d/%d shop rooms", shopsPlaced, shopCount);
 
         int treasureCount = mainConfig.getTreasureRooms().roll(random);
+        context.progressTracker().addPlannedRooms(treasureCount);
         int treasuresPlaced = 0;
         if (treasureCount > 0 && !resolvedPools.treasure.isEmpty()) {
             for (int i = 0; i < treasureCount && !branchTerminalExits.isEmpty(); i++) {
@@ -719,6 +743,7 @@ public class DungeonGenerator {
                 if (tryPlaceRoom(context, resolvedPools.treasure, exit, deadEndExits,
                         "Treasure", false, RoomType.TREASURE)) {
                     treasuresPlaced++;
+                    context.progressTracker().roomPlaced();
                     specialRoomBranches.add(exit.branchId());
                 } else {
                     sealExit(context, exit.exit);
@@ -728,6 +753,7 @@ public class DungeonGenerator {
         LOGGER.at(Level.INFO).log("Placed %d/%d treasure rooms", treasuresPlaced, treasureCount);
 
         List<String> importantGlobs = levelConfig.getImportantRooms();
+        context.progressTracker().addPlannedRooms(importantGlobs.size());
         int importantPlaced = 0;
         for (String glob : importantGlobs) {
             List<Path> importantPaths = DungeonConfig.resolveGlobs(List.of(glob));
@@ -736,6 +762,7 @@ public class DungeonGenerator {
             if (tryPlaceRoom(context, importantPaths, exit, deadEndExits,
                     "Important", true, RoomType.CHALLENGE)) {
                 importantPlaced++;
+                context.progressTracker().roomPlaced();
             } else {
                 sealExit(context, exit.exit);
             }
@@ -746,12 +773,16 @@ public class DungeonGenerator {
             sealExit(context, exit.exit);
         }
         deadEndExits.clear();
+        reportProgress(ROOM_LAYOUT_END_PROGRESS);
 
         prePasteKeyDoors(world, levelConfig, level);
+        reportProgress(DOOR_SETUP_PROGRESS);
 
         distributeMobs(level, levelConfig, random);
+        reportProgress(MOB_SETUP_PROGRESS);
 
         distributeKeys(level, world, random);
+        reportProgress(KEY_SETUP_PROGRESS);
 
         // Pre-spawn mobs in the first rooms so they are ready before the player loads in.
         preSpawnedRooms.clear();
@@ -759,10 +790,12 @@ public class DungeonGenerator {
             preSpawnedRooms = mobSpawningService.spawnEarlyRoomMobs(level, store, EARLY_SPAWN_ROOM_COUNT);
             LOGGER.at(Level.INFO).log("Pre-spawned mobs in %d rooms during generation", preSpawnedRooms.size());
         }
+        reportProgress(PRESPAWN_PROGRESS);
 
         LOGGER.at(Level.INFO).log("Dungeon complete: %d rooms, boss=%b, treasures=%d, shops=%d, branches=%d",
                 level.getRooms().size(), level.getBossRoom() != null,
                 treasuresPlaced, shopsPlaced, context.branchCount());
+        reportProgress(1.0f);
     }
 
     private void prePasteKeyDoors(@Nonnull World world,
@@ -812,6 +845,7 @@ public class DungeonGenerator {
                              int branchDepth, @Nonnull String branchId,
                              @Nonnull IntRange challengeRange, int minCorridorLength,
                              int maxRooms, boolean isMainBranch) {
+        context.progressTracker().addPlannedRooms(maxRooms + (isMainBranch ? 1 : 0));
         BranchRoomPaths roomPaths = resolveBranchRoomPaths(context.resolvedPools(), isMainBranch);
         BranchLayoutPlan layoutPlan = planBranchLayout(
                 context.random(), challengeRange, minCorridorLength, maxRooms, isMainBranch);
@@ -959,6 +993,7 @@ public class DungeonGenerator {
             if (placeChallengeRoom(context, deadEndExits, branchTerminalExits, branchDepth, branchId, roomPaths.challenge(),
                     challengeIndex, state)) {
                 state.roomsPlaced++;
+                context.progressTracker().roomPlaced();
             }
         }
     }
@@ -1048,6 +1083,7 @@ public class DungeonGenerator {
                 if (tryPlaceRoom(context, context.resolvedPools().boss, bossExit, bossNewExits,
                         "Boss", true, RoomType.BOSS, branchDepth, branchId)) {
                     bossPlaced = true;
+                    context.progressTracker().roomPlaced();
                     for (TrackedExit exit : bossNewExits) {
                         sealExit(context, exit.exit);
                     }
@@ -1109,6 +1145,7 @@ public class DungeonGenerator {
             }
 
             placed++;
+            context.progressTracker().roomPlaced();
             if (!newExits.isEmpty()) {
                 if (useSplitter && newExits.size() > 1) {
                     // Pick the exit most aligned with the incoming direction as main continuation
@@ -1983,7 +2020,8 @@ public class DungeonGenerator {
             @Nonnull DungeonConfig.LevelConfig levelConfig,
             @Nonnull ResolvedPools resolvedPools,
             @Nonnull Set<Long> occupiedBlocks,
-            @Nonnull BranchCounter branchCounter) {
+            @Nonnull BranchCounter branchCounter,
+            @Nonnull GenerationProgressTracker progressTracker) {
 
         private int nextBranchIndex() {
             return branchCounter.next();
@@ -2015,6 +2053,52 @@ public class DungeonGenerator {
 
         private BranchState(@Nonnull List<TrackedExit> startExits) {
             this.currentExits = new ArrayList<>(startExits);
+        }
+    }
+
+    private static final class GenerationProgressTracker {
+        private final DungeonGenerator generator;
+        private int plannedRooms;
+        private int completedRooms;
+
+        private GenerationProgressTracker(@Nonnull DungeonGenerator generator) {
+            this.generator = generator;
+        }
+
+        private void addPlannedRooms(int count) {
+            if (count <= 0) {
+                return;
+            }
+            this.plannedRooms += count;
+            publish();
+        }
+
+        private void roomPlaced() {
+            this.completedRooms++;
+            publish();
+        }
+
+        private void publish() {
+            if (plannedRooms <= 0) {
+                return;
+            }
+
+            float fraction = Math.min(1.0f, (float) completedRooms / plannedRooms);
+            float progress = ROOM_LAYOUT_START_PROGRESS
+                    + fraction * (ROOM_LAYOUT_END_PROGRESS - ROOM_LAYOUT_START_PROGRESS);
+            generator.reportProgress(progress);
+        }
+    }
+
+    private void reportProgress(float progress) {
+        float clamped = Math.max(0.0f, Math.min(1.0f, progress));
+        if (clamped <= lastReportedProgress) {
+            return;
+        }
+
+        lastReportedProgress = clamped;
+        if (progressConsumer != null) {
+            progressConsumer.accept(clamped);
         }
     }
 

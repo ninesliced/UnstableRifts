@@ -404,7 +404,12 @@ public final class PartyManager {
                 // Generation was cancelled (e.g. party disbanded during generation) — no need to broadcast
                 return null;
             }
-            broadcast(party, "Failed to start dungeon: " + throwable.getMessage(), true);
+            Throwable rootCause = throwable;
+            while (rootCause.getCause() != null) {
+                rootCause = rootCause.getCause();
+            }
+            String message = rootCause.getMessage() != null ? rootCause.getMessage() : "Unknown generation error.";
+            broadcast(party, "Failed to start dungeon: " + message, true);
             return null;
         });
 

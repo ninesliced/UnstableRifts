@@ -62,6 +62,7 @@ public final class DungeonInstanceService {
                                                            @Nonnull Transform returnPoint,
                                                            @Nonnull DungeonConfig.LevelConfig levelConfig,
                                                            @Nullable Consumer<String> statusConsumer,
+                                                           @Nullable Consumer<Float> progressConsumer,
                                                            @Nullable MobSpawningService mobSpawningService) {
         InstancesPlugin instancesPlugin = InstancesPlugin.get();
         CompletableFuture<World> worldFuture = instancesPlugin.spawnInstance(INSTANCE_TEMPLATE, currentWorld,
@@ -74,7 +75,11 @@ public final class DungeonInstanceService {
                     long seed = System.nanoTime();
                     DungeonGenerator generator = new DungeonGenerator();
                     generator.setMobSpawningService(mobSpawningService);
+                    generator.setProgressConsumer(progressConsumer);
                     generator.generate(world, seed, levelConfig);
+                    if (generator.getGeneratedLevel() == null) {
+                        throw new IllegalStateException("Dungeon generation produced no level for '" + levelConfig.getSelector() + "'.");
+                    }
                     this.lastGenerator = generator;
                     applyDungeonWorldSettings(world);
                     LOGGER.at(Level.INFO).log("Dungeon instance created: " + world.getName() + " for selector " + levelConfig.getSelector());
@@ -87,7 +92,7 @@ public final class DungeonInstanceService {
                     if (statusConsumer != null) {
                         statusConsumer.accept("Dungeon generation had errors.");
                     }
-                    generationFuture.complete(world);
+                    generationFuture.completeExceptionally(e);
                 }
             });
             return generationFuture;
@@ -125,12 +130,14 @@ public final class DungeonInstanceService {
             @Nonnull World world,
             @Nonnull DungeonConfig.LevelConfig levelConfig,
             @Nonnull Vector3i origin,
-            int levelIndex) {
+            int levelIndex,
+            @Nullable Consumer<Float> progressConsumer) {
         CompletableFuture<dev.ninesliced.unstablerifts.dungeon.Level> future = new CompletableFuture<>();
         world.execute(() -> {
             try {
                 long seed = System.nanoTime();
                 DungeonGenerator generator = new DungeonGenerator();
+                generator.setProgressConsumer(progressConsumer);
                 generator.generate(world, seed, levelConfig, origin, levelIndex);
                 dev.ninesliced.unstablerifts.dungeon.Level generated = generator.getGeneratedLevel();
                 if (generated != null) {
