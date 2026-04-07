@@ -64,13 +64,46 @@
     }
   },
   "PlayerAnimationsId": "Block",
+  "Recipe": {
+    "TimeSeconds": 3,
+    "KnowledgeRequired": false,
+    "Input": [
+      {
+        "ItemId": "Rock_Stone_Cobble",
+        "Quantity": 30
+      },
+      {
+        "ItemId": "Ingredient_Bar_Thorium",
+        "Quantity": 10
+      },
+      {
+        "ItemId": "Ingredient_Life_Essence",
+        "Quantity": 10
+      },
+      {
+        "ItemId": "Ingredient_Void_Essence",
+        "Quantity": 10
+      }
+    ],
+    "BenchRequirement": [
+      {
+        "Id": "Arcanebench",
+        "Type": "Crafting",
+        "Categories": [
+          "Arcane_Portals"
+        ]
+      }
+    ]
+  },
   "Tags": {
     "Type": [
       "Portal",
       "UnstableRiftsPartyPortal"
     ]
   },
-  "Quality": "Developer",
+  "Quality": "Rare",
+  "MaxStack": 1,
+  "ItemLevel": 50,
   "IconProperties": {
     "Scale": 0.35,
     "Rotation": [

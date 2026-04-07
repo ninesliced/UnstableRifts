@@ -1,10 +1,105 @@
 {
-  "Parent": "Rifle",
   "Animations": {
-    "Shoot": {
-      "ThirdPerson": "Characters/Animations/Toxic_launcher/Firing.blockyanim",
-      "ThirdPersonMoving": "Characters/Animations/Toxic_launcher/Firing.blockyanim",
+    "Idle": {
+      "Speed": 0.5,
+      "ThirdPerson": "Characters/Animations/Toxic_launcher/Idle.blockyanim",
+      "Looping": true
+    },
+    "Walk": {
+      "Speed": 1.0,
+      "ThirdPerson": "Characters/Animations/Toxic_launcher/Walk.blockyanim",
+      "Looping": true
+    },
+    "WalkBackward": {
+      "Speed": 1.0,
+      "ThirdPerson": "Characters/Animations/Toxic_launcher/Walk_Backward.blockyanim",
+      "Looping": true
+    },
+    "Run": {
+      "Speed": 0.9,
+      "ThirdPerson": "Characters/Animations/Toxic_launcher/Run.blockyanim",
+      "Looping": true
+    },
+    "RunBackward": {
+      "Speed": 0.9,
+      "ThirdPerson": "Characters/Animations/Toxic_launcher/Run_Backward.blockyanim",
+      "Looping": true
+    },
+    "Sprint": {
+      "Speed": 1.1,
+      "ThirdPerson": "Characters/Animations/Toxic_launcher/Sprint.blockyanim",
+      "Looping": true
+    },
+    "Crouch": {
+      "BlendingDuration": 0.1,
+      "Speed": 0.5,
+      "ThirdPerson": "Characters/Animations/Toxic_launcher/Crouch.blockyanim",
+      "Looping": true
+    },
+    "CrouchWalk": {
+      "BlendingDuration": 0.1,
+      "Speed": 0.8,
+      "ThirdPerson": "Characters/Animations/Toxic_launcher/Crouch_Walk.blockyanim",
+      "Looping": true
+    },
+    "CrouchWalkBackward": {
+      "BlendingDuration": 0.1,
+      "Speed": 0.8,
+      "ThirdPerson": "Characters/Animations/Toxic_launcher/Crouch_Walk_Backward.blockyanim",
+      "Looping": true
+    },
+    "Jump": {
       "Speed": 1,
+      "ThirdPerson": "Characters/Animations/Toxic_launcher/Jump.blockyanim",
+      "Looping": false
+    },
+    "JumpWalk": {
+      "Speed": 0.8,
+      "ThirdPerson": "Characters/Animations/Toxic_launcher/Jump_Far.blockyanim",
+      "Looping": false
+    },
+    "JumpRun": {
+      "Speed": 0.8,
+      "ThirdPerson": "Characters/Animations/Toxic_launcher/Jump_Far.blockyanim",
+      "Looping": false
+    },
+    "Fall": {
+      "BlendingDuration": 0.4,
+      "Speed": 1,
+      "ThirdPerson": "Characters/Animations/Toxic_launcher/Fall.blockyanim",
+      "Looping": true
+    },
+    "FallFar": {
+      "BlendingDuration": 0.4,
+      "Speed": 1,
+      "ThirdPerson": "Characters/Animations/Toxic_launcher/Fall_Far.blockyanim",
+      "Looping": true
+    },
+    "FluidIdle": {
+      "Speed": 0.3,
+      "ThirdPerson": "Characters/Animations/Toxic_launcher/Idle.blockyanim",
+      "Looping": true
+    },
+    "FluidWalk": {
+      "Speed": 0.6,
+      "ThirdPerson": "Characters/Animations/Toxic_launcher/Walk.blockyanim",
+      "Looping": true
+    },
+    "FluidWalkBackward": {
+      "Speed": 0.6,
+      "ThirdPerson": "Characters/Animations/Toxic_launcher/Walk_Backward.blockyanim",
+      "Looping": true
+    },
+    "FluidRun": {
+      "Speed": 0.6,
+      "ThirdPerson": "Characters/Animations/Toxic_launcher/Run.blockyanim",
+      "Looping": true
+    },
+    "Shoot": {
+      "ThirdPerson": "Characters/Animations/Toxic_launcher/Attacks/Shoot/Shoot.blockyanim",
+      "ThirdPersonMoving": "Characters/Animations/Toxic_launcher/Attacks/Shoot/Shoot_Moving.blockyanim",
+      "Speed": 1,
+      "BlendingDuration": 0,
       "Looping": false
     }
   },

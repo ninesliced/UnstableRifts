@@ -2,10 +2,10 @@
   "TranslationProperties": {
     "Name": "server.items.UnstableRifts_Props_Coin.name"
   },
-  "Icon": "Icons/ItemsGenerated/Ingredient_Bar_Gold.png",
-  "Model": "Resources/Materials/Ingot.blockymodel",
-  "Texture": "Resources/Materials/Ingot_Textures/Gold.png",
-  "Scale": 0.7,
+  "Icon": "Icons/ItemsGenerated/coin.png",
+  "Model": "Items/Consumable/coin/Coin.blockymodel",
+  "Texture": "Items/Consumable/coin/Coin.png",
+  "Scale": 2.8,
   "PlayerAnimationsId": "Item",
   "IconProperties": {
     "Scale": 1,
