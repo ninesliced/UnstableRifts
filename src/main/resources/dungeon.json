@@ -21,6 +21,9 @@
         "challenge": [
           "UnstableRifts.Kweebec.Challenge.*"
         ],
+        "treasure": [
+          "UnstableRifts.Kweebec.Treasure.*"
+        ],
         "shop": [
           "UnstableRifts.Kweebec.Shop.*"
         ],
@@ -47,7 +50,7 @@
         ]
       },
       "main": {
-        "maxRooms": 6,
+        "maxRooms": 5,
         "challengeRooms": {
           "min": 2,
           "max": 2
@@ -58,8 +61,8 @@
           "max": 400
         },
         "treasureRooms": {
-          "min": 0,
-          "max": 0
+          "min": 1,
+          "max": 1
         },
         "shopRooms": {
           "min": 1,
@@ -68,15 +71,15 @@
       },
       "branch": {
         "splitterCount": {
-          "min": 1,
-          "max": 1
+          "min": 2,
+          "max": 2
         },
-        "maxRooms": 2,
+        "maxRooms": 1,
         "challengeRooms": {
-          "min": 1,
-          "max": 1
+          "min": 0,
+          "max": 0
         },
-        "minimumCorridorLength": 1,
+        "minimumCorridorLength": 0,
         "mobsToSpawn": {
           "min": 50,
           "max": 100

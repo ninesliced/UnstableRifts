@@ -6,6 +6,7 @@ import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.event.events.ecs.BreakBlockEvent;
 import com.hypixel.hytale.server.core.event.events.ecs.DropItemEvent;
 import com.hypixel.hytale.server.core.event.events.ecs.SwitchActiveSlotEvent;
+import com.hypixel.hytale.server.core.event.events.ecs.UseBlockEvent;
 import com.hypixel.hytale.server.core.event.events.player.*;
 import com.hypixel.hytale.server.core.io.adapter.PacketAdapters;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.Interaction;
@@ -295,6 +296,11 @@ public class UnstableRifts extends JavaPlugin {
         }
         try {
             this.getEntityStoreRegistry().registerEntityEventType(BreakBlockEvent.class);
+        } catch (IllegalArgumentException e) {
+            // Already registered by another plugin
+        }
+        try {
+            this.getEntityStoreRegistry().registerEntityEventType(UseBlockEvent.Pre.class);
         } catch (IllegalArgumentException e) {
             // Already registered by another plugin
         }

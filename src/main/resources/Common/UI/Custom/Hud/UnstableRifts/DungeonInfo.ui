@@ -1,6 +1,6 @@
 // ─────────────────────────────────────────────
 //  UnstableRifts — Dungeon Info HUD
-//  Displays dungeon name, level, money, game time, mobs
+//  Displays dungeon name, level, money, keys, game time, mobs
 // ─────────────────────────────────────────────
 
 @DimText = #6b7d94;
@@ -20,7 +20,7 @@ Group #DungeonInfoRoot {
     LayoutMode: Middle;
 
     Group #DungeonInfoPanel {
-      Anchor: (Width: 220, Height: 126);
+      Anchor: (Width: 220, Height: 146);
       Background: @PanelBg;
       LayoutMode: Top;
       Padding: (Horizontal: 12, Vertical: 8);
@@ -74,6 +74,23 @@ Group #DungeonInfoRoot {
       }
     }
 
+      // ── Keys ──
+      Group {
+      Anchor: (Height: 18, Top: 2);
+      LayoutMode: Left;
+
+      Label {
+        Text: "Keys:";
+        Anchor: (Width: 70, Height: 18);
+        Style: LabelStyle(FontSize: 11, TextColor: @LabelColor, HorizontalAlignment: Start, VerticalAlignment: Center);
+      }
+      Label #KeysLabel {
+        Text: "0";
+        Anchor: (Height: 18);
+        Style: LabelStyle(FontSize: 12, TextColor: @ValueColor, RenderBold: true, HorizontalAlignment: Start, VerticalAlignment: Center);
+      }
+    }
+
       // ── Game Time ──
       Group {
       Anchor: (Height: 18, Top: 2);
@@ -110,4 +127,3 @@ Group #DungeonInfoRoot {
     }
   }
 }
-

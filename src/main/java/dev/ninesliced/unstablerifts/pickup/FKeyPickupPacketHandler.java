@@ -82,13 +82,12 @@ public final class FKeyPickupPacketHandler implements PlayerPacketWatcher {
 
         Vector3d playerPos = playerTransform.getPosition();
 
-        // Try to unlock a KEY-mode door before item pickup.
-        if (tryUnlockKeyDoor(playerRef, playerPos)) {
+        // Portals now require explicit confirmation with the interaction key.
+        if (tryUsePortal(playerRef, playerPos)) {
             return;
         }
 
-        // Portals now require explicit confirmation with the interaction key.
-        if (tryUsePortal(playerRef, playerPos)) {
+        if (tryUnlockKeyDoor(playerRef, playerPos)) {
             return;
         }
 
@@ -322,60 +321,6 @@ public final class FKeyPickupPacketHandler implements PlayerPacketWatcher {
         sendPickupNotification(playerRef, tracked, armorItem.getQuantity());
     }
 
-    /**
-     * Checks if the player is in a KEY-mode locked room and has keys to unlock it.
-     * Returns true if a door was unlocked (consuming the F-key press).
-     */
-    private static boolean tryUnlockKeyDoor(@Nonnull PlayerRef playerRef, @Nonnull Vector3d playerPos) {
-        UnstableRifts unstablerifts = UnstableRifts.getInstance();
-        if (unstablerifts == null) return false;
-
-        Game game = unstablerifts.getGameManager().findGameForPlayer(playerRef.getUuid());
-        if (game == null) return false;
-
-        Level level = game.getCurrentLevel();
-        if (level == null) return false;
-
-        int px = (int) Math.floor(playerPos.x);
-        int py = (int) Math.floor(playerPos.y);
-        int pz = (int) Math.floor(playerPos.z);
-        RoomData room = level.findRoomAt(px, py, pz);
-        if (room == null) return false;
-
-        if (!room.isLocked() || !room.isDoorsSealed() || room.getDoorMode() != DoorMode.KEY) {
-            return false;
-        }
-
-        if (!game.useKey()) {
-            try {
-                NotificationUtil.sendNotification(
-                        playerRef.getPacketHandler(),
-                        Message.raw("You need a key to unlock this door!"),
-                        null,
-                        "door_locked");
-            } catch (Exception e) {
-                // Best-effort
-            }
-            return true; // Consume the F-key press even if no key.
-        }
-
-        World world = game.getInstanceWorld();
-        if (world != null) {
-            unstablerifts.getDoorService().onRoomCleared(room, world);
-        }
-
-        try {
-            NotificationUtil.sendNotification(
-                    playerRef.getPacketHandler(),
-                    Message.raw("Door unlocked!"),
-                    null,
-                    "door_unlocked");
-        } catch (Exception e) {
-            // Best-effort
-        }
-        return true;
-    }
-
     private static boolean tryUsePortal(@Nonnull PlayerRef playerRef,
                                         @Nonnull Vector3d playerPos) {
         UnstableRifts unstablerifts = UnstableRifts.getInstance();
@@ -384,6 +329,50 @@ public final class FKeyPickupPacketHandler implements PlayerPacketWatcher {
         }
 
         return unstablerifts.getPortalInteractionService().tryInteract(playerRef, playerPos);
+    }
+
+    private static boolean tryUnlockKeyDoor(@Nonnull PlayerRef playerRef,
+                                            @Nonnull Vector3d playerPos) {
+        UnstableRifts unstablerifts = UnstableRifts.getInstance();
+        if (unstablerifts == null) {
+            return false;
+        }
+
+        Game game = unstablerifts.getGameManager().findGameForPlayer(playerRef.getUuid());
+        if (game == null) {
+            return false;
+        }
+
+        World world = game.getInstanceWorld();
+        if (world == null) {
+            return false;
+        }
+
+        Level level = game.getCurrentLevel();
+        if (level == null) {
+            return false;
+        }
+
+        DoorService.NearbyKeyDoor nearbyDoor = unstablerifts.getDoorService().findNearbyKeyDoor(
+                level, playerPos, DoorService.KEY_INTERACTION_RADIUS);
+        if (nearbyDoor == null) {
+            return false;
+        }
+
+        if (!game.useKey()) {
+            sendInteractionNotification(playerRef,
+                    "This door is locked. Your team needs a key.",
+                    "door_locked");
+            return true;
+        }
+
+        unstablerifts.getDoorService().unlockKeyDoor(level, world, nearbyDoor.target());
+
+        int remainingKeys = game.getTeamKeys();
+        sendInteractionNotification(playerRef,
+                "Door unlocked! (" + remainingKeys + " key" + (remainingKeys != 1 ? "s" : "") + " left)",
+                "door_unlocked");
+        return true;
     }
 
     private static boolean tryOpenShop(@Nonnull PlayerRef playerRef,
@@ -596,6 +585,20 @@ public final class FKeyPickupPacketHandler implements PlayerPacketWatcher {
                     "crate_item_pickup");
         } catch (Exception e) {
             // Best-effort notification — player still received the item
+        }
+    }
+
+    private static void sendInteractionNotification(@Nonnull PlayerRef playerRef,
+                                                    @Nonnull String text,
+                                                    @Nonnull String notificationId) {
+        try {
+            NotificationUtil.sendNotification(
+                    playerRef.getPacketHandler(),
+                    Message.raw(text),
+                    null,
+                    notificationId);
+        } catch (Exception e) {
+            // Best-effort feedback only.
         }
     }
 

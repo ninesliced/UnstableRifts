@@ -32,6 +32,7 @@ import java.util.List;
 public final class CoinCollectionSystem extends EntityTickingSystem<EntityStore> {
 
     private static final HytaleLogger LOGGER = UnstableRiftsLog.forModule("Coin");
+    private static final String KEY_ITEM_ID = "UnstableRifts_Key_Item";
 
     public CoinCollectionSystem() {
     }
@@ -147,6 +148,9 @@ public final class CoinCollectionSystem extends EntityTickingSystem<EntityStore>
 
         for (ItemPickupTracker.TrackedItem tracked : ItemPickupTracker.getAll()) {
             if (!tracked.isScoreCollect()) {
+                continue;
+            }
+            if (KEY_ITEM_ID.equals(tracked.getItemId())) {
                 continue;
             }
             if (!tracked.getRef().isValid()) {

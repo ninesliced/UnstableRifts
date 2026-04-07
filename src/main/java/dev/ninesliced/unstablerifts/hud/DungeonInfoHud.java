@@ -12,7 +12,7 @@ import javax.annotation.Nonnull;
 
 /**
  * HUD overlay displaying dungeon information:
- * dungeon name, current level, money, game time, and mob count.
+ * dungeon name, current level, money, keys, game time, and mob count.
  */
 public final class DungeonInfoHud extends CustomUIHud {
 
@@ -22,6 +22,7 @@ public final class DungeonInfoHud extends CustomUIHud {
     private final String dungeonName;
     private final String levelName;
     private final long money;
+    private final int keys;
     private final String gameTime;
     private final int mobsAlive;
     private final int mobsTotal;
@@ -30,6 +31,7 @@ public final class DungeonInfoHud extends CustomUIHud {
                           @Nonnull String dungeonName,
                           @Nonnull String levelName,
                           long money,
+                          int keys,
                           @Nonnull String gameTime,
                           int mobsAlive,
                           int mobsTotal) {
@@ -37,6 +39,7 @@ public final class DungeonInfoHud extends CustomUIHud {
         this.dungeonName = dungeonName;
         this.levelName = levelName;
         this.money = money;
+        this.keys = keys;
         this.gameTime = gameTime;
         this.mobsAlive = mobsAlive;
         this.mobsTotal = mobsTotal;
@@ -59,6 +62,7 @@ public final class DungeonInfoHud extends CustomUIHud {
                 dungeonName,
                 levelName,
                 game.getMoney(),
+                game.getTeamKeys(),
                 Game.formatTime(game.getElapsedGameTime()),
                 mobsAlive,
                 mobsTotal
@@ -92,8 +96,8 @@ public final class DungeonInfoHud extends CustomUIHud {
         ui.set("#DungeonNameLabel.TextSpans", Message.raw(dungeonName));
         ui.set("#LevelNameLabel.TextSpans", Message.raw(levelName));
         ui.set("#MoneyLabel.TextSpans", Message.raw(String.valueOf(money)));
+        ui.set("#KeysLabel.TextSpans", Message.raw(String.valueOf(keys)));
         ui.set("#GameTimeLabel.TextSpans", Message.raw(gameTime));
         ui.set("#MobCountLabel.TextSpans", Message.raw(mobsAlive + " / " + mobsTotal));
     }
 }
-

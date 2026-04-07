@@ -3,6 +3,7 @@ package dev.ninesliced.unstablerifts.shop;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import dev.ninesliced.unstablerifts.hud.MultiHudCompat;
+import dev.ninesliced.unstablerifts.hud.HudVisibilityService;
 
 import javax.annotation.Nonnull;
 import java.util.UUID;
@@ -25,6 +26,9 @@ public final class ShopPromptHudService {
                             @Nonnull PlayerRef playerRef,
                             @Nonnull String title,
                             @Nonnull String detail) {
+        if (HudVisibilityService.isHidden(playerRef.getUuid())) {
+            return;
+        }
         long state = computeState(title, detail);
         UUID uuid = playerRef.getUuid();
 

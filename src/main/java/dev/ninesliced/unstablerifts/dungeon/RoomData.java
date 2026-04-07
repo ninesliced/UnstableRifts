@@ -42,7 +42,9 @@ public final class RoomData {
     private final List<Vector3i> portalExitPositions = new ArrayList<>();
     // ── Door & lock system ──
     private final List<Vector3i> lockDoorBlockPositions = new ArrayList<>();
+    private final List<TrackedDoorBlock> trackedDoorBlocks = new ArrayList<>();
     private final List<Vector3i> doorPositions = new ArrayList<>();
+    private final List<DoorMarker> doorMarkers = new ArrayList<>();
     private final List<Vector3i> activationZonePositions = new ArrayList<>();
     private final List<ChallengeObjective> challenges = new ArrayList<>();
     private int branchDepth;
@@ -153,7 +155,32 @@ public final class RoomData {
     }
 
     public void addLockDoorBlockPosition(@Nonnull Vector3i pos) {
+        addLockDoorBlockPosition(pos, this, doorMode, "lockDoor", null);
+    }
+
+    public void addLockDoorBlockPosition(@Nonnull Vector3i pos,
+                                         @Nonnull RoomData targetRoom,
+                                         @Nonnull DoorMode mode) {
+        addLockDoorBlockPosition(pos, targetRoom, mode, "trackedDoor", null);
+    }
+
+    public void addLockDoorBlockPosition(@Nonnull Vector3i pos,
+                                         @Nonnull RoomData targetRoom,
+                                         @Nonnull DoorMode mode,
+                                         @Nonnull String kind,
+                                         @Nullable Vector3i sourceDoorMarker) {
         lockDoorBlockPositions.add(pos);
+        trackedDoorBlocks.add(new TrackedDoorBlock(
+                new Vector3i(pos),
+                targetRoom,
+                mode,
+                kind,
+                sourceDoorMarker != null ? new Vector3i(sourceDoorMarker) : null));
+    }
+
+    @Nonnull
+    public List<TrackedDoorBlock> getTrackedDoorBlocks() {
+        return trackedDoorBlocks;
     }
 
     @Nonnull
@@ -422,6 +449,63 @@ public final class RoomData {
 
     public void addDoorPosition(@Nonnull Vector3i pos) {
         doorPositions.add(pos);
+    }
+
+    public void addDoorPosition(@Nonnull Vector3i pos, @Nonnull DoorMode mode) {
+        doorPositions.add(pos);
+        doorMarkers.add(new DoorMarker(pos, mode));
+    }
+
+    @Nonnull
+    public List<DoorMarker> getDoorMarkers() {
+        return Collections.unmodifiableList(doorMarkers);
+    }
+
+    public boolean hasDoorMode(@Nonnull DoorMode mode) {
+        for (DoorMarker doorMarker : doorMarkers) {
+            if (doorMarker.mode() == mode) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Nonnull
+    public List<Vector3i> getDoorPositions(@Nonnull DoorMode mode) {
+        List<Vector3i> matching = new ArrayList<>();
+        for (DoorMarker doorMarker : doorMarkers) {
+            if (doorMarker.mode() == mode) {
+                matching.add(doorMarker.position());
+            }
+        }
+        return matching;
+    }
+
+    public int getDoorCount(@Nonnull DoorMode mode) {
+        int count = 0;
+        for (DoorMarker doorMarker : doorMarkers) {
+            if (doorMarker.mode() == mode) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    public boolean hasDoorMarkerNear(@Nonnull Vector3i pos,
+                                     @Nonnull DoorMode mode,
+                                     int verticalTolerance) {
+        for (DoorMarker doorMarker : doorMarkers) {
+            if (doorMarker.mode() != mode) {
+                continue;
+            }
+            Vector3i markerPos = doorMarker.position();
+            if (markerPos.x == pos.x
+                    && markerPos.z == pos.z
+                    && Math.abs(markerPos.y - pos.y) <= Math.max(0, verticalTolerance)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Nonnull
@@ -737,7 +821,17 @@ public final class RoomData {
     public record PortalMarker(@Nonnull Vector3i position, @Nonnull PortalMode mode) {
     }
 
+    public record DoorMarker(@Nonnull Vector3i position, @Nonnull DoorMode mode) {
+    }
+
     public record PinnedMobSpawn(@Nonnull Vector3i position, @Nonnull String mobId) {
+    }
+
+    public record TrackedDoorBlock(@Nonnull Vector3i position,
+                                   @Nonnull RoomData targetRoom,
+                                   @Nonnull DoorMode mode,
+                                   @Nonnull String kind,
+                                   @Nullable Vector3i sourceDoorMarker) {
     }
 
     /**

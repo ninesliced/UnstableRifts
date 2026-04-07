@@ -4,6 +4,7 @@ import com.hypixel.hytale.protocol.packets.interface_.HudComponent;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import dev.ninesliced.unstablerifts.pickup.ItemPickupHudService;
+import dev.ninesliced.unstablerifts.shop.ShopPromptHudService;
 
 import javax.annotation.Nonnull;
 import java.util.Set;
@@ -41,6 +42,7 @@ public final class HudVisibilityService {
             RevivePromptHudService.clear(playerRef);
             ItemPickupHudService.clear(playerRef);
             PortalPromptHudService.clear(playerRef);
+            ShopPromptHudService.clear(playerRef);
             return true;
         } else {
             // Was visible → now hidden: hide everything
@@ -68,6 +70,9 @@ public final class HudVisibilityService {
 
         // Portal prompt
         PortalPromptHudService.hide(player, playerRef);
+
+        // Shared interaction prompt (shop / key door)
+        ShopPromptHudService.hide(player, playerRef);
 
         // MultiHud-based overlays
         MultiHudCompat.hideHud(player, playerRef, ChallengeHud.HUD_ID);

@@ -8,7 +8,9 @@ import com.hypixel.hytale.server.core.modules.entity.component.TransformComponen
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import dev.ninesliced.unstablerifts.UnstableRifts;
+import dev.ninesliced.unstablerifts.dungeon.DoorService;
 import dev.ninesliced.unstablerifts.dungeon.Game;
+import dev.ninesliced.unstablerifts.dungeon.Level;
 import dev.ninesliced.unstablerifts.pickup.ItemPickupConfig;
 import dev.ninesliced.unstablerifts.pickup.ItemPickupTracker;
 import dev.ninesliced.unstablerifts.player.OnlinePlayers;
@@ -19,7 +21,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Polls nearby shopkeepers per player and shows/hides the shop interaction prompt.
+ * Polls nearby key doors and shopkeepers per player and shows/hides the shared interaction prompt.
  */
 public final class ShopPromptHudRuntime {
 
@@ -91,6 +93,21 @@ public final class ShopPromptHudRuntime {
                 if (transform == null) return;
 
                 Vector3d playerPos = transform.getPosition();
+                Level level = game.getCurrentLevel();
+                if (level != null) {
+                    DoorService.NearbyKeyDoor nearbyDoor = plugin.getDoorService().findNearbyKeyDoor(
+                            level, playerPos, DoorService.KEY_INTERACTION_RADIUS);
+                    if (nearbyDoor != null) {
+                        int teamKeys = game.getTeamKeys();
+                        ShopPromptHudService.show(player, playerRef,
+                                "Locked Door",
+                                teamKeys > 0
+                                        ? "Press F to unlock with a team key (" + teamKeys + " ready)"
+                                        : "Press F when your team has a key");
+                        return;
+                    }
+                }
+
                 double pickupRadiusSq = ItemPickupConfig.ITEM_PICKUP_RADIUS * ItemPickupConfig.ITEM_PICKUP_RADIUS;
                 if (ItemPickupTracker.findClosestFKeyPickup(ref.getStore(), playerPos, pickupRadiusSq) != null) {
                     ShopPromptHudService.hide(player, playerRef);

@@ -199,15 +199,15 @@ public final class Game {
         return this.money;
     }
 
-    public int getTeamKeys() {
+    public synchronized int getTeamKeys() {
         return teamKeys;
     }
 
-    public void addKey() {
+    public synchronized void addKey() {
         teamKeys++;
     }
 
-    public boolean useKey() {
+    public synchronized boolean useKey() {
         if (teamKeys > 0) {
             teamKeys--;
             return true;

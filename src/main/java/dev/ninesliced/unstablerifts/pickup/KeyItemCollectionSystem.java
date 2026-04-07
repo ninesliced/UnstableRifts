@@ -12,6 +12,7 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.core.util.NotificationUtil;
 import dev.ninesliced.unstablerifts.UnstableRifts;
 import dev.ninesliced.unstablerifts.dungeon.Game;
+import dev.ninesliced.unstablerifts.systems.DeathComponent;
 import org.joml.Vector3d;
 
 import javax.annotation.Nonnull;
@@ -43,6 +44,10 @@ public final class KeyItemCollectionSystem extends EntityTickingSystem<EntitySto
         }
 
         if (!keyRef.isValid()) {
+            return;
+        }
+
+        if (keyRef.getStore() != store) {
             return;
         }
 
@@ -112,6 +117,11 @@ public final class KeyItemCollectionSystem extends EntityTickingSystem<EntitySto
             return;
         }
 
+        DeathComponent death = store.getComponent(playerEntityRef, DeathComponent.getComponentType());
+        if (death != null && death.isDead()) {
+            return;
+        }
+
         Vector3d playerPos = playerTransform.getPosition();
 
         double collectRadius = ItemPickupConfig.getCoinCollectRadius(playerRef.getUuid());
@@ -127,6 +137,9 @@ public final class KeyItemCollectionSystem extends EntityTickingSystem<EntitySto
                 continue;
             }
             if (!tracked.getRef().isValid()) {
+                continue;
+            }
+            if (tracked.getRef().getStore() != store) {
                 continue;
             }
 

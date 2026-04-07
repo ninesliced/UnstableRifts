@@ -2,6 +2,7 @@ package dev.ninesliced.unstablerifts.dungeon;
 
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import org.joml.Vector3i;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -16,6 +17,7 @@ public final class Level {
     private final String name;
     private final int index;
     private final List<RoomData> rooms = new ArrayList<>();
+    private final List<Vector3i> keySpawnPositions = new ArrayList<>();
 
     private final Map<String, List<RoomData>> branches = new HashMap<>();
     private final List<RoomData> mainBranchRooms = new ArrayList<>();
@@ -70,9 +72,18 @@ public final class Level {
         }
     }
 
+    public void addKeySpawnPosition(@Nonnull Vector3i position) {
+        keySpawnPositions.add(new Vector3i(position));
+    }
+
     @Nonnull
     public List<RoomData> getRooms() {
         return Collections.unmodifiableList(rooms);
+    }
+
+    @Nonnull
+    public List<Vector3i> getKeySpawnPositions() {
+        return Collections.unmodifiableList(keySpawnPositions);
     }
 
     @Nullable

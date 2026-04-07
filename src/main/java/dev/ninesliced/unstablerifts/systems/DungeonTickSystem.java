@@ -469,6 +469,10 @@ public final class DungeonTickSystem extends EntityTickingSystem<EntityStore> {
 
         // Player just entered a new room — check if it's locked.
         if (room.isLocked() && !room.isCleared() && !room.isDoorsSealed()) {
+            if (unstablerifts.getDoorService().hasRemainingKeyDoors(level, room)) {
+                return;
+            }
+
             DungeonConfig.LevelConfig levelConfig = null;
             String selector = game.getCurrentLevelSelector();
             if (selector != null && !selector.isBlank()) {
@@ -477,16 +481,15 @@ public final class DungeonTickSystem extends EntityTickingSystem<EntityStore> {
             if (levelConfig == null && game.getCurrentLevelIndex() < config.getLevels().size()) {
                 levelConfig = config.getLevels().get(game.getCurrentLevelIndex());
             }
-            String doorBlock = levelConfig != null ? levelConfig.getDoorBlock() : DungeonConstants.DEFAULT_DOOR_BLOCK;
-            unstablerifts.getDoorService().onPlayerEnterRoom(room, game, level, game.getInstanceWorld(), doorBlock);
 
-            // Lock the room entrance at the anchor, and seal every outbound exit spawner.
+            // Lock the room using prefab-based blockers only so we do not
+            // race a plain block seal against the door prefab pass.
             World world = game.getInstanceWorld();
             if (world != null && levelConfig != null) {
                 DungeonConfig.LevelConfig lc = levelConfig;
                 room.setDoorsSealed(true);
                 world.execute(() -> {
-                    DungeonGenerator.pasteConfiguredDoorMarkers(world, lc, room);
+                    DungeonGenerator.pasteConfiguredDoorMarkers(world, lc, room, EnumSet.of(DoorMode.ACTIVATOR), true);
                     DungeonGenerator.pasteLockDoor(world, lc, room, room.getAnchor(), room.getRotation());
                     DungeonGenerator.pasteSealDoorsAtRoomExits(world, lc, room);
                 });
@@ -499,6 +502,13 @@ public final class DungeonTickSystem extends EntityTickingSystem<EntityStore> {
                     Store<EntityStore> eStore = world.getEntityStore().getStore();
                     unstablerifts.getGameManager().getMobSpawningService().spawnRoomMobs(room, eStore);
                 });
+            }
+
+            // Locked rooms with mobs should not instantly clear just because the
+            // prefab has no explicit challenge marker. Fall back to a mob-clear
+            // objective so the doors stay shut until the encounter is finished.
+            if (room.getChallenges().isEmpty() && hasDeferredEncounterMobs(room)) {
+                room.addChallenge(new ChallengeObjective(ChallengeObjective.Type.MOB_CLEAR, room.getAnchor()));
             }
 
             // If no challenges at all → instantly mark as completed and open doors.
@@ -520,6 +530,19 @@ public final class DungeonTickSystem extends EntityTickingSystem<EntityStore> {
                 && !room.isChallengeActive() && !room.isCleared()) {
             room.setChallengeActive(true);
         }
+    }
+
+    private boolean hasDeferredEncounterMobs(@Nonnull RoomData room) {
+        if (room.getExpectedMobCount() > 0) {
+            return true;
+        }
+        if (!room.getMobsToSpawn().isEmpty()) {
+            return true;
+        }
+        if (!room.getPinnedMobSpawns().isEmpty()) {
+            return true;
+        }
+        return !room.getPrefabMobMarkerPositions().isEmpty();
     }
 
     private void updateChallenges(@Nonnull Game game, @Nonnull Level level, @Nonnull UnstableRifts unstablerifts) {
