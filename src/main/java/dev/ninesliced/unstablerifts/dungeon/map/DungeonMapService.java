@@ -4,6 +4,7 @@ import com.hypixel.hytale.protocol.*;
 import com.hypixel.hytale.protocol.packets.worldmap.*;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import dev.ninesliced.unstablerifts.dungeon.Game;
+import dev.ninesliced.unstablerifts.dungeon.GameState;
 import dev.ninesliced.unstablerifts.dungeon.Level;
 import dev.ninesliced.unstablerifts.dungeon.RoomData;
 
@@ -149,7 +150,9 @@ public final class DungeonMapService {
         Map<Long, MapChunk> chunks = cachedChunks.get(game.getPartyId());
         MapMarker[] markers = cachedMarkers.get(game.getPartyId());
         if (chunks == null || chunks.isEmpty()) {
-            legendService.clear(playerRef);
+            if (game.getCurrentLevel() == null || game.getState() == GameState.COMPLETE) {
+                legendService.clear(playerRef);
+            }
             return;
         }
 

@@ -518,6 +518,8 @@ public final class GameManager {
         Teleport tp = Teleport.createForPlayer(destination, new Rotation3f());
         playerStore.putComponent(ref, Teleport.getComponentType(), tp);
 
+        scheduleDungeonMapResync(game.getInstanceWorld(), game, Collections.singletonList(playerId));
+
         LOGGER.info("Closest Exit portal teleported player " + playerId
                 + " from room " + resolvedSourceRoom.getAnchor()
                 + " to exit " + exitPos);
@@ -617,6 +619,7 @@ public final class GameManager {
             game.setState(GameState.ACTIVE);
             game.setBossRoomSealed(false);
             plugin.getDungeonMapService().buildMap(game);
+                scheduleDungeonMapResync(world, game, new ArrayList<>(game.getPlayersInInstance()));
             PartyUiPage.refreshOpenPages();
             LOGGER.info("Activated level '" + level.getName() + "' (index " + levelIndex
                     + ") for party " + game.getPartyId());
@@ -645,6 +648,42 @@ public final class GameManager {
             Teleport tp = Teleport.createForPlayer(position, new Rotation3f());
             playerStore.putComponent(ref, Teleport.getComponentType(), tp);
         }
+    }
+
+    private void scheduleDungeonMapResync(@Nullable World world,
+                                          @Nonnull Game game,
+                                          @Nonnull Collection<UUID> playerIds) {
+        if (world == null || playerIds.isEmpty()) {
+            return;
+        }
+
+        List<UUID> targetPlayerIds = new ArrayList<>(playerIds);
+        world.execute(() -> {
+            if (game.getState() == GameState.COMPLETE || game.getInstanceWorld() != world) {
+                return;
+            }
+
+            for (UUID playerId : targetPlayerIds) {
+                PlayerRef playerRef = Universe.get().getPlayer(playerId);
+                if (playerRef == null || !playerRef.isValid()) {
+                    continue;
+                }
+
+                Ref<EntityStore> ref = playerRef.getReference();
+                if (ref == null || !ref.isValid()) {
+                    continue;
+                }
+
+                Store<EntityStore> store = ref.getStore();
+                Player player = store.getComponent(ref, Player.getComponentType());
+                if (player == null || player.getWorld() != world) {
+                    continue;
+                }
+
+                playerStateService.enableMap(playerRef);
+                plugin.getDungeonMapService().sendMapToPlayer(playerRef, game);
+            }
+        });
     }
 
     /**
@@ -1090,17 +1129,18 @@ public final class GameManager {
         playerStateService.applyDungeonMovementSettings(ref, store, playerRef);
 
         playerStateService.enableMap(playerRef);
-        if (game != null) {
-            plugin.getDungeonMapService().sendMapToPlayer(playerRef, game);
-        }
 
         inventoryService.syncInventoryAndSelectedSlots(playerRef, ref, store);
 
+        World world = player.getWorld();
+
         if (game != null) {
+            boolean queuedTeleport = false;
             Vector3d savedPosition = game.removeDisconnectedPosition(playerId);
             if (savedPosition != null) {
                 Teleport tp = Teleport.createForPlayer(savedPosition, new Rotation3f());
                 store.putComponent(ref, Teleport.getComponentType(), tp);
+                queuedTeleport = true;
             } else {
                 Level currentLevel = game.getCurrentLevel();
                 if (currentLevel != null) {
@@ -1110,14 +1150,20 @@ public final class GameManager {
                         Vector3d spawnPos = new Vector3d(anchor.x + 0.5, anchor.y + 1.0, anchor.z + 0.5);
                         Teleport tp = Teleport.createForPlayer(spawnPos, new Rotation3f());
                         store.putComponent(ref, Teleport.getComponentType(), tp);
+                        queuedTeleport = true;
                     }
                 }
+            }
+
+            if (queuedTeleport) {
+                scheduleDungeonMapResync(world, game, Collections.singletonList(playerId));
+            } else {
+                plugin.getDungeonMapService().sendMapToPlayer(playerRef, game);
             }
             PartyUiPage.refreshOpenPages();
         }
 
         // Re-apply movement one tick later in case engine systems overwrite it.
-        World world = player.getWorld();
         if (world != null) {
             world.execute(() -> {
                 Ref<EntityStore> delayedRef = playerRef.getReference();
@@ -1392,15 +1438,18 @@ public final class GameManager {
         plugin.getCameraService().scheduleEnableOnNextReady(playerRef);
         playerStateService.applyDungeonMovementSettings(ref, store, playerRef);
         playerStateService.enableMap(playerRef);
-        plugin.getDungeonMapService().sendMapToPlayer(playerRef, game);
         game.removeDisconnectedPlayer(playerId);
         game.setPlayerInInstance(playerId, true);
         pendingPostReadyResync.add(playerId);
+
+        World world = player.getWorld();
+        boolean queuedTeleport = false;
 
         Vector3d savedPosition = game.removeDisconnectedPosition(playerId);
         if (savedPosition != null) {
             Teleport tp = Teleport.createForPlayer(savedPosition, new Rotation3f());
             store.putComponent(ref, Teleport.getComponentType(), tp);
+            queuedTeleport = true;
         } else {
             Level currentLevel = game.getCurrentLevel();
             if (currentLevel != null) {
@@ -1410,8 +1459,15 @@ public final class GameManager {
                     Vector3d spawnPos = new Vector3d(anchor.x + 0.5, anchor.y + 1.0, anchor.z + 0.5);
                     Teleport tp = Teleport.createForPlayer(spawnPos, new Rotation3f());
                     store.putComponent(ref, Teleport.getComponentType(), tp);
+                    queuedTeleport = true;
                 }
             }
+        }
+
+        if (queuedTeleport) {
+            scheduleDungeonMapResync(world, game, Collections.singletonList(playerId));
+        } else {
+            plugin.getDungeonMapService().sendMapToPlayer(playerRef, game);
         }
         PartyUiPage.refreshOpenPages();
     }
