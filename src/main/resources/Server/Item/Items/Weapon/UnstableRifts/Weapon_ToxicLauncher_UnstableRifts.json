@@ -5,7 +5,7 @@
   "Categories": [
     "Items.Weapons"
   ],
-  "Icon": "Icons/ItemsGenerated/Flamethrower_Goblin.png",
+  "Icon": "Icons/ItemsGenerated/Toxic_launcher.png",
   "ItemLevel": 40,
   "Model": "Items/Weapons/UnstableRifts/Toxic_launcher/Model/Toxic_Launcher.blockymodel",
   "Texture": "Items/Weapons/UnstableRifts/Toxic_launcher/Model/HazmatLauncher.png",

@@ -1,0 +1,50 @@
+{
+  "itemId": "Weapon_Corrupted_Shotgun_UnstableRifts",
+  "displayName": "Corrupted Shotgun",
+  "category": "BULLET",
+  "lockedEffect": "VOID",
+  "pelletEffects": [
+    "ACID",
+    "VOID"
+  ],
+  "minRarity": "EPIC",
+  "maxRarity": "UNIQUE",
+  "spawnWeight": 3,
+  "baseStats": {
+    "range": 20,
+    "spread": 34.0,
+    "pellets": 32,
+    "knockback": 2.6,
+    "precision": 8
+  },
+  "primary": {
+    "id": "UnstableRifts_Corrupted_Shotgun_Primary",
+    "cooldown": 2.2,
+    "requireAmmo": true,
+    "shotId": "UnstableRifts_Corrupted_Shotgun_Shot",
+    "reloadId": "UnstableRifts_Corrupted_Shotgun_Reload"
+  },
+  "reload": {
+    "id": "UnstableRifts_Corrupted_Shotgun_Reload",
+    "cooldown": 2.2,
+    "runTime": 2.2,
+    "amount": 0,
+    "nextId": "UnstableRifts_Update_Hud",
+    "worldSfx": "SFX_Blunderbuss_Load",
+    "localSfx": "SFX_Blunderbuss_Load_Local",
+    "animationId": "Reload",
+    "maxAmmo": 60
+  },
+  "damage": {
+    "id": "UnstableRifts_Corrupted_Shotgun_Projectile_Hit",
+    "amount": 5.0,
+    "type": "Projectile",
+    "worldSfx": "SFX_Blunderbuss_Hit",
+    "localSfx": "SFX_Blunderbuss_Hit",
+    "particleId": "RifleShooting_Impact",
+    "particleYOffset": 0.8
+  },
+  "extraRoots": [
+    "UnstableRifts_Crystal_Blunderbuss_Miss"
+  ]
+}
