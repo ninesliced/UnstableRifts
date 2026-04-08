@@ -42,6 +42,7 @@ public final class DungeonTickSystem extends EntityTickingSystem<EntityStore> {
 
     private static final Logger LOGGER = Logger.getLogger(DungeonTickSystem.class.getName());
     private static final double BOSS_ROOM_WALK_THRESHOLD = 10.0;
+    private static final int LOCKED_ROOM_ENTRY_MARGIN = 5;
     private static final long LOGIC_UPDATE_INTERVAL_MS = 200L;
     private static final long HUD_UPDATE_INTERVAL_MS = 400L;
 
@@ -445,90 +446,154 @@ public final class DungeonTickSystem extends EntityTickingSystem<EntityStore> {
 
         UUID playerId = playerRef.getUuid();
         RoomData previousRoom = playerCurrentRoom.put(playerId, room);
+        boolean roomChanged = previousRoom != room;
 
-        // Only trigger on room change.
-        if (previousRoom == room) return;
-
-        // Broadcast exit message for the room the player just left.
-        if (previousRoom != null) {
-            broadcastRoomMessage(unstablerifts, game, previousRoom.getExitTitle(), previousRoom.getExitSubtitle());
-        }
-
-        // Broadcast enter message for the new room.
-        broadcastRoomMessage(unstablerifts, game, room.getEnterTitle(), room.getEnterSubtitle());
-
-        if (room.getType() == RoomType.SHOP) {
-            World world = game.getInstanceWorld();
-            if (world != null) {
-                world.execute(() -> {
-                    Store<EntityStore> roomStore = world.getEntityStore().getStore();
-                    unstablerifts.getShopService().refreshOnFirstRoomEntry(game, room, roomStore);
-                });
-            }
-        }
-
-        // Player just entered a new room — check if it's locked.
-        if (room.isLocked() && !room.isCleared() && !room.isDoorsSealed()) {
-            if (unstablerifts.getDoorService().hasRemainingKeyDoors(level, room)) {
-                return;
+        if (roomChanged) {
+            // Broadcast exit message for the room the player just left.
+            if (previousRoom != null) {
+                broadcastRoomMessage(unstablerifts, game, previousRoom.getExitTitle(), previousRoom.getExitSubtitle());
             }
 
-            DungeonConfig.LevelConfig levelConfig = null;
-            String selector = game.getCurrentLevelSelector();
-            if (selector != null && !selector.isBlank()) {
-                levelConfig = config.findLevel(selector);
-            }
-            if (levelConfig == null && game.getCurrentLevelIndex() < config.getLevels().size()) {
-                levelConfig = config.getLevels().get(game.getCurrentLevelIndex());
-            }
+            // Broadcast enter message for the new room.
+            broadcastRoomMessage(unstablerifts, game, room.getEnterTitle(), room.getEnterSubtitle());
 
-            // Lock the room using prefab-based blockers only so we do not
-            // race a plain block seal against the door prefab pass.
-            World world = game.getInstanceWorld();
-            if (world != null && levelConfig != null) {
-                DungeonConfig.LevelConfig lc = levelConfig;
-                room.setDoorsSealed(true);
-                world.execute(() -> {
-                    DungeonGenerator.pasteConfiguredDoorMarkers(world, lc, room, EnumSet.of(DoorMode.ACTIVATOR), true);
-                    DungeonGenerator.pasteLockDoor(world, lc, room, room.getAnchor(), room.getRotation());
-                    DungeonGenerator.pasteSealDoorsAtRoomExits(world, lc, room);
-                });
-            }
-
-            // Spawn ALL deferred mobs on room entry (pinned + random pool).
-            // Must use world.execute() — can't add entities during tick processing.
-            if (world != null) {
-                world.execute(() -> {
-                    Store<EntityStore> eStore = world.getEntityStore().getStore();
-                    unstablerifts.getGameManager().getMobSpawningService().spawnRoomMobs(room, eStore);
-                });
-            }
-
-            // Locked rooms with mobs should not instantly clear just because the
-            // prefab has no explicit challenge marker. Fall back to a mob-clear
-            // objective so the doors stay shut until the encounter is finished.
-            if (room.getChallenges().isEmpty() && hasDeferredEncounterMobs(room)) {
-                room.addChallenge(new ChallengeObjective(ChallengeObjective.Type.MOB_CLEAR, room.getAnchor()));
-            }
-
-            // If no challenges at all → instantly mark as completed and open doors.
-            if (room.getChallenges().isEmpty()) {
-                room.setCleared(true);
-                if (world != null && room.isDoorsSealed()) {
-                    unstablerifts.getDoorService().onRoomCleared(room, world);
+            if (room.getType() == RoomType.SHOP) {
+                World world = game.getInstanceWorld();
+                if (world != null) {
+                    world.execute(() -> {
+                        Store<EntityStore> roomStore = world.getEntityStore().getStore();
+                        unstablerifts.getShopService().refreshOnFirstRoomEntry(game, room, roomStore);
+                    });
                 }
-                if (world != null && !room.getPortalPositions().isEmpty()) {
-                    world.execute(() -> unstablerifts.getPortalService().spawnPortal(room, world));
-                }
-                unstablerifts.getDungeonMapService().onRoomCleared(game, room);
-                broadcastRoomMessage(unstablerifts, game, room.getUnlockTitle(), room.getUnlockSubtitle());
             }
         }
 
-        // Activate challenge on first entry (any room with challenge markers).
+        trySealLockedRoomInsideTriggerBox(px, py, pz, room, level, game, unstablerifts, config);
+
+        // Unlocked rooms activate on first entry. Locked rooms wait until the seal actually happens.
         if (!room.getChallenges().isEmpty()
-                && !room.isChallengeActive() && !room.isCleared()) {
+                && !room.isChallengeActive()
+                && !room.isCleared()
+                && ((!room.isLocked() && roomChanged) || room.isDoorsSealed())) {
             room.setChallengeActive(true);
+        }
+    }
+
+    private void trySealLockedRoomInsideTriggerBox(int px, int py, int pz,
+                                                   @Nonnull RoomData room,
+                                                   @Nonnull Level level,
+                                                   @Nonnull Game game,
+                                                   @Nonnull UnstableRifts unstablerifts,
+                                                   @Nonnull DungeonConfig config) {
+        if (!room.isLocked() || room.isCleared() || room.isDoorsSealed()) {
+            return;
+        }
+
+        if (unstablerifts.getDoorService().hasRemainingKeyDoors(level, room)) {
+            return;
+        }
+
+        if (!isInsideLockedRoomTriggerBox(room, px, py, pz)) {
+            return;
+        }
+
+        sealLockedRoom(room, game, unstablerifts, config);
+    }
+
+    private boolean isInsideLockedRoomTriggerBox(@Nonnull RoomData room, int x, int y, int z) {
+        if (!room.contains(x, y, z)) {
+            return false;
+        }
+        if (!room.hasBounds()) {
+            return true;
+        }
+
+        LockedRoomEntrySide entrySide = resolveLockedRoomEntrySide(room);
+        int minX = room.getBoundsMinX();
+        int maxX = room.getBoundsMaxX();
+        int minZ = room.getBoundsMinZ();
+        int maxZ = room.getBoundsMaxZ();
+
+        switch (entrySide) {
+            case MIN_X -> minX = Math.min(maxX, minX + LOCKED_ROOM_ENTRY_MARGIN);
+            case MAX_X -> maxX = Math.max(minX, maxX - LOCKED_ROOM_ENTRY_MARGIN);
+            case MIN_Z -> minZ = Math.min(maxZ, minZ + LOCKED_ROOM_ENTRY_MARGIN);
+            case MAX_Z -> maxZ = Math.max(minZ, maxZ - LOCKED_ROOM_ENTRY_MARGIN);
+        }
+
+        return x >= minX && x <= maxX
+                && z >= minZ && z <= maxZ
+                && room.containsY(y);
+    }
+
+    private LockedRoomEntrySide resolveLockedRoomEntrySide(@Nonnull RoomData room) {
+        // Dungeon room prefabs are authored with their entrance on the local +Z edge.
+        // Rotating the room tells us which world-space side should keep the 5-block grace zone.
+        return switch (room.getRotation() & 3) {
+            case 1 -> LockedRoomEntrySide.MAX_X;
+            case 2 -> LockedRoomEntrySide.MIN_Z;
+            case 3 -> LockedRoomEntrySide.MIN_X;
+            default -> LockedRoomEntrySide.MAX_Z;
+        };
+    }
+
+    private void sealLockedRoom(@Nonnull RoomData room,
+                                @Nonnull Game game,
+                                @Nonnull UnstableRifts unstablerifts,
+                                @Nonnull DungeonConfig config) {
+        if (!room.isLocked() || room.isCleared() || room.isDoorsSealed()) {
+            return;
+        }
+
+        DungeonConfig.LevelConfig levelConfig = null;
+        String selector = game.getCurrentLevelSelector();
+        if (selector != null && !selector.isBlank()) {
+            levelConfig = config.findLevel(selector);
+        }
+        if (levelConfig == null && game.getCurrentLevelIndex() < config.getLevels().size()) {
+            levelConfig = config.getLevels().get(game.getCurrentLevelIndex());
+        }
+
+        // Lock the room using prefab-based blockers only so we do not
+        // race a plain block seal against the door prefab pass.
+        World world = game.getInstanceWorld();
+        if (world != null && levelConfig != null) {
+            DungeonConfig.LevelConfig lc = levelConfig;
+            room.setDoorsSealed(true);
+            world.execute(() -> {
+                DungeonGenerator.pasteConfiguredDoorMarkers(world, lc, room, EnumSet.of(DoorMode.ACTIVATOR), true);
+                DungeonGenerator.pasteLockDoor(world, lc, room, room.getAnchor(), room.getRotation());
+                DungeonGenerator.pasteSealDoorsAtRoomExits(world, lc, room);
+            });
+        }
+
+        // Spawn ALL deferred mobs on room entry (pinned + random pool).
+        // Must use world.execute() — can't add entities during tick processing.
+        if (world != null) {
+            world.execute(() -> {
+                Store<EntityStore> eStore = world.getEntityStore().getStore();
+                unstablerifts.getGameManager().getMobSpawningService().spawnRoomMobs(room, eStore);
+            });
+        }
+
+        // Locked rooms with mobs should not instantly clear just because the
+        // prefab has no explicit challenge marker. Fall back to a mob-clear
+        // objective so the doors stay shut until the encounter is finished.
+        if (room.getChallenges().isEmpty() && hasDeferredEncounterMobs(room)) {
+            room.addChallenge(new ChallengeObjective(ChallengeObjective.Type.MOB_CLEAR, room.getAnchor()));
+        }
+
+        // If no challenges at all → instantly mark as completed and open doors.
+        if (room.getChallenges().isEmpty()) {
+            room.setCleared(true);
+            if (world != null && room.isDoorsSealed()) {
+                unstablerifts.getDoorService().onRoomCleared(room, world);
+            }
+            if (world != null && !room.getPortalPositions().isEmpty()) {
+                world.execute(() -> unstablerifts.getPortalService().spawnPortal(room, world));
+            }
+            unstablerifts.getDungeonMapService().onRoomCleared(game, room);
+            broadcastRoomMessage(unstablerifts, game, room.getUnlockTitle(), room.getUnlockSubtitle());
         }
     }
 
@@ -633,5 +698,12 @@ public final class DungeonTickSystem extends EntityTickingSystem<EntityStore> {
         @Nullable
         private Vector3d lastPosition;
         private double distanceWalked;
+    }
+
+    private enum LockedRoomEntrySide {
+        MIN_X,
+        MAX_X,
+        MIN_Z,
+        MAX_Z
     }
 }
