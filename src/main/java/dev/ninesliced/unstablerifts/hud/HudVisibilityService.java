@@ -78,6 +78,7 @@ public final class HudVisibilityService {
         MultiHudCompat.hideHud(player, playerRef, ChallengeHud.HUD_ID);
         MultiHudCompat.hideHud(player, playerRef, PartyStatusHud.HUD_ID);
         MultiHudCompat.hideHud(player, playerRef, DungeonInfoHud.HUD_ID);
+        MultiHudCompat.hideHud(player, playerRef, BossFightHud.HUD_ID);
         MultiHudCompat.hideHud(player, playerRef, DeathCountdownHud.HUD_ID);
         MultiHudCompat.hideHud(player, playerRef, ReviveProgressHud.HUD_ID);
 

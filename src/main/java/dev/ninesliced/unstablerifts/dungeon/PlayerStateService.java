@@ -190,6 +190,7 @@ public final class PlayerStateService {
         DungeonInfoHud.hideHud(player, playerRef);
         PartyStatusHud.hideHud(player, playerRef);
         ChallengeHud.hideHud(player, playerRef);
+        BossFightHud.hideHud(player, playerRef);
         DeathCountdownHud.hideHud(player, playerRef);
         ReviveProgressHud.hideHud(player, playerRef);
     }

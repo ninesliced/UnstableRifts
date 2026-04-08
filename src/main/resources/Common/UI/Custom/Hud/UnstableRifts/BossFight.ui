@@ -1,0 +1,102 @@
+@PanelBg = #0c0f14(0.84);
+@BossText = #f5f1df;
+@AccentGold = #d9c18a;
+@SubtleText = #8fa4b8;
+@BarBg = #201711(0.95);
+@FrameLine = #d9c18a(0.85);
+
+Group #BossFightRoot {
+  Anchor: (Left: 0, Top: 0, Right: 0, Bottom: 0);
+  HitTestVisible: false;
+
+  Group #BossFightAnchor {
+    Anchor: (Left: 0, Right: 0, Top: 25, Height: 76);
+    LayoutMode: Top;
+
+    Group {
+      Anchor: (Height: 18);
+      LayoutMode: Left;
+
+      Group { FlexWeight: 1; }
+
+      Label {
+        Anchor: (Width: 180, Height: 18);
+        Text: "BOSS ENCOUNTER";
+        Style: LabelStyle(
+          FontSize: 11,
+          TextColor: @AccentGold,
+          RenderBold: true,
+          RenderUppercase: true,
+          HorizontalAlignment: Center,
+          VerticalAlignment: Center
+        );
+      }
+
+      Group { FlexWeight: 1; }
+    }
+
+    Group {
+      Anchor: (Height: 54, Top: 4);
+      LayoutMode: Left;
+
+      Group { FlexWeight: 1; }
+
+      Group #BossFightPanel {
+        Anchor: (Width: 500, Height: 54);
+        Background: @PanelBg;
+        Padding: (Left: 14, Right: 14, Top: 8, Bottom: 8);
+        LayoutMode: Top;
+
+        Label #BossNameLabel {
+          Anchor: (Height: 16);
+          Text: "Forklift";
+          Style: LabelStyle(
+            FontSize: 14,
+            TextColor: @BossText,
+            RenderBold: true,
+            HorizontalAlignment: Center,
+            VerticalAlignment: Center
+          );
+        }
+
+        Group {
+          Anchor: (Height: 14, Top: 8);
+          LayoutMode: Left;
+
+          Group #BossHealthBarFrame {
+            Anchor: (Width: 380, Height: 14);
+            Background: @BarBg;
+
+            Group {
+              Anchor: (Left: 0, Top: 0, Right: 0, Height: 1);
+              Background: @FrameLine;
+            }
+
+            Group {
+              Anchor: (Left: 0, Bottom: 0, Right: 0, Height: 1);
+              Background: #000000(0.35);
+            }
+
+            Group #BossHealthBarFill {
+              Anchor: (Left: 0, Top: 1, Width: 380, Height: 12);
+              Background: #7be36f;
+            }
+          }
+
+          Label #BossHealthValue {
+            Anchor: (Width: 82, Height: 14, Left: 10);
+            Text: "0 / 0 HP";
+            Style: LabelStyle(
+              FontSize: 10,
+              TextColor: @SubtleText,
+              HorizontalAlignment: End,
+              VerticalAlignment: Center
+            );
+          }
+        }
+      }
+
+      Group { FlexWeight: 1; }
+    }
+  }
+}

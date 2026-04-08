@@ -16,6 +16,7 @@ import dev.ninesliced.unstablerifts.UnstableRifts;
 import dev.ninesliced.unstablerifts.camera.TopCameraService;
 import dev.ninesliced.unstablerifts.dungeon.*;
 import dev.ninesliced.unstablerifts.hud.ChallengeHud;
+import dev.ninesliced.unstablerifts.hud.BossFightHud;
 import dev.ninesliced.unstablerifts.hud.DungeonInfoHud;
 import dev.ninesliced.unstablerifts.hud.PartyStatusHud;
 import dev.ninesliced.unstablerifts.hud.PortalPromptHudService;
@@ -88,6 +89,7 @@ public final class DungeonTickSystem extends EntityTickingSystem<EntityStore> {
             unstablerifts.getCameraService().restoreDefault(playerRef);
             DungeonInfoHud.hideHud(player, playerRef);
             PartyStatusHud.hideHud(player, playerRef);
+            BossFightHud.hideHud(player, playerRef);
             PortalPromptHudService.hide(player, playerRef);
             return;
         }
@@ -102,6 +104,7 @@ public final class DungeonTickSystem extends EntityTickingSystem<EntityStore> {
             unstablerifts.getCameraService().restoreDefault(playerRef);
             DungeonInfoHud.hideHud(player, playerRef);
             PartyStatusHud.hideHud(player, playerRef);
+            BossFightHud.hideHud(player, playerRef);
             PortalPromptHudService.hide(player, playerRef);
             return;
         }
@@ -114,6 +117,7 @@ public final class DungeonTickSystem extends EntityTickingSystem<EntityStore> {
             unstablerifts.getCameraService().restoreDefault(playerRef);
             DungeonInfoHud.hideHud(player, playerRef);
             PartyStatusHud.hideHud(player, playerRef);
+            BossFightHud.hideHud(player, playerRef);
             PortalPromptHudService.hide(player, playerRef);
             return;
         }
@@ -228,6 +232,18 @@ public final class DungeonTickSystem extends EntityTickingSystem<EntityStore> {
             ChallengeHud.applyHud(player, playerRef, challengeHud);
         } else {
             ChallengeHud.hideHud(player, playerRef);
+        }
+
+        RoomData bossRoom = game.getCurrentLevel() != null ? game.getCurrentLevel().getBossRoom() : null;
+        if (game.getState() == GameState.BOSS && bossRoom != null) {
+            BossFightHud bossHud = BossFightHud.fromRoom(playerRef, bossRoom);
+            if (bossHud != null) {
+                BossFightHud.applyHud(player, playerRef, bossHud);
+            } else {
+                BossFightHud.hideHud(player, playerRef);
+            }
+        } else {
+            BossFightHud.hideHud(player, playerRef);
         }
     }
 

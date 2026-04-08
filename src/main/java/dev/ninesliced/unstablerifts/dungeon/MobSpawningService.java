@@ -3,6 +3,8 @@ package dev.ninesliced.unstablerifts.dungeon;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.math.vector.Rotation3f;
+import com.hypixel.hytale.server.core.Message;
+import com.hypixel.hytale.server.core.modules.entity.component.DisplayNameComponent;
 import com.hypixel.hytale.server.core.entity.UUIDComponent;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.NPCPlugin;
@@ -211,6 +213,7 @@ public final class MobSpawningService {
             Ref<EntityStore> mobRef = mobResult != null ? mobResult.first() : null;
             if (mobRef != null) {
                 KweebecScaleHelper.applyScale(store, mobRef, mobId);
+                applyBossDisplayName(store, mobRef, mobId);
                 room.addSpawnedMob(mobRef);
                 UUIDComponent uuidComp = store.getComponent(mobRef, UUIDComponent.getComponentType());
                 if (uuidComp != null) {
@@ -222,6 +225,25 @@ public final class MobSpawningService {
             LOGGER.log(java.util.logging.Level.WARNING, "Failed to spawn mob: " + mobId, e);
             return null;
         }
+    }
+
+    private void applyBossDisplayName(@Nonnull Store<EntityStore> store,
+                                      @Nonnull Ref<EntityStore> mobRef,
+                                      @Nonnull String mobId) {
+        String displayName;
+        if (mobId.startsWith("Boss_Forklift")) {
+            displayName = "Forklift";
+        } else if (mobId.startsWith("Boss_Zombie_Commander")) {
+            displayName = "Zombie Commander";
+        } else {
+            displayName = null;
+        }
+        if (displayName == null) {
+            return;
+        }
+        store.putComponent(mobRef,
+                DisplayNameComponent.getComponentType(),
+                new DisplayNameComponent(Message.raw(displayName)));
     }
 
     /**
