@@ -145,6 +145,13 @@ public final class WeaponRegistry {
                 ? DamageEffect.fromString(wc.lockedEffect)
                 : DamageEffect.NONE;
         boolean effectLocked = wc.lockedEffect != null;
+        List<DamageEffect> pelletEffects = wc.pelletEffects == null
+            ? List.of()
+            : wc.pelletEffects.stream()
+            .map(DamageEffect::fromString)
+            .filter(effect -> effect != DamageEffect.NONE)
+            .distinct()
+            .toList();
         WeaponRarity minRarity = wc.minRarity != null
                 ? WeaponRarity.fromString(wc.minRarity)
                 : WeaponRarity.BASIC;
@@ -165,7 +172,7 @@ public final class WeaponRegistry {
         int baseMobLifetime = wc.summoningStats != null ? wc.summoningStats.mobLifetime : 0;
 
         WeaponDefinition def = new WeaponDefinition(
-                wc.itemId, wc.displayName, category, locked, effectLocked, minRarity, maxRarity,
+        wc.itemId, wc.displayName, category, locked, effectLocked, pelletEffects, minRarity, maxRarity,
                 wc.spawnWeight, baseDamage, baseCooldown, baseMaxAmmo,
                 baseRange, baseSpread, basePellets, baseKnockback,
                 baseMobHealth, baseMobDamage, baseMobLifetime, basePrecision
@@ -233,6 +240,9 @@ public final class WeaponRegistry {
         String maxRarity;
         @SerializedName("spawnWeight")
         int spawnWeight;
+        @SerializedName("pelletEffects")
+        @Nullable
+        List<String> pelletEffects;
         @SerializedName("baseStats")
         @Nullable
         BaseStatsDef baseStats;

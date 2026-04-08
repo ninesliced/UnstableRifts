@@ -58,7 +58,8 @@
         "Weapon_Crystal_Blunderbuss_Fire_UnstableRifts",
         "Weapon_Crystal_Blunderbuss_Ice_UnstableRifts",
         "Weapon_Crystal_Blunderbuss_Lightning_UnstableRifts",
-        "Weapon_Crystal_Blunderbuss_Void_UnstableRifts"
+        "Weapon_Crystal_Blunderbuss_Void_UnstableRifts",
+        "Weapon_Corrupted_Shotgun_UnstableRifts"
       ],
       "armorChance": 0.40,
       "armorMinRarity": "UNCOMMON",
@@ -107,6 +108,7 @@
         "Weapon_Crystal_Blunderbuss_Ice_UnstableRifts",
         "Weapon_Crystal_Blunderbuss_Lightning_UnstableRifts",
         "Weapon_Crystal_Blunderbuss_Void_UnstableRifts",
+        "Weapon_Corrupted_Shotgun_UnstableRifts",
         "Weapon_Taser_UnstableRifts",
         "Weapon_Voidlance_UnstableRifts"
       ],
@@ -198,7 +200,8 @@
         "Weapon_Crystal_Blunderbuss_Fire_UnstableRifts",
         "Weapon_Crystal_Blunderbuss_Ice_UnstableRifts",
         "Weapon_Crystal_Blunderbuss_Lightning_UnstableRifts",
-        "Weapon_Crystal_Blunderbuss_Void_UnstableRifts"
+        "Weapon_Crystal_Blunderbuss_Void_UnstableRifts",
+        "Weapon_Corrupted_Shotgun_UnstableRifts"
       ],
       "armorChance": 0.40,
       "armorMinRarity": "BASIC",

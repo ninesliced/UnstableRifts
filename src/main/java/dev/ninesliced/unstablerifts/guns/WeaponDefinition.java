@@ -1,6 +1,7 @@
 package dev.ninesliced.unstablerifts.guns;
 
 import javax.annotation.Nonnull;
+import java.util.List;
 
 /**
  * Immutable definition of a weapon loaded from JSON.
@@ -8,6 +9,7 @@ import javax.annotation.Nonnull;
  */
 public record WeaponDefinition(@Nonnull String itemId, @Nonnull String displayName, @Nonnull WeaponCategory category,
                                @Nonnull DamageEffect lockedEffect, boolean effectLocked,
+                               @Nonnull List<DamageEffect> pelletEffects,
                                @Nonnull WeaponRarity minRarity, @Nonnull WeaponRarity maxRarity, int spawnWeight,
                                float baseDamage, float baseCooldown, int baseMaxAmmo, int baseRange, double baseSpread,
                                int basePellets, float baseKnockback, int baseMobHealth, int baseMobDamage,

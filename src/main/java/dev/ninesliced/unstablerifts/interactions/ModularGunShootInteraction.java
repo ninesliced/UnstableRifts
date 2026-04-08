@@ -300,11 +300,13 @@ public final class ModularGunShootInteraction extends SimpleInteraction {
         int effectiveRange = this.range;
         int effectivePellets = this.pellets;
         double effectiveSpread = this.spreadDegrees;
-        int effectiveTrailR = this.trailColorR;
-        int effectiveTrailG = this.trailColorG;
-        int effectiveTrailB = this.trailColorB;
         double effectiveKnockback = 0.0;
         WeaponDefinition weaponDefinition = null;
+        List<DamageEffect> pelletEffectPool = List.of();
+        DamageEffect baseEffect = DamageEffect.NONE;
+        int defaultTrailR = this.trailColorR;
+        int defaultTrailG = this.trailColorG;
+        int defaultTrailB = this.trailColorB;
 
         if (heldItem != null) {
             weaponDefinition = WeaponDefinitions.getById(heldItem.getItemId());
@@ -317,24 +319,24 @@ public final class ModularGunShootInteraction extends SimpleInteraction {
             double pelletBonus = GunItemMetadata.getModifierBonus(heldItem, WeaponModifierType.ADDITIONAL_BULLETS);
             effectivePellets = this.pellets + (int) pelletBonus;
 
-            DamageEffect effect = GunItemMetadata.getEffect(heldItem);
-            if (effect != DamageEffect.NONE) {
-                effectiveTrailR = effect.getTrailR();
-                effectiveTrailG = effect.getTrailG();
-                effectiveTrailB = effect.getTrailB();
+            baseEffect = GunItemMetadata.getEffect(heldItem);
+            if (baseEffect != DamageEffect.NONE) {
+                defaultTrailR = baseEffect.getTrailR();
+                defaultTrailG = baseEffect.getTrailG();
+                defaultTrailB = baseEffect.getTrailB();
             } else if (weaponDefinition != null && weaponDefinition.category() == WeaponCategory.LASER) {
-                effectiveTrailR = 255;
-                effectiveTrailG = 255;
-                effectiveTrailB = 255;
+                defaultTrailR = 255;
+                defaultTrailG = 255;
+                defaultTrailB = 255;
             }
 
             if (weaponDefinition != null) {
+                pelletEffectPool = weaponDefinition.pelletEffects();
                 double knockbackBonus = GunItemMetadata.getModifierBonus(heldItem, WeaponModifierType.KNOCKBACK);
                 effectiveKnockback = weaponDefinition.baseKnockback() * (1.0 + knockbackBonus);
             }
         }
 
-        DamageEffect dotEffect = heldItem != null ? GunItemMetadata.getEffect(heldItem) : DamageEffect.NONE;
         WeaponRarity weaponRarity = heldItem != null ? GunItemMetadata.getRarity(heldItem) : WeaponRarity.BASIC;
 
         Vector3d start = getMuzzlePosition(commandBuffer, context.getEntity());
@@ -361,13 +363,16 @@ public final class ModularGunShootInteraction extends SimpleInteraction {
 
         final int shotRange = effectiveRange;
         final double shotSpread = effectiveSpread;
-        final int shotTrailR = effectiveTrailR;
-        final int shotTrailG = effectiveTrailG;
-        final int shotTrailB = effectiveTrailB;
+        final int shotTrailR = defaultTrailR;
+        final int shotTrailG = defaultTrailG;
+        final int shotTrailB = defaultTrailB;
+        final DamageEffect baseShotEffect = baseEffect;
+        final List<DamageEffect> perPelletEffects = pelletEffectPool;
         Set<Integer> knockedTargets = effectiveKnockback > 0.001 ? new HashSet<>() : null;
-        Set<Integer> effectedTargets = dotEffect.hasDoT() ? new HashSet<>() : null;
+        Set<Integer> effectedTargets = (baseShotEffect.hasDoT() || !perPelletEffects.isEmpty()) ? new HashSet<>() : null;
 
         for (int i = 0; i < effectivePellets; i++) {
+            DamageEffect pelletEffect = rollPelletEffect(perPelletEffects, baseShotEffect);
             Vector3d direction;
             if (assistedBaseDir != null) {
                 direction = applySpread(assistedBaseDir, shotSpread);
@@ -377,7 +382,10 @@ public final class ModularGunShootInteraction extends SimpleInteraction {
             ShotHit hit = traceShot(commandBuffer, context, start, direction, shotRange);
 
             if (hasText(this.trailParticleId)) {
-                spawnTrail(start, hit.position, commandBuffer, shotTrailR, shotTrailG, shotTrailB);
+                int pelletTrailR = pelletEffect != DamageEffect.NONE ? pelletEffect.getTrailR() : shotTrailR;
+                int pelletTrailG = pelletEffect != DamageEffect.NONE ? pelletEffect.getTrailG() : shotTrailG;
+                int pelletTrailB = pelletEffect != DamageEffect.NONE ? pelletEffect.getTrailB() : shotTrailB;
+                spawnTrail(start, hit.position, commandBuffer, pelletTrailR, pelletTrailG, pelletTrailB);
             }
 
             if (hit.target != null) {
@@ -385,8 +393,8 @@ public final class ModularGunShootInteraction extends SimpleInteraction {
                 if (knockedTargets != null && knockedTargets.add(hit.target.getIndex())) {
                     applyKnockback(commandBuffer, context.getEntity(), hit.target, effectiveKnockback);
                 }
-                if (effectedTargets != null && effectedTargets.add(hit.target.getIndex())) {
-                    DamageEffectRuntime.apply(commandBuffer, hit.target, dotEffect, weaponRarity);
+                if (effectedTargets != null && pelletEffect.hasDoT() && effectedTargets.add(hit.target.getIndex())) {
+                    DamageEffectRuntime.apply(commandBuffer, hit.target, pelletEffect, weaponRarity);
                 }
                 continue;
             }
@@ -396,6 +404,15 @@ public final class ModularGunShootInteraction extends SimpleInteraction {
                 forkMissInteraction(context, miss, hit.block, hit.position);
             }
         }
+    }
+
+    @Nonnull
+    private DamageEffect rollPelletEffect(@Nonnull List<DamageEffect> perPelletEffects,
+                                          @Nonnull DamageEffect baseEffect) {
+        if (!perPelletEffects.isEmpty()) {
+            return perPelletEffects.get(ThreadLocalRandom.current().nextInt(perPelletEffects.size()));
+        }
+        return baseEffect;
     }
 
     @Nullable

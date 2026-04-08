@@ -1,0 +1,44 @@
+{
+  "TranslationProperties": {
+    "Name": "server.items.Weapon_Corrupted_Shotgun_UnstableRifts.name"
+  },
+  "Categories": [
+    "Items.Weapons"
+  ],
+  "Icon": "Icons/ItemsGenerated/Corrupt_Shotgun.png",
+  "Model": "Items/Weapons/UnstableRifts/Currupted_Shotgun/Model/Corrupted_Shotgun.blockymodel",
+  "Texture": "Items/Weapons/UnstableRifts/Currupted_Shotgun/Model/Corrupt_Shotgun.png",
+  "PlayerAnimationsId": {
+    "Parent": "Rifle",
+    "Animations": {
+      "Shoot": {
+        "ThirdPerson": "Characters/Animations/Corrupted_Shotgun/Reload.blockyanim",
+        "FirstPerson": "Characters/Animations/Corrupted_Shotgun/Reload.blockyanim",
+        "Speed": 1,
+        "Looping": false
+      },
+      "Reload": {
+        "ThirdPerson": "Characters/Animations/Corrupted_Shotgun/Reload.blockyanim",
+        "FirstPerson": "Characters/Animations/Corrupted_Shotgun/Reload.blockyanim",
+        "Speed": 1,
+        "Looping": false
+      }
+    }
+  },
+  "Interactions": {
+    "Primary": "Root_UnstableRifts_Corrupted_Shotgun_Primary",
+    "Secondary": "Root_UnstableRifts_Corrupted_Shotgun_Reload"
+  },
+  "Weapon": {},
+  "Tags": {
+    "Type": [
+      "Weapon"
+    ],
+    "Family": [
+      "Gun"
+    ],
+    "Pickup": [
+      "FKey"
+    ]
+  }
+}
