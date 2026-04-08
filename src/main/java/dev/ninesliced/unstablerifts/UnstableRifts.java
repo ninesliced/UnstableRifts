@@ -156,6 +156,11 @@ public class UnstableRifts extends JavaPlugin {
         }
 
         var game = this.gameManager.findGameForPlayer(playerRef.getUuid());
+        if (game != null && game.getInstanceWorld() == world) {
+            this.gameManager.reconcileDungeonStateOnReady(playerRef, player, game);
+            return;
+        }
+
         if (game == null || game.getInstanceWorld() != world) {
             this.gameManager.normalizeOutsideDungeonState(playerRef, player, game);
         }

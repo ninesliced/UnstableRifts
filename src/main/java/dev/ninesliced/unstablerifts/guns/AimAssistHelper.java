@@ -23,7 +23,9 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Shared aim-assist logic for hitscan weapons.
@@ -31,6 +33,10 @@ import java.util.List;
 public final class AimAssistHelper {
     private static final double XZ_CONE_RAD = Math.toRadians(30.0);
     private static final double XZ_CORRECTION_FACTOR = 0.35;
+    private static final double[] BLOCK_ASSIST_YAW_OFFSETS_DEGREES = {
+            0.0, -5.0, 5.0, -10.0, 10.0, -15.0, 15.0, -20.0, 20.0, -25.0, 25.0, -30.0, 30.0
+    };
+    private static final double[] BLOCK_ASSIST_PITCH_OFFSETS_DEGREES = {0.0, -6.0, 6.0};
 
     private AimAssistHelper() {
     }
@@ -192,9 +198,10 @@ public final class AimAssistHelper {
     }
 
     /**
-     * Computes an assisted direction toward the best destructible block
-     * (crate / barrel) within a 30° horizontal cone, with top-to-bottom
-     * priority for stacked blocks.
+     * Computes an assisted direction toward a visible destructible block
+     * (crate / barrel) using a small fan of sampled rays inside the aim cone.
+     * This keeps block targeting responsive on long-range weapons without
+     * scanning every block in range.
      */
     @Nullable
     public static Vector3d computeAssistedDirectionForBlocks(@Nonnull CommandBuffer<EntityStore> commandBuffer,
@@ -217,96 +224,27 @@ public final class AimAssistHelper {
             return null;
         }
 
-        int scanRange = (int) Math.ceil(range);
-        int muzzleX = (int) Math.floor(muzzle.x);
-        int muzzleY = (int) Math.floor(muzzle.y);
-        int muzzleZ = (int) Math.floor(muzzle.z);
-
-        List<BlockCandidate> candidates = new ArrayList<>();
-
-        for (int dx = -scanRange; dx <= scanRange; dx++) {
-            for (int dz = -scanRange; dz <= scanRange; dz++) {
-                for (int dy = -scanRange; dy <= scanRange; dy++) {
-                    int bx = muzzleX + dx;
-                    int by = muzzleY + dy;
-                    int bz = muzzleZ + dz;
-
-                    if (by < 0 || by > 320) continue;
-
-                    double centerX = bx + 0.5;
-                    double centerY = by + 0.5;
-                    double centerZ = bz + 0.5;
-
-                    double toBlockX = centerX - muzzle.x;
-                    double toBlockZ = centerZ - muzzle.z;
-                    double horizDist = Math.sqrt(toBlockX * toBlockX + toBlockZ * toBlockZ);
-                    if (horizDist < 0.5 || horizDist > range) continue;
-
-                    double toBlockHorizLen = horizDist;
-                    double toBlockHorizNormX = toBlockX / toBlockHorizLen;
-                    double toBlockHorizNormZ = toBlockZ / toBlockHorizLen;
-
-                    double horizontalDot = lookXN * toBlockHorizNormX + lookZN * toBlockHorizNormZ;
-                    if (horizontalDot < minHorizontalDot) continue;
-
-                    double toBlockY = centerY - muzzle.y;
-                    double distSq = toBlockX * toBlockX + toBlockY * toBlockY + toBlockZ * toBlockZ;
-                    if (distSq > range * range) continue;
-
-                    BlockType blockType = getBlockTypeSafe(world, bx, by, bz);
-                    if (blockType == null) continue;
-
-                    String blockTypeId = blockType.getId();
-                    if (blockTypeId == null || !DestructibleBlockConfig.isDestructible(blockTypeId)) continue;
-
-                    // Score: alignment + distance factor. Lower Y gets higher score (worse) so top is preferred.
-                    double score = (1.0 - horizontalDot) + (horizDist / range) * 0.15;
-                    candidates.add(new BlockCandidate(bx, by, bz, toBlockX, toBlockY, toBlockZ,
-                            Math.sqrt(distSq), score));
-                }
-            }
-        }
+        List<BlockCandidate> candidates = collectSampledBlockCandidates(world, muzzle, rawDirection, range);
 
         if (candidates.isEmpty()) {
             return null;
         }
 
-        // Sort by score ascending, then by Y descending (highest first = top-to-bottom priority)
         candidates.sort((a, b) -> {
-            int cmp = Double.compare(a.score, b.score);
+            int cmp = Double.compare(a.score(), b.score());
             if (cmp != 0) return cmp;
-            return Integer.compare(b.blockY, a.blockY);
+            cmp = Double.compare(a.distance(), b.distance());
+            if (cmp != 0) return cmp;
+            return Integer.compare(b.blockY(), a.blockY());
         });
 
         for (BlockCandidate candidate : candidates) {
-            double dist = candidate.distance;
+            double dist = candidate.distance();
             if (dist < 1.0E-6) continue;
 
-            double dirX = candidate.toBlockX / dist;
-            double dirY = candidate.toBlockY / dist;
-            double dirZ = candidate.toBlockZ / dist;
-
-            // Line-of-sight check: reject if a non-destructible solid block is between muzzle and target
-            Vector3i blockingBlock = TargetUtil.getTargetBlock(
-                    world,
-                    (id, fluidId) -> id != 0,
-                    muzzle.x, muzzle.y, muzzle.z,
-                    dirX, dirY, dirZ,
-                    (int) Math.ceil(dist));
-
-            if (blockingBlock != null) {
-                // If the blocking block IS the target block, that's fine
-                if (blockingBlock.x != candidate.blockX || blockingBlock.y != candidate.blockY
-                        || blockingBlock.z != candidate.blockZ) {
-                    // There's a different block in the way — check if it's closer
-                    Vector3d blockCenter = new Vector3d(blockingBlock.x + 0.5, blockingBlock.y + 0.5, blockingBlock.z + 0.5);
-                    double blockDistSq = muzzle.distanceSquared(blockCenter);
-                    double targetDistSq = dist * dist;
-                    if (blockDistSq + 1.0E-6 < targetDistSq) {
-                        continue; // Blocked by another solid block
-                    }
-                }
-            }
+            double dirX = candidate.toBlockX() / dist;
+            double dirY = candidate.toBlockY() / dist;
+            double dirZ = candidate.toBlockZ() / dist;
 
             double targetHorizLen = Math.sqrt(dirX * dirX + dirZ * dirZ);
             if (targetHorizLen < 1.0E-8) continue;
@@ -392,50 +330,19 @@ public final class AimAssistHelper {
             if (distSq > rangeSq) return;
 
             double dist = Math.sqrt(distSq);
-            candidates.add(new double[]{toX, toY, toZ, dist});
+            candidates.add(new double[]{toX, toY, toZ, dist, 0.0});
         }, ref -> true);
 
         // ── Block candidates ──
         if (world != null) {
-            int scanRange = (int) Math.ceil(range);
-            int mx = (int) Math.floor(muzzle.x);
-            int my = (int) Math.floor(muzzle.y);
-            int mz = (int) Math.floor(muzzle.z);
-
-            for (int dx = -scanRange; dx <= scanRange; dx++) {
-                for (int dz = -scanRange; dz <= scanRange; dz++) {
-                    for (int dy = -scanRange; dy <= scanRange; dy++) {
-                        int bx = mx + dx;
-                        int by = my + dy;
-                        int bz = mz + dz;
-                        if (by < 0 || by > 320) continue;
-
-                        double cx = bx + 0.5;
-                        double cy = by + 0.5;
-                        double cz = bz + 0.5;
-                        double toX = cx - muzzle.x;
-                        double toZ = cz - muzzle.z;
-                        double horizDist = Math.sqrt(toX * toX + toZ * toZ);
-                        if (horizDist < 0.5 || horizDist > range) continue;
-
-                        double hNormX = toX / horizDist;
-                        double hNormZ = toZ / horizDist;
-                        double hDot = lookXN * hNormX + lookZN * hNormZ;
-                        if (hDot < minHorizontalDot) continue;
-
-                        double toY = cy - muzzle.y;
-                        double distSq = toX * toX + toY * toY + toZ * toZ;
-                        if (distSq > rangeSq) continue;
-
-                        BlockType blockType = getBlockTypeSafe(world, bx, by, bz);
-                        if (blockType == null) continue;
-                        String blockTypeId = blockType.getId();
-                        if (blockTypeId == null || !DestructibleBlockConfig.isDestructible(blockTypeId)) continue;
-
-                        double dist = Math.sqrt(distSq);
-                        candidates.add(new double[]{toX, toY, toZ, dist});
-                    }
-                }
+            for (BlockCandidate blockCandidate : collectSampledBlockCandidates(world, muzzle, rawDirection, range)) {
+                candidates.add(new double[]{
+                        blockCandidate.toBlockX(),
+                        blockCandidate.toBlockY(),
+                        blockCandidate.toBlockZ(),
+                        blockCandidate.distance(),
+                        blockCandidate.score()
+                });
             }
         }
 
@@ -444,7 +351,9 @@ public final class AimAssistHelper {
         }
 
         // Sort by distance ascending — nearest target wins
-        candidates.sort(Comparator.comparingDouble(a -> a[3]));
+        candidates.sort(Comparator
+                .comparingDouble((double[] a) -> a[3])
+                .thenComparingDouble(a -> a[4]));
 
         for (double[] c : candidates) {
             double dist = c[3];
@@ -495,6 +404,106 @@ public final class AimAssistHelper {
         }
 
         return null;
+    }
+
+    @Nonnull
+    private static List<BlockCandidate> collectSampledBlockCandidates(@Nonnull World world,
+                                                                      @Nonnull Vector3d muzzle,
+                                                                      @Nonnull Vector3d rawDirection,
+                                                                      double range) {
+        List<BlockCandidate> candidates = new ArrayList<>();
+        Vector3d normalizedLook = new Vector3d(rawDirection);
+        if (normalizedLook.lengthSquared() < 1.0E-8) {
+            return candidates;
+        }
+
+        normalizedLook.normalize();
+        int blockRange = (int) Math.ceil(range);
+        Set<Long> seenBlocks = new HashSet<>();
+
+        for (double yawOffset : BLOCK_ASSIST_YAW_OFFSETS_DEGREES) {
+            for (double pitchOffset : BLOCK_ASSIST_PITCH_OFFSETS_DEGREES) {
+                Vector3d sampleDirection = rotateSampleDirection(normalizedLook, yawOffset, pitchOffset);
+                Vector3i hit = TargetUtil.getTargetBlock(
+                        world,
+                        (id, fluidId) -> id != 0,
+                        muzzle.x,
+                        muzzle.y,
+                        muzzle.z,
+                        sampleDirection.x,
+                        sampleDirection.y,
+                        sampleDirection.z,
+                        blockRange);
+
+                if (hit == null) {
+                    continue;
+                }
+
+                BlockType blockType = getBlockTypeSafe(world, hit.x, hit.y, hit.z);
+                if (blockType == null) {
+                    continue;
+                }
+
+                String blockTypeId = blockType.getId();
+                if (blockTypeId == null || !DestructibleBlockConfig.isDestructible(blockTypeId)) {
+                    continue;
+                }
+
+                long packed = packBlock(hit.x, hit.y, hit.z);
+                if (!seenBlocks.add(packed)) {
+                    continue;
+                }
+
+                double centerX = hit.x + 0.5;
+                double centerY = hit.y + 0.5;
+                double centerZ = hit.z + 0.5;
+                double toBlockX = centerX - muzzle.x;
+                double toBlockY = centerY - muzzle.y;
+                double toBlockZ = centerZ - muzzle.z;
+                double distSq = toBlockX * toBlockX + toBlockY * toBlockY + toBlockZ * toBlockZ;
+                if (distSq > range * range) {
+                    continue;
+                }
+
+                double dist = Math.sqrt(distSq);
+                double score = Math.abs(yawOffset) + Math.abs(pitchOffset) * 0.35 + (dist / Math.max(1.0, range)) * 0.15;
+                candidates.add(new BlockCandidate(hit.x, hit.y, hit.z, toBlockX, toBlockY, toBlockZ, dist, score));
+            }
+        }
+
+        return candidates;
+    }
+
+    @Nonnull
+    private static Vector3d rotateSampleDirection(@Nonnull Vector3d baseDirection,
+                                                  double yawOffsetDegrees,
+                                                  double pitchOffsetDegrees) {
+        Vector3d rotated = new Vector3d(baseDirection);
+
+        if (Math.abs(yawOffsetDegrees) > 1.0E-6) {
+            rotated.rotateAxis(Math.toRadians(yawOffsetDegrees), 0.0, 1.0, 0.0);
+        }
+
+        if (Math.abs(pitchOffsetDegrees) > 1.0E-6) {
+            Vector3d rightAxis = new Vector3d(rotated).cross(0.0, 1.0, 0.0);
+            if (rightAxis.lengthSquared() <= 1.0E-8) {
+                rightAxis.set(1.0, 0.0, 0.0);
+            } else {
+                rightAxis.normalize();
+            }
+            rotated.rotateAxis(Math.toRadians(pitchOffsetDegrees), rightAxis.x, rightAxis.y, rightAxis.z);
+        }
+
+        if (rotated.lengthSquared() > 1.0E-8) {
+            rotated.normalize();
+        }
+        return rotated;
+    }
+
+    private static long packBlock(int x, int y, int z) {
+        return (((long) x & 0x3FFFFFFL) << 38)
+                | (((long) z & 0x3FFFFFFL) << 12)
+                | ((long) y & 0xFFFL);
     }
 
     private record BlockCandidate(int blockX, int blockY, int blockZ, double toBlockX, double toBlockY, double toBlockZ,

@@ -201,11 +201,15 @@ public final class PlayerInventoryService {
         InventoryComponent.Storage storageComp = store.getComponent(ref, InventoryComponent.Storage.getComponentType());
         InventoryComponent.Armor armorComp = store.getComponent(ref, InventoryComponent.Armor.getComponentType());
         InventoryComponent.Utility utilityComp = store.getComponent(ref, InventoryComponent.Utility.getComponentType());
+        InventoryComponent.Tool toolComp = store.getComponent(ref, InventoryComponent.Tool.getComponentType());
+        InventoryComponent.Backpack backpackComp = store.getComponent(ref, InventoryComponent.Backpack.getComponentType());
 
         if (hotbarComp != null) clearContainer(hotbarComp.getInventory());
         if (storageComp != null) clearContainer(storageComp.getInventory());
         if (armorComp != null) clearContainer(armorComp.getInventory());
         if (utilityComp != null) clearContainer(utilityComp.getInventory());
+        if (toolComp != null) clearContainer(toolComp.getInventory());
+        if (backpackComp != null) clearContainer(backpackComp.getInventory());
     }
 
     /**
@@ -402,6 +406,41 @@ public final class PlayerInventoryService {
         deathInventorySnapshots.remove(playerId);
     }
 
+    /**
+     * Returns true when the player's live inventory still contains items that
+     * should never survive a clean dungeon entry.
+     */
+    public boolean hasUnexpectedDungeonEntryInventory(@Nonnull Ref<EntityStore> ref,
+                                                      @Nonnull Store<EntityStore> store) {
+        InventoryComponent.Hotbar hotbarComp = store.getComponent(ref, InventoryComponent.Hotbar.getComponentType());
+        if (hotbarComp != null && hasItemsBeyondWeaponSlots(hotbarComp.getInventory())) {
+            return true;
+        }
+
+        InventoryComponent.Storage storageComp = store.getComponent(ref, InventoryComponent.Storage.getComponentType());
+        if (storageComp != null && hasAnyItems(storageComp.getInventory())) {
+            return true;
+        }
+
+        InventoryComponent.Armor armorComp = store.getComponent(ref, InventoryComponent.Armor.getComponentType());
+        if (armorComp != null && hasAnyItems(armorComp.getInventory())) {
+            return true;
+        }
+
+        InventoryComponent.Utility utilityComp = store.getComponent(ref, InventoryComponent.Utility.getComponentType());
+        if (utilityComp != null && hasAnyItems(utilityComp.getInventory())) {
+            return true;
+        }
+
+        InventoryComponent.Tool toolComp = store.getComponent(ref, InventoryComponent.Tool.getComponentType());
+        if (toolComp != null && hasAnyItems(toolComp.getInventory())) {
+            return true;
+        }
+
+        InventoryComponent.Backpack backpackComp = store.getComponent(ref, InventoryComponent.Backpack.getComponentType());
+        return backpackComp != null && hasAnyItems(backpackComp.getInventory());
+    }
+
     // ────────────────────────────────────────────────
     //  Internal helpers
     // ────────────────────────────────────────────────
@@ -412,12 +451,16 @@ public final class PlayerInventoryService {
         InventoryComponent.Storage storageComp = store.getComponent(ref, InventoryComponent.Storage.getComponentType());
         InventoryComponent.Armor armorComp = store.getComponent(ref, InventoryComponent.Armor.getComponentType());
         InventoryComponent.Utility utilityComp = store.getComponent(ref, InventoryComponent.Utility.getComponentType());
+        InventoryComponent.Tool toolComp = store.getComponent(ref, InventoryComponent.Tool.getComponentType());
+        InventoryComponent.Backpack backpackComp = store.getComponent(ref, InventoryComponent.Backpack.getComponentType());
 
         InventorySaveData data = new InventorySaveData();
         data.hotbarItems = hotbarComp != null ? serializeContainer(hotbarComp.getInventory()) : null;
         data.storageItems = storageComp != null ? serializeContainer(storageComp.getInventory()) : null;
         data.armorItems = armorComp != null ? serializeContainer(armorComp.getInventory()) : null;
         data.utilityItems = utilityComp != null ? serializeContainer(utilityComp.getInventory()) : null;
+        data.toolItems = toolComp != null ? serializeContainer(toolComp.getInventory()) : null;
+        data.backpackItems = backpackComp != null ? serializeContainer(backpackComp.getInventory()) : null;
         data.activeHotbarSlot = hotbarComp != null ? hotbarComp.getActiveSlot() : 0;
         return data;
     }
@@ -429,11 +472,33 @@ public final class PlayerInventoryService {
         InventoryComponent.Storage storageComp = store.getComponent(ref, InventoryComponent.Storage.getComponentType());
         InventoryComponent.Armor armorComp = store.getComponent(ref, InventoryComponent.Armor.getComponentType());
         InventoryComponent.Utility utilityComp = store.getComponent(ref, InventoryComponent.Utility.getComponentType());
+        InventoryComponent.Tool toolComp = store.getComponent(ref, InventoryComponent.Tool.getComponentType());
+        InventoryComponent.Backpack backpackComp = store.getComponent(ref, InventoryComponent.Backpack.getComponentType());
 
         if (hotbarComp != null) restoreContainer(hotbarComp.getInventory(), saveData.hotbarItems);
         if (storageComp != null) restoreContainer(storageComp.getInventory(), saveData.storageItems);
         if (armorComp != null) restoreContainer(armorComp.getInventory(), saveData.armorItems);
         if (utilityComp != null) restoreContainer(utilityComp.getInventory(), saveData.utilityItems);
+        if (toolComp != null) restoreContainer(toolComp.getInventory(), saveData.toolItems);
+        if (backpackComp != null) restoreContainer(backpackComp.getInventory(), saveData.backpackItems);
+    }
+
+    private boolean hasItemsBeyondWeaponSlots(@Nonnull ItemContainer container) {
+        for (short slot = InventoryLockService.MAX_WEAPON_SLOTS; slot < container.getCapacity(); slot++) {
+            if (!ItemStack.isEmpty(container.getItemStack(slot))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean hasAnyItems(@Nonnull ItemContainer container) {
+        for (short slot = 0; slot < container.getCapacity(); slot++) {
+            if (!ItemStack.isEmpty(container.getItemStack(slot))) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void clearContainer(@Nonnull ItemContainer container) {
@@ -526,6 +591,8 @@ public final class PlayerInventoryService {
         SavedItemStack[] storageItems;
         SavedItemStack[] armorItems;
         SavedItemStack[] utilityItems;
+        SavedItemStack[] toolItems;
+        SavedItemStack[] backpackItems;
         byte activeHotbarSlot;
     }
 

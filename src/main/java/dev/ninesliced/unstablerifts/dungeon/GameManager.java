@@ -745,10 +745,14 @@ public final class GameManager {
 
                 playerStateService.hideDungeonHuds(player, playerRef);
 
+                boolean physicallyInInstance = player.getWorld() == game.getInstanceWorld();
+                boolean treatAsInInstance = wasInInstance || physicallyInInstance;
+                boolean treatAsReconnected = !treatAsInInstance && wasReconnected;
+
                 plugin.getInventoryLockService().unlock(player, playerId);
-                if (wasInInstance) {
+                if (treatAsInInstance) {
                     inventoryService.restorePlayerInventory(playerId, player, true);
-                } else if (wasReconnected) {
+                } else if (treatAsReconnected) {
                     if (inventoryService.hasSavedInventoryFile(playerId)) {
                         inventoryService.deleteSavedInventoryFiles(playerId);
                     }
@@ -764,7 +768,7 @@ public final class GameManager {
                 playerStateService.resetPlayerStatus(player, ref, store);
                 game.setPlayerInInstance(playerId, false);
 
-                if ((wasInInstance || wasReconnected) && returnPoint != null) {
+                if ((treatAsInInstance || treatAsReconnected) && returnPoint != null) {
                     try {
                         World returnWorld = trackedReturnWorld;
                         if (returnWorld == null) {
@@ -859,6 +863,10 @@ public final class GameManager {
 
                     playerStateService.hideDungeonHuds(player, playerRef);
 
+                        boolean physicallyInInstance = player.getWorld() == game.getInstanceWorld();
+                        boolean treatAsInInstance = wasInInstance || physicallyInInstance;
+                        boolean treatAsDisconnected = !treatAsInInstance && wasDisconnected;
+
                     store.getExternalData().getWorld().execute(() -> {
                         if (!ref.isValid()) {
                             return;
@@ -871,9 +879,9 @@ public final class GameManager {
 
                         DeathStateController.clear(store, ref);
                         plugin.getInventoryLockService().unlock(player, playerId);
-                        if (wasInInstance) {
+                        if (treatAsInInstance) {
                             inventoryService.restorePlayerInventory(playerId, player, true);
-                        } else if (wasDisconnected && inventoryService.hasSavedInventoryFile(playerId)) {
+                        } else if (treatAsDisconnected && inventoryService.hasSavedInventoryFile(playerId)) {
                             // Reconnected player in home world — home inventory is already
                             // restored, just delete the saved file since they're leaving.
                             inventoryService.deleteSavedInventoryFiles(playerId);
@@ -887,7 +895,7 @@ public final class GameManager {
                         }
                         playerStateService.resetPlayerStatus(player, ref, store);
 
-                        if ((wasInInstance || wasDisconnected) && returnPoint != null) {
+                        if ((treatAsInInstance || treatAsDisconnected) && returnPoint != null) {
                             try {
                                 World returnWorld = trackedReturnWorld;
                                 if (returnWorld == null) {
@@ -1131,6 +1139,56 @@ public final class GameManager {
     }
 
     /**
+     * Final dungeon-entry safeguard that runs after PlayerReady in the dungeon
+     * world. If the world transfer left the player without the dungeon lock,
+     * inventory snapshot, or in-instance tracking, re-apply the standard
+     * dungeon setup now that the client/world load is complete.
+     */
+    public void reconcileDungeonStateOnReady(@Nonnull PlayerRef playerRef,
+                                             @Nonnull Player player,
+                                             @Nonnull Game game) {
+        if (game.getState() == GameState.COMPLETE) {
+            return;
+        }
+
+        UUID playerId = playerRef.getUuid();
+        World world = player.getWorld();
+        if (world == null || world != game.getInstanceWorld()) {
+            return;
+        }
+
+        if (pendingRejoinDecision.contains(playerId) || pendingReconnectPlayers.contains(playerId)) {
+            return;
+        }
+
+        Ref<EntityStore> ref = playerRef.getReference();
+        if (ref == null || !ref.isValid()) {
+            LOGGER.warning("reconcileDungeonStateOnReady: invalid ref for " + playerId);
+            return;
+        }
+
+        Store<EntityStore> store = ref.getStore();
+
+        boolean inInstance = game.isPlayerInInstance(playerId);
+        boolean inventoryLocked = plugin.getInventoryLockService().isLocked(playerId);
+        boolean hasSavedInventory = inventoryService.hasSavedInventoryFile(playerId);
+        boolean unexpectedInventory = inventoryService.hasUnexpectedDungeonEntryInventory(ref, store);
+
+        if (inInstance && hasSavedInventory && !unexpectedInventory) {
+            return;
+        }
+
+        DungeonConfig config = plugin.loadDungeonConfig();
+        LOGGER.warning("Re-applying dungeon setup after PlayerReady for " + playerRef.getUsername()
+                + " inInstance=" + inInstance
+                + " inventoryLocked=" + inventoryLocked
+                + " hasSavedInventory=" + hasSavedInventory
+                + " unexpectedInventory=" + unexpectedInventory);
+        preparePlayerForDungeon(game, playerId, playerRef, player, ref, store, config);
+        PartyUiPage.refreshOpenPages();
+    }
+
+    /**
      * Called when a previously-disconnected player reconnects and is ready.
      * Ensures the player is in their home world with normal inventory, then
      * shows a popup asking if they want to rejoin the dungeon.
@@ -1370,8 +1428,6 @@ public final class GameManager {
         UUID playerId = playerRef.getUuid();
         Game game = findGameForPlayer(playerId);
         boolean isReconnecting = game != null && game.isDisconnectedPlayer(playerId);
-        boolean hasSavedInventoryFile = inventoryService.hasSavedInventoryFile(playerId);
-        boolean hasSavedInventory = hasSavedInventoryFile;
         boolean inActiveDungeonWorld = game != null
                 && game.getState() != GameState.COMPLETE
                 && world == game.getInstanceWorld();
@@ -1401,7 +1457,7 @@ public final class GameManager {
             return;
         }
 
-        if (game.isPlayerInInstance(playerId) || !hasSavedInventory) {
+        if (game.isPlayerInInstance(playerId)) {
             return;
         }
 
@@ -1412,6 +1468,10 @@ public final class GameManager {
 
         Store<EntityStore> store = ref.getStore();
         DungeonConfig config = plugin.loadDungeonConfig();
+        if (!inventoryService.hasSavedInventoryFile(playerId)) {
+            LOGGER.info("Late dungeon setup for " + playerRef.getUsername()
+                    + " after world join; the timed start path missed the initial inventory snapshot.");
+        }
         preparePlayerForDungeon(game, playerId, playerRef, player, ref, store, config);
         PartyUiPage.refreshOpenPages();
     }
