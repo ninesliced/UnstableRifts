@@ -140,7 +140,7 @@ Group #ShopItemConfigRoot {
           }
 
           $C.@DropdownBox #MinRarityDropdown {
-            @Anchor = (Width: 280);
+            Anchor: (Width: 270, Height: 30);
             Value: "";
           }
         }
@@ -157,7 +157,7 @@ Group #ShopItemConfigRoot {
           }
 
           $C.@DropdownBox #MaxRarityDropdown {
-            @Anchor = (Width: 280);
+            Anchor: (Width: 270, Height: 30);
             Value: "";
           }
         }
@@ -172,6 +172,7 @@ Group #ShopItemConfigRoot {
       // ═══ WEAPON SECTION (visible for WEAPON type) ═══
       Group #WeaponSection {
         Anchor: (Top: 4);
+        FlexWeight: 1;
         LayoutMode: Top;
 
         Group {
@@ -202,6 +203,7 @@ Group #ShopItemConfigRoot {
       // ═══ ARMOR SECTION (visible for ARMOR type) ═══
       Group #ArmorSection {
         Anchor: (Top: 4);
+        FlexWeight: 1;
         LayoutMode: Top;
 
         Group {

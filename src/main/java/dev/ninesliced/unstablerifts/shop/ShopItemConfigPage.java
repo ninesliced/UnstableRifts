@@ -215,8 +215,10 @@ public final class ShopItemConfigPage extends InteractiveCustomUIPage<ShopItemCo
     @Nonnull
     private List<DropdownEntryInfo> buildWeaponDropdownEntries() {
         List<DropdownEntryInfo> entries = new ArrayList<>();
-        for (WeaponDefinition wd : WeaponDefinitions.getAll()) {
-            entries.add(new DropdownEntryInfo(LocalizableString.fromString(wd.displayName()), wd.itemId()));
+        // One entry per unique display name — selecting it adds every variant
+        // sharing that name (e.g., the four elemental Musket variants).
+        for (String name : WeaponDefinitions.getDistinctDisplayNames()) {
+            entries.add(new DropdownEntryInfo(LocalizableString.fromString(name), name));
         }
         return entries;
     }
@@ -224,10 +226,55 @@ public final class ShopItemConfigPage extends InteractiveCustomUIPage<ShopItemCo
     @Nonnull
     private List<DropdownEntryInfo> buildArmorDropdownEntries() {
         List<DropdownEntryInfo> entries = new ArrayList<>();
-        for (ArmorDefinition ad : ArmorDefinitions.getAll()) {
-            entries.add(new DropdownEntryInfo(LocalizableString.fromString(ad.displayName()), ad.itemId()));
+        // One entry per armor set — selecting a set covers all of its pieces
+        // instead of forcing the designer to add helmet/chest/legs/boots one by one.
+        for (String setId : ArmorDefinitions.getDistinctSetIds()) {
+            entries.add(new DropdownEntryInfo(LocalizableString.fromString(formatSetLabel(setId)), setId));
         }
         return entries;
+    }
+
+    @Nonnull
+    private static String formatSetLabel(@Nonnull String setId) {
+        if (setId.isEmpty()) return setId;
+        return Character.toUpperCase(setId.charAt(0)) + setId.substring(1) + " Set";
+    }
+
+    /**
+     * Resolves a stored weapon entry id to its current group key (display name).
+     * Accepts a display name as-is, or converts a legacy item id to its display name.
+     */
+    @Nonnull
+    private static String resolveWeaponGroupKey(@Nonnull String stored) {
+        WeaponDefinition byId = WeaponDefinitions.getById(stored);
+        if (byId != null) return byId.displayName();
+        return stored;
+    }
+
+    /**
+     * Resolves a stored armor entry id to its current group key (set id).
+     * Accepts a set id as-is, or converts a legacy item id to its set id.
+     */
+    @Nonnull
+    private static String resolveArmorGroupKey(@Nonnull String stored) {
+        ArmorDefinition byId = ArmorDefinitions.getById(stored);
+        if (byId != null) return byId.setId();
+        return stored;
+    }
+
+    /**
+     * Adds {@code weight} to the existing entry for {@code key}, or appends a
+     * new entry if none yet exists. Used to dedupe legacy entries that stored
+     * each set piece / weapon variant individually.
+     */
+    private static void mergePoolEntry(@Nonnull List<PoolEntry> entries, @Nonnull String key, int weight) {
+        for (PoolEntry existing : entries) {
+            if (existing.id.equals(key)) {
+                existing.weight += weight;
+                return;
+            }
+        }
+        entries.add(new PoolEntry(key, weight));
     }
 
     // ── Block load/save ──
@@ -253,11 +300,15 @@ public final class ShopItemConfigPage extends InteractiveCustomUIPage<ShopItemCo
         String p = data.getPrice();
         if (p != null && !p.isBlank()) price = p;
 
+        // Migrate legacy entries that stored individual item IDs into the new
+        // grouped form (display name for weapons, set ID for armors).
         for (ShopItemData.WeightedEntry e : data.parseWeaponEntries()) {
-            weaponEntries.add(new PoolEntry(e.id(), e.weight()));
+            String groupKey = resolveWeaponGroupKey(e.id());
+            mergePoolEntry(weaponEntries, groupKey, e.weight());
         }
         for (ShopItemData.WeightedEntry e : data.parseArmorEntries()) {
-            armorEntries.add(new PoolEntry(e.id(), e.weight()));
+            String groupKey = resolveArmorGroupKey(e.id());
+            mergePoolEntry(armorEntries, groupKey, e.weight());
         }
 
         String min = data.getMinRarity();
@@ -364,9 +415,9 @@ public final class ShopItemConfigPage extends InteractiveCustomUIPage<ShopItemCo
 
             // Weapon pool management
             case "ADD_WEAPON" -> {
-                List<WeaponDefinition> all = WeaponDefinitions.getAll();
-                if (!all.isEmpty()) {
-                    weaponEntries.add(new PoolEntry(all.get(0).itemId(), 1));
+                List<String> names = WeaponDefinitions.getDistinctDisplayNames();
+                if (!names.isEmpty()) {
+                    weaponEntries.add(new PoolEntry(names.get(0), 1));
                 }
             }
             case "WEAPON_REMOVE" -> {
@@ -383,9 +434,9 @@ public final class ShopItemConfigPage extends InteractiveCustomUIPage<ShopItemCo
 
             // Armor pool management
             case "ADD_ARMOR" -> {
-                List<ArmorDefinition> all = ArmorDefinitions.getAll();
-                if (!all.isEmpty()) {
-                    armorEntries.add(new PoolEntry(all.get(0).itemId(), 1));
+                List<String> setIds = ArmorDefinitions.getDistinctSetIds();
+                if (!setIds.isEmpty()) {
+                    armorEntries.add(new PoolEntry(setIds.get(0), 1));
                 }
             }
             case "ARMOR_REMOVE" -> {

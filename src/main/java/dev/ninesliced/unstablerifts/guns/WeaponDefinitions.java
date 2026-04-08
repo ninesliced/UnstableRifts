@@ -30,6 +30,37 @@ public final class WeaponDefinitions {
     }
 
     /**
+     * Returns the display names of every registered weapon, in registration order
+     * and without duplicates. Multiple weapon variants share a single name (e.g.,
+     * the four "Musket" elemental variants).
+     */
+    @Nonnull
+    public static List<String> getDistinctDisplayNames() {
+        List<String> names = new ArrayList<>();
+        for (WeaponDefinition def : BY_ITEM_ID.values()) {
+            if (!names.contains(def.displayName())) {
+                names.add(def.displayName());
+            }
+        }
+        return Collections.unmodifiableList(names);
+    }
+
+    /**
+     * Returns every weapon definition whose display name matches the given value.
+     * Used to expand a single shop entry into all of its underlying variants.
+     */
+    @Nonnull
+    public static List<WeaponDefinition> getByDisplayName(@Nonnull String displayName) {
+        List<WeaponDefinition> result = new ArrayList<>();
+        for (WeaponDefinition def : BY_ITEM_ID.values()) {
+            if (def.displayName().equals(displayName)) {
+                result.add(def);
+            }
+        }
+        return Collections.unmodifiableList(result);
+    }
+
+    /**
      * Returns a flat list where each weapon appears N times equal to its spawnWeight.
      * Used by {@link WeaponLootRoller} for weighted random selection.
      */

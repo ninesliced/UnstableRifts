@@ -18,11 +18,15 @@ import com.hypixel.hytale.server.core.modules.physics.component.Velocity;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.NPCPlugin;
 import com.hypixel.hytale.server.npc.entities.NPCEntity;
+import dev.ninesliced.unstablerifts.armor.ArmorDefinition;
+import dev.ninesliced.unstablerifts.armor.ArmorDefinitions;
 import dev.ninesliced.unstablerifts.armor.ArmorLootRoller;
 import dev.ninesliced.unstablerifts.dungeon.Game;
 import dev.ninesliced.unstablerifts.dungeon.Level;
 import dev.ninesliced.unstablerifts.dungeon.RoomData;
 import dev.ninesliced.unstablerifts.dungeon.RoomType;
+import dev.ninesliced.unstablerifts.guns.WeaponDefinition;
+import dev.ninesliced.unstablerifts.guns.WeaponDefinitions;
 import dev.ninesliced.unstablerifts.guns.WeaponLootRoller;
 import dev.ninesliced.unstablerifts.guns.WeaponRarity;
 import dev.ninesliced.unstablerifts.pickup.ItemPickupTracker;
@@ -399,7 +403,7 @@ public final class ShopService {
                 ? WeaponRarity.LEGENDARY : WeaponRarity.fromString(slot.maxRarity());
 
         if (!slot.weapons().isEmpty()) {
-            List<String> whitelist = expandWeightedEntries(slot.weapons());
+            List<String> whitelist = expandWeaponEntries(slot.weapons());
             return WeaponLootRoller.rollFromCrate(minRarity, maxRarity, whitelist);
         }
         return WeaponLootRoller.rollRandom(null);
@@ -413,24 +417,63 @@ public final class ShopService {
                 ? WeaponRarity.LEGENDARY : WeaponRarity.fromString(slot.maxRarity());
 
         if (!slot.armors().isEmpty()) {
-            List<String> whitelist = expandWeightedEntries(slot.armors());
+            List<String> whitelist = expandArmorEntries(slot.armors());
             return ArmorLootRoller.rollFromCrate(minRarity, maxRarity, whitelist);
         }
         return ArmorLootRoller.rollRandom(null);
     }
 
     /**
-     * Expands weighted entries into a flat list where each ID appears N times equal to its weight.
+     * Expands weapon shop entries into a whitelist of concrete weapon item ids.
+     * Each entry id is treated as a weapon display name and resolves to every
+     * variant sharing that name; legacy entries that already store an item id
+     * are accepted as-is.
      */
     @Nonnull
-    private static List<String> expandWeightedEntries(@Nonnull List<ShopItemData.WeightedEntry> entries) {
-        List<String> flat = new ArrayList<>();
+    private static List<String> expandWeaponEntries(@Nonnull List<ShopItemData.WeightedEntry> entries) {
+        List<String> whitelist = new ArrayList<>();
         for (ShopItemData.WeightedEntry e : entries) {
-            for (int i = 0; i < e.weight(); i++) {
-                flat.add(e.id());
+            int weight = Math.max(1, e.weight());
+            List<WeaponDefinition> variants = WeaponDefinitions.getByDisplayName(e.id());
+            if (!variants.isEmpty()) {
+                for (WeaponDefinition def : variants) {
+                    for (int i = 0; i < weight; i++) {
+                        whitelist.add(def.itemId());
+                    }
+                }
+            } else if (WeaponDefinitions.getById(e.id()) != null) {
+                for (int i = 0; i < weight; i++) {
+                    whitelist.add(e.id());
+                }
             }
         }
-        return flat;
+        return whitelist;
+    }
+
+    /**
+     * Expands armor shop entries into a whitelist of concrete armor item ids.
+     * Each entry id is treated as a set id and resolves to every piece of that
+     * set; legacy entries that already store an item id are accepted as-is.
+     */
+    @Nonnull
+    private static List<String> expandArmorEntries(@Nonnull List<ShopItemData.WeightedEntry> entries) {
+        List<String> whitelist = new ArrayList<>();
+        for (ShopItemData.WeightedEntry e : entries) {
+            int weight = Math.max(1, e.weight());
+            List<ArmorDefinition> pieces = ArmorDefinitions.getBySetId(e.id());
+            if (!pieces.isEmpty()) {
+                for (ArmorDefinition def : pieces) {
+                    for (int i = 0; i < weight; i++) {
+                        whitelist.add(def.itemId());
+                    }
+                }
+            } else if (ArmorDefinitions.getById(e.id()) != null) {
+                for (int i = 0; i < weight; i++) {
+                    whitelist.add(e.id());
+                }
+            }
+        }
+        return whitelist;
     }
 
     @Nullable

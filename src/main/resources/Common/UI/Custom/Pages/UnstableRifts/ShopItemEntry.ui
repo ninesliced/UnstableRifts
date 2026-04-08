@@ -12,13 +12,13 @@ $C = "../../Common.ui";
 @RemoveHover = #5a3030;
 @BtnBg = #2a3040;
 @BtnHover = #3a4560;
-@SmallLabelStyle = LabelStyle(FontSize: 11, TextColor: @LblColor, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center);
+@SmallLabelStyle = LabelStyle(FontSize: 13, TextColor: @LblColor, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center);
 @SmallBtnStyle = TextButtonStyle(
   Default: (Background: @BtnBg, LabelStyle: @SmallLabelStyle),
   Hovered: (Background: @BtnHover, LabelStyle: @SmallLabelStyle),
   Pressed: (Background: @BtnBg, LabelStyle: @SmallLabelStyle)
 );
-@RemoveLabelStyle = LabelStyle(FontSize: 12, TextColor: #ff6666, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center);
+@RemoveLabelStyle = LabelStyle(FontSize: 13, TextColor: #ff6666, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center);
 @RemoveBtnStyle = TextButtonStyle(
   Default: (Background: @RemoveBg, LabelStyle: @RemoveLabelStyle),
   Hovered: (Background: @RemoveHover, LabelStyle: @RemoveLabelStyle),
@@ -27,13 +27,13 @@ $C = "../../Common.ui";
 
 Group #PoolEntry {
   LayoutMode: Left;
-  Anchor: (Height: 34, Bottom: 4);
+  Anchor: (Height: 38, Bottom: 4);
   Background: @EntryBg;
-  Padding: (Left: 4, Right: 4, Top: 3, Bottom: 3);
+  Padding: (Left: 6, Right: 6, Top: 3, Bottom: 3);
 
-  // Dropdown selector for weapon/armor
+  // Dropdown selector for weapon/armor.
   $C.@DropdownBox #EntryDropdown {
-    @Anchor = (Width: 200);
+    Anchor: (Width: 210, Height: 30);
     Value: "";
   }
 
@@ -43,29 +43,29 @@ Group #PoolEntry {
   // Weight controls
   TextButton #WeightMinusBtn {
     Text: "-";
-    Anchor: (Width: 22, Height: 24);
+    Anchor: (Width: 26, Height: 30);
     Style: @SmallBtnStyle;
   }
 
   Label #WeightLabel {
     Text: "1";
-    Anchor: (Width: 32, Height: 24);
-    Style: LabelStyle(FontSize: 12, TextColor: @LblColor, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center);
+    Anchor: (Width: 28, Height: 30);
+    Style: LabelStyle(FontSize: 13, TextColor: @LblColor, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center);
   }
 
   TextButton #WeightPlusBtn {
     Text: "+";
-    Anchor: (Width: 22, Height: 24);
+    Anchor: (Width: 26, Height: 30);
     Style: @SmallBtnStyle;
   }
 
   // Spacer
-  Label { Anchor: (Width: 6, Height: 1); }
+  Label { Anchor: (Width: 10, Height: 1); }
 
   // Remove button
   TextButton #RemoveBtn {
     Text: "X";
-    Anchor: (Width: 28, Height: 24);
+    Anchor: (Width: 30, Height: 30);
     Style: @RemoveBtnStyle;
   }
 }

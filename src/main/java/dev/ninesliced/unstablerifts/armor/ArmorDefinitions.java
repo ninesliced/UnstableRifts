@@ -41,6 +41,18 @@ public final class ArmorDefinitions {
     }
 
     /**
+     * Returns the set IDs of every registered armor set, in registration order
+     * and without duplicates.
+     */
+    @Nonnull
+    public static List<String> getDistinctSetIds() {
+        return BY_ITEM_ID.values().stream()
+                .map(ArmorDefinition::setId)
+                .distinct()
+                .collect(Collectors.toUnmodifiableList());
+    }
+
+    /**
      * Returns a flat list where each armor piece appears N times equal to its spawnWeight.
      */
     @Nonnull
