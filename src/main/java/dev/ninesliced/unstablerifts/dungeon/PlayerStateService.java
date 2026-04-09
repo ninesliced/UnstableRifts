@@ -87,7 +87,7 @@ public final class PlayerStateService {
 
             PlayerRef playerRef = store.getComponent(ref, PlayerRef.getComponentType());
             if (playerRef != null) {
-                InteractionManager im = new InteractionManager(player, playerRef, new InteractionSimulationHandler());
+                InteractionManager im = new InteractionManager(playerRef, new InteractionSimulationHandler());
                 var type = InteractionModule.get().getInteractionManagerComponent();
                 if (commandBuffer != null) {
                     commandBuffer.putComponent(ref, type, im);
