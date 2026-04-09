@@ -595,8 +595,10 @@ public final class DungeonTickSystem extends EntityTickingSystem<EntityStore> {
         // Locked rooms with mobs should not instantly clear just because the
         // prefab has no explicit challenge marker. Fall back to a mob-clear
         // objective so the doors stay shut until the encounter is finished.
-        if (room.getChallenges().isEmpty() && hasDeferredEncounterMobs(room)) {
-            room.addChallenge(new ChallengeObjective(ChallengeObjective.Type.MOB_CLEAR, room.getAnchor()));
+        if (room.getChallenges().isEmpty()
+                && hasDeferredEncounterMobs(room)
+                && !room.hasConfiguredMobClearUnlockPercent()) {
+            room.addChallenge(new ChallengeObjective(ChallengeObjective.Type.MOB_CLEAR, room.getAnchor(), 100));
         }
 
         // If no challenges at all → instantly mark as completed and open doors.
@@ -659,8 +661,8 @@ public final class DungeonTickSystem extends EntityTickingSystem<EntityStore> {
                         }
                     }
                     case MOB_CLEAR -> {
-                        // Complete if all mobs in the room are dead.
-                        if (room.areAllMobsDead() && room.getExpectedMobCount() > 0) {
+                        // Complete once the configured mob-clear threshold is reached.
+                        if (room.hasReachedMobClearThreshold(obj.getMobClearPercent())) {
                             obj.complete();
                         }
                     }

@@ -49,7 +49,8 @@ public final class RoomData {
     private final List<ChallengeObjective> challenges = new ArrayList<>();
     private int branchDepth;
     private String branchId;
-    private boolean hasMobClearActivator = false;
+    private boolean mobClearUnlockPercentConfigured = false;
+    private int mobClearUnlockPercent = 0;
     private boolean locked = false;
     @Nonnull
     private String enterTitle = "";
@@ -330,10 +331,7 @@ public final class RoomData {
      * Returns true if all expected mobs in this room have been confirmed killed.
      */
     public boolean areAllMobsDead() {
-        if (expectedMobCount == 0) {
-            return true;
-        }
-        return confirmedKillCount >= expectedMobCount;
+        return hasReachedMobClearThreshold(100);
     }
 
     /**
@@ -341,6 +339,23 @@ public final class RoomData {
      */
     public int getAliveMobCount() {
         return Math.max(0, expectedMobCount - confirmedKillCount);
+    }
+
+    public int getConfirmedKillCount() {
+        return Math.max(0, confirmedKillCount);
+    }
+
+    public int getRequiredMobKillsForPercent(int percent) {
+        int clampedPercent = Math.max(0, Math.min(100, percent));
+        if (clampedPercent <= 0 || expectedMobCount <= 0) {
+            return 0;
+        }
+        return Math.max(1, (int) Math.ceil(expectedMobCount * (clampedPercent / 100.0d)));
+    }
+
+    public boolean hasReachedMobClearThreshold(int percent) {
+        int requiredKills = getRequiredMobKillsForPercent(percent);
+        return requiredKills == 0 || confirmedKillCount >= requiredKills;
     }
 
     public int getBranchDepth() {
@@ -517,12 +532,17 @@ public final class RoomData {
         activationZonePositions.add(pos);
     }
 
-    public boolean hasMobClearActivator() {
-        return hasMobClearActivator;
+    public boolean hasConfiguredMobClearUnlockPercent() {
+        return mobClearUnlockPercentConfigured;
     }
 
-    public void setHasMobClearActivator(boolean hasMobClearActivator) {
-        this.hasMobClearActivator = hasMobClearActivator;
+    public int getMobClearUnlockPercent() {
+        return mobClearUnlockPercentConfigured ? mobClearUnlockPercent : 0;
+    }
+
+    public void setMobClearUnlockPercent(int mobClearUnlockPercent) {
+        this.mobClearUnlockPercentConfigured = true;
+        this.mobClearUnlockPercent = Math.max(0, Math.min(100, mobClearUnlockPercent));
     }
 
     public boolean isLocked() {

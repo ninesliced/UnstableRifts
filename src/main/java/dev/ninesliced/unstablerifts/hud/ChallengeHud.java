@@ -29,26 +29,37 @@ public final class ChallengeHud extends CustomUIHud {
     private static final int MOB_COUNTER_ROW_HEIGHT = 24;
 
     private final List<ChallengeObjective> objectives;
-    private final int mobsRemaining;
+    private final String mobCounterText;
     private final boolean hasMobClear;
 
     public ChallengeHud(@Nonnull PlayerRef playerRef,
                         @Nonnull List<ChallengeObjective> objectives,
-                        int mobsRemaining,
+                        @Nonnull String mobCounterText,
                         boolean hasMobClear) {
         super(playerRef);
         this.objectives = objectives;
-        this.mobsRemaining = mobsRemaining;
+        this.mobCounterText = mobCounterText;
         this.hasMobClear = hasMobClear;
     }
 
     @Nonnull
     public static ChallengeHud fromRoom(@Nonnull PlayerRef playerRef, @Nonnull RoomData room) {
         List<ChallengeObjective> objectives = room.getChallenges();
-        boolean hasMobClear = objectives.stream()
-                .anyMatch(o -> o.getType() == ChallengeObjective.Type.MOB_CLEAR);
-        int mobsRemaining = room.getAliveMobCount();
-        return new ChallengeHud(playerRef, objectives, mobsRemaining, hasMobClear);
+        ChallengeObjective mobClearObjective = objectives.stream()
+                .filter(o -> o.getType() == ChallengeObjective.Type.MOB_CLEAR)
+                .findFirst()
+                .orElse(null);
+        boolean hasMobClear = mobClearObjective != null;
+        String mobCounterText = "";
+        if (mobClearObjective != null) {
+            int requiredKills = room.getRequiredMobKillsForPercent(mobClearObjective.getMobClearPercent());
+            if (requiredKills <= 0) {
+                mobCounterText = "Ready";
+            } else {
+                mobCounterText = Math.min(room.getConfirmedKillCount(), requiredKills) + " / " + requiredKills;
+            }
+        }
+        return new ChallengeHud(playerRef, objectives, mobCounterText, hasMobClear);
     }
 
     public static void applyHud(@Nonnull Player player, @Nonnull PlayerRef playerRef, @Nonnull ChallengeHud hud) {
@@ -108,7 +119,7 @@ public final class ChallengeHud extends CustomUIHud {
         // Mob counter row.
         if (hasMobClear) {
             ui.set("#MobCounterRow.Visible", true);
-            ui.set("#MobCounterLabel.TextSpans", Message.raw(String.valueOf(mobsRemaining)));
+            ui.set("#MobCounterLabel.TextSpans", Message.raw(mobCounterText));
         } else {
             ui.set("#MobCounterRow.Visible", false);
         }

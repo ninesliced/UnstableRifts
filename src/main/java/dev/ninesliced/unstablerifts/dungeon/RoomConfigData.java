@@ -20,6 +20,7 @@ public class RoomConfigData implements Component<ChunkStore> {
     public static final BuilderCodec<RoomConfigData> CODEC = BuilderCodec.builder(RoomConfigData.class, RoomConfigData::new)
             .append(new KeyedCodec<>("LockRoom", Codec.STRING), (d, v) -> d.lockRoom = v, d -> d.lockRoom).add()
             .append(new KeyedCodec<>("MobClearActivator", Codec.STRING), (d, v) -> d.mobClearActivator = v, d -> d.mobClearActivator).add()
+            .append(new KeyedCodec<>("MobClearUnlockPercent", Codec.STRING), (d, v) -> d.mobClearUnlockPercent = v, d -> d.mobClearUnlockPercent).add()
             .append(new KeyedCodec<>("EnterTitle", Codec.STRING), (d, v) -> d.enterTitle = v, d -> d.enterTitle).add()
             .append(new KeyedCodec<>("EnterSubtitle", Codec.STRING), (d, v) -> d.enterSubtitle = v, d -> d.enterSubtitle).add()
             .append(new KeyedCodec<>("UnlockTitle", Codec.STRING), (d, v) -> d.unlockTitle = v, d -> d.unlockTitle).add()
@@ -32,6 +33,7 @@ public class RoomConfigData implements Component<ChunkStore> {
 
     @Nullable private String lockRoom;
     @Nullable private String mobClearActivator;
+    @Nullable private String mobClearUnlockPercent;
     @Nullable private String enterTitle;
     @Nullable private String enterSubtitle;
     @Nullable private String unlockTitle;
@@ -44,6 +46,7 @@ public class RoomConfigData implements Component<ChunkStore> {
 
     public RoomConfigData(@Nullable String lockRoom,
                           @Nullable String mobClearActivator,
+                          @Nullable String mobClearUnlockPercent,
                           @Nullable String enterTitle,
                           @Nullable String enterSubtitle,
                           @Nullable String unlockTitle,
@@ -52,6 +55,7 @@ public class RoomConfigData implements Component<ChunkStore> {
                           @Nullable String exitSubtitle) {
         this.lockRoom = lockRoom;
         this.mobClearActivator = mobClearActivator;
+        this.mobClearUnlockPercent = mobClearUnlockPercent;
         this.enterTitle = enterTitle;
         this.enterSubtitle = enterSubtitle;
         this.unlockTitle = unlockTitle;
@@ -72,8 +76,23 @@ public class RoomConfigData implements Component<ChunkStore> {
         return "true".equalsIgnoreCase(lockRoom);
     }
 
+    public boolean hasMobClearUnlockPercentConfigured() {
+        return isConfigured(mobClearUnlockPercent) || isConfigured(mobClearActivator);
+    }
+
+    public int getMobClearUnlockPercent() {
+        if (isConfigured(mobClearUnlockPercent)) {
+            return clampPercent(parseIntSafe(mobClearUnlockPercent, 0));
+        }
+        if (isConfigured(mobClearActivator)) {
+            return "true".equalsIgnoreCase(mobClearActivator) ? 100 : 0;
+        }
+        return 0;
+    }
+
+    @Deprecated
     public boolean isMobClearActivator() {
-        return "true".equalsIgnoreCase(mobClearActivator);
+        return getMobClearUnlockPercent() > 0;
     }
 
     @Nonnull
@@ -109,9 +128,28 @@ public class RoomConfigData implements Component<ChunkStore> {
     @Override
     @Nullable
     public Component<ChunkStore> clone() {
-        return new RoomConfigData(this.lockRoom, this.mobClearActivator,
+        return new RoomConfigData(this.lockRoom, this.mobClearActivator, this.mobClearUnlockPercent,
                 this.enterTitle, this.enterSubtitle,
                 this.unlockTitle, this.unlockSubtitle,
                 this.exitTitle, this.exitSubtitle);
+    }
+
+    private static boolean isConfigured(@Nullable String value) {
+        return value != null && !value.isBlank();
+    }
+
+    private static int parseIntSafe(@Nullable String value, int fallback) {
+        if (value == null) {
+            return fallback;
+        }
+        try {
+            return Integer.parseInt(value.trim());
+        } catch (NumberFormatException ignored) {
+            return fallback;
+        }
+    }
+
+    private static int clampPercent(int value) {
+        return Math.max(0, Math.min(100, value));
     }
 }

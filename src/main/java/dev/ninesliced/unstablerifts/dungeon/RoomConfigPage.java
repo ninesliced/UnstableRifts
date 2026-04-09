@@ -30,7 +30,7 @@ import javax.annotation.Nullable;
 
 /**
  * Room configuration UI page for level designers.
- * Allows configuring: lock on enter, must clear before unlock,
+ * Allows configuring: lock on enter, mob-clear unlock percentage,
  * and three configurable messages (enter, unlock, exit) each with title + subtitle.
  */
 public final class RoomConfigPage extends InteractiveCustomUIPage<RoomConfigPage.RoomConfigEventData> {
@@ -40,7 +40,7 @@ public final class RoomConfigPage extends InteractiveCustomUIPage<RoomConfigPage
     @Nullable
     private final BlockPosition blockPos;
     private boolean lockRoom = false;
-    private boolean mobClearActivator = false;
+    private String mobClearUnlockPercent = "0";
     private String enterTitle = "";
     private String enterSubtitle = "";
     private String unlockTitle = "";
@@ -72,7 +72,7 @@ public final class RoomConfigPage extends InteractiveCustomUIPage<RoomConfigPage
 
     private void applyUIState(@Nonnull UICommandBuilder ui) {
         ui.set("#LockRoomToggle.Text", lockRoom ? "ON" : "OFF");
-        ui.set("#MobClearToggle.Text", mobClearActivator ? "ON" : "OFF");
+        ui.set("#MobClearPercentInput.Value", mobClearUnlockPercent);
         ui.set("#EnterTitleInput.Value", enterTitle);
         ui.set("#EnterSubtitleInput.Value", enterSubtitle);
         ui.set("#UnlockTitleInput.Value", unlockTitle);
@@ -86,8 +86,10 @@ public final class RoomConfigPage extends InteractiveCustomUIPage<RoomConfigPage
                 CustomUIEventBindingType.Activating, "#LockRoomToggleBtn",
                 new EventData().put(RoomConfigEventData.KEY_ACTION, "TOGGLE_LOCK"), false);
         events.addEventBinding(
-                CustomUIEventBindingType.Activating, "#MobClearToggleBtn",
-                new EventData().put(RoomConfigEventData.KEY_ACTION, "TOGGLE_MOB_CLEAR"), false);
+                CustomUIEventBindingType.ValueChanged, "#MobClearPercentInput",
+                new EventData()
+                        .put(RoomConfigEventData.KEY_ACTION, "MOB_CLEAR_PERCENT")
+                        .put(RoomConfigEventData.KEY_VALUE, "#MobClearPercentInput.Value"), false);
 
         // Enter message
         events.addEventBinding(
@@ -150,7 +152,7 @@ public final class RoomConfigPage extends InteractiveCustomUIPage<RoomConfigPage
         if (data == null) return;
 
         lockRoom = data.isLockRoom();
-        mobClearActivator = data.isMobClearActivator();
+        mobClearUnlockPercent = String.valueOf(data.getMobClearUnlockPercent());
         enterTitle = data.getEnterTitle();
         enterSubtitle = data.getEnterSubtitle();
         unlockTitle = data.getUnlockTitle();
@@ -172,9 +174,11 @@ public final class RoomConfigPage extends InteractiveCustomUIPage<RoomConfigPage
         if (blockType == null) return;
         int rotation = chunk.getRotationIndex(blockPos.x, blockPos.y, blockPos.z);
 
+        mobClearUnlockPercent = normalizeMobClearUnlockPercent(mobClearUnlockPercent);
         RoomConfigData data = new RoomConfigData(
                 String.valueOf(lockRoom),
-                String.valueOf(mobClearActivator),
+                null,
+                mobClearUnlockPercent,
                 enterTitle, enterSubtitle,
                 unlockTitle, unlockSubtitle,
                 exitTitle, exitSubtitle
@@ -202,7 +206,7 @@ public final class RoomConfigPage extends InteractiveCustomUIPage<RoomConfigPage
 
         switch (action) {
             case "TOGGLE_LOCK" -> { lockRoom = !lockRoom; refresh(); }
-            case "TOGGLE_MOB_CLEAR" -> { mobClearActivator = !mobClearActivator; refresh(); }
+            case "MOB_CLEAR_PERCENT" -> { if (data.value != null) mobClearUnlockPercent = data.value; }
             case "ENTER_TITLE" -> { if (data.value != null) enterTitle = data.value; }
             case "ENTER_SUBTITLE" -> { if (data.value != null) enterSubtitle = data.value; }
             case "UNLOCK_TITLE" -> { if (data.value != null) unlockTitle = data.value; }
@@ -230,6 +234,19 @@ public final class RoomConfigPage extends InteractiveCustomUIPage<RoomConfigPage
                     player.getPageManager().setPage(ref, store, Page.None);
                 }
             }
+        }
+    }
+
+    @Nonnull
+    private static String normalizeMobClearUnlockPercent(@Nullable String rawValue) {
+        if (rawValue == null || rawValue.isBlank()) {
+            return "0";
+        }
+        try {
+            int parsed = Integer.parseInt(rawValue.trim());
+            return String.valueOf(Math.max(0, Math.min(100, parsed)));
+        } catch (NumberFormatException ignored) {
+            return "0";
         }
     }
 

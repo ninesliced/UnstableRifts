@@ -11,11 +11,19 @@ public final class ChallengeObjective {
 
     private final Type type;
     private final Vector3i position;
+    private final int mobClearPercent;
     private boolean completed;
 
     public ChallengeObjective(@Nonnull Type type, @Nonnull Vector3i position) {
+        this(type, position, 100);
+    }
+
+    public ChallengeObjective(@Nonnull Type type, @Nonnull Vector3i position, int mobClearPercent) {
         this.type = type;
         this.position = position;
+        this.mobClearPercent = type == Type.MOB_CLEAR
+                ? Math.max(0, Math.min(100, mobClearPercent))
+                : 0;
     }
 
     @Nonnull
@@ -26,6 +34,10 @@ public final class ChallengeObjective {
     @Nonnull
     public Vector3i getPosition() {
         return position;
+    }
+
+    public int getMobClearPercent() {
+        return mobClearPercent;
     }
 
     public boolean isCompleted() {
@@ -43,7 +55,9 @@ public final class ChallengeObjective {
     public String getDisplayName() {
         return switch (type) {
             case ACTIVATION_ZONE -> "Reach the activation zone";
-            case MOB_CLEAR -> "Clear all enemies";
+            case MOB_CLEAR -> mobClearPercent >= 100
+                    ? "Clear all enemies"
+                    : "Defeat " + mobClearPercent + "% of enemies";
         };
     }
 
@@ -53,7 +67,7 @@ public final class ChallengeObjective {
          */
         ACTIVATION_ZONE,
         /**
-         * All mobs in the room must be cleared.
+         * A configured percentage of the room's mobs must be defeated.
          */
         MOB_CLEAR
     }

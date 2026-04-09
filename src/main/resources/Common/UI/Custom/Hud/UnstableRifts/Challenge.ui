@@ -80,7 +80,7 @@ Group #ChallengeRoot {
         Anchor: (Height: 20, Top: 4);
         LayoutMode: Left;
         Visible: false;
-        Label { Text: "Enemies remaining:"; Anchor: (Width: 150, Height: 20); Style: LabelStyle(FontSize: 11, TextColor: @LabelColor, HorizontalAlignment: Start, VerticalAlignment: Center); }
+        Label { Text: "Unlock progress:"; Anchor: (Width: 150, Height: 20); Style: LabelStyle(FontSize: 11, TextColor: @LabelColor, HorizontalAlignment: Start, VerticalAlignment: Center); }
         Label #MobCounterLabel { Text: "0"; Anchor: (Height: 20); Style: LabelStyle(FontSize: 12, TextColor: @IncompleteColor, RenderBold: true, HorizontalAlignment: Start, VerticalAlignment: Center); }
       }
     }

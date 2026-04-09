@@ -351,6 +351,7 @@ public class DungeonGenerator {
         return new RoomConfigData(
                 getSerializedString(component, "LockRoom"),
                 getSerializedString(component, "MobClearActivator"),
+                getSerializedString(component, "MobClearUnlockPercent"),
                 getSerializedString(component, "EnterTitle"),
                 getSerializedString(component, "EnterSubtitle"),
                 getSerializedString(component, "UnlockTitle"),
@@ -1388,8 +1389,8 @@ public class DungeonGenerator {
                         if (cfg.isLockRoom()) {
                             roomData.setLocked(true);
                         }
-                        if (cfg.isMobClearActivator()) {
-                            roomData.setHasMobClearActivator(true);
+                        if (cfg.hasMobClearUnlockPercentConfigured()) {
+                            roomData.setMobClearUnlockPercent(cfg.getMobClearUnlockPercent());
                         }
                         roomData.setEnterTitle(cfg.getEnterTitle());
                         roomData.setEnterSubtitle(cfg.getEnterSubtitle());
@@ -1460,8 +1461,11 @@ public class DungeonGenerator {
         for (Vector3i pos : roomData.getActivationZonePositions()) {
             roomData.addChallenge(new ChallengeObjective(ChallengeObjective.Type.ACTIVATION_ZONE, pos));
         }
-        if (roomData.hasMobClearActivator()) {
-            roomData.addChallenge(new ChallengeObjective(ChallengeObjective.Type.MOB_CLEAR, roomData.getAnchor()));
+        if (roomData.getMobClearUnlockPercent() > 0) {
+            roomData.addChallenge(new ChallengeObjective(
+                    ChallengeObjective.Type.MOB_CLEAR,
+                    roomData.getAnchor(),
+                    roomData.getMobClearUnlockPercent()));
         }
         if (!roomData.getChallenges().isEmpty()) {
             roomData.setLocked(true);

@@ -77,27 +77,24 @@ Group #RoomConfigRoot {
         }
       }
 
-      // ── Must clear the room before unlock ──
+      // ── Mob clear threshold before unlock ──
       Group {
         Anchor: (Height: 30, Top: 4);
         LayoutMode: Left;
 
         Label {
-          Text: "Must clear the room before unlock";
+          Text: "Mob clear threshold (0-100%)";
           Anchor: (Width: 230, Height: 28);
           Style: LabelStyle(FontSize: 13, TextColor: @LabelColor, RenderBold: true, HorizontalAlignment: Start, VerticalAlignment: Center);
         }
 
-        Label #MobClearToggle {
-          Text: "OFF";
-          Anchor: (Width: 40, Height: 28);
-          Style: LabelStyle(FontSize: 12, TextColor: @OffColor, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center);
-        }
-
-        TextButton #MobClearToggleBtn {
-          Text: "TOGGLE";
-          Anchor: (Width: 70, Height: 28);
-          Style: @BtnStyle;
+        TextField #MobClearPercentInput {
+          PlaceholderText: "0";
+          Anchor: (Width: 110, Height: 26);
+          Style: InputFieldStyle(FontSize: 12, TextColor: @ValueColor);
+          PlaceholderStyle: InputFieldStyle(FontSize: 12, TextColor: #556070);
+          Background: @InputBg;
+          Padding: (Left: 6, Right: 6);
         }
       }
 
