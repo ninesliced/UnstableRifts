@@ -28,7 +28,7 @@ public enum ShopItemType {
             case WEAPON -> "Weapon";
             case ARMOR -> "Armor";
             case AMMO -> "Ammo";
-            case HEAL -> "Heal";
+            case HEAL -> "Health";
         };
     }
 }

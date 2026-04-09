@@ -35,7 +35,8 @@ import com.hypixel.hytale.protocol.packets.inventory.UpdatePlayerInventory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -108,10 +109,12 @@ public final class ShopPage extends InteractiveCustomUIPage<ShopPage.ShopEventDa
     private void buildItemList(@Nonnull UICommandBuilder ui, @Nonnull UIEventBuilder events) {
         ui.clear(ITEM_LIST_PATH);
 
-        List<ShopEntry> entries = inventory.entries();
-        for (int i = 0; i < entries.size(); i++) {
-            ShopEntry entry = entries.get(i);
-            String itemPath = ITEM_LIST_PATH + "[" + i + "]";
+        List<SortedShopEntry> sortedEntries = getSortedEntriesForDisplay();
+        for (int displayIndex = 0; displayIndex < sortedEntries.size(); displayIndex++) {
+            SortedShopEntry sortedEntry = sortedEntries.get(displayIndex);
+            ShopEntry entry = sortedEntry.entry();
+            int inventoryIndex = sortedEntry.inventoryIndex();
+            String itemPath = ITEM_LIST_PATH + "[" + displayIndex + "]";
 
             ui.append(ITEM_LIST_PATH, ITEM_TEMPLATE);
 
@@ -139,10 +142,33 @@ public final class ShopPage extends InteractiveCustomUIPage<ShopPage.ShopEventDa
                     itemPath + " #ShopEntryBuyBtn",
                     new EventData()
                             .put(ShopEventData.KEY_ACTION, "BUY")
-                            .put(ShopEventData.KEY_INDEX, String.valueOf(i)),
+                            .put(ShopEventData.KEY_INDEX, String.valueOf(inventoryIndex)),
                     false
             );
         }
+    }
+
+    @Nonnull
+    private List<SortedShopEntry> getSortedEntriesForDisplay() {
+        List<ShopEntry> entries = inventory.entries();
+        List<SortedShopEntry> sortedEntries = new ArrayList<>(entries.size());
+        for (int i = 0; i < entries.size(); i++) {
+            sortedEntries.add(new SortedShopEntry(i, entries.get(i)));
+        }
+
+        sortedEntries.sort(
+                Comparator.comparingInt((SortedShopEntry entry) -> getTypeSortOrder(entry.entry().getType()))
+                        .thenComparingInt(SortedShopEntry::inventoryIndex));
+        return sortedEntries;
+    }
+
+    private int getTypeSortOrder(@Nonnull ShopItemType type) {
+        return switch (type) {
+            case WEAPON -> 0;
+            case ARMOR -> 1;
+            case HEAL -> 2;
+            case AMMO -> 3;
+        };
     }
 
     private void buildItemDetails(@Nonnull UICommandBuilder ui, @Nonnull String itemPath,
@@ -649,5 +675,8 @@ public final class ShopPage extends InteractiveCustomUIPage<ShopPage.ShopEventDa
         private String action;
         @Nullable
         private String index;
+    }
+
+    private record SortedShopEntry(int inventoryIndex, @Nonnull ShopEntry entry) {
     }
 }
