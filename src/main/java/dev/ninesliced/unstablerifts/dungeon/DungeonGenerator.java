@@ -2112,9 +2112,12 @@ public class DungeonGenerator {
      * and blocks that would land outside valid world Y range (where chunk sections don't exist).
      */
     private static final class SpawnerFilteredBuffer implements IPrefabBuffer {
+        private static final int DECO_SUPPORT_VALUE = 15;
+
         private final IPrefabBuffer delegate;
         private final int spawnerBlockId;
         private final int pasteY;
+        private final Map<Integer, Boolean> ignoreSupportPlacementCache = new HashMap<>();
 
         SpawnerFilteredBuffer(@Nonnull IPrefabBuffer delegate, int pasteY) {
             this.delegate = delegate;
@@ -2218,8 +2221,26 @@ public class DungeonGenerator {
                 if (worldY < 0 || worldY >= 256) {
                     return; // Skip blocks outside world bounds — no chunk section exists
                 }
-                blockConsumer.accept(x, y, z, blockId, holder, supportValue, rotation, filler, call, fluidId, fluidLevel);
+
+                // Prefab optimization can remove hidden support cubes inside trees/branches.
+                // Match Hytale's "IgnoreSupportWhenPlaced" behavior by pasting those blocks
+                // as deco support so they do not collapse from stale prefab support data.
+                int adjustedSupportValue = shouldPasteAsDecoSupport(blockId)
+                        ? DECO_SUPPORT_VALUE
+                        : supportValue;
+                blockConsumer.accept(x, y, z, blockId, holder, adjustedSupportValue, rotation, filler, call, fluidId, fluidLevel);
             }, entityConsumer, childConsumer, t);
+        }
+
+        private boolean shouldPasteAsDecoSupport(int blockId) {
+            if (blockId <= 0) {
+                return false;
+            }
+
+            return ignoreSupportPlacementCache.computeIfAbsent(blockId, id -> {
+                BlockType blockType = BlockType.getAssetMap().getAsset(id);
+                return blockType != null && blockType.shouldIgnoreSupportWhenPlaced();
+            });
         }
 
         @Override
