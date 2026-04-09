@@ -59,6 +59,11 @@ public final class PortalPromptHudService {
         LAST_STATE.remove(playerRef.getUuid());
     }
 
+    public static boolean isActive(@Nonnull UUID playerUuid) {
+        Long state = LAST_STATE.get(playerUuid);
+        return state != null && state != STATE_HIDDEN;
+    }
+
     public static void clearAll() {
         LAST_STATE.clear();
     }

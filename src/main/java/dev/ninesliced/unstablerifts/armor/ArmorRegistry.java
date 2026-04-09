@@ -25,7 +25,7 @@ public final class ArmorRegistry {
     public static final String ABILITY_INTERACTION_ID = "UnstableRifts_Armor_Ability";
     private static final String PACK_KEY = "ninesliced:UnstableRifts";
     private static final String MANIFEST_FILE = "armor_registry.json";
-    private static final float ABILITY_COOLDOWN_SECONDS = 30.0f;
+    private static final float ABILITY_COOLDOWN_SECONDS = 60.0f;
     private static final Gson GSON = new Gson();
 
     private ArmorRegistry() {

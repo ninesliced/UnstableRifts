@@ -18,7 +18,7 @@ import javax.annotation.Nonnull;
 
 /**
  * Ticks the passive armor charge timer for all entities with an
- * {@link ArmorChargeComponent}. Fills the charge from 0→100% over 30s.
+ * {@link ArmorChargeComponent}. Fills the charge from 0→100% over 60s.
  * Also syncs the charge progress to the entity's SignatureEnergy stat
  * so the client Ability1 bar reflects the fill state.
  */

@@ -50,6 +50,13 @@ public final class ArmorAbilityInteraction extends SimpleInstantInteraction {
             return;
         }
 
+        com.hypixel.hytale.server.core.universe.PlayerRef playerRef =
+                commandBuffer.getComponent(ref, com.hypixel.hytale.server.core.universe.PlayerRef.getComponentType());
+        if (playerRef != null && ArmorAbilityActivationGuard.hasBlockingUseInteraction(playerRef, ref, commandBuffer)) {
+            context.getState().state = InteractionState.Failed;
+            return;
+        }
+
         InventoryComponent.Armor armorComp = commandBuffer.getComponent(ref, InventoryComponent.Armor.getComponentType());
         if (armorComp == null) {
             context.getState().state = InteractionState.Failed;
@@ -87,9 +94,6 @@ public final class ArmorAbilityInteraction extends SimpleInstantInteraction {
         }
 
         charge.reset();
-
-        com.hypixel.hytale.server.core.universe.PlayerRef playerRef =
-                commandBuffer.getComponent(ref, com.hypixel.hytale.server.core.universe.PlayerRef.getComponentType());
         ArmorAbilityBuffSystem.activateAbility(ref, commandBuffer, anyPiece.setAbility(), playerRef);
     }
 

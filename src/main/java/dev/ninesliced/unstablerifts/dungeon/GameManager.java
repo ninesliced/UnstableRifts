@@ -721,8 +721,10 @@ public final class GameManager {
         game.clearDisconnectedDungeonInventories();
         showAllPartyMembers(game.getPartyId());
 
+        Set<UUID> disconnectedPlayersAtCleanup = new HashSet<>(game.getDisconnectedPlayers());
+
         // Clean up pending reconnect state for any disconnected players
-        for (UUID disconnectedId : game.getDisconnectedPlayers()) {
+        for (UUID disconnectedId : disconnectedPlayersAtCleanup) {
             rememberPendingReturnTarget(game, disconnectedId);
             pendingReconnectPlayers.remove(disconnectedId);
             pendingReadyRecoveryPlayers.remove(disconnectedId);
@@ -759,7 +761,7 @@ public final class GameManager {
             // home world (popup shown or pending) — they still need to be
             // teleported to their return point and have inventory restored.
             boolean wasInInstance = game.isPlayerInInstance(playerId);
-            boolean wasReconnected = !wasInInstance && (game.isDisconnectedPlayer(playerId)
+            boolean wasReconnected = !wasInInstance && (disconnectedPlayersAtCleanup.contains(playerId)
                     || outsideDungeonNormalizedPlayers.contains(playerId));
 
             plugin.getCameraService().restoreDefault(playerRef);
@@ -1139,6 +1141,12 @@ public final class GameManager {
         game.removeDisconnectedPlayer(playerId);
         game.removeDisconnectedDungeonInventory(playerId);
         game.removeDisconnectedPosition(playerId);
+    }
+
+    private void markPlayerRejoinedDungeon(@Nonnull Game game, @Nonnull UUID playerId) {
+        game.removeDisconnectedPlayer(playerId);
+        game.setPlayerInInstance(playerId, true);
+        showPlayerToParty(playerId, game.getPartyId());
     }
 
     private void rememberPendingReturnTarget(@Nonnull Game game, @Nonnull UUID playerId) {
@@ -1679,9 +1687,9 @@ public final class GameManager {
         if (isReconnecting) {
             pendingReconnectPlayers.remove(playerId);
             pendingReadyRecoveryPlayers.remove(playerId);
-            game.removeDisconnectedPlayer(playerId);
-            game.setPlayerInInstance(playerId, true);
+            markPlayerRejoinedDungeon(game, playerId);
             pendingPostReadyResync.add(playerId);
+            PartyUiPage.refreshOpenPages();
             return;
         }
 

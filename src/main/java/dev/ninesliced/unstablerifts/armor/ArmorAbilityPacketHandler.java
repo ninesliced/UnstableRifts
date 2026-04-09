@@ -39,6 +39,10 @@ public final class ArmorAbilityPacketHandler implements PlayerPacketWatcher {
             return;
         }
 
+        if (ArmorAbilityActivationGuard.hasBlockingUseInteraction(playerRef, ref, accessor)) {
+            return;
+        }
+
         InventoryComponent.Armor armorComp = accessor.getComponent(ref, InventoryComponent.Armor.getComponentType());
         if (armorComp == null) {
             return;
@@ -102,6 +106,10 @@ public final class ArmorAbilityPacketHandler implements PlayerPacketWatcher {
         }
 
         if (!hasUntargetedUse) {
+            return;
+        }
+
+        if (ArmorAbilityActivationGuard.hasVisiblePrompt(playerRef.getUuid())) {
             return;
         }
 

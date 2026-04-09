@@ -7,14 +7,14 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import javax.annotation.Nonnull;
 
 /**
- * ECS component tracking the passive 30-second charge timer for the armor
- * set ability. The charge fills from 0→600 ticks (30s at 20 TPS).
+ * ECS component tracking the passive 60-second charge timer for the armor
+ * set ability. The charge fills from 0→1200 ticks (60s at 20 TPS).
  * When full, the ability can be activated via Ability1.
  * Also tracks the active buff state (ability, remaining duration).
  */
 public final class ArmorChargeComponent implements Component<EntityStore> {
 
-    private static final int CHARGE_TICKS_MAX = 600; // 30 seconds at 20 TPS
+    private static final int CHARGE_TICKS_MAX = 1200; // 60 seconds at 20 TPS
 
     private static ComponentType<EntityStore, ArmorChargeComponent> componentType;
 

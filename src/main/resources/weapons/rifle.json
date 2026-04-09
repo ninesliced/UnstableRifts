@@ -31,7 +31,7 @@
   },
   "damage": {
     "id": "UnstableRifts_Rifle_Projectile_Hit",
-    "amount": 15,
+    "amount": 18,
     "type": "Projectile",
     "worldSfx": "SFX_Blunderbuss_Hit",
     "localSfx": "SFX_Blunderbuss_Hit",
