@@ -14,9 +14,10 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import javax.annotation.Nonnull;
 
 /**
- * Blocks item drops from non-weapon slots for locked players.
- * Drops from the 3 weapon hotbar slots (0-2) are allowed so players
- * can voluntarily discard a weapon during a dungeon run.
+ * Blocks item drops from locked inventory sections for dungeon players.
+ * Drops from the 3 weapon hotbar slots (0-2) and equipped armor slots are
+ * allowed so players can discard a weapon or remove armor during a run while
+ * every other inventory section stays locked.
  */
 public final class DropBlockSystem extends EntityEventSystem<EntityStore, DropItemEvent.PlayerRequest> {
 
@@ -49,6 +50,13 @@ public final class DropBlockSystem extends EntityEventSystem<EntityStore, DropIt
                     && event.getSlotId() < InventoryLockService.MAX_WEAPON_SLOTS) {
                 return;
             }
+
+            // Allow dropping equipped armor while the rest of the inventory remains blocked.
+            if (event.getInventorySectionId() == InventoryComponent.ARMOR_SECTION_ID
+                    && event.getSlotId() >= 0) {
+                return;
+            }
+
             event.setCancelled(true);
         }
     }
