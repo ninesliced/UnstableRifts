@@ -1,6 +1,7 @@
 package dev.ninesliced.unstablerifts.dungeon;
 
 import com.hypixel.hytale.builtin.instances.InstancesPlugin;
+import com.hypixel.hytale.builtin.instances.config.InstanceWorldConfig;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
@@ -40,6 +41,11 @@ import java.util.logging.Logger;
 public final class GameManager {
 
     private static final Logger LOGGER = Logger.getLogger(GameManager.class.getName());
+    /**
+     * Lowercase prefix used by instance worlds created for this plugin.
+     * Matches the pattern produced by InstancesPlugin: "instance-" + safeName("UnstableRifts") + "-".
+     */
+    private static final String STALE_INSTANCE_PREFIX = "instance-unstablerifts-";
 
     private final UnstableRifts plugin;
     private final PlayerInventoryService inventoryService;
@@ -86,6 +92,11 @@ public final class GameManager {
      * even when their Game is no longer present in activeGames.
      */
     private final Map<UUID, PendingReturnTarget> pendingReturnTargets = new ConcurrentHashMap<>();
+    /**
+     * Ensures stale instance world cleanup runs only once, on the first
+     * player connect after the server has finished loading worlds.
+     */
+    private volatile boolean staleWorldCleanupDone;
 
     private record PendingReturnTarget(@Nonnull Transform returnPoint,
                                        @Nullable World returnWorld,
@@ -1193,6 +1204,11 @@ public final class GameManager {
      * or if they are reconnecting to an active dungeon run.
      */
     public void onPlayerConnect(@Nonnull PlayerRef playerRef) {
+        if (!staleWorldCleanupDone) {
+            staleWorldCleanupDone = true;
+            cleanupStaleInstanceWorlds();
+        }
+
         UUID playerId = playerRef.getUuid();
 
         UUID partyId = playerToParty.get(playerId);
@@ -1913,7 +1929,6 @@ public final class GameManager {
         }
 
         if (pendingReadyRecoveryPlayers.contains(playerId)) {
-            LOGGER.info("Deferring outside-dungeon normalization until PlayerReady for " + playerId);
             return false;
         }
 
@@ -1924,19 +1939,6 @@ public final class GameManager {
             }
             return false;
         }
-
-        LOGGER.info("normalizeOutsideDungeonState: player=" + playerId
-                + " username=" + playerRef.getUsername()
-                + " currentWorld=" + (player.getWorld() != null ? player.getWorld().getName() : "null")
-                + " gameState=" + (game != null ? game.getState() : null)
-                + " instanceWorld=" + (game != null && game.getInstanceWorld() != null ? game.getInstanceWorld().getName() : "null")
-                + " inventoryLocked=" + inventoryLocked
-                + " hasSavedInventory=" + hasSavedInventory
-                + " forceReturnTeleport=" + forceReturnTeleport
-                + " deathComponentDead=" + deadComponentDead
-                + " gamePlayerInInstance=" + gamePlayerInInstance
-                + " gamePlayerDead=" + gamePlayerDead
-                + " deleteAfterRestore=" + (game == null || game.getState() == GameState.COMPLETE));
 
         plugin.getDungeonMapLegendService().clear(playerRef);
         plugin.getCameraService().restoreDefault(playerRef);
@@ -1966,6 +1968,40 @@ public final class GameManager {
         }
         if (!teleportedOut) {
             clearPendingReturnTarget(playerId);
+        }
+
+        // Fallback: if the player is still in an instance world (e.g. after a
+        // server crash where no Game tracks this world), defer the exit to the
+        // next tick. Calling exitInstance synchronously during PlayerReady
+        // invalidates the entity ref, which breaks other systems that still
+        // expect a valid ref during the current event dispatch.
+        if (!teleportedOut && ref != null && ref.isValid() && store != null) {
+            World currentWorld = player.getWorld();
+            if (currentWorld != null) {
+                InstanceWorldConfig instanceWorldConfig = InstanceWorldConfig.get(currentWorld.getWorldConfig());
+                if (instanceWorldConfig != null) {
+                    final Ref<EntityStore> exitRef = ref;
+                    final Store<EntityStore> exitStore = store;
+                    currentWorld.execute(() -> {
+                        if (!exitRef.isValid()) return;
+                        try {
+                            InstancesPlugin.exitInstance(exitRef, exitStore);
+                            LOGGER.info("Used InstancesPlugin.exitInstance fallback for " + playerId
+                                    + " stuck in stale instance world " + currentWorld.getName());
+                        } catch (Exception e) {
+                            World defaultWorld = Universe.get().getDefaultWorld();
+                            if (defaultWorld != null && exitRef.isValid()) {
+                                teleportPlayerToReturnPoint(exitRef, exitStore, defaultWorld,
+                                        new Transform(0, 100, 0));
+                            }
+                            LOGGER.warning("Fallback: teleported " + playerId
+                                    + " to default world after crash recovery: " + e.getMessage());
+                        }
+                    });
+                    scheduleStaleWorldRemoval(currentWorld);
+                    teleportedOut = true;
+                }
+            }
         }
 
         LOGGER.info("Normalized player state for " + playerRef.getUsername()
@@ -2028,6 +2064,55 @@ public final class GameManager {
                                              @Nonnull Transform returnPoint) {
         Teleport teleport = Teleport.createForPlayer(returnWorld, returnPoint);
         store.putComponent(ref, Teleport.getComponentType(), teleport);
+    }
+
+    /**
+     * Schedules removal of an instance world that is no longer tracked by any
+     * active game. This handles stale worlds left over after a server crash.
+     */
+    private void scheduleStaleWorldRemoval(@Nonnull World world) {
+        if (!isTrackedByActiveGame(world) && world.isAlive()) {
+            world.execute(() -> InstancesPlugin.safeRemoveInstance(world));
+            LOGGER.info("Scheduled removal of stale instance world: " + world.getName());
+        }
+    }
+
+    private boolean isTrackedByActiveGame(@Nonnull World world) {
+        for (Game game : activeGames.values()) {
+            if (game.getInstanceWorld() == world) return true;
+        }
+        return false;
+    }
+
+    /**
+     * Removes leftover UnstableRifts instance worlds that survived a server
+     * crash or unclean shutdown. Should be called once during plugin setup,
+     * before players connect.
+     */
+    public void cleanupStaleInstanceWorlds() {
+        try {
+            Map<String, World> worlds = Universe.get().getWorlds();
+            List<String> staleWorldNames = new ArrayList<>();
+            for (Map.Entry<String, World> entry : worlds.entrySet()) {
+                if (entry.getKey().startsWith(STALE_INSTANCE_PREFIX)
+                        && !isTrackedByActiveGame(entry.getValue())) {
+                    staleWorldNames.add(entry.getKey());
+                }
+            }
+            for (String worldName : staleWorldNames) {
+                LOGGER.info("Removing stale dungeon instance world from previous session: " + worldName);
+                try {
+                    Universe.get().removeWorld(worldName);
+                } catch (Exception e) {
+                    LOGGER.warning("Failed to remove stale instance world " + worldName + ": " + e.getMessage());
+                }
+            }
+            if (!staleWorldNames.isEmpty()) {
+                LOGGER.info("Cleaned up " + staleWorldNames.size() + " stale dungeon instance world(s).");
+            }
+        } catch (Exception e) {
+            LOGGER.warning("Stale instance world cleanup skipped: " + e.getMessage());
+        }
     }
 
     public void onInstanceWorldRemoved(@Nonnull World world) {
@@ -2408,6 +2493,10 @@ public final class GameManager {
             if (game.getState() != GameState.COMPLETE) {
                 LOGGER.info("Shutting down active game for party " + game.getPartyId());
                 game.setState(GameState.COMPLETE);
+            }
+            World instanceWorld = game.getInstanceWorld();
+            if (instanceWorld != null && instanceWorld.isAlive()) {
+                instanceWorld.execute(() -> InstancesPlugin.safeRemoveInstance(instanceWorld));
             }
         }
         activeGames.clear();
