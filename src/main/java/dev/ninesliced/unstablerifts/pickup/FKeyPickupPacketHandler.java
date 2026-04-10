@@ -69,6 +69,10 @@ public final class FKeyPickupPacketHandler implements PlayerPacketWatcher {
             return;
         }
 
+        if (ItemPickupConfig.isPickupDelayed(playerRef.getUuid())) {
+            return;
+        }
+
         DeathComponent death = store.getComponent(playerEntityRef, DeathComponent.getComponentType());
         if (death != null && death.isDead()) {
             return;
@@ -176,6 +180,7 @@ public final class FKeyPickupPacketHandler implements PlayerPacketWatcher {
             // Full pickup.
             itemComponent.setRemovedByPlayerPickup(true);
             store.removeEntity(itemRef, RemoveReason.REMOVE);
+            ItemPickupConfig.applyPickupDelay(playerRef.getUuid());
 
             sendPickupNotification(playerRef, tracked, itemStack.getQuantity());
 
@@ -185,6 +190,7 @@ public final class FKeyPickupPacketHandler implements PlayerPacketWatcher {
             itemComponent.setItemStack(remainder);
 
             ItemPickupTracker.track(tracked);
+            ItemPickupConfig.applyPickupDelay(playerRef.getUuid());
 
             if (pickedUp > 0) {
                 sendPickupNotification(playerRef, tracked, pickedUp);
@@ -263,6 +269,7 @@ public final class FKeyPickupPacketHandler implements PlayerPacketWatcher {
         // Remove the picked-up entity from the world.
         itemComponent.setRemovedByPlayerPickup(true);
         store.removeEntity(itemRef, RemoveReason.REMOVE);
+        ItemPickupConfig.applyPickupDelay(playerRef.getUuid());
 
         sendPickupNotification(playerRef, tracked, pickedItem.getQuantity());
     }
@@ -317,6 +324,7 @@ public final class FKeyPickupPacketHandler implements PlayerPacketWatcher {
 
         itemComponent.setRemovedByPlayerPickup(true);
         store.removeEntity(itemRef, RemoveReason.REMOVE);
+        ItemPickupConfig.applyPickupDelay(playerRef.getUuid());
 
         sendPickupNotification(playerRef, tracked, armorItem.getQuantity());
     }
@@ -448,6 +456,7 @@ public final class FKeyPickupPacketHandler implements PlayerPacketWatcher {
             itemComponent.setRemovedByPlayerPickup(true);
         }
         store.removeEntity(itemRef, RemoveReason.REMOVE);
+        ItemPickupConfig.applyPickupDelay(playerRef.getUuid());
     }
 
     /**
@@ -561,6 +570,7 @@ public final class FKeyPickupPacketHandler implements PlayerPacketWatcher {
             itemComponent.setRemovedByPlayerPickup(true);
         }
         store.removeEntity(itemRef, RemoveReason.REMOVE);
+        ItemPickupConfig.applyPickupDelay(playerRef.getUuid());
     }
 
     private static void sendPickupNotification(@Nonnull PlayerRef playerRef,

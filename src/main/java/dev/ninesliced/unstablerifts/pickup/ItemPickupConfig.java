@@ -25,6 +25,7 @@ public final class ItemPickupConfig {
      * Max distance (blocks) for F-key pickup.
      */
     public static final double ITEM_PICKUP_RADIUS = 1.2;
+    public static final long PICKUP_DELAY_MS = 250L;
     /**
      * Max distance (blocks) for showing the pickup HUD.
      */
@@ -41,6 +42,7 @@ public final class ItemPickupConfig {
     private static final String TAG_FKEY_PICKUP = "Pickup=FKey";
     private static final String TAG_SCORE_COLLECT = "Pickup=ScoreCollect";
     private static final ConcurrentHashMap<UUID, Double> PLAYER_COIN_RADIUS = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<UUID, Long> PLAYER_PICKUP_DELAY_UNTIL = new ConcurrentHashMap<>();
 
     // ── Per-player coin collect radius ──────────────────────────────────────
 
@@ -66,6 +68,32 @@ public final class ItemPickupConfig {
 
     public static void clearAllCoinCollectRadii() {
         PLAYER_COIN_RADIUS.clear();
+    }
+
+    public static boolean isPickupDelayed(@Nonnull UUID playerUuid) {
+        Long blockedUntil = PLAYER_PICKUP_DELAY_UNTIL.get(playerUuid);
+        if (blockedUntil == null) {
+            return false;
+        }
+
+        long now = System.currentTimeMillis();
+        if (blockedUntil <= now) {
+            PLAYER_PICKUP_DELAY_UNTIL.remove(playerUuid, blockedUntil);
+            return false;
+        }
+        return true;
+    }
+
+    public static void applyPickupDelay(@Nonnull UUID playerUuid) {
+        PLAYER_PICKUP_DELAY_UNTIL.put(playerUuid, System.currentTimeMillis() + PICKUP_DELAY_MS);
+    }
+
+    public static void resetPickupDelay(@Nonnull UUID playerUuid) {
+        PLAYER_PICKUP_DELAY_UNTIL.remove(playerUuid);
+    }
+
+    public static void clearAllPickupDelays() {
+        PLAYER_PICKUP_DELAY_UNTIL.clear();
     }
 
     // ── Tag-based queries ───────────────────────────────────────────────────

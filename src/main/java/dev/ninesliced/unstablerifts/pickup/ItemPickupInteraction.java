@@ -79,6 +79,12 @@ public final class ItemPickupInteraction extends SimpleInstantInteraction {
             return;
         }
 
+        PlayerRef playerRefComp = commandBuffer.getComponent(ref, PlayerRef.getComponentType());
+        if (playerRefComp != null && ItemPickupConfig.isPickupDelayed(playerRefComp.getUuid())) {
+            context.getState().state = InteractionState.Failed;
+            return;
+        }
+
         // Dead/ghost players cannot pick up items.
         DeathComponent death = commandBuffer.getComponent(ref, DeathComponent.getComponentType());
         if (death != null && death.isDead()) {
@@ -138,7 +144,6 @@ public final class ItemPickupInteraction extends SimpleInstantInteraction {
 
         // Locked inventory (dungeon) — weapon swap or armor equip logic.
         UnstableRifts unstablerifts = UnstableRifts.getInstance();
-        PlayerRef playerRefComp = commandBuffer.getComponent(ref, PlayerRef.getComponentType());
         if (unstablerifts != null && playerRefComp != null
                 && unstablerifts.getInventoryLockService().isLocked(playerRefComp.getUuid())) {
 
@@ -180,6 +185,7 @@ public final class ItemPickupInteraction extends SimpleInstantInteraction {
                 ));
                 itemComponent.setRemovedByPlayerPickup(true);
                 commandBuffer.removeEntity(targetRef, RemoveReason.REMOVE);
+                ItemPickupConfig.applyPickupDelay(playerRefComp.getUuid());
                 playerComponent.notifyPickupItem(ref, itemStack, itemEntityPosition, commandBuffer);
                 return;
             }
@@ -221,6 +227,7 @@ public final class ItemPickupInteraction extends SimpleInstantInteraction {
             ));
             itemComponent.setRemovedByPlayerPickup(true);
             commandBuffer.removeEntity(targetRef, RemoveReason.REMOVE);
+            ItemPickupConfig.applyPickupDelay(playerRefComp.getUuid());
             playerComponent.notifyPickupItem(ref, itemStack, itemEntityPosition, commandBuffer);
             return;
         }
@@ -233,12 +240,19 @@ public final class ItemPickupInteraction extends SimpleInstantInteraction {
             // Full pickup.
             itemComponent.setRemovedByPlayerPickup(true);
             commandBuffer.removeEntity(targetRef, RemoveReason.REMOVE);
+            if (playerRefComp != null) {
+                ItemPickupConfig.applyPickupDelay(playerRefComp.getUuid());
+            }
             playerComponent.notifyPickupItem(ref, itemStack, itemEntityPosition, commandBuffer);
 
         } else if (!remainder.equals(itemStack)) {
             // Partial pickup (inventory almost full).
             int pickedUp = itemStack.getQuantity() - remainder.getQuantity();
             itemComponent.setItemStack(remainder);
+
+            if (playerRefComp != null) {
+                ItemPickupConfig.applyPickupDelay(playerRefComp.getUuid());
+            }
 
             if (pickedUp > 0) {
                 playerComponent.notifyPickupItem(
