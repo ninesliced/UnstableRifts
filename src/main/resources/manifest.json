@@ -16,9 +16,6 @@
   "Website": "https://ninesliced.com",
   "ServerVersion": "2026.04.09-7243e82f8",
   "Dependencies": {},
-  "OptionalDependencies": {
-    "Buuz135:MultipleHUD": "*"
-  },
   "DisabledByDefault": false,
   "IncludesAssetPack": true,
   "Main": "dev.ninesliced.unstablerifts.UnstableRifts"

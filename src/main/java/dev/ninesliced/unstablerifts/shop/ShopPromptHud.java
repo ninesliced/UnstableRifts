@@ -10,6 +10,7 @@ import javax.annotation.Nonnull;
 public final class ShopPromptHud extends CustomUIHud {
 
     public static final String UI_PATH = "Hud/UnstableRifts/ShopPrompt.ui";
+    public static final String HUD_ID = "UnstableRifts_ShopPrompt";
 
     private final String title;
     private final String detail;
@@ -17,7 +18,7 @@ public final class ShopPromptHud extends CustomUIHud {
     public ShopPromptHud(@Nonnull PlayerRef playerRef,
                          @Nonnull String title,
                          @Nonnull String detail) {
-        super(playerRef);
+        super(playerRef, HUD_ID);
         this.title = title;
         this.detail = detail;
     }

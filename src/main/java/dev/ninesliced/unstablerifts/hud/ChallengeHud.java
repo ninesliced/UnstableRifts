@@ -36,7 +36,7 @@ public final class ChallengeHud extends CustomUIHud {
                         @Nonnull List<ChallengeObjective> objectives,
                         @Nonnull String mobCounterText,
                         boolean hasMobClear) {
-        super(playerRef);
+        super(playerRef, HUD_ID);
         this.objectives = objectives;
         this.mobCounterText = mobCounterText;
         this.hasMobClear = hasMobClear;
@@ -66,13 +66,11 @@ public final class ChallengeHud extends CustomUIHud {
         if (HudVisibilityService.isHidden(playerRef.getUuid())) {
             return;
         }
-        if (!MultiHudCompat.setHud(player, playerRef, HUD_ID, hud)) {
-            // Fallback: cannot set secondary HUD without MultipleHUD
-        }
+        player.getHudManager().addCustomHud(playerRef, hud);
     }
 
     public static void hideHud(@Nonnull Player player, @Nonnull PlayerRef playerRef) {
-        MultiHudCompat.hideHud(player, playerRef, HUD_ID);
+        player.getHudManager().removeCustomHud(playerRef, HUD_ID);
     }
 
     private static void setPanelHeight(@Nonnull UICommandBuilder ui, int height) {

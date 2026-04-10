@@ -50,7 +50,7 @@ public final class PartyStatusHud extends CustomUIHud {
     private final List<MemberStatus> members;
 
     public PartyStatusHud(@Nonnull PlayerRef playerRef, @Nonnull List<MemberStatus> members) {
-        super(playerRef);
+        super(playerRef, HUD_ID);
         this.members = members;
     }
 
@@ -61,16 +61,14 @@ public final class PartyStatusHud extends CustomUIHud {
         if (HudVisibilityService.isHidden(playerRef.getUuid())) {
             return;
         }
-        if (!MultiHudCompat.setHud(player, playerRef, HUD_ID, hud)) {
-            // Fallback: cannot set secondary HUD without MultipleHUD, skip
-        }
+        player.getHudManager().addCustomHud(playerRef, hud);
     }
 
     /**
      * Hides the party status HUD.
      */
     public static void hideHud(@Nonnull Player player, @Nonnull PlayerRef playerRef) {
-        MultiHudCompat.hideHud(player, playerRef, HUD_ID);
+        player.getHudManager().removeCustomHud(playerRef, HUD_ID);
     }
 
     private static void setHealthBarWidth(@Nonnull UICommandBuilder ui, @Nonnull String selector, int width) {

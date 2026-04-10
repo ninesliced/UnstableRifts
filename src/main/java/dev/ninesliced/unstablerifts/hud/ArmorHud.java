@@ -22,6 +22,7 @@ import java.util.List;
  */
 public final class ArmorHud extends CustomUIHud {
     public static final String UI_PATH = "Hud/UnstableRifts/ArmorHud.ui";
+    public static final String HUD_ID = "UnstableRifts_Armor";
 
     private static final int ABILITY_BAR_WIDTH = 197;
     private static final int ABILITY_BAR_HEIGHT = 3;
@@ -62,7 +63,7 @@ public final class ArmorHud extends CustomUIHud {
                     @Nonnull ArmorSetAbility ability, float chargeProgress, boolean abilityActive,
                     boolean crouching,
                     @Nonnull List<ArmorModifier> allModifiers) {
-        super(playerRef);
+        super(playerRef, HUD_ID);
         this.bestSetId = bestSetId;
         this.bestSetCount = bestSetCount;
         this.setTotalPieces = setTotalPieces;

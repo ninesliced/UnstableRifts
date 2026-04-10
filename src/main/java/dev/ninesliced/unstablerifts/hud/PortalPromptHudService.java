@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public final class PortalPromptHudService {
 
-    private static final String HUD_IDENTIFIER = "UnstableRifts_PortalPrompt";
+    private static final String HUD_IDENTIFIER = PortalPromptHud.HUD_ID;
     private static final long STATE_HIDDEN = 0L;
 
     private static final ConcurrentHashMap<UUID, Long> LAST_STATE = new ConcurrentHashMap<>();
@@ -37,9 +37,7 @@ public final class PortalPromptHudService {
         LAST_STATE.put(uuid, state);
 
         PortalPromptHud hud = new PortalPromptHud(playerRef, title, detail);
-        if (!MultiHudCompat.setHud(player, playerRef, HUD_IDENTIFIER, hud)) {
-            player.getHudManager().setCustomHud(playerRef, hud);
-        }
+        player.getHudManager().addCustomHud(playerRef, hud);
     }
 
     public static void hide(@Nonnull Player player, @Nonnull PlayerRef playerRef) {
@@ -50,9 +48,7 @@ public final class PortalPromptHudService {
         }
         LAST_STATE.put(uuid, STATE_HIDDEN);
 
-        if (!MultiHudCompat.hideHud(player, playerRef, HUD_IDENTIFIER)) {
-            player.getHudManager().setCustomHud(playerRef, null);
-        }
+        player.getHudManager().removeCustomHud(playerRef, HUD_IDENTIFIER);
     }
 
     public static void clear(@Nonnull PlayerRef playerRef) {

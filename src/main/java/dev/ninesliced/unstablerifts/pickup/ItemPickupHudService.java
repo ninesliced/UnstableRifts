@@ -8,7 +8,6 @@ import dev.ninesliced.unstablerifts.armor.ArmorDefinitions;
 import dev.ninesliced.unstablerifts.armor.ArmorItemMetadata;
 import dev.ninesliced.unstablerifts.armor.ArmorModifier;
 import dev.ninesliced.unstablerifts.guns.*;
-import dev.ninesliced.unstablerifts.hud.MultiHudCompat;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -22,7 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public final class ItemPickupHudService {
 
-    private static final String HUD_IDENTIFIER = "UnstableRifts_ItemPickup";
+    private static final String HUD_IDENTIFIER = ItemPickupHud.HUD_ID;
     private static final long STATE_HIDDEN = 0L;
 
     private static final ConcurrentHashMap<UUID, Long> LAST_STATE = new ConcurrentHashMap<>();
@@ -101,9 +100,7 @@ public final class ItemPickupHudService {
                 crouching, rarity, effect, category, definition, modifiers, isWeapon, baseMaxAmmo, maxAmmo,
                 isArmor, armorDefinition, armorModifiers);
 
-        if (!MultiHudCompat.setHud(player, playerRef, HUD_IDENTIFIER, hud)) {
-            player.getHudManager().setCustomHud(playerRef, hud);
-        }
+        player.getHudManager().addCustomHud(playerRef, hud);
     }
 
     public static void hide(@Nonnull Player player,
@@ -117,9 +114,7 @@ public final class ItemPickupHudService {
         }
         LAST_STATE.put(uuid, STATE_HIDDEN);
 
-        if (!MultiHudCompat.hideHud(player, playerRef, HUD_IDENTIFIER)) {
-            player.getHudManager().setCustomHud(playerRef, null);
-        }
+        player.getHudManager().removeCustomHud(playerRef, HUD_IDENTIFIER);
     }
 
     public static boolean isActive(@Nonnull UUID playerUuid) {

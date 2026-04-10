@@ -30,7 +30,7 @@ public final class ReviveProgressHud extends CustomUIHud {
     public ReviveProgressHud(@Nonnull PlayerRef playerRef,
                              @Nonnull String targetName,
                              float progress) {
-        super(playerRef);
+        super(playerRef, HUD_ID);
         this.targetName = targetName;
         this.progress = progress;
     }
@@ -40,11 +40,11 @@ public final class ReviveProgressHud extends CustomUIHud {
         if (HudVisibilityService.isHidden(playerRef.getUuid())) {
             return;
         }
-        MultiHudCompat.setHud(player, playerRef, HUD_ID, hud);
+        player.getHudManager().addCustomHud(playerRef, hud);
     }
 
     public static void hideHud(@Nonnull Player player, @Nonnull PlayerRef playerRef) {
-        MultiHudCompat.hideHud(player, playerRef, HUD_ID);
+        player.getHudManager().removeCustomHud(playerRef, HUD_ID);
     }
 
     @Override

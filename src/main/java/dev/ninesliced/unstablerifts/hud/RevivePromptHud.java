@@ -10,11 +10,12 @@ import javax.annotation.Nonnull;
 public final class RevivePromptHud extends CustomUIHud {
 
     public static final String UI_PATH = "Hud/UnstableRifts/RevivePrompt.ui";
+    public static final String HUD_ID = "UnstableRifts_RevivePrompt";
 
     private final String targetName;
 
     public RevivePromptHud(@Nonnull PlayerRef playerRef, @Nonnull String targetName) {
-        super(playerRef);
+        super(playerRef, HUD_ID);
         this.targetName = targetName;
     }
 

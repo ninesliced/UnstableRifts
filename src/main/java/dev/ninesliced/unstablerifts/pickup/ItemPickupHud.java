@@ -22,7 +22,7 @@ import java.util.List;
 public final class ItemPickupHud extends CustomUIHud {
 
     public static final String UI_PATH = "Hud/UnstableRifts/CratePickupHud.ui";
-    public static final String HUD_ID = "ItemPickup";
+    public static final String HUD_ID = "UnstableRifts_ItemPickup";
 
     private final String itemDisplayName;
     private final String itemIconPath;
@@ -66,7 +66,7 @@ public final class ItemPickupHud extends CustomUIHud {
                          boolean isArmor,
                          @Nullable ArmorDefinition armorDefinition,
                          @Nonnull List<ArmorModifier> armorModifiers) {
-        super(playerRef);
+        super(playerRef, HUD_ID);
         this.itemDisplayName = itemDisplayName;
         this.itemIconPath = itemIconPath;
         this.itemQuantity = Math.max(0, itemQuantity);

@@ -35,7 +35,7 @@ public final class DungeonInfoHud extends CustomUIHud {
                           @Nonnull String gameTime,
                           int mobsAlive,
                           int mobsTotal) {
-        super(playerRef);
+        super(playerRef, HUD_ID);
         this.dungeonName = dungeonName;
         this.levelName = levelName;
         this.money = money;
@@ -70,22 +70,20 @@ public final class DungeonInfoHud extends CustomUIHud {
     }
 
     /**
-     * Applies the HUD update to a player, using MultiHudCompat if available.
+     * Applies the HUD update to a player.
      */
     public static void applyHud(@Nonnull Player player, @Nonnull PlayerRef playerRef, @Nonnull DungeonInfoHud hud) {
         if (HudVisibilityService.isHidden(playerRef.getUuid())) {
             return;
         }
-        if (!MultiHudCompat.setHud(player, playerRef, HUD_ID, hud)) {
-            // Fallback: cannot set secondary HUD without MultipleHUD, skip to avoid replacing ammo HUD
-        }
+        player.getHudManager().addCustomHud(playerRef, hud);
     }
 
     /**
      * Hides the dungeon info HUD.
      */
     public static void hideHud(@Nonnull Player player, @Nonnull PlayerRef playerRef) {
-        MultiHudCompat.hideHud(player, playerRef, HUD_ID);
+        player.getHudManager().removeCustomHud(playerRef, HUD_ID);
     }
 
     @Override

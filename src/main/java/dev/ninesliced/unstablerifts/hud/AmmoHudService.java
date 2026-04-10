@@ -25,8 +25,8 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public final class AmmoHudService {
 
-    private static final String HUD_IDENTIFIER = "UnstableRifts_Ammo";
-    private static final String ARMOR_HUD_IDENTIFIER = "UnstableRifts_Armor";
+    private static final String HUD_IDENTIFIER = UnstableRiftsHud.HUD_ID;
+    private static final String ARMOR_HUD_IDENTIFIER = ArmorHud.HUD_ID;
     private static final long STATE_HIDDEN = 0L;
     private static final ConcurrentHashMap<UUID, Long> LAST_STATE = new ConcurrentHashMap<>();
     private static final ConcurrentHashMap<UUID, Long> LAST_ARMOR_STATE = new ConcurrentHashMap<>();
@@ -90,9 +90,7 @@ public final class AmmoHudService {
                             rarity, effect, category, definition, modifiers, displayName, iconPath, crouching);
 
                     player.getHudManager().showHudComponents(playerRef, HudComponent.AmmoIndicator);
-                    if (!MultiHudCompat.setHud(player, playerRef, HUD_IDENTIFIER, hud)) {
-                        player.getHudManager().setCustomHud(playerRef, hud);
-                    }
+                    player.getHudManager().addCustomHud(playerRef, hud);
                 }
                 // Weapon is shown — also update armor HUD (always visible)
                 if (ref != null) {
@@ -122,9 +120,7 @@ public final class AmmoHudService {
         LAST_STATE.put(uuid, STATE_HIDDEN);
 
         player.getHudManager().hideHudComponents(playerRef, HudComponent.AmmoIndicator);
-        if (!MultiHudCompat.hideHud(player, playerRef, HUD_IDENTIFIER)) {
-            player.getHudManager().setCustomHud(playerRef, null);
-        }
+        player.getHudManager().removeCustomHud(playerRef, HUD_IDENTIFIER);
     }
 
     public static void clear(@Nonnull PlayerRef playerRef) {
@@ -248,9 +244,7 @@ public final class AmmoHudService {
                 allModifiers);
 
         player.getHudManager().showHudComponents(playerRef, HudComponent.AmmoIndicator);
-        if (!MultiHudCompat.setHud(player, playerRef, ARMOR_HUD_IDENTIFIER, hud)) {
-            player.getHudManager().setCustomHud(playerRef, hud);
-        }
+        player.getHudManager().addCustomHud(playerRef, hud);
     }
 
     static void hideArmorHud(@Nonnull Player player, @Nonnull PlayerRef playerRef) {
@@ -261,12 +255,11 @@ public final class AmmoHudService {
         }
         LAST_ARMOR_STATE.put(uuid, STATE_HIDDEN);
 
-        if (!MultiHudCompat.hideHud(player, playerRef, ARMOR_HUD_IDENTIFIER)) {
-            // Only clear custom hud if weapon hud is also hidden
-            Long weaponState = LAST_STATE.get(uuid);
-            if (weaponState != null && weaponState == STATE_HIDDEN) {
-                player.getHudManager().hideHudComponents(playerRef, HudComponent.AmmoIndicator);
-            }
+        player.getHudManager().removeCustomHud(playerRef, ARMOR_HUD_IDENTIFIER);
+
+        Long weaponState = LAST_STATE.get(uuid);
+        if (weaponState != null && weaponState == STATE_HIDDEN) {
+            player.getHudManager().hideHudComponents(playerRef, HudComponent.AmmoIndicator);
         }
     }
 

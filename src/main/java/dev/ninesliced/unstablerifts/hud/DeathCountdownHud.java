@@ -26,7 +26,7 @@ public final class DeathCountdownHud extends CustomUIHud {
                              int remainingSeconds,
                              boolean beingRevived,
                              float reviveProgress) {
-        super(playerRef);
+        super(playerRef, HUD_ID);
         this.remainingSeconds = remainingSeconds;
         this.beingRevived = beingRevived;
         this.reviveProgress = reviveProgress;
@@ -37,11 +37,11 @@ public final class DeathCountdownHud extends CustomUIHud {
         if (HudVisibilityService.isHidden(playerRef.getUuid())) {
             return;
         }
-        MultiHudCompat.setHud(player, playerRef, HUD_ID, hud);
+        player.getHudManager().addCustomHud(playerRef, hud);
     }
 
     public static void hideHud(@Nonnull Player player, @Nonnull PlayerRef playerRef) {
-        MultiHudCompat.hideHud(player, playerRef, HUD_ID);
+        player.getHudManager().removeCustomHud(playerRef, HUD_ID);
     }
 
     @Override

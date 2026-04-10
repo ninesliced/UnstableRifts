@@ -40,7 +40,7 @@ public final class BossFightHud extends CustomUIHud {
                          @Nonnull String bossName,
                          float currentHealth,
                          float maxHealth) {
-        super(playerRef);
+        super(playerRef, HUD_ID);
         this.bossName = bossName;
         this.currentHealth = Math.max(0f, currentHealth);
         this.maxHealth = Math.max(1f, maxHealth);
@@ -59,13 +59,11 @@ public final class BossFightHud extends CustomUIHud {
         if (HudVisibilityService.isHidden(playerRef.getUuid())) {
             return;
         }
-        if (!MultiHudCompat.setHud(player, playerRef, HUD_ID, hud)) {
-            // Fallback intentionally omitted to avoid replacing the primary weapon HUD.
-        }
+        player.getHudManager().addCustomHud(playerRef, hud);
     }
 
     public static void hideHud(@Nonnull Player player, @Nonnull PlayerRef playerRef) {
-        MultiHudCompat.hideHud(player, playerRef, HUD_ID);
+        player.getHudManager().removeCustomHud(playerRef, HUD_ID);
     }
 
     private static void setHealthBarWidth(@Nonnull UICommandBuilder ui, int width) {

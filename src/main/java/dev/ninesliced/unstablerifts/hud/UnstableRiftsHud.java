@@ -14,6 +14,7 @@ import java.util.List;
 
 public final class UnstableRiftsHud extends CustomUIHud {
     public static final String UI_PATH = "Hud/UnstableRifts/AmmoHud.ui";
+    public static final String HUD_ID = "UnstableRifts_Ammo";
 
     private static final double LOW_AMMO_THRESHOLD = 0.25;
 
@@ -49,7 +50,7 @@ public final class UnstableRiftsHud extends CustomUIHud {
                             @Nonnull List<WeaponModifier> modifiers, @Nullable String weaponName,
                             @Nullable String weaponIconPath,
                             boolean crouching) {
-        super(playerRef);
+        super(playerRef, HUD_ID);
         this.ammo = Math.max(0, ammo);
         this.baseMaxAmmo = Math.max(1, baseMaxAmmo);
         this.maxAmmo = Math.max(1, maxAmmo);
