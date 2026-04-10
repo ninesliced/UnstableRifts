@@ -6,6 +6,7 @@
   "Categories": [
     "Items.Weapons"
   ],
+  "MaxDurability": 0,
   "Icon": "Icons/ItemsGenerated/Crystal_sword.png",
   "Model": "Items/Weapons/UnstableRifts/Crystal_Sword/Crystal_Power_Sword.blockymodel",
   "Texture": "Items/Weapons/UnstableRifts/Crystal_Sword/Crystal_Power_Sword_Blue.png",
