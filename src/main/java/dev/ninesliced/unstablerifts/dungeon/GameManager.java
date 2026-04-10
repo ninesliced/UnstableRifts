@@ -9,6 +9,7 @@ import com.hypixel.hytale.math.vector.Transform;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
 import com.hypixel.hytale.server.core.modules.entity.teleport.Teleport;
+import com.hypixel.hytale.server.core.modules.entity.tracker.EntityTrackerSystems;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.World;
@@ -527,13 +528,122 @@ public final class GameManager {
         Store<EntityStore> playerStore = ref.getStore();
         Vector3d destination = new Vector3d(exitPos.x + 0.5, exitPos.y + 1.0, exitPos.z + 0.5);
         Teleport tp = Teleport.createForPlayer(destination, new Rotation3f());
+        CompletableFuture<Void> recoveryFuture = new CompletableFuture<>();
+        RoomData recoverySourceRoom = resolvedSourceRoom;
+        Vector3i recoveryExitPos = new Vector3i(exitPos);
+        tp.setOnComplete(recoveryFuture);
+        recoveryFuture.thenRun(() -> {
+            World instanceWorld = game.getInstanceWorld();
+            if (instanceWorld != null) {
+                instanceWorld.execute(() -> recoverClosestExitPortalTeleport(game, playerId, recoverySourceRoom, recoveryExitPos));
+            }
+        });
         playerStore.putComponent(ref, Teleport.getComponentType(), tp);
-
-        scheduleDungeonMapResync(game.getInstanceWorld(), game, Collections.singletonList(playerId));
 
         LOGGER.info("Closest Exit portal teleported player " + playerId
                 + " from room " + resolvedSourceRoom.getAnchor()
                 + " to exit " + exitPos);
+    }
+
+    private void recoverClosestExitPortalTeleport(@Nonnull Game game,
+                                                  @Nonnull UUID playerId,
+                                                  @Nonnull RoomData sourceRoom,
+                                                  @Nonnull Vector3i exitPos) {
+        World world = game.getInstanceWorld();
+        if (world == null || game.getState() == GameState.COMPLETE) {
+            return;
+        }
+
+        PlayerRef playerRef = Universe.get().getPlayer(playerId);
+        if (playerRef == null || !playerRef.isValid()) {
+            return;
+        }
+
+        Ref<EntityStore> ref = playerRef.getReference();
+        if (ref == null || !ref.isValid()) {
+            return;
+        }
+
+        Store<EntityStore> store = ref.getStore();
+        Player player = store.getComponent(ref, Player.getComponentType());
+        if (player == null || player.getWorld() != world || !game.isPlayerInInstance(playerId)) {
+            return;
+        }
+
+        int viewerResetCount = resendAliveDungeonViewers(game, world);
+        int visibilityRestoreCount = restoreAlivePartyVisibilityForPlayer(game, world, playerId, playerRef);
+
+        playerStateService.reapplyDungeonMovementProfile(ref, store, playerRef);
+        scheduleDungeonMapResync(world, game, Collections.singletonList(playerId));
+
+        LOGGER.info("Closest Exit portal recovery completed for player " + playerId
+                + " from room " + sourceRoom.getAnchor()
+                + " to exit " + exitPos
+                + " viewerResets=" + viewerResetCount
+                + " visibilityRestores=" + visibilityRestoreCount);
+    }
+
+    private int resendAliveDungeonViewers(@Nonnull Game game, @Nonnull World world) {
+        int resetCount = 0;
+        for (UUID memberId : new ArrayList<>(game.getPlayersInInstance())) {
+            if (game.isPlayerDead(memberId)) {
+                continue;
+            }
+
+            PlayerRef memberRef = Universe.get().getPlayer(memberId);
+            if (memberRef == null || !memberRef.isValid()) {
+                continue;
+            }
+
+            Ref<EntityStore> memberEntityRef = memberRef.getReference();
+            if (memberEntityRef == null || !memberEntityRef.isValid()) {
+                continue;
+            }
+
+            Store<EntityStore> memberStore = memberEntityRef.getStore();
+            Player memberPlayer = memberStore.getComponent(memberEntityRef, Player.getComponentType());
+            if (memberPlayer == null || memberPlayer.getWorld() != world) {
+                continue;
+            }
+
+            if (EntityTrackerSystems.despawnAll(memberEntityRef, memberStore)) {
+                resetCount++;
+            }
+        }
+        return resetCount;
+    }
+
+    private int restoreAlivePartyVisibilityForPlayer(@Nonnull Game game,
+                                                     @Nonnull World world,
+                                                     @Nonnull UUID playerId,
+                                                     @Nonnull PlayerRef playerRef) {
+        int restoreCount = 0;
+        for (UUID memberId : new ArrayList<>(game.getPlayersInInstance())) {
+            if (memberId.equals(playerId) || game.isPlayerDead(memberId)) {
+                continue;
+            }
+
+            PlayerRef memberRef = Universe.get().getPlayer(memberId);
+            if (memberRef == null || !memberRef.isValid()) {
+                continue;
+            }
+
+            Ref<EntityStore> memberEntityRef = memberRef.getReference();
+            if (memberEntityRef == null || !memberEntityRef.isValid()) {
+                continue;
+            }
+
+            Store<EntityStore> memberStore = memberEntityRef.getStore();
+            Player memberPlayer = memberStore.getComponent(memberEntityRef, Player.getComponentType());
+            if (memberPlayer == null || memberPlayer.getWorld() != world) {
+                continue;
+            }
+
+            memberRef.getHiddenPlayersManager().showPlayer(playerId);
+            playerRef.getHiddenPlayersManager().showPlayer(memberId);
+            restoreCount++;
+        }
+        return restoreCount;
     }
 
     /**
