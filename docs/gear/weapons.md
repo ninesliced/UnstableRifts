@@ -40,8 +40,8 @@ _Assault Rifle_
 _Rifle_
 ![Blitzer Crystal](https://raw.githubusercontent.com/ninesliced/UnstableRifts/refs/heads/main/img/weapons/blitzer_crystal.png)
 _Blitzer Crystal_
-![Hytale Blunderbuss](https://raw.githubusercontent.com/ninesliced/UnstableRifts/refs/heads/main/img/weapons/hytale_blunderbuss.png)
-_Hytale Blunderbuss_
+![Blunderbuss](https://raw.githubusercontent.com/ninesliced/UnstableRifts/refs/heads/main/img/weapons/blunderbuss.png)
+_Blunderbuss_
 
 | Weapon | Category | Damage | Cooldown | Reload | Ammo | Range | Spread | Pellets | Rarity Range | Weight |
 |--------|----------|--------|----------|--------|------|-------|--------|---------|-------------|--------|
