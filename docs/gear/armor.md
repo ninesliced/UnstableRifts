@@ -29,7 +29,7 @@ Unstable Rifts has 6 armor sets, each with 4 pieces (Head, Chest, Arms, Legs). W
 ## Crystal Set
 
 A versatile starting set with balanced stats and the Berserker ability for aggressive play.
-![Crystal Armor Set](../../img/armor/crystal_set.png)
+![Crystal Armor Set](https://raw.githubusercontent.com/ninesliced/UnstableRifts/refs/heads/main/img/armor/crystal_set.png)
 _Crystal Armor -- full set_
 | Piece | Protection | Knockback | Close Dmg Reduction | Far Dmg Reduction | Spike Dmg | Life Boost | Speed Boost |
 |-------|-----------|-----------|--------------------|--------------------|-----------|------------|-------------|
@@ -44,7 +44,7 @@ _Crystal Armor -- full set_
 ## Vine Set
 
 A durable set with the highest base protection at lower tiers and passive health regeneration.
-![Vine Armor Set](../../img/armor/vine_set.png)
+![Vine Armor Set](https://raw.githubusercontent.com/ninesliced/UnstableRifts/refs/heads/main/img/armor/vine_set.png)
 _Vine Armor -- full set_
 | Piece | Protection | Knockback | Close Dmg Reduction | Far Dmg Reduction | Spike Dmg | Life Boost | Speed Boost |
 |-------|-----------|-----------|--------------------|--------------------|-----------|------------|-------------|
@@ -59,7 +59,7 @@ _Vine Armor -- full set_
 ## Shale Set
 
 A tank set with outstanding protection and the Guardian damage shield.
-![Shale Armor Set](../../img/armor/shale_set.png)
+![Shale Armor Set](https://raw.githubusercontent.com/ninesliced/UnstableRifts/refs/heads/main/img/armor/shale_set.png)
 _Shale Armor -- full set_
 | Piece | Protection | Knockback | Close Dmg Reduction | Far Dmg Reduction | Spike Dmg | Life Boost | Speed Boost |
 |-------|-----------|-----------|--------------------|--------------------|-----------|------------|-------------|
@@ -74,7 +74,7 @@ _Shale Armor -- full set_
 ## Bone Set
 
 A lightweight set built for speed. Low protection but the highest speed bonus and Swiftness ability.
-![Bone Armor Set](../../img/armor/bone_set.png)
+![Bone Armor Set](https://raw.githubusercontent.com/ninesliced/UnstableRifts/refs/heads/main/img/armor/bone_set.png)
 _Bone Armor -- full set_
 | Piece | Protection | Knockback | Close Dmg Reduction | Far Dmg Reduction | Spike Dmg | Life Boost | Speed Boost |
 |-------|-----------|-----------|--------------------|--------------------|-----------|------------|-------------|
@@ -89,7 +89,7 @@ _Bone Armor -- full set_
 ## Void Set
 
 An end-game set with the strongest defensive stats and immunity to status effects.
-![Void Armor Set](../../img/armor/void_set.png)
+![Void Armor Set](https://raw.githubusercontent.com/ninesliced/UnstableRifts/refs/heads/main/img/armor/void_set.png)
 _Void Armor -- full set_
 | Piece | Protection | Knockback | Close Dmg Reduction | Far Dmg Reduction | Spike Dmg | Life Boost | Speed Boost |
 |-------|-----------|-----------|--------------------|--------------------|-----------|------------|-------------|
@@ -104,7 +104,7 @@ _Void Armor -- full set_
 ## Warden Set
 
 A unique combat set focused on knockback and spike damage. Reflects damage back to melee attackers.
-![Warden Armor Set](../../img/armor/warden_set.png)
+![Warden Armor Set](https://raw.githubusercontent.com/ninesliced/UnstableRifts/refs/heads/main/img/armor/warden_set.png)
 _Warden Armor -- full set_
 | Piece | Protection | Knockback | Close Dmg Reduction | Far Dmg Reduction | Spike Dmg | Life Boost | Speed Boost |
 |-------|-----------|-----------|--------------------|--------------------|-----------|------------|-------------|

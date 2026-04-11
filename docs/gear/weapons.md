@@ -30,13 +30,13 @@ In short: higher rarity = stronger weapon.
 
 ## Standard Weapons
 
-![Pistol](../../img/weapons/pistol.png)
+![Pistol](https://raw.githubusercontent.com/ninesliced/UnstableRifts/refs/heads/main/img/weapons/pistol.png)
 _Pistol_
-![Crystal Sword](../../img/weapons/crystal_sword.png)
+![Crystal Sword](https://raw.githubusercontent.com/ninesliced/UnstableRifts/refs/heads/main/img/weapons/crystal_sword.png)
 _Crystal Sword_
-![Assault Rifle](../../img/weapons/assault_rifle.png)
+![Assault Rifle](https://raw.githubusercontent.com/ninesliced/UnstableRifts/refs/heads/main/img/weapons/assault_rifle.png)
 _Assault Rifle_
-![Rifle](../../img/weapons/rifle.png)
+![Rifle](https://raw.githubusercontent.com/ninesliced/UnstableRifts/refs/heads/main/img/weapons/rifle.png)
 _Rifle_
 | Weapon | Category | Damage | Cooldown | Reload | Ammo | Range | Spread | Pellets | Rarity Range | Weight |
 |--------|----------|--------|----------|--------|------|-------|--------|---------|-------------|--------|
@@ -59,13 +59,13 @@ _Rifle_
 ## Elemental Muskets
 
 Muskets are long-range weapons with high damage. Each one always uses a fixed element.
-![Fire Musket](../../img/weapons/musket_fire.png)
+![Fire Musket](https://raw.githubusercontent.com/ninesliced/UnstableRifts/refs/heads/main/img/weapons/musket_fire.png)
 _Fire Musket_
-![Ice Musket](../../img/weapons/musket_ice.png)
+![Ice Musket](https://raw.githubusercontent.com/ninesliced/UnstableRifts/refs/heads/main/img/weapons/musket_ice.png)
 _Ice Musket_
-![Lightning Musket](../../img/weapons/musket_lightning.png)
+![Lightning Musket](https://raw.githubusercontent.com/ninesliced/UnstableRifts/refs/heads/main/img/weapons/musket_lightning.png)
 _Lightning Musket_
-![Void Musket](../../img/weapons/musket_void.png)
+![Void Musket](https://raw.githubusercontent.com/ninesliced/UnstableRifts/refs/heads/main/img/weapons/musket_void.png)
 _Void Musket_
 | Variant | Element | Damage | Cooldown | Reload | Ammo | Range | Min Rarity | Weight |
 |---------|---------|--------|----------|--------|------|-------|-----------|--------|
@@ -82,19 +82,19 @@ All muskets share the same base stats. Lightning and Void versions are rarer.
 
 Blunderbusses are close-range spread weapons that fire 8 pellets per shot. Each version has its own fixed element.
 
-![Acid Blunderbuss](../../img/weapons/blunderbuss_acid.png)
+![Acid Blunderbuss](https://raw.githubusercontent.com/ninesliced/UnstableRifts/refs/heads/main/img/weapons/blunderbuss_acid.png)
 _Acid Blunderbuss_
 
-![Fire Blunderbuss](../../img/weapons/blunderbuss_fire.png)
+![Fire Blunderbuss](https://raw.githubusercontent.com/ninesliced/UnstableRifts/refs/heads/main/img/weapons/blunderbuss_fire.png)
 _Fire Blunderbuss_
 
-![Ice Blunderbuss](../../img/weapons/blunderbuss_ice.png)
+![Ice Blunderbuss](https://raw.githubusercontent.com/ninesliced/UnstableRifts/refs/heads/main/img/weapons/blunderbuss_ice.png)
 _Ice Blunderbuss_
 
-![Lightning Blunderbuss](../../img/weapons/blunderbuss_lightning.png)
+![Lightning Blunderbuss](https://raw.githubusercontent.com/ninesliced/UnstableRifts/refs/heads/main/img/weapons/blunderbuss_lightning.png)
 _Lightning Blunderbuss_
 
-![Void Blunderbuss](../../img/weapons/blunderbuss_void.png)
+![Void Blunderbuss](https://raw.githubusercontent.com/ninesliced/UnstableRifts/refs/heads/main/img/weapons/blunderbuss_void.png)
 _Void Blunderbuss_
 
 | Variant | Element | Category | Damage | Cooldown | Reload | Ammo | Range | Spread | Min Rarity | Weight |
@@ -139,16 +139,16 @@ One of the strongest spread weapons in the game. It fires 32 pellets with both <
 
 This weapon summons a friendly Kweebec instead of shooting bullets. The summon has 36 HP, deals 12 damage, and lasts 600 ticks. Drops at Epic rarity.
 
-![Taser](../../img/weapons/taser.png)
+![Taser](https://raw.githubusercontent.com/ninesliced/UnstableRifts/refs/heads/main/img/weapons/taser.png)
 _Taser -- chains to nearby enemies_
 
-![Voidlance](../../img/weapons/voidlance.png)
+![Voidlance](https://raw.githubusercontent.com/ninesliced/UnstableRifts/refs/heads/main/img/weapons/voidlance.png)
 _Voidlance -- void-powered range weapon_
 
-![Corrupted Shotgun](../../img/weapons/corrupted_shotgun.png)
+![Corrupted Shotgun](https://raw.githubusercontent.com/ninesliced/UnstableRifts/refs/heads/main/img/weapons/corrupted_shotgun.png)
 _Corrupted Shotgun -- 32 pellets per shot_
 
-![Kweebec Launcher](../../img/weapons/kweebec_launcher.png)
+![Kweebec Launcher](https://raw.githubusercontent.com/ninesliced/UnstableRifts/refs/heads/main/img/weapons/kweebec_launcher.png)
 _Kweebec Launcher -- summons a friendly Kweebec_
 
 ---

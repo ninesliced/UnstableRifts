@@ -9,15 +9,15 @@ draft: false
 
 Crates are breakable loot boxes found in dungeon rooms. Break them to get weapons, armor, ammo, healing, and coins. Better crates show up deeper in the run.
 
-![Standard Crate](../../img/crates/crate.png)
+![Standard Crate](https://raw.githubusercontent.com/ninesliced/UnstableRifts/refs/heads/main/img/crates/crate.png)
 _Standard Crate_
-![Level 1 Crate](../../img/crates/crate.png)
+![Level 1 Crate](https://raw.githubusercontent.com/ninesliced/UnstableRifts/refs/heads/main/img/crates/crate.png)
 _Level 1 Crate_
-![Level 2 Crate](../../img/crates/crate.png)
+![Level 2 Crate](https://raw.githubusercontent.com/ninesliced/UnstableRifts/refs/heads/main/img/crates/crate.png)
 _Level 2 Crate_
-![Level 3 Crate](../../img/crates/crate.png)
+![Level 3 Crate](https://raw.githubusercontent.com/ninesliced/UnstableRifts/refs/heads/main/img/crates/crate.png)
 _Level 3 Crate_
-![Large Crate (2x2)](../../img/crates/crate.png)
+![Large Crate (2x2)](https://raw.githubusercontent.com/ninesliced/UnstableRifts/refs/heads/main/img/crates/crate.png)
 _Large Crate (2x2)_
 
 ---
@@ -123,7 +123,7 @@ The dungeon also has breakable world objects:
 |--------|-------------|
 | Radioactive Barrel | Explodes when destroyed, damaging nearby enemies |
 | Rusted Radioactive Barrel | Decayed variant, same explosion behavior |
-![Radioactive Barrels](../../img/props/radioactive_barrels.png)
+![Radioactive Barrels](https://raw.githubusercontent.com/ninesliced/UnstableRifts/refs/heads/main/img/props/radioactive_barrels.png)
 _Radioactive barrels in the dungeon_
 ---
 

@@ -9,7 +9,7 @@ draft: false
 
 Unstable Rifts is a top-down co-op dungeon mode. You and your team enter a portal, clear rooms, grab loot, visit shops, and beat the boss.
 
-![Gameplay Overview](../../img/general/gameplay_overview.png)
+![Gameplay Overview](https://raw.githubusercontent.com/ninesliced/UnstableRifts/refs/heads/main/img/general/gameplay_overview.png)
 
 ---
 
@@ -21,9 +21,9 @@ Unstable Rifts is a top-down co-op dungeon mode. You and your team enter a porta
 4. **Defeat the Boss** -- Each level ends with a boss fight. Defeat it to unlock the exit portal.
 5. **Progress or Exit** -- Step through the portal to advance to the next level or return to the lobby.
 
-![Ancient Party Portal](../../img/getting-started/ancient_party_portal.png)
-![Dungeon Entrance](../../img/getting-started/dungeon_entrance.png)
-![Top-Down Camera](../../img/getting-started/top_camera.png)
+![Ancient Party Portal](https://raw.githubusercontent.com/ninesliced/UnstableRifts/refs/heads/main/img/getting-started/ancient_party_portal.png)
+![Dungeon Entrance](https://raw.githubusercontent.com/ninesliced/UnstableRifts/refs/heads/main/img/getting-started/dungeon_entrance.png)
+![Top-Down Camera](https://raw.githubusercontent.com/ninesliced/UnstableRifts/refs/heads/main/img/getting-started/top_camera.png)
 
 ---
 

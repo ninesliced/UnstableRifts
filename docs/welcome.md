@@ -20,9 +20,9 @@ draft: false
 | **Bosses** | 1 |
 | **Enemies** | 14+ types |
 | **Website** | [curseforge.com](https://www.curseforge.com) |
-![Unstable Rifts Logo](img/general/unstablerifts_logo.png)
+![Unstable Rifts Logo](https://raw.githubusercontent.com/ninesliced/UnstableRifts/refs/heads/main/img/general/unstablerifts_logo.png)
 _Unstable Rifts -- roguelike shooter in Hytale_
-![Gameplay Overview](img/general/gameplay_overview.png)
+![Gameplay Overview](https://raw.githubusercontent.com/ninesliced/UnstableRifts/refs/heads/main/img/general/gameplay_overview.png)
 _Top-down dungeon gameplay with a party of 4_
 ---
 

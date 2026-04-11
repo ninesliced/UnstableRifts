@@ -9,9 +9,9 @@ draft: false
 
 Unstable Rifts is built for co-op. The party system lets you team up with up to 3 other players before entering the dungeon.
 
-![Party UI](../../img/party/party_ui.png)
+![Party UI](https://raw.githubusercontent.com/ninesliced/UnstableRifts/refs/heads/main/img/party/party_ui.png)
 _Party management UI showing member list and controls_
-![Party Portal](../../img/getting-started/ancient_party_portal.png)
+![Party Portal](https://raw.githubusercontent.com/ninesliced/UnstableRifts/refs/heads/main/img/getting-started/ancient_party_portal.png)
 _Ancient Party Portal -- used to create a party_
 
 ---

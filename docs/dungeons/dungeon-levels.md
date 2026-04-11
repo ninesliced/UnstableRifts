@@ -9,9 +9,9 @@ draft: false
 
 Each run builds a fresh dungeon layout. Rooms connect with corridors, side paths, locked doors, and special rooms. No two runs are exactly the same.
 
-![Dungeon Generation Example](../../img/dungeons/dungeon_generation.png)
+![Dungeon Generation Example](https://raw.githubusercontent.com/ninesliced/UnstableRifts/refs/heads/main/img/dungeons/dungeon_generation.png)
 _Example of a procedurally generated dungeon layout_
-![Dungeon Map View](../../img/dungeons/dungeon_map.png)
+![Dungeon Map View](https://raw.githubusercontent.com/ninesliced/UnstableRifts/refs/heads/main/img/dungeons/dungeon_map.png)
 _In-game dungeon map showing explored rooms_
 
 ---
@@ -19,9 +19,9 @@ _In-game dungeon map showing explored rooms_
 ## Level 1: Kweebec
 
 A corrupted forest full of DeadWood enemies and radioactive wildlife.
-![Kweebec Entrance](../../img/dungeons/kweebec_entrance.png)
+![Kweebec Entrance](https://raw.githubusercontent.com/ninesliced/UnstableRifts/refs/heads/main/img/dungeons/kweebec_entrance.png)
 _The Kweebec level entrance room_
-![Kweebec Combat](../../img/dungeons/kweebec_combat.png)
+![Kweebec Combat](https://raw.githubusercontent.com/ninesliced/UnstableRifts/refs/heads/main/img/dungeons/kweebec_combat.png)
 _Fighting DeadWood mobs in the Kweebec level_
 
 ### Layout
@@ -73,9 +73,9 @@ The Kweebec level includes themed environmental props:
 | Ruined Kweebec Stool | Broken stool |
 | Ruined Kweebec Table | Damaged table |
 | Ruined Kweebec Wardrobe | Ruined wardrobe |
-![Kweebec Props](../../img/props/kweebec_props.png)
+![Kweebec Props](https://raw.githubusercontent.com/ninesliced/UnstableRifts/refs/heads/main/img/props/kweebec_props.png)
 _Ruined Kweebec furniture props in a dungeon room_
-![Radioactive Barrels](../../img/props/radioactive_barrels.png)
+![Radioactive Barrels](https://raw.githubusercontent.com/ninesliced/UnstableRifts/refs/heads/main/img/props/radioactive_barrels.png)
 _Radioactive barrels -- breakable environmental hazards_
 ---
 
@@ -130,11 +130,11 @@ All Kweebec enemies can also appear in Desert. Desert side paths are longer and 
 | Activation Door | Opens when a nearby trigger is activated |
 | Lock Door | Locked until a specific condition is met |
 | Sealed Door | Permanently sealed passage |
-![Challenge Room](../../img/dungeons/challenge_room.png)
+![Challenge Room](https://raw.githubusercontent.com/ninesliced/UnstableRifts/refs/heads/main/img/dungeons/challenge_room.png)
 _A challenge room with mob spawners_
-![Treasure Room](../../img/dungeons/treasure_room.png)
+![Treasure Room](https://raw.githubusercontent.com/ninesliced/UnstableRifts/refs/heads/main/img/dungeons/treasure_room.png)
 _A treasure room behind a key door_
-![Shop Room](../../img/dungeons/shop_room.png)
+![Shop Room](https://raw.githubusercontent.com/ninesliced/UnstableRifts/refs/heads/main/img/dungeons/shop_room.png)
 _Shop room with the shopkeeper NPC_
 ---
 
