@@ -33,19 +33,16 @@ This page covers everything a server owner needs to set up and configure Unstabl
 
 ## Configuration Files
 
-The mod is fully data-driven. All configuration files are located in `src/main/resources/` and require a server restart to apply changes.
+The mod creates and uses its runtime files inside the `UnstableRifts` folder.
 
 | File | Purpose |
 |------|---------|
-| `dungeon.json` | Level layout, room counts, mob pools, branch configuration |
-| `weapon_registry.json` | All weapon definitions, stats, and rarity ranges |
-| `armor_registry.json` | All armor definitions, set bonuses, and stat values |
-| `crate_loot.json` | Crate drop tables, weapon whitelists, rarity bounds |
-| `destructible_blocks.json` | Breakable block definitions and crate tier mapping |
+| `dungeon.json` | Main dungeon configuration used by the mod |
+| `saves/playerUID` | Per-player save data created by the mod |
 
 ### dungeon.json
 
-Controls the dungeon structure. Key settings:
+Controls the dungeon structure.
 
 | Setting | Description |
 |---------|-------------|
@@ -70,56 +67,18 @@ Each level contains:
 | `branch.maxRooms` | Max rooms per branch |
 | `mobs` | Weighted mob pool (mob ID to spawn weight) |
 
-### weapon_registry.json
+### saves/playerUID
 
-Each weapon entry includes:
+Stores per-player save data. A file is created for each player UID.
 
-| Field | Description |
-|-------|-------------|
-| `itemId` | Item ID registered in the server |
-| `displayName` | Name shown to players |
-| `category` | LASER, BULLET, MELEE, or SUMMONING |
-| `damage` | Base damage per hit |
-| `cooldown` | Seconds between shots |
-| `reloadTime` | Seconds to reload |
-| `maxAmmo` | Maximum ammunition |
-| `range` | Maximum effective range |
-| `spread` | Projectile spread angle |
-| `pellets` | Projectiles per shot |
-| `minRarity` / `maxRarity` | Rarity range for drops |
-| `spawnWeight` | Relative drop frequency weight |
-| `lockedEffect` | Fixed elemental effect (if any) |
+Typical data includes:
 
-### armor_registry.json
+| Data | Description |
+|------|-------------|
+| Progress state | Run/session-related player state |
+| Restorable values | Data needed when reconnecting/restoring player state |
 
-Each armor entry includes:
-
-| Field | Description |
-|-------|-------------|
-| `itemId` | Item ID registered in the server |
-| `setId` | Armor set group identifier |
-| `slot` | HELMET, CHESTPLATE, LEGGINGS, or BOOTS |
-| `protection` | Base protection value |
-| `setAbility` | Ability granted when full set is worn |
-| `minRarity` / `maxRarity` | Rarity range for drops |
-| `spawnWeight` | Relative drop frequency weight |
-| Additional stats | knockback, closeDamageReduction, farDamageReduction, spikeDamage, lifeBoost, speedBoost |
-
-### crate_loot.json
-
-Each crate tier entry includes:
-
-| Field | Description |
-|-------|-------------|
-| `crateId` | Block ID of the crate |
-| `minRarity` / `maxRarity` | Rarity bounds for rolled items |
-| `weaponChance` | Percentage chance to drop a weapon |
-| `armorChance` | Percentage chance to drop armor |
-| `coinMin` / `coinMax` | Coin drop range |
-| `ammoChance` | Percentage chance for ammo |
-| `healChance` | Percentage chance for healing |
-| `weaponWhitelist` | List of weapon IDs eligible to drop |
-| `armorWhitelist` | List of armor IDs eligible to drop |
+> **Note:** Keep this folder intact to preserve player progress.
 
 ---
 
@@ -171,6 +130,6 @@ Understanding the instance lifecycle helps with debugging and monitoring:
 
 ## Related Pages
 
-- [Commands](commands.md) -- Full command reference (player and admin)
-- [Dungeon Levels](dungeon-levels.md) -- Level configuration details
-- [Loot and Crates](loot-crates.md) -- Crate loot configuration
+- [Commands](commands) -- Full command reference (player and admin)
+- [Dungeon Levels](dungeon-levels) -- Level configuration details
+- [Loot and Crates](loot-crates) -- Crate loot configuration

@@ -31,30 +31,30 @@ _Top-down dungeon gameplay with a party of 4_
 ## Wiki Pages
 
 ### Getting Started
-#### [Getting Started](getting-started.md)
+#### [Getting Started](getting-started)
 How to play, starting equipment, and basic gameplay loop.
-#### [Installation](installation.md)
+#### [Installation](installation)
 Server setup, requirements, configuration files, and admin tools.
-#### [Commands](commands.md)
+#### [Commands](commands)
 Full command reference for players and server administrators.
 ### Gear and Loot
-#### [Weapons](weapons.md)
+#### [Weapons](weapons)
 All 19 weapons -- stats, rarities, elemental effects, and categories.
-#### [Armor Sets](armor.md)
+#### [Armor Sets](armor)
 6 armor sets, set abilities, stat breakdowns, and rarity ranges.
-#### [Loot and Crates](loot-crates.md)
+#### [Loot and Crates](loot-crates)
 Crate tiers, drop tables, weapon and armor pool details.
 ### Dungeons and Combat
-#### [Dungeon Levels](dungeon-levels.md)
+#### [Dungeon Levels](dungeon-levels)
 Level layouts, room types, mob pools, and generation details.
-#### [Enemies and Bosses](enemies-bosses.md)
+#### [Enemies and Bosses](enemies-bosses)
 All enemy types, boss mechanics, attack patterns, and ally NPCs.
-#### [Shops](shops.md)
+#### [Shops](shops)
 In-dungeon shops, purchasing, and available items.
 ### Systems
-#### [Party System](party-system.md)
+#### [Party System](party-system)
 Party creation, invites, privacy, reconnection, and shared resources.
-#### [HUD and Interface](hud-interface.md)
+#### [HUD and Interface](hud-interface)
 All HUD elements -- ammo, boss health, party status, revive prompts, and map.
 ---
 Unstable Rifts v1.0.0 -- by Theobosse and Paralaxe -- [curseforge.com](https://www.curseforge.com)

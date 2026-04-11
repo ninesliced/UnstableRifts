@@ -85,7 +85,7 @@ Some shop rooms include a refresh option that regenerates the available item sto
 
 ## Related Pages
 
-- [Weapons](weapons.md) -- Weapon stats and rarity tiers
-- [Armor Sets](armor.md) -- Armor stats and set bonuses
-- [Getting Started](getting-started.md) -- Coin economy basics
-- [Dungeon Levels](dungeon-levels.md) -- Shop room placement
+- [Weapons](weapons) -- Weapon stats and rarity tiers
+- [Armor Sets](armor) -- Armor stats and set bonuses
+- [Getting Started](getting-started) -- Coin economy basics
+- [Dungeon Levels](dungeon-levels) -- Shop room placement

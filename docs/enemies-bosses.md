@@ -215,7 +215,7 @@ _Friendly Kweebec Seedling -- summoned by the Kweebec Launcher_
 
 ## Related Pages
 
-- [Dungeon Levels](dungeon-levels.md) -- Where each enemy spawns
-- [Weapons](weapons.md) -- What to fight them with
-- [Loot and Crates](loot-crates.md) -- Enemy and crate drop tables
-- [Getting Started](getting-started.md) -- Combat basics
+- [Dungeon Levels](dungeon-levels) -- Where each enemy spawns
+- [Weapons](weapons) -- What to fight them with
+- [Loot and Crates](loot-crates) -- Enemy and crate drop tables
+- [Getting Started](getting-started) -- Combat basics

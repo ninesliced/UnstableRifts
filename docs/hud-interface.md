@@ -100,7 +100,7 @@ _Minimap view in the corner of the screen_
 
 ## Related Pages
 
-- [Getting Started](getting-started.md) -- Camera controls and basics
-- [Party System](party-system.md) -- Party status details
-- [Enemies and Bosses](enemies-bosses.md) -- Boss health bar context
-- [Dungeon Levels](dungeon-levels.md) -- Room types shown on the map
+- [Getting Started](getting-started) -- Camera controls and basics
+- [Party System](party-system) -- Party status details
+- [Enemies and Bosses](enemies-bosses) -- Boss health bar context
+- [Dungeon Levels](dungeon-levels) -- Room types shown on the map

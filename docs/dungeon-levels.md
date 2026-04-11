@@ -171,7 +171,7 @@ Each run creates a unique layout by:
 
 ## Related Pages
 
-- [Enemies and Bosses](enemies-bosses.md) -- Detailed enemy stats and boss mechanics
-- [Loot and Crates](loot-crates.md) -- What drops in each level
-- [Shops](shops.md) -- In-dungeon shop mechanics
-- [HUD and Interface](hud-interface.md) -- Dungeon map and minimap features
+- [Enemies and Bosses](enemies-bosses) -- Detailed enemy stats and boss mechanics
+- [Loot and Crates](loot-crates) -- What drops in each level
+- [Shops](shops) -- In-dungeon shop mechanics
+- [HUD and Interface](hud-interface) -- Dungeon map and minimap features

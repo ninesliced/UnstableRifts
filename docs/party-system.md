@@ -104,6 +104,6 @@ When the leader starts the run:
 
 ## Related Pages
 
-- [Commands](commands.md) -- Full command reference
-- [Getting Started](getting-started.md) -- How to play
-- [HUD and Interface](hud-interface.md) -- Party status HUD elements
+- [Commands](commands) -- Full command reference
+- [Getting Started](getting-started) -- How to play
+- [HUD and Interface](hud-interface) -- Party status HUD elements

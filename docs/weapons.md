@@ -153,7 +153,7 @@ _Kweebec Launcher -- summons a friendly Kweebec_
 
 ## Related Pages
 
-- [Getting Started](getting-started.md) -- Starting equipment and basics
-- [Armor Sets](armor.md) -- Defensive gear and set bonuses
-- [Loot and Crates](loot-crates.md) -- Where to find weapons
-- [Enemies and Bosses](enemies-bosses.md) -- What you'll be fighting
+- [Getting Started](getting-started) -- Starting equipment and basics
+- [Armor Sets](armor) -- Defensive gear and set bonuses
+- [Loot and Crates](loot-crates) -- Where to find weapons
+- [Enemies and Bosses](enemies-bosses) -- What you'll be fighting
