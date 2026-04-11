@@ -101,11 +101,12 @@ The mod ships with its own assets, so players can jump in and start using the ne
 ## Credits
 
 - **Created by:** Theobosse and Paralaxe
-- **Builds:** Palomote72
+- **Builds by:** Palomote72
 - **NPC Design:** That_Worm and TheCommando315
 - **NPC animations:** TheCommanddo315 and danilerts
 - **Custom Weapons:** kill_dill
 - **Props and items:** Sylano
+- **Other:** Xenap
 - **Team:** [Ninesliced](https://ninesliced.com/)
 
 ---
