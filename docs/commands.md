@@ -1,12 +1,11 @@
 ---
-title: Commands
-description: Full command reference for Unstable Rifts
+title: "Commands"
+order: 4
+published: true
+draft: false
 ---
 
-<style>
-:root { --ur-accent: #bb2f2c; --ur-border: #2a2a4a; --ur-text-muted: #8892a4; }
-.ur-info-card { border-left: 3px solid var(--ur-accent); padding: 10px 16px; margin: 14px 0; background: rgba(187,47,44,0.05); border-radius: 0 4px 4px 0; }
-</style>
+
 
 # Commands
 
@@ -32,12 +31,7 @@ All commands use the base command `/unstablerifts` with the alias `/ur`.
 | `/ur party list` | -- | Display all available public parties |
 | `/ur party start` | -- | Launch party into a dungeon instance (leader only) |
 | `/ur party ui` | -- | Open the party management UI |
-
-<div class="ur-info-card">
-
 **Note:** Party invites expire after 5 minutes. The maximum party size is 4 players.
-</div>
-
 ### Dungeon Commands
 
 | Command | Arguments | Description |

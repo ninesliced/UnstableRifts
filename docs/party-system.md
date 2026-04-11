@@ -1,31 +1,19 @@
 ---
-title: Party System
-description: Party creation, management, and multiplayer features in Unstable Rifts
+title: "Party System"
+order: 10
+published: true
+draft: false
 ---
 
-<style>
-:root { --ur-accent: #bb2f2c; --ur-border: #2a2a4a; --ur-text-muted: #8892a4; }
-.ur-gallery { display: flex; flex-wrap: wrap; gap: 12px; margin: 16px 0; } .ur-gallery figure { flex: 1 1 200px; max-width: 320px; margin: 0; text-align: center; } .ur-gallery figure img { width: 100%; border-radius: 6px; border: 1px solid var(--ur-border); } .ur-gallery figure figcaption { font-size: 0.82em; color: var(--ur-text-muted); margin-top: 4px; }
-.ur-info-card { border-left: 3px solid var(--ur-accent); padding: 10px 16px; margin: 14px 0; background: rgba(187,47,44,0.05); border-radius: 0 4px 4px 0; }
-</style>
+
 
 # Party System
 
 Unstable Rifts is designed for cooperative play. The party system lets you team up with up to 3 other players before entering the dungeon.
-
-<div class="ur-gallery">
-<figure>
-
 ![Party UI](images/party/party_ui.png)
-<figcaption>Party management UI showing member list and controls</figcaption>
-</figure>
-<figure>
-
+_Party management UI showing member list and controls_
 ![Party Portal](images/party/party_portal.png)
-<figcaption>Ancient Party Portal -- used to create a party</figcaption>
-</figure>
-</div>
-
+_Ancient Party Portal -- used to create a party_
 ---
 
 ## Quick Start
@@ -99,12 +87,7 @@ When the leader starts the run:
 2. Each player's return position is saved for after the run
 3. Starting equipment is distributed (Pistol + Crystal Sword)
 4. The dungeon begins generating
-
-<div class="ur-info-card">
-
 **Note:** Only online members are teleported. Disconnected members will be teleported when they reconnect.
-</div>
-
 ---
 
 ## Party Lifecycle

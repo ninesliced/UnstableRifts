@@ -1,31 +1,19 @@
 ---
-title: Shops
-description: In-dungeon shop mechanics and purchases in Unstable Rifts
+title: "Shops"
+order: 11
+published: true
+draft: false
 ---
 
-<style>
-:root { --ur-accent: #bb2f2c; --ur-border: #2a2a4a; --ur-text-muted: #8892a4; }
-.ur-gallery { display: flex; flex-wrap: wrap; gap: 12px; margin: 16px 0; } .ur-gallery figure { flex: 1 1 200px; max-width: 320px; margin: 0; text-align: center; } .ur-gallery figure img { width: 100%; border-radius: 6px; border: 1px solid var(--ur-border); } .ur-gallery figure figcaption { font-size: 0.82em; color: var(--ur-text-muted); margin-top: 4px; }
-.ur-info-card { border-left: 3px solid var(--ur-accent); padding: 10px 16px; margin: 14px 0; background: rgba(187,47,44,0.05); border-radius: 0 4px 4px 0; }
-</style>
+
 
 # Shops
 
 Each dungeon level contains one shop room with a shopkeeper NPC. Shops are safe zones -- no enemies will spawn in a shop room.
-
-<div class="ur-gallery">
-<figure>
-
 ![Shop Room](images/shop/shop_room.png)
-<figcaption>A shop room with the shopkeeper NPC and displayed items</figcaption>
-</figure>
-<figure>
-
+_A shop room with the shopkeeper NPC and displayed items_
 ![Shop UI](images/shop/shop_ui.png)
-<figcaption>Shop purchase interface showing item details</figcaption>
-</figure>
-</div>
-
+_Shop purchase interface showing item details_
 ---
 
 ## How to Buy
@@ -83,12 +71,7 @@ Some shop rooms include a refresh option that regenerates the available item sto
 | Refresh Cost | Costs team coins (varies by room) |
 | Effect | Regenerates all unsold items with new random rolls |
 | Limit | Available based on room configuration |
-
-<div class="ur-info-card">
-
 **Tip:** If the shop doesn't have the weapon or armor you need, try refreshing the stock. The refresh re-rolls all items, including their rarity and elemental effects.
-</div>
-
 ---
 
 ## Shop Details

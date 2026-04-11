@@ -1,14 +1,11 @@
 ---
-title: Weapons
-description: Complete weapon guide for Unstable Rifts
+title: "Weapons"
+order: 6
+published: true
+draft: false
 ---
 
-<style>
-:root { --ur-accent: #bb2f2c; --ur-border: #2a2a4a; --ur-text-muted: #8892a4; }
-.ur-gallery { display: flex; flex-wrap: wrap; gap: 12px; margin: 16px 0; } .ur-gallery figure { flex: 1 1 200px; max-width: 320px; margin: 0; text-align: center; } .ur-gallery figure img { width: 100%; border-radius: 6px; border: 1px solid var(--ur-border); } .ur-gallery figure figcaption { font-size: 0.82em; color: var(--ur-text-muted); margin-top: 4px; }
-.ur-info-card { border-left: 3px solid var(--ur-accent); padding: 10px 16px; margin: 14px 0; background: rgba(187,47,44,0.05); border-radius: 0 4px 4px 0; }
-span.rarity-basic { background:#9e9e9e;color:#fff;padding:2px 8px;border-radius:4px;font-size:0.85em; } span.rarity-uncommon { background:#4caf50;color:#fff;padding:2px 8px;border-radius:4px;font-size:0.85em; } span.rarity-rare { background:#2196f3;color:#fff;padding:2px 8px;border-radius:4px;font-size:0.85em; } span.rarity-epic { background:#9c27b0;color:#fff;padding:2px 8px;border-radius:4px;font-size:0.85em; } span.rarity-legendary { background:#ff9800;color:#fff;padding:2px 8px;border-radius:4px;font-size:0.85em; } span.rarity-unique { background:#e91e63;color:#fff;padding:2px 8px;border-radius:4px;font-size:0.85em; }
-</style>
+
 
 # Weapons
 
@@ -34,30 +31,14 @@ Higher rarity increases damage, ammo capacity, and reload speed.
 ---
 
 ## Standard Weapons
-
-<div class="ur-gallery">
-<figure>
-
 ![Pistol](images/weapons/pistol.png)
-<figcaption>Pistol</figcaption>
-</figure>
-<figure>
-
+_Pistol_
 ![Crystal Sword](images/weapons/crystal_sword.png)
-<figcaption>Crystal Sword</figcaption>
-</figure>
-<figure>
-
+_Crystal Sword_
 ![Assault Rifle](images/weapons/assault_rifle.png)
-<figcaption>Assault Rifle</figcaption>
-</figure>
-<figure>
-
+_Assault Rifle_
 ![Rifle](images/weapons/rifle.png)
-<figcaption>Rifle</figcaption>
-</figure>
-</div>
-
+_Rifle_
 | Weapon | Category | Damage | Cooldown | Reload | Ammo | Range | Spread | Pellets | Rarity Range | Weight |
 |--------|----------|--------|----------|--------|------|-------|--------|---------|-------------|--------|
 | Pistol | LASER | 14 | 0.2s | 0.7s | 120 | 45 | 0 | 1 | <span class="rarity-basic">Basic</span> | 20 |
@@ -70,41 +51,20 @@ Higher rarity increases damage, ammo capacity, and reload speed.
 | Voidlance | BULLET | -- | 1.2s | 1.4s | 100 | 40 | 0 | 1 | <span class="rarity-epic">Epic</span> | 5 |
 | Corrupted Shotgun | BULLET | 5 | 2.2s | 2.2s | 60 | 20 | 34.0 | 32 | <span class="rarity-epic">Epic</span> -- <span class="rarity-unique">Unique</span> | 3 |
 | Kweebec Launcher | SUMMON | -- | 1.5s | 3.0s | 50 | 30 | 0 | 1 | <span class="rarity-epic">Epic</span> | 15 |
-
-<div class="ur-info-card">
-
 **Crystal Sword** is always available as starting equipment. It uses no ammo and has a built-in knockback of 1.5.
-</div>
-
 ---
 
 ## Elemental Muskets
 
 Muskets are long-range, high-damage laser weapons. Each variant is locked to a specific element.
-
-<div class="ur-gallery">
-<figure>
-
 ![Fire Musket](images/weapons/musket_fire.png)
-<figcaption>Fire Musket</figcaption>
-</figure>
-<figure>
-
+_Fire Musket_
 ![Ice Musket](images/weapons/musket_ice.png)
-<figcaption>Ice Musket</figcaption>
-</figure>
-<figure>
-
+_Ice Musket_
 ![Lightning Musket](images/weapons/musket_lightning.png)
-<figcaption>Lightning Musket</figcaption>
-</figure>
-<figure>
-
+_Lightning Musket_
 ![Void Musket](images/weapons/musket_void.png)
-<figcaption>Void Musket</figcaption>
-</figure>
-</div>
-
+_Void Musket_
 | Variant | Element | Damage | Cooldown | Reload | Ammo | Range | Min Rarity | Weight |
 |---------|---------|--------|----------|--------|------|-------|-----------|--------|
 | Musket (Fire) | FIRE | 26 | 1.4s | 1.25s | 50 | 60 | <span class="rarity-rare">Rare</span> | 5 |
@@ -119,35 +79,16 @@ All muskets share identical base stats. The Lightning and Void variants are hard
 ## Elemental Blunderbusses
 
 Blunderbusses are short-range spread weapons that fire 8 pellets per shot. Each variant has a locked element.
-
-<div class="ur-gallery">
-<figure>
-
 ![Acid Blunderbuss](images/weapons/blunderbuss_acid.png)
-<figcaption>Acid Blunderbuss</figcaption>
-</figure>
-<figure>
-
+_Acid Blunderbuss_
 ![Fire Blunderbuss](images/weapons/blunderbuss_fire.png)
-<figcaption>Fire Blunderbuss</figcaption>
-</figure>
-<figure>
-
+_Fire Blunderbuss_
 ![Ice Blunderbuss](images/weapons/blunderbuss_ice.png)
-<figcaption>Ice Blunderbuss</figcaption>
-</figure>
-<figure>
-
+_Ice Blunderbuss_
 ![Lightning Blunderbuss](images/weapons/blunderbuss_lightning.png)
-<figcaption>Lightning Blunderbuss</figcaption>
-</figure>
-<figure>
-
+_Lightning Blunderbuss_
 ![Void Blunderbuss](images/weapons/blunderbuss_void.png)
-<figcaption>Void Blunderbuss</figcaption>
-</figure>
-</div>
-
+_Void Blunderbuss_
 | Variant | Element | Category | Damage | Cooldown | Reload | Ammo | Range | Spread | Min Rarity | Weight |
 |---------|---------|----------|--------|----------|--------|------|-------|--------|-----------|--------|
 | Blunderbuss (Acid) | ACID | LASER | 8 | 1.05s | 1.25s | 60 | 24 | 14.0 | <span class="rarity-rare">Rare</span> | 5 |
@@ -155,12 +96,7 @@ Blunderbusses are short-range spread weapons that fire 8 pellets per shot. Each 
 | Blunderbuss (Ice) | ICE | LASER | 8 | 1.05s | 1.25s | 60 | 24 | 14.0 | <span class="rarity-epic">Epic</span> | 5 |
 | Blunderbuss (Lightning) | ELECTRICITY | LASER | 8 | 1.05s | 1.25s | 60 | 24 | 14.0 | <span class="rarity-epic">Epic</span> | 5 |
 | Blunderbuss (Void) | VOID | BULLET | 8 | 1.05s | 1.25s | 60 | 24 | 14.0 | <span class="rarity-epic">Epic</span> | 5 |
-
-<div class="ur-info-card">
-
 **Note:** The Void Blunderbuss is categorized as BULLET, unlike the other elemental blunderbusses which are LASER.
-</div>
-
 ---
 
 ## Elemental Effects
@@ -194,30 +130,14 @@ The most destructive spread weapon in the game. Fires 32 pellets per shot with b
 ### Kweebec Launcher
 
 A summoning weapon that spawns a friendly Kweebec ally instead of firing projectiles. The summoned Kweebec has 36 HP, deals 12 damage, and persists for 600 ticks. Only drops at Epic rarity.
-
-<div class="ur-gallery">
-<figure>
-
 ![Taser](images/weapons/taser.png)
-<figcaption>Taser -- chains to nearby enemies</figcaption>
-</figure>
-<figure>
-
+_Taser -- chains to nearby enemies_
 ![Voidlance](images/weapons/voidlance.png)
-<figcaption>Voidlance -- void-powered range weapon</figcaption>
-</figure>
-<figure>
-
+_Voidlance -- void-powered range weapon_
 ![Corrupted Shotgun](images/weapons/corrupted_shotgun.png)
-<figcaption>Corrupted Shotgun -- 32 pellets per shot</figcaption>
-</figure>
-<figure>
-
+_Corrupted Shotgun -- 32 pellets per shot_
 ![Kweebec Launcher](images/weapons/kweebec_launcher.png)
-<figcaption>Kweebec Launcher -- summons a friendly Kweebec</figcaption>
-</figure>
-</div>
-
+_Kweebec Launcher -- summons a friendly Kweebec_
 ---
 
 ## Weapon Categories

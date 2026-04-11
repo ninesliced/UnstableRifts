@@ -1,12 +1,11 @@
 ---
-title: Installation
-description: Server setup and configuration for Unstable Rifts
+title: "Installation"
+order: 3
+published: true
+draft: false
 ---
 
-<style>
-:root { --ur-accent: #bb2f2c; --ur-border: #2a2a4a; --ur-text-muted: #8892a4; }
-.ur-info-card { border-left: 3px solid var(--ur-accent); padding: 10px 16px; margin: 14px 0; background: rgba(187,47,44,0.05); border-radius: 0 4px 4px 0; }
-</style>
+
 
 # Installation
 
@@ -29,12 +28,7 @@ This page covers everything a server owner needs to set up and configure Unstabl
 1. Download the latest `.jar` from the releases page.
 2. Place it in your server's `mods/` directory.
 3. Restart the server. The mod auto-registers all assets and configurations.
-
-<div class="ur-info-card">
-
 **Note:** The mod includes its own asset pack. No additional downloads or manual asset installation is required.
-</div>
-
 ---
 
 ## Configuration Files

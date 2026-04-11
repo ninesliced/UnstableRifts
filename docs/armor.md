@@ -1,14 +1,9 @@
 ---
-title: Armor Sets
-description: All armor sets, stats, and set bonuses in Unstable Rifts
+title: "Armor Sets"
+order: 7
+published: true
+draft: false
 ---
-
-<style>
-:root { --ur-accent: #bb2f2c; --ur-border: #2a2a4a; --ur-text-muted: #8892a4; }
-.ur-gallery { display: flex; flex-wrap: wrap; gap: 12px; margin: 16px 0; } .ur-gallery figure { flex: 1 1 200px; max-width: 320px; margin: 0; text-align: center; } .ur-gallery figure img { width: 100%; border-radius: 6px; border: 1px solid var(--ur-border); } .ur-gallery figure figcaption { font-size: 0.82em; color: var(--ur-text-muted); margin-top: 4px; }
-.ur-info-card { border-left: 3px solid var(--ur-accent); padding: 10px 16px; margin: 14px 0; background: rgba(187,47,44,0.05); border-radius: 0 4px 4px 0; }
-span.rarity-basic { background:#9e9e9e;color:#fff;padding:2px 8px;border-radius:4px;font-size:0.85em; } span.rarity-uncommon { background:#4caf50;color:#fff;padding:2px 8px;border-radius:4px;font-size:0.85em; } span.rarity-rare { background:#2196f3;color:#fff;padding:2px 8px;border-radius:4px;font-size:0.85em; } span.rarity-unique { background:#e91e63;color:#fff;padding:2px 8px;border-radius:4px;font-size:0.85em; } span.rarity-legendary { background:#ff9800;color:#fff;padding:2px 8px;border-radius:4px;font-size:0.85em; }
-</style>
 
 # Armor Sets
 
@@ -20,32 +15,24 @@ Unstable Rifts has 6 armor sets, each with 4 pieces (Head, Chest, Arms, Legs). W
 
 | Set | Ability | Effect | Rarity Range | Weight |
 |-----|---------|--------|-------------|--------|
-| Crystal | BERSERKER | Increased damage output when low on health | <span class="rarity-basic">Basic</span> -- <span class="rarity-legendary">Legendary</span> | 15 |
-| Vine | REGENERATION | Passive health regeneration over time | <span class="rarity-basic">Basic</span> -- <span class="rarity-legendary">Legendary</span> | 15 |
-| Shale | GUARDIAN | Damage absorption shield that blocks incoming hits | <span class="rarity-uncommon">Uncommon</span> -- <span class="rarity-unique">Unique</span> | 12 |
-| Bone | SWIFTNESS | Increased movement speed | <span class="rarity-uncommon">Uncommon</span> -- <span class="rarity-unique">Unique</span> | 12 |
-| Void | PURIFICATION | Immune to negative status effects | <span class="rarity-rare">Rare</span> -- <span class="rarity-unique">Unique</span> | 10 |
-| Warden | WARDEN | Reflects damage back to attackers + high knockback | <span class="rarity-rare">Rare</span> -- <span class="rarity-unique">Unique</span> | 10 |
 
-<div class="ur-info-card">
+| Crystal | BERSERKER | Increased damage output when low on health | Basic -- Legendary | 15 |
+| Vine | REGENERATION | Passive health regeneration over time | Basic -- Legendary | 15 |
+| Shale | GUARDIAN | Damage absorption shield that blocks incoming hits | Uncommon -- Unique | 12 |
+| Bone | SWIFTNESS | Increased movement speed | Uncommon -- Unique | 12 |
+| Void | PURIFICATION | Immune to negative status effects | Rare -- Unique | 10 |
+| Warden | WARDEN | Reflects damage back to attackers + high knockback | Rare -- Unique | 10 |
 
-**Tip:** Mix and match pieces from different sets if you need the individual stats, but you'll lose the set bonus. Full sets are always stronger when synergized with the right weapons.
-</div>
+
+> **Tip:** Mix and match pieces from different sets if you need the individual stats, but you'll lose the set bonus. Full sets are always stronger when synergized with the right weapons.
 
 ---
 
 ## Crystal Set
 
 A versatile starting set with balanced stats and the Berserker ability for aggressive play.
-
-<div class="ur-gallery">
-<figure>
-
 ![Crystal Armor Set](images/armor/crystal_set.png)
-<figcaption>Crystal Armor -- full set</figcaption>
-</figure>
-</div>
-
+_Crystal Armor -- full set_
 | Piece | Protection | Knockback | Close Dmg Reduction | Far Dmg Reduction | Spike Dmg | Life Boost | Speed Boost |
 |-------|-----------|-----------|--------------------|--------------------|-----------|------------|-------------|
 | Crystal Helmet | 6 | 0 | 0% | 4% | 0 | 0 | 0% |
@@ -59,15 +46,8 @@ A versatile starting set with balanced stats and the Berserker ability for aggre
 ## Vine Set
 
 A durable set with the highest base protection at lower tiers and passive health regeneration.
-
-<div class="ur-gallery">
-<figure>
-
 ![Vine Armor Set](images/armor/vine_set.png)
-<figcaption>Vine Armor -- full set</figcaption>
-</figure>
-</div>
-
+_Vine Armor -- full set_
 | Piece | Protection | Knockback | Close Dmg Reduction | Far Dmg Reduction | Spike Dmg | Life Boost | Speed Boost |
 |-------|-----------|-----------|--------------------|--------------------|-----------|------------|-------------|
 | Vine Crown | 8 | 0 | 0% | 5% | 0 | 0 | 0% |
@@ -81,15 +61,8 @@ A durable set with the highest base protection at lower tiers and passive health
 ## Shale Set
 
 A tank set with outstanding protection and the Guardian damage shield.
-
-<div class="ur-gallery">
-<figure>
-
 ![Shale Armor Set](images/armor/shale_set.png)
-<figcaption>Shale Armor -- full set</figcaption>
-</figure>
-</div>
-
+_Shale Armor -- full set_
 | Piece | Protection | Knockback | Close Dmg Reduction | Far Dmg Reduction | Spike Dmg | Life Boost | Speed Boost |
 |-------|-----------|-----------|--------------------|--------------------|-----------|------------|-------------|
 | Shale Helmet | 10 | 0 | 0% | 7% | 0 | 0 | 0% |
@@ -103,15 +76,8 @@ A tank set with outstanding protection and the Guardian damage shield.
 ## Bone Set
 
 A lightweight set built for speed. Low protection but the highest speed bonus and Swiftness ability.
-
-<div class="ur-gallery">
-<figure>
-
 ![Bone Armor Set](images/armor/bone_set.png)
-<figcaption>Bone Armor -- full set</figcaption>
-</figure>
-</div>
-
+_Bone Armor -- full set_
 | Piece | Protection | Knockback | Close Dmg Reduction | Far Dmg Reduction | Spike Dmg | Life Boost | Speed Boost |
 |-------|-----------|-----------|--------------------|--------------------|-----------|------------|-------------|
 | Bone Visor | 7 | 0 | 0% | 5% | 0 | 0 | 0% |
@@ -125,15 +91,8 @@ A lightweight set built for speed. Low protection but the highest speed bonus an
 ## Void Set
 
 An end-game set with the strongest defensive stats and immunity to status effects.
-
-<div class="ur-gallery">
-<figure>
-
 ![Void Armor Set](images/armor/void_set.png)
-<figcaption>Void Armor -- full set</figcaption>
-</figure>
-</div>
-
+_Void Armor -- full set_
 | Piece | Protection | Knockback | Close Dmg Reduction | Far Dmg Reduction | Spike Dmg | Life Boost | Speed Boost |
 |-------|-----------|-----------|--------------------|--------------------|-----------|------------|-------------|
 | Void Mask | 12 | 0 | 0% | 8% | 0 | 0 | 0% |
@@ -147,15 +106,8 @@ An end-game set with the strongest defensive stats and immunity to status effect
 ## Warden Set
 
 A unique combat set focused on knockback and spike damage. Reflects damage back to melee attackers.
-
-<div class="ur-gallery">
-<figure>
-
 ![Warden Armor Set](images/armor/warden_set.png)
-<figcaption>Warden Armor -- full set</figcaption>
-</figure>
-</div>
-
+_Warden Armor -- full set_
 | Piece | Protection | Knockback | Close Dmg Reduction | Far Dmg Reduction | Spike Dmg | Life Boost | Speed Boost |
 |-------|-----------|-----------|--------------------|--------------------|-----------|------------|-------------|
 | Warden Helmet | 10 | 2.5 | 4% | 4% | 8 | 10 | 0% |

@@ -1,51 +1,28 @@
 ---
-title: Dungeon Levels
-description: Level layouts, room types, and mob pools in Unstable Rifts
+title: "Dungeon Levels"
+order: 5
+published: true
+draft: false
 ---
 
-<style>
-:root { --ur-accent: #bb2f2c; --ur-border: #2a2a4a; --ur-text-muted: #8892a4; }
-.ur-gallery { display: flex; flex-wrap: wrap; gap: 12px; margin: 16px 0; } .ur-gallery figure { flex: 1 1 200px; max-width: 320px; margin: 0; text-align: center; } .ur-gallery figure img { width: 100%; border-radius: 6px; border: 1px solid var(--ur-border); } .ur-gallery figure figcaption { font-size: 0.82em; color: var(--ur-text-muted); margin-top: 4px; }
-.ur-columns { display: flex; gap: 24px; flex-wrap: wrap; } .ur-columns > div { flex: 1; min-width: 280px; }
-.ur-info-card { border-left: 3px solid var(--ur-accent); padding: 10px 16px; margin: 14px 0; background: rgba(187,47,44,0.05); border-radius: 0 4px 4px 0; }
-</style>
+
 
 # Dungeon Levels
 
 The dungeon is procedurally generated each run. Rooms connect via corridors, with branching paths, locked doors, and special rooms scattered throughout. No two runs are the same.
-
-<div class="ur-gallery">
-<figure>
-
 ![Dungeon Generation Example](images/dungeon_generation.png)
-<figcaption>Example of a procedurally generated dungeon layout</figcaption>
-</figure>
-<figure>
-
+_Example of a procedurally generated dungeon layout_
 ![Dungeon Map View](images/dungeon_map.png)
-<figcaption>In-game dungeon map showing explored rooms</figcaption>
-</figure>
-</div>
-
+_In-game dungeon map showing explored rooms_
 ---
 
 ## Level 1: Kweebec
 
 A corrupted forest overrun by twisted DeadWood creatures and radioactive wildlife.
-
-<div class="ur-gallery">
-<figure>
-
 ![Kweebec Entrance](images/kweebec_entrance.png)
-<figcaption>The Kweebec level entrance room</figcaption>
-</figure>
-<figure>
-
+_The Kweebec level entrance room_
 ![Kweebec Combat](images/kweebec_combat.png)
-<figcaption>Fighting DeadWood mobs in the Kweebec level</figcaption>
-</figure>
-</div>
-
+_Fighting DeadWood mobs in the Kweebec level_
 ### Layout
 
 | Property | Value |
@@ -95,39 +72,19 @@ The Kweebec level includes themed environmental props:
 | Ruined Kweebec Stool | Broken stool |
 | Ruined Kweebec Table | Damaged table |
 | Ruined Kweebec Wardrobe | Ruined wardrobe |
-
-<div class="ur-gallery">
-<figure>
-
 ![Kweebec Props](images/props/kweebec_props.png)
-<figcaption>Ruined Kweebec furniture props in a dungeon room</figcaption>
-</figure>
-<figure>
-
+_Ruined Kweebec furniture props in a dungeon room_
 ![Radioactive Barrels](images/props/radioactive_barrels.png)
-<figcaption>Radioactive barrels -- breakable environmental hazards</figcaption>
-</figure>
-</div>
-
+_Radioactive barrels -- breakable environmental hazards_
 ---
 
 ## Level 2: Desert
 
 An arid industrial wasteland with hazardous enemies and tougher encounters.
-
-<div class="ur-gallery">
-<figure>
-
 ![Desert Entrance](images/desert_entrance.png)
-<figcaption>The Desert level entrance room</figcaption>
-</figure>
-<figure>
-
+_The Desert level entrance room_
 ![Desert Combat](images/desert_combat.png)
-<figcaption>Fighting industrial enemies in the Desert level</figcaption>
-</figure>
-</div>
-
+_Fighting industrial enemies in the Desert level_
 ### Layout
 
 | Property | Value |
@@ -153,10 +110,6 @@ All Kweebec level enemies also appear in the Desert level with the same weights.
 ---
 
 ## Room Types
-
-<div class="ur-columns">
-<div>
-
 ### Gameplay Rooms
 
 | Room Type | Description |
@@ -169,10 +122,6 @@ All Kweebec level enemies also appear in the Desert level with the same weights.
 | Boss | Final room with the level boss |
 | Branch | Side path rooms off the main path |
 | Wall | Dead-end seals |
-
-</div>
-<div>
-
 ### Door Types
 
 | Door Type | Description |
@@ -181,28 +130,12 @@ All Kweebec level enemies also appear in the Desert level with the same weights.
 | Activation Door | Opens when a nearby trigger is activated |
 | Lock Door | Locked until a specific condition is met |
 | Sealed Door | Permanently sealed passage |
-
-</div>
-</div>
-
-<div class="ur-gallery">
-<figure>
-
 ![Challenge Room](images/challenge_room.png)
-<figcaption>A challenge room with mob spawners</figcaption>
-</figure>
-<figure>
-
+_A challenge room with mob spawners_
 ![Treasure Room](images/treasure_room.png)
-<figcaption>A treasure room behind a key door</figcaption>
-</figure>
-<figure>
-
+_A treasure room behind a key door_
 ![Shop Room](images/shop_room.png)
-<figcaption>Shop room with the shopkeeper NPC</figcaption>
-</figure>
-</div>
-
+_Shop room with the shopkeeper NPC_
 ---
 
 ## Dungeon Generation
@@ -217,12 +150,7 @@ Each run creates a unique layout by:
 6. Placing the boss room at the end of the main path
 7. Connecting rooms with doors based on type assignments
 8. Distributing mobs across the level based on the weighted pool
-
-<div class="ur-info-card">
-
 **Note:** Branch paths are shorter than the main path and contain fewer mobs, but can still hold challenge rooms (Desert level branches always include one).
-</div>
-
 ---
 
 ## Level Comparison

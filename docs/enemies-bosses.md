@@ -1,57 +1,24 @@
 ---
-title: Enemies and Bosses
-description: All enemies, bosses, and ally NPCs in Unstable Rifts
+title: "Enemies and Bosses"
+order: 8
+published: true
+draft: false
 ---
-
-<style>
-:root { --ur-accent: #bb2f2c; --ur-border: #2a2a4a; --ur-text-muted: #8892a4; }
-.ur-gallery { display: flex; flex-wrap: wrap; gap: 12px; margin: 16px 0; } .ur-gallery figure { flex: 1 1 200px; max-width: 320px; margin: 0; text-align: center; } .ur-gallery figure img { width: 100%; border-radius: 6px; border: 1px solid var(--ur-border); } .ur-gallery figure figcaption { font-size: 0.82em; color: var(--ur-text-muted); margin-top: 4px; }
-.ur-columns { display: flex; gap: 24px; flex-wrap: wrap; } .ur-columns > div { flex: 1; min-width: 280px; }
-.ur-info-card { border-left: 3px solid var(--ur-accent); padding: 10px 16px; margin: 14px 0; background: rgba(187,47,44,0.05); border-radius: 0 4px 4px 0; }
-</style>
 
 # Enemies and Bosses
 
 The dungeon is populated with hostile mobs, a powerful boss, and a few friendly allies. Each enemy type has unique behavior, stats, and drop tables.
 
-<div class="ur-gallery">
-<figure>
-
 ![DeadWood Rootling](images/enemies/deadwood_rootling.png)
-<figcaption>DeadWood Rootling</figcaption>
-</figure>
-<figure>
-
 ![DeadWood Sproutling](images/enemies/deadwood_sproutling.png)
-<figcaption>DeadWood Sproutling</figcaption>
-</figure>
-<figure>
-
 ![Radioactive Wolf](images/enemies/radioactive_wolf.png)
-<figcaption>Radioactive Wolf</figcaption>
-</figure>
-<figure>
-
 ![Industrial Nosuit](images/enemies/industrial_nosuit.png)
-<figcaption>Industrial Nosuit</figcaption>
-</figure>
-<figure>
-
 ![Kweebec Seedling](images/enemies/kweebec_seedling.png)
-<figcaption>Kweebec Seedling</figcaption>
-</figure>
-<figure>
-
+_Kweebec Seedling_
 ![DeadWood Seedling](images/enemies/deadwood_seedling.png)
-<figcaption>DeadWood Seedling</figcaption>
-</figure>
-<figure>
-
+_DeadWood Seedling_
 ![Industrial Hazmat](images/enemies/industrial_hazmat.png)
-<figcaption>Industrial Hazmat (Toxic Launcher)</figcaption>
-</figure>
-</div>
-
+_Industrial Hazmat (Toxic Launcher)_
 ---
 
 ## DeadWood Enemies
@@ -174,25 +141,12 @@ The dungeon ends with a boss fight. The boss room is always the last room on the
 ### Boss: Forklift
 
 A massive industrial machine that charges at players with devastating speed.
-
-<div class="ur-gallery">
-<figure>
-
 ![Boss Forklift](images/bosses/forklift_idle.png)
-<figcaption>Boss Forklift -- idle stance</figcaption>
-</figure>
-<figure>
-
+_Boss Forklift -- idle stance_
 ![Forklift Dash Attack](images/bosses/forklift_dash.png)
-<figcaption>Forklift performing its multi-hit dash attack</figcaption>
-</figure>
-<figure>
-
+_Forklift performing its multi-hit dash attack_
 ![Forklift Barrel Toss](images/bosses/forklift_barrel.png)
-<figcaption>Forklift throwing a radioactive barrel</figcaption>
-</figure>
-</div>
-
+_Forklift throwing a radioactive barrel_
 | Stat | Value |
 |------|-------|
 | Health | 2,500 HP |
@@ -231,15 +185,8 @@ A friendly NPC can fight alongside the player:
 ### Kweebec Seedling (Ally)
 
 A small Kweebec summoned by the Kweebec Launcher weapon. Rushes enemies and explodes on contact.
-
-<div class="ur-gallery">
-<figure>
-
 ![Kweebec Ally](images/allies/kweebec_seedling_ally.png)
-<figcaption>Friendly Kweebec Seedling -- summoned by the Kweebec Launcher</figcaption>
-</figure>
-</div>
-
+_Friendly Kweebec Seedling -- summoned by the Kweebec Launcher_
 | Stat | Value |
 |------|-------|
 | Health | 36 HP |
