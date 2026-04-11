@@ -1,6 +1,6 @@
 ---
 title: "Shops"
-order: 11
+order: 3
 published: true
 draft: false
 ---
@@ -83,7 +83,7 @@ Some shop rooms include a refresh option that regenerates the available item sto
 
 ## Related Pages
 
-- [Weapons](weapons) -- Weapon stats and rarity tiers
-- [Armor Sets](armor) -- Armor stats and set bonuses
+- [Weapons](gear/weapons) -- Weapon stats and rarity tiers
+- [Armor Sets](gear/armor) -- Armor stats and set bonuses
 - [Getting Started](getting-started) -- Coin economy basics
-- [Dungeon Levels](dungeon-levels) -- Shop room placement
+- [Dungeon Levels](dungeons/dungeon-levels) -- Shop room placement

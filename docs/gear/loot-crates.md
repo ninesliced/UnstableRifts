@@ -1,6 +1,6 @@
 ---
 title: "Loot and Crates"
-order: 9
+order: 4
 published: true
 draft: false
 ---
@@ -140,7 +140,7 @@ As you advance through the dungeon, crate quality improves:
 
 ## Related Pages
 
-- [Weapons](weapons) -- What weapons can drop
-- [Armor Sets](armor) -- What armor can drop
-- [Dungeon Levels](dungeon-levels) -- Where each crate tier appears
-- [Enemies and Bosses](enemies-bosses) -- Enemy drop tables
+- [Weapons](gear/weapons) -- What weapons can drop
+- [Armor Sets](gear/armor) -- What armor can drop
+- [Dungeon Levels](dungeons/dungeon-levels) -- Where each crate tier appears
+- [Enemies and Bosses](dungeons/enemies-bosses) -- Enemy drop tables

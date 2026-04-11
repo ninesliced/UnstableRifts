@@ -34,49 +34,53 @@ _Top-down dungeon gameplay with a party of 4_
 
 How to play, starting equipment, and basic gameplay loop.
 
-#### [Installation](installation)
+#### [Installation](getting-started/installation)
 
 Server setup, requirements, configuration files, and admin tools.
 
-#### [Commands](commands)
+#### [Commands](getting-started/commands)
 
 Full command reference for players and server administrators.
 
 ### Gear and Loot
 
-#### [Weapons](weapons)
+#### [Weapons](gear/weapons)
 
 All 19 weapons -- stats, rarities, elemental effects, and categories.
 
-#### [Armor Sets](armor)
+#### [Rarity, Modifiers & Effects](gear/rarity-and-modifiers)
+
+Rarity tiers, modifier types, elemental effects, and how drops are rolled.
+
+#### [Armor Sets](gear/armor)
 
 6 armor sets, set abilities, stat breakdowns, and rarity ranges.
 
-#### [Loot and Crates](loot-crates)
+#### [Loot and Crates](gear/loot-crates)
 
 Crate tiers, drop tables, weapon and armor pool details.
 
 ### Dungeons and Combat
 
-#### [Dungeon Levels](dungeon-levels)
+#### [Dungeon Levels](dungeons/dungeon-levels)
 
 Level layouts, room types, mob pools, and generation details.
 
-#### [Enemies and Bosses](enemies-bosses)
+#### [Enemies and Bosses](dungeons/enemies-bosses)
 
 All enemy types, boss mechanics, attack patterns, and ally NPCs.
 
-#### [Shops](shops)
+#### [Shops](dungeons/shops)
 
 In-dungeon shops, purchasing, and available items.
 
 ### Systems
 
-#### [Party System](party-system)
+#### [Party System](systems/party-system)
 
 Party creation, invites, privacy, reconnection, and shared resources.
 
-#### [HUD and Interface](hud-interface)
+#### [HUD and Interface](systems/hud-interface)
 
 All HUD elements -- ammo, boss health, party status, revive prompts, and map.
 ---

@@ -1,6 +1,6 @@
 ---
 title: "Commands"
-order: 4
+order: 2
 published: true
 draft: false
 ---
@@ -92,6 +92,6 @@ These commands require operator permissions or the `unstablerifts.admin` permiss
 
 ## Related Pages
 
-- [Party System](party-system) -- Detailed party mechanics
+- [Party System](systems/party-system) -- Detailed party mechanics
 - [Getting Started](getting-started) -- Quick start guide
-- [Installation](installation) -- Server setup and admin tools
+- [Installation](getting-started/installation) -- Server setup and admin tools

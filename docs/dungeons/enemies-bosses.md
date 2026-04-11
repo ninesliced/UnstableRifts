@@ -1,6 +1,6 @@
 ---
 title: "Enemies and Bosses"
-order: 8
+order: 2
 published: true
 draft: false
 ---
@@ -215,7 +215,7 @@ _Friendly Kweebec Seedling -- summoned by the Kweebec Launcher_
 
 ## Related Pages
 
-- [Dungeon Levels](dungeon-levels) -- Where each enemy spawns
-- [Weapons](weapons) -- What to fight them with
-- [Loot and Crates](loot-crates) -- Enemy and crate drop tables
+- [Dungeon Levels](dungeons/dungeon-levels) -- Where each enemy spawns
+- [Weapons](gear/weapons) -- What to fight them with
+- [Loot and Crates](gear/loot-crates) -- Enemy and crate drop tables
 - [Getting Started](getting-started) -- Combat basics

@@ -1,6 +1,6 @@
 ---
 title: "Armor Sets"
-order: 7
+order: 3
 published: true
 draft: false
 ---
@@ -147,7 +147,7 @@ _Warden Armor -- full set_
 
 ## Related Pages
 
-- [Weapons](weapons) -- Pair your armor with the right weapon
-- [Loot and Crates](loot-crates) -- Where armor drops
-- [Shops](shops) -- Buy armor from the dungeon shop
+- [Weapons](gear/weapons) -- Pair your armor with the right weapon
+- [Loot and Crates](gear/loot-crates) -- Where armor drops
+- [Shops](dungeons/shops) -- Buy armor from the dungeon shop
 - [Getting Started](getting-started) -- New player guide

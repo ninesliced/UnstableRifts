@@ -1,6 +1,6 @@
 ---
 title: "HUD and Interface"
-order: 12
+order: 2
 published: true
 draft: false
 ---
@@ -106,6 +106,6 @@ _Minimap view in the corner of the screen_
 ## Related Pages
 
 - [Getting Started](getting-started) -- Camera controls and basics
-- [Party System](party-system) -- Party status details
-- [Enemies and Bosses](enemies-bosses) -- Boss health bar context
-- [Dungeon Levels](dungeon-levels) -- Room types shown on the map
+- [Party System](systems/party-system) -- Party status details
+- [Enemies and Bosses](dungeons/enemies-bosses) -- Boss health bar context
+- [Dungeon Levels](dungeons/dungeon-levels) -- Room types shown on the map

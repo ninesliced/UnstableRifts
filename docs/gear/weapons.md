@@ -1,6 +1,6 @@
 ---
 title: "Weapons"
-order: 6
+order: 1
 published: true
 draft: false
 ---
@@ -42,13 +42,13 @@ _Rifle_
 |--------|----------|--------|----------|--------|------|-------|--------|---------|-------------|--------|
 | Pistol | LASER | 14 | 0.2s | 0.7s | 120 | 45 | 0 | 1 | <span class="rarity-basic">Basic</span> | 20 |
 | Crystal Sword | MELEE | 18 | 0.25s | -- | -- | 0 | 0 | 1 | <span class="rarity-basic">Basic</span> | 20 |
-| Assault Rifle | BULLET | 15 | 1.0s | 1.0s | 180 | 35 | 3.0 | 3 | <span class="rarity-basic">Basic</span> -- <span class="rarity-unique">Unique</span> | 10 |
-| Rifle | BULLET | 18 | 1.0s | 1.0s | 140 | 40 | 2.4 | 1 | <span class="rarity-basic">Basic</span> -- <span class="rarity-unique">Unique</span> | 8 |
+| Assault Rifle | LASER | 15 | 1.0s | 1.0s | 180 | 35 | 3.0 | 3 | <span class="rarity-basic">Basic</span> -- <span class="rarity-unique">Unique</span> | 10 |
+| Rifle | LASER | 18 | 1.0s | 1.0s | 140 | 40 | 2.4 | 1 | <span class="rarity-basic">Basic</span> -- <span class="rarity-unique">Unique</span> | 8 |
 | Blitzer Crystal | LASER | 8 | 3.0s | 1.4s | 50 | 35 | 0 | 1 | <span class="rarity-basic">Basic</span> -- <span class="rarity-unique">Unique</span> | 10 |
 | Hytale Blunderbuss | LASER | 8 | 1.1s | 1.3s | 60 | 24 | 14.0 | 8 | <span class="rarity-basic">Basic</span> -- <span class="rarity-uncommon">Uncommon</span> | 15 |
 | Taser | LASER | 10 | 0.8s | 1.0s | 80 | 30 | 0 | 1 | <span class="rarity-epic">Epic</span> | 5 |
 | Voidlance | BULLET | -- | 1.2s | 1.4s | 100 | 40 | 0 | 1 | <span class="rarity-epic">Epic</span> | 5 |
-| Corrupted Shotgun | BULLET | 5 | 2.2s | 2.2s | 60 | 20 | 34.0 | 32 | <span class="rarity-epic">Epic</span> -- <span class="rarity-unique">Unique</span> | 3 |
+| Corrupted Shotgun | LASER | 5 | 2.2s | 2.2s | 60 | 20 | 34.0 | 32 | <span class="rarity-epic">Epic</span> -- <span class="rarity-unique">Unique</span> | 3 |
 | Kweebec Launcher | SUMMON | -- | 1.5s | 3.0s | 50 | 30 | 0 | 1 | <span class="rarity-epic">Epic</span> | 15 |
 
 > [!NOTE]
@@ -69,10 +69,10 @@ _Lightning Musket_
 _Void Musket_
 | Variant | Element | Damage | Cooldown | Reload | Ammo | Range | Min Rarity | Weight |
 |---------|---------|--------|----------|--------|------|-------|-----------|--------|
-| Musket (Fire) | FIRE | 26 | 1.4s | 1.25s | 50 | 60 | <span class="rarity-rare">Rare</span> | 5 |
-| Musket (Ice) | ICE | 26 | 1.4s | 1.25s | 50 | 60 | <span class="rarity-rare">Rare</span> | 5 |
-| Musket (Lightning) | ELECTRICITY | 26 | 1.4s | 1.25s | 50 | 60 | <span class="rarity-epic">Epic</span> | 5 |
-| Musket (Void) | VOID | 26 | 1.4s | 1.25s | 50 | 60 | <span class="rarity-epic">Epic</span> | 5 |
+| Musket (Fire) | <span class="effect-fire">FIRE</span> | 26 | 1.4s | 1.25s | 50 | 60 | <span class="rarity-rare">Rare</span> | 5 |
+| Musket (Ice) | <span class="effect-ice">ICE</span> | 26 | 1.4s | 1.25s | 50 | 60 | <span class="rarity-rare">Rare</span> | 5 |
+| Musket (Lightning) | <span class="effect-electricity">ELECTRICITY</span> | 26 | 1.4s | 1.25s | 50 | 60 | <span class="rarity-epic">Epic</span> | 5 |
+| Musket (Void) | <span class="effect-void">VOID</span> | 26 | 1.4s | 1.25s | 50 | 60 | <span class="rarity-epic">Epic</span> | 5 |
 
 All muskets share identical base stats. The Lightning and Void variants are harder to find, starting at Epic rarity.
 
@@ -99,14 +99,11 @@ _Void Blunderbuss_
 
 | Variant | Element | Category | Damage | Cooldown | Reload | Ammo | Range | Spread | Min Rarity | Weight |
 |---------|---------|----------|--------|----------|--------|------|-------|--------|-----------|--------|
-| Blunderbuss (Acid) | ACID | LASER | 8 | 1.05s | 1.25s | 60 | 24 | 14.0 | <span class="rarity-rare">Rare</span> | 5 |
-| Blunderbuss (Fire) | FIRE | LASER | 8 | 1.05s | 1.25s | 60 | 24 | 14.0 | <span class="rarity-rare">Rare</span> | 5 |
-| Blunderbuss (Ice) | ICE | LASER | 8 | 1.05s | 1.25s | 60 | 24 | 14.0 | <span class="rarity-epic">Epic</span> | 5 |
-| Blunderbuss (Lightning) | ELECTRICITY | LASER | 8 | 1.05s | 1.25s | 60 | 24 | 14.0 | <span class="rarity-epic">Epic</span> | 5 |
-| Blunderbuss (Void) | VOID | BULLET | 8 | 1.05s | 1.25s | 60 | 24 | 14.0 | <span class="rarity-epic">Epic</span> | 5 |
-
-> [!NOTE]
-> The Void Blunderbuss is categorized as **BULLET**, unlike the other elemental blunderbusses which are **LASER**.
+| Blunderbuss (Acid) | <span class="effect-acid">ACID</span> | LASER | 8 | 1.05s | 1.25s | 60 | 24 | 14.0 | <span class="rarity-rare">Rare</span> | 5 |
+| Blunderbuss (Fire) | <span class="effect-fire">FIRE</span> | LASER | 8 | 1.05s | 1.25s | 60 | 24 | 14.0 | <span class="rarity-rare">Rare</span> | 5 |
+| Blunderbuss (Ice) | <span class="effect-ice">ICE</span> | LASER | 8 | 1.05s | 1.25s | 60 | 24 | 14.0 | <span class="rarity-epic">Epic</span> | 5 |
+| Blunderbuss (Lightning) | <span class="effect-electricity">ELECTRICITY</span> | LASER | 8 | 1.05s | 1.25s | 60 | 24 | 14.0 | <span class="rarity-epic">Epic</span> | 5 |
+| Blunderbuss (Void) | <span class="effect-void">VOID</span> | LASER | 8 | 1.05s | 1.25s | 60 | 24 | 14.0 | <span class="rarity-epic">Epic</span> | 5 |
 
 ---
 
@@ -136,7 +133,7 @@ A void-powered long-range weapon. Its base damage is not defined in the standard
 
 ### Corrupted Shotgun
 
-The most destructive spread weapon in the game. Fires 32 pellets per shot with both Acid and Void effects. Extremely rare, dropping only at Epic or Unique rarity with a spawn weight of 3.
+The most destructive spread weapon in the game. Fires 32 pellets per shot with both <span class="effect-acid">Acid</span> and <span class="effect-void">Void</span> effects. Extremely rare, dropping only at Epic or Unique rarity with a spawn weight of 3.
 
 ### Kweebec Launcher
 
@@ -161,7 +158,7 @@ _Kweebec Launcher -- summons a friendly Kweebec_
 | Category | Description | Weapons |
 |----------|-------------|---------|
 | LASER | Energy-based projectiles | Pistol, Blitzer Crystal, Taser, Hytale Blunderbuss, all Muskets, Acid/Fire/Ice/Lightning Blunderbusses |
-| BULLET | Physical projectiles | Assault Rifle, Rifle, Corrupted Shotgun, Voidlance, Void Blunderbuss |
+| BULLET | Physical projectiles | Voidlance |
 | MELEE | Close-range attacks | Crystal Sword |
 | SUMMONING | Summons allies | Kweebec Launcher |
 
@@ -170,6 +167,6 @@ _Kweebec Launcher -- summons a friendly Kweebec_
 ## Related Pages
 
 - [Getting Started](getting-started) -- Starting equipment and basics
-- [Armor Sets](armor) -- Defensive gear and set bonuses
-- [Loot and Crates](loot-crates) -- Where to find weapons
-- [Enemies and Bosses](enemies-bosses) -- What you'll be fighting
+- [Armor Sets](gear/armor) -- Defensive gear and set bonuses
+- [Loot and Crates](gear/loot-crates) -- Where to find weapons
+- [Enemies and Bosses](dungeons/enemies-bosses) -- What you'll be fighting

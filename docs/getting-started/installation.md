@@ -1,6 +1,6 @@
 ---
 title: "Installation"
-order: 3
+order: 1
 published: true
 draft: false
 ---
@@ -128,6 +128,6 @@ Understanding the instance lifecycle helps with debugging and monitoring:
 
 ## Related Pages
 
-- [Commands](commands) -- Full command reference (player and admin)
-- [Dungeon Levels](dungeon-levels) -- Level configuration details
-- [Loot and Crates](loot-crates) -- Crate loot configuration
+- [Commands](getting-started/commands) -- Full command reference (player and admin)
+- [Dungeon Levels](dungeons/dungeon-levels) -- Level configuration details
+- [Loot and Crates](gear/loot-crates) -- Crate loot configuration

@@ -1,6 +1,6 @@
 ---
 title: "Party System"
-order: 10
+order: 1
 published: true
 draft: false
 ---
@@ -102,6 +102,6 @@ When the leader starts the run:
 
 ## Related Pages
 
-- [Commands](commands) -- Full command reference
+- [Commands](getting-started/commands) -- Full command reference
 - [Getting Started](getting-started) -- How to play
-- [HUD and Interface](hud-interface) -- Party status HUD elements
+- [HUD and Interface](systems/hud-interface) -- Party status HUD elements
