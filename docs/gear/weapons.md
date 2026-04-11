@@ -38,6 +38,11 @@ _Crystal Sword_
 _Assault Rifle_
 ![Rifle](https://raw.githubusercontent.com/ninesliced/UnstableRifts/refs/heads/main/img/weapons/rifle.png)
 _Rifle_
+![Blitzer Crystal](https://raw.githubusercontent.com/ninesliced/UnstableRifts/refs/heads/main/img/weapons/blitzer_crystal.png)
+_Blitzer Crystal_
+![Hytale Blunderbuss](https://raw.githubusercontent.com/ninesliced/UnstableRifts/refs/heads/main/img/weapons/hytale_blunderbuss.png)
+_Hytale Blunderbuss_
+
 | Weapon | Category | Damage | Cooldown | Reload | Ammo | Range | Spread | Pellets | Rarity Range | Weight |
 |--------|----------|--------|----------|--------|------|-------|--------|---------|-------------|--------|
 | Pistol | LASER | 14 | 0.2s | 0.7s | 120 | 45 | 0 | 1 | <span class="rarity-basic">Basic</span> | 20 |
@@ -45,7 +50,7 @@ _Rifle_
 | Assault Rifle | LASER | 15 | 1.0s | 1.0s | 180 | 35 | 3.0 | 3 | <span class="rarity-basic">Basic</span> -- <span class="rarity-unique">Unique</span> | 10 |
 | Rifle | LASER | 18 | 1.0s | 1.0s | 140 | 40 | 2.4 | 1 | <span class="rarity-basic">Basic</span> -- <span class="rarity-unique">Unique</span> | 8 |
 | Blitzer Crystal | LASER | 8 | 3.0s | 1.4s | 50 | 35 | 0 | 1 | <span class="rarity-basic">Basic</span> -- <span class="rarity-unique">Unique</span> | 10 |
-| Hytale Blunderbuss | LASER | 8 | 1.1s | 1.3s | 60 | 24 | 14.0 | 8 | <span class="rarity-basic">Basic</span> -- <span class="rarity-uncommon">Uncommon</span> | 15 |
+| Blunderbuss | LASER | 8 | 1.1s | 1.3s | 60 | 24 | 14.0 | 8 | <span class="rarity-basic">Basic</span> -- <span class="rarity-uncommon">Uncommon</span> | 15 |
 | Taser | LASER | 10 | 0.8s | 1.0s | 80 | 30 | 0 | 1 | <span class="rarity-epic">Epic</span> | 5 |
 | Voidlance | BULLET | -- | 1.2s | 1.4s | 100 | 40 | 0 | 1 | <span class="rarity-epic">Epic</span> | 5 |
 | Corrupted Shotgun | LASER | 5 | 2.2s | 2.2s | 60 | 20 | 34.0 | 32 | <span class="rarity-epic">Epic</span> -- <span class="rarity-unique">Unique</span> | 3 |
