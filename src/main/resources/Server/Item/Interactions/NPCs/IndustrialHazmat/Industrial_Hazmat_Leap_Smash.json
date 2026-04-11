@@ -1,0 +1,70 @@
+{
+  "$Comment": "Industrial Hazmat leap landing: small AOE impact on landing, much smaller than the Forklift boss.",
+  "Type": "Simple",
+  "Effects": {
+    "ItemPlayerAnimationsId": "Industrial_Hazmat_Default",
+    "ItemAnimationId": "JumpArrive",
+    "ClearAnimationOnFinish": false
+  },
+  "RunTime": 0.0,
+  "Next": {
+    "Type": "Parallel",
+    "Interactions": [
+      {
+        "Interactions": [
+          {
+            "Type": "Selector",
+            "RunTime": 0.05,
+            "Selector": {
+              "Id": "AOECylinder",
+              "Range": 2.5,
+              "Offset": {
+                "Y": -1
+              },
+              "Height": 2.4
+            },
+            "HitEntity": {
+              "Interactions": [
+                {
+                  "Type": "Replace",
+                  "DefaultOk": true,
+                  "DefaultValue": {
+                    "Interactions": [
+                      "Industrial_Hazmat_Leap_Smash_Damage"
+                    ]
+                  },
+                  "Var": "Leap_Smash_Damage"
+                }
+              ]
+            },
+            "Next": {
+              "Type": "Simple",
+              "RunTime": 0.4
+            }
+          }
+        ]
+      },
+      {
+        "Interactions": [
+          {
+            "Type": "Simple",
+            "RunTime": 0.4,
+            "Effects": {
+              "WorldSoundEventId": "SFX_Mace_T2_Impact",
+              "Particles": [
+                {
+                  "SystemId": "Impact_Mace_Charged",
+                  "PositionOffset": {
+                    "Y": 0.5
+                  },
+                  "TargetEntityPart": "Entity",
+                  "Scale": 0.7
+                }
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

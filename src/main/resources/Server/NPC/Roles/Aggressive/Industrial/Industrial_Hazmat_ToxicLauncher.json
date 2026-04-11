@@ -8,6 +8,7 @@
     ],
     "AttackSequence": "Component_Instruction_Attack_Sequence_Industrial_Hazmat_ToxicLauncher",
     "AttackDistance": 16,
+    "LeapEnabled": false,
     "MemoriesNameOverride": "Industrial_Hazmat_ToxicLauncher",
     "NameTranslationKey": "bettermobs.npcRoles.Industrial_Hazmat_ToxicLauncher.name"
   }

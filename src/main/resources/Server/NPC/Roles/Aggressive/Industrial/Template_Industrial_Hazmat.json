@@ -85,6 +85,22 @@
       "Value": 2.4,
       "Description": "Distance at which attacks are executed"
     },
+    "LeapAttack": {
+      "Value": "Root_Industrial_Hazmat_Leap_Attack",
+      "Description": "The leap attack to use when target is far away"
+    },
+    "LeapDistance": {
+      "Value": 8.0,
+      "Description": "Distance at which the NPC will leap instead of running"
+    },
+    "LeapMinDistance": {
+      "Value": 5,
+      "Description": "Minimum distance from target before the NPC will leap"
+    },
+    "LeapEnabled": {
+      "Value": true,
+      "Description": "Whether the NPC can use the leap attack"
+    },
     "TargetGroups": {
       "Value": [
         "Industrial_Hazmat"
@@ -400,6 +416,51 @@
                   "Compute": "CombatRelativeTurnSpeed"
                 }
               }
+            },
+            {
+              "$Comment": "LEAP: use leap attack when target is 5-8 blocks away.",
+              "Enabled": {
+                "Compute": "LeapEnabled"
+              },
+              "Continue": true,
+              "Sensor": {
+                "Type": "And",
+                "Sensors": [
+                  {
+                    "Type": "Target",
+                    "Range": {
+                      "Compute": "LeapDistance"
+                    },
+                    "Filters": [
+                      {
+                        "Type": "LineOfSight"
+                      }
+                    ]
+                  },
+                  {
+                    "Type": "Not",
+                    "Sensor": {
+                      "Type": "Target",
+                      "Range": {
+                        "Compute": "LeapMinDistance"
+                      }
+                    }
+                  }
+                ]
+              },
+              "ActionsBlocking": false,
+              "Actions": [
+                {
+                  "Type": "Attack",
+                  "Attack": {
+                    "Compute": "LeapAttack"
+                  },
+                  "AttackPauseRange": [
+                    0.2,
+                    0.5
+                  ]
+                }
+              ]
             },
             {
               "Reference": "Component_Instruction_Soft_Leash",

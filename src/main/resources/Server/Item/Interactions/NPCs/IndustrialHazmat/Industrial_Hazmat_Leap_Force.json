@@ -1,0 +1,75 @@
+{
+  "$Comment": "Industrial Hazmat leap force: shorter and lower leap than the Forklift boss. Play jump start, launch into air, then land with a small impact.",
+  "Type": "Serial",
+  "Interactions": [
+    {
+      "Type": "Simple",
+      "RunTime": 0.35,
+      "Effects": {
+        "ItemAnimationId": "JumpStart",
+        "ItemPlayerAnimationsId": "Industrial_Hazmat_Default",
+        "MovementEffects": {
+          "DisableAll": true
+        },
+        "WorldSoundEventId": "SFX_Unarmed_Swing"
+      }
+    },
+    {
+      "Type": "ApplyForce",
+      "Force": 500,
+      "Direction": {
+        "X": 0,
+        "Y": 0.25,
+        "Z": -6.0
+      },
+      "AdjustVertical": false,
+      "Effects": {
+        "ItemAnimationId": "JumpAir",
+        "ItemPlayerAnimationsId": "Industrial_Hazmat_Default",
+        "MovementEffects": {
+          "DisableForward": false,
+          "DisableBackward": false
+        }
+      },
+      "ChangeVelocityType": "Add",
+      "WaitForGround": true,
+      "WaitForCollision": false,
+      "RaycastHeightOffset": 0.5,
+      "RaycastDistance": 2,
+      "VelocityConfig": {
+        "AirResistance": 0.99,
+        "AirResistanceMax": 0.97,
+        "GroundResistance": 0.9,
+        "GroundResistanceMax": 0.75,
+        "Threshold": 3.0,
+        "Style": "Linear"
+      },
+      "GroundCheckDelay": 0.2,
+      "RunTime": 1.2,
+      "GroundNext": {
+        "Type": "Replace",
+        "Var": "Pounce_Sweep",
+        "DefaultOk": true,
+        "DefaultValue": {
+          "Interactions": [
+            "Industrial_Hazmat_Leap_Smash"
+          ]
+        }
+      },
+      "Next": {
+        "Type": "Replace",
+        "Var": "Pounce_Sweep",
+        "DefaultOk": true,
+        "DefaultValue": {
+          "Interactions": [
+            "Industrial_Hazmat_Leap_Smash"
+          ]
+        }
+      },
+      "VerticalClamp": [
+        -20,
+        8
+      ]
+    }
+  ]
+}

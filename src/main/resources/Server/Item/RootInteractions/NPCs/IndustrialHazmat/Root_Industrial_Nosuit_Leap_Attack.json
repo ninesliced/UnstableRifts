@@ -1,0 +1,13 @@
+{
+  "Tags": {
+    "Attack": [
+      "Melee"
+    ]
+  },
+  "Cooldown": {
+    "Cooldown": 6.0
+  },
+  "Interactions": [
+    "Industrial_Nosuit_Leap_Force"
+  ]
+}

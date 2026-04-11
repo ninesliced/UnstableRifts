@@ -7,6 +7,7 @@
     ],
     "AttackSequence": "Component_Instruction_Attack_Sequence_Industrial_Hazmat_Flamethrower",
     "AttackDistance": 8.4,
+    "LeapEnabled": false,
     "MemoriesNameOverride": "Industrial_Hazmat_Flamethrower",
     "NameTranslationKey": "bettermobs.npcRoles.Industrial_Hazmat_Flamethrower.name"
   }

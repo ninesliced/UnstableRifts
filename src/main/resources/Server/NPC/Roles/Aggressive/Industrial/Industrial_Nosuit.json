@@ -7,6 +7,9 @@
     "TargetGroups": [
       "Industrial_Nosuit"
     ],
+    "LeapAttack": "Root_Industrial_Nosuit_Leap_Attack",
+    "LeapDistance": 8.0,
+    "LeapMinDistance": 5.0,
     "NameTranslationKey": "bettermobs.npcRoles.Industrial_Nosuit.name"
   }
 }
