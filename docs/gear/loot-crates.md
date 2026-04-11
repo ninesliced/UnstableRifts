@@ -142,7 +142,7 @@ As you advance through the dungeon, crate quality improves:
 
 ## Related Pages
 
-- [Weapons](gear/weapons) -- What weapons can drop
-- [Armor Sets](gear/armor) -- What armor can drop
-- [Dungeon Levels](dungeons/dungeon-levels) -- Where each crate tier appears
-- [Enemies and Bosses](dungeons/enemies-bosses) -- Enemy drop tables
+- [Weapons](weapons-1) -- What weapons can drop
+- [Armor Sets](armor-sets-1) -- What armor can drop
+- [Dungeon Levels](dungeon-levels-1) -- Where each crate tier appears
+- [Enemies and Bosses](enemies-bosses-1) -- Enemy drop tables

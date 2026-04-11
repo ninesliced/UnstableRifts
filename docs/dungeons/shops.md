@@ -37,7 +37,7 @@ Shops use the shared team coin pool. Any party member can make purchases, and th
 | Crate loot | Coins found in destructible crates |
 | Boss drops | Guaranteed coin drops from boss kills |
 
-See [Getting Started](getting-started.md#coins) for detailed coin drop rates.
+See [Getting Started](getting-started-1#coins) for detailed coin drop rates.
 
 ---
 
@@ -85,7 +85,7 @@ Some shop rooms include a refresh option that regenerates the available item sto
 
 ## Related Pages
 
-- [Weapons](gear/weapons) -- Weapon stats and rarity tiers
-- [Armor Sets](gear/armor) -- Armor stats and set bonuses
-- [Getting Started](getting-started) -- Coin economy basics
-- [Dungeon Levels](dungeons/dungeon-levels) -- Shop room placement
+- [Weapons](weapons-1) -- Weapon stats and rarity tiers
+- [Armor Sets](armor-sets-1) -- Armor stats and set bonuses
+- [Getting Started](getting-started-1) -- Coin economy basics
+- [Dungeon Levels](dungeon-levels-1) -- Shop room placement

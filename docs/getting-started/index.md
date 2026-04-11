@@ -115,8 +115,8 @@ Coins drop from enemies and crates. They are shared across the entire party and 
 
 ## Next Steps
 
-- [Weapons](gear/weapons) -- Learn about the 19 available weapons
-- [Armor Sets](gear/armor) -- Find out about armor set bonuses
-- [Dungeon Levels](dungeons/dungeon-levels) -- Explore what awaits in each level
-- [Party System](systems/party-system) -- Team up with friends
-- [Commands](getting-started/commands) -- Full command reference
+- [Weapons](weapons-1) -- Learn about the 19 available weapons
+- [Armor Sets](armor-sets-1) -- Find out about armor set bonuses
+- [Dungeon Levels](dungeon-levels-1) -- Explore what awaits in each level
+- [Party System](party-system-1) -- Team up with friends
+- [Commands](commands-1) -- Full command reference
