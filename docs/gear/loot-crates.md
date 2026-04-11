@@ -144,4 +144,4 @@ As you go deeper, crate quality improves:
 - [Weapons](weapons-1) -- What weapons can drop
 - [Armor Sets](armor-sets-1) -- What armor can drop
 - [Dungeon Levels](dungeon-levels-1) -- Where each crate tier appears
-- [Enemies and Bosses](enemies-bosses-1) -- Enemy drop tables
+- [Enemies and Bosses](enemies-and-bosses-1) -- Enemy drop tables

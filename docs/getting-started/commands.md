@@ -92,6 +92,6 @@ These commands require operator permissions or the `unstablerifts.admin` permiss
 
 ## Related Pages
 
-- [Party System](systems/party-system) -- Detailed party mechanics
+- [Party System](systems/party-system-1) -- Detailed party mechanics
 - [Getting Started](getting-started-1) -- Quick start guide
 - [Installation](installation-1) -- Server setup and admin tools

@@ -15,7 +15,7 @@ Unstable Rifts is a top-down co-op dungeon mode. You and your team enter a porta
 
 The Industrial faction has invaded Orbis and is attacking the Kweebecs to steal resources and take control of the land. The rifts you enter are part of that invasion, and each completed run pushes the enemy back.
 
-Many Kweebecs have already been lost to an unknown plague that turns them into DeadWood. If you want the full story, read [Lore](lore-1).
+Many Kweebecs have already been lost to an unknown plague that turns them into DeadWood. If you want the full story, read [Lore](lore).
 
 ---
 
@@ -128,9 +128,9 @@ Coins drop from enemies and crates. They are shared across the entire party and 
 
 ## Next Steps
 
-- [Lore](lore-1) -- Learn why the invasion started and what the rifts mean
-- [Weapons](weapons-1) -- Learn about the 19 available weapons
-- [Armor Sets](armor-sets-1) -- Find out about armor set bonuses
-- [Dungeon Levels](dungeon-levels-1) -- Explore what awaits in each level
-- [Party System](party-system-1) -- Team up with friends
-- [Commands](commands-1) -- Full command reference
+- [Lore](unstable-rifts/lore) -- Learn why the invasion started and what the rifts mean
+- [Weapons](unstable-rifts/weapons-1) -- Learn about the 19 available weapons
+- [Armor Sets](unstable-rifts/armor-sets-1) -- Find out about armor set bonuses
+- [Dungeon Levels](unstable-rifts/dungeon-levels-1) -- Explore what awaits in each level
+- [Party System](unstable-rifts/party-system-1) -- Team up with friends
+- [Commands](unstable-rifts/commands-1) -- Full command reference
