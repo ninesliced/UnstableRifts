@@ -16,7 +16,7 @@ Instead of a simple one-off dungeon, each run throws your party into a generated
 
 It is built to be easy to understand for new players, but strong on replayability once you start chasing better drops, stronger builds, and cleaner runs with friends.
 
-## Story Setup
+## Story
 
 Orbis is under attack.
 
@@ -101,7 +101,9 @@ The mod ships with its own assets, so players can jump in and start using the ne
 ## Credits
 
 - **Created by:** Theobosse and Paralaxe
+- **Builds:** Palomote72
 - **NPC Design:** That_Worm and TheCommando315
+- **NPC animations:** TheCommanddo315 and danilerts
 - **Custom Weapons:** kill_dill
 - **Props and items:** Sylano
 - **Team:** [Ninesliced](https://ninesliced.com/)
