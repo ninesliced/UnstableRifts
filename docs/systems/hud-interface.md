@@ -18,7 +18,7 @@ _Complete HUD layout during gameplay_
 
 ### Ammo Display
 
-Shows current ammo and reload state. It updates as you shoot and reload.
+Shows current ammo and reload state. It updates as you shoot and reload. You can see the details of the items you have equipped with the crouch key. The ammo display will show the weapon stats details.
 
 ![Ammo HUD](https://raw.githubusercontent.com/ninesliced/UnstableRifts/refs/heads/main/img/hud/ammo_hud.png)
 _Ammo counter with reload indicator_
