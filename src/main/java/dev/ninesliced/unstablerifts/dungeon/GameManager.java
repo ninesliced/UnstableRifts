@@ -7,6 +7,7 @@ import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.math.vector.Rotation3f;
 import com.hypixel.hytale.math.vector.Transform;
+import com.hypixel.hytale.protocol.packets.entities.EntityUpdates;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
 import com.hypixel.hytale.server.core.modules.entity.teleport.Teleport;
@@ -538,6 +539,16 @@ public final class GameManager {
 
         Store<EntityStore> playerStore = ref.getStore();
         Vector3d destination = new Vector3d(exitPos.x + 0.5, exitPos.y + 1.0, exitPos.z + 0.5);
+
+        EntityTrackerSystems.EntityViewer preTpViewer = playerStore.getComponent(ref,
+                EntityTrackerSystems.EntityViewer.getComponentType());
+        Set<Ref<EntityStore>> trackedBeforeTeleport = new HashSet<>();
+        if (preTpViewer != null) {
+            trackedBeforeTeleport.addAll(preTpViewer.sent.keySet());
+            trackedBeforeTeleport.addAll(preTpViewer.visible);
+            trackedBeforeTeleport.addAll(preTpViewer.updates.keySet());
+        }
+
         Teleport tp = Teleport.createForPlayer(destination, new Rotation3f());
         CompletableFuture<Void> recoveryFuture = new CompletableFuture<>();
         RoomData recoverySourceRoom = resolvedSourceRoom;
@@ -546,7 +557,8 @@ public final class GameManager {
         recoveryFuture.thenRun(() -> {
             World instanceWorld = game.getInstanceWorld();
             if (instanceWorld != null) {
-                instanceWorld.execute(() -> recoverClosestExitPortalTeleport(game, playerId, recoverySourceRoom, recoveryExitPos));
+                instanceWorld.execute(() -> recoverClosestExitPortalTeleport(
+                        game, playerId, recoverySourceRoom, recoveryExitPos, trackedBeforeTeleport));
             }
         });
         playerStore.putComponent(ref, Teleport.getComponentType(), tp);
@@ -559,7 +571,8 @@ public final class GameManager {
     private void recoverClosestExitPortalTeleport(@Nonnull Game game,
                                                   @Nonnull UUID playerId,
                                                   @Nonnull RoomData sourceRoom,
-                                                  @Nonnull Vector3i exitPos) {
+                                                  @Nonnull Vector3i exitPos,
+                                                  @Nonnull Set<Ref<EntityStore>> trackedBeforeTeleport) {
         World world = game.getInstanceWorld();
         if (world == null || game.getState() == GameState.COMPLETE) {
             return;
@@ -581,7 +594,12 @@ public final class GameManager {
             return;
         }
 
-        int viewerResetCount = resendAliveDungeonViewers(game, world);
+        int cleanedCount = resetViewerTrackingForTeleport(ref, store, trackedBeforeTeleport);
+        boolean trackerReset = cleanedCount >= 0;
+        if (cleanedCount < 0) {
+            cleanedCount = 0;
+        }
+
         int visibilityRestoreCount = restoreAlivePartyVisibilityForPlayer(game, world, playerId, playerRef);
 
         playerStateService.reapplyDungeonMovementProfile(ref, store, playerRef);
@@ -590,39 +608,61 @@ public final class GameManager {
         LOGGER.info("Closest Exit portal recovery completed for player " + playerId
                 + " from room " + sourceRoom.getAnchor()
                 + " to exit " + exitPos
-                + " viewerResets=" + viewerResetCount
+                + " trackerReset=" + trackerReset
+                + " cleanedEntities=" + cleanedCount
                 + " visibilityRestores=" + visibilityRestoreCount);
     }
 
-    private int resendAliveDungeonViewers(@Nonnull Game game, @Nonnull World world) {
-        int resetCount = 0;
-        for (UUID memberId : new ArrayList<>(game.getPlayersInInstance())) {
-            if (game.isPlayerDead(memberId)) {
-                continue;
-            }
-
-            PlayerRef memberRef = Universe.get().getPlayer(memberId);
-            if (memberRef == null || !memberRef.isValid()) {
-                continue;
-            }
-
-            Ref<EntityStore> memberEntityRef = memberRef.getReference();
-            if (memberEntityRef == null || !memberEntityRef.isValid()) {
-                continue;
-            }
-
-            Store<EntityStore> memberStore = memberEntityRef.getStore();
-            Player memberPlayer = memberStore.getComponent(memberEntityRef, Player.getComponentType());
-            if (memberPlayer == null || memberPlayer.getWorld() != world) {
-                continue;
-            }
-
-            if (EntityTrackerSystems.despawnAll(memberEntityRef, memberStore)) {
-                resetCount++;
-            }
+    private int resetViewerTrackingForTeleport(@Nonnull Ref<EntityStore> viewerRef,
+                                               @Nonnull Store<EntityStore> store,
+                                               @Nonnull Set<Ref<EntityStore>> trackedBeforeTeleport) {
+        EntityTrackerSystems.EntityViewer viewer = store.getComponent(viewerRef,
+                EntityTrackerSystems.EntityViewer.getComponentType());
+        if (viewer == null) {
+            return -1;
         }
-        return resetCount;
+
+        Set<Ref<EntityStore>> trackedRefs = new HashSet<>(trackedBeforeTeleport);
+        trackedRefs.addAll(viewer.sent.keySet());
+        trackedRefs.addAll(viewer.visible);
+        trackedRefs.addAll(viewer.updates.keySet());
+
+        int selfNetworkId = viewer.sent.removeInt(viewerRef);
+        EntityUpdates packet = new EntityUpdates();
+        packet.removed = viewer.sent.values().toIntArray();
+        viewer.packetReceiver.writeNoCache(packet);
+
+        int cleanedCount = 0;
+        for (Ref<EntityStore> entityRef : trackedRefs) {
+            if (entityRef == null || entityRef == viewerRef || !entityRef.isValid() || entityRef.getStore() != store) {
+                continue;
+            }
+
+            EntityTrackerSystems.Visible visible = store.getComponent(entityRef,
+                    EntityTrackerSystems.Visible.getComponentType());
+            if (visible == null) {
+                continue;
+            }
+
+            visible.previousVisibleTo.remove(viewerRef);
+            visible.visibleTo.remove(viewerRef);
+            visible.newlyVisibleTo.remove(viewerRef);
+            cleanedCount++;
+        }
+
+        viewer.visible.clear();
+        viewer.updates.clear();
+        viewer.sent.clear();
+        viewer.hiddenCount = 0;
+        viewer.lodExcludedCount = 0;
+        if (selfNetworkId != -1) {
+            viewer.sent.put(viewerRef, selfNetworkId);
+        }
+
+        return cleanedCount;
     }
+
+
 
     private int restoreAlivePartyVisibilityForPlayer(@Nonnull Game game,
                                                      @Nonnull World world,
