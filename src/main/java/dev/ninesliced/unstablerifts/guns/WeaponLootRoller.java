@@ -100,6 +100,21 @@ public final class WeaponLootRoller {
     }
 
     /**
+     * Rolls effect/modifiers for a specific weapon definition. If {@code forcedRarity}
+     * is non-null the rarity is fixed instead of being rolled.
+     */
+    @Nonnull
+    public static ItemStack rollFor(@Nonnull WeaponDefinition def, @Nullable WeaponRarity forcedRarity) {
+        if (forcedRarity != null) {
+            ThreadLocalRandom rng = ThreadLocalRandom.current();
+            DamageEffect effect = rollEffect(def, forcedRarity, rng);
+            List<WeaponModifier> modifiers = rollModifiers(def, forcedRarity, rng);
+            return stamp(def.itemId(), forcedRarity, effect, modifiers);
+        }
+        return rollFor(def);
+    }
+
+    /**
      * Creates a stamped ItemStack with rarity/effect/modifiers baked into BSON metadata.
      */
     @Nonnull

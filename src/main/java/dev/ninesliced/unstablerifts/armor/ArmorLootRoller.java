@@ -72,6 +72,16 @@ public final class ArmorLootRoller {
     }
 
     @Nonnull
+    public static ItemStack rollFor(@Nonnull ArmorDefinition def, @Nullable WeaponRarity forcedRarity) {
+        if (forcedRarity != null) {
+            ThreadLocalRandom rng = ThreadLocalRandom.current();
+            List<ArmorModifier> modifiers = rollModifiers(def, forcedRarity, rng);
+            return stamp(def.itemId(), forcedRarity, def.setId(), modifiers);
+        }
+        return rollFor(def);
+    }
+
+    @Nonnull
     public static ItemStack stamp(@Nonnull String itemId,
                                   @Nonnull WeaponRarity rarity,
                                   @Nonnull String setId,

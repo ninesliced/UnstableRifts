@@ -22,6 +22,9 @@ public class UnstableRiftsCommand extends AbstractCommand {
         this.addSubCommand(new GivePartyPortalCommand());
         this.addSubCommand(new PartyCommand(plugin));
         this.addSubCommand(new LootCommand());
+        this.addSubCommand(GearDropCommand.weapon());
+        this.addSubCommand(GearDropCommand.armor());
+        this.addSubCommand(GearDropCommand.armorSet());
         this.addSubCommand(new ToggleHudCommand());
     }
 
@@ -52,6 +55,12 @@ public class UnstableRiftsCommand extends AbstractCommand {
                 .insert(Message.raw(" : Open party management commands and UI.").color(Color.GRAY)));
         context.sendMessage(Message.raw("- /unstablerifts loot").color(Color.WHITE)
                 .insert(Message.raw(" : Spawn a random weapon drop at your feet.").color(Color.GRAY)));
+        context.sendMessage(Message.raw("- /unstablerifts weapon <name> [rarity]").color(Color.WHITE)
+                .insert(Message.raw(" : Spawn a specific weapon drop at your feet.").color(Color.GRAY)));
+        context.sendMessage(Message.raw("- /unstablerifts armor <name> [rarity]").color(Color.WHITE)
+                .insert(Message.raw(" : Spawn a specific armor drop at your feet.").color(Color.GRAY)));
+        context.sendMessage(Message.raw("- /unstablerifts armorset <name> [rarity]").color(Color.WHITE)
+                .insert(Message.raw(" : Spawn a full armor set at your feet.").color(Color.GRAY)));
         context.sendMessage(Message.raw("- /unstablerifts togglehud").color(Color.WHITE)
                 .insert(Message.raw(" : Toggle all HUD elements on or off.").color(Color.GRAY)));
         context.sendMessage(Message.raw("Tip: Run /unstablerifts --help to view all subcommands and usage.").color(Color.CYAN));
