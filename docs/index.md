@@ -52,7 +52,7 @@ From there, create or join a party, invite friends, and start the dungeon run to
 
 How to start from a village portal, a crafted portal, or `/ur party ui`, plus the basic gameplay loop.
 
-#### [Lore](lore-1)
+#### [Lore](lore)
 
 The story behind the invasion, the Kweebecs, the DeadWood, and your mission.
 

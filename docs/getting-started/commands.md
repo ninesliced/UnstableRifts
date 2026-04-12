@@ -44,17 +44,6 @@ All commands use the base command `/unstablerifts` with the alias `/ur`.
 | `/ur topcamera` | `/ur tcam` | Toggle top-down camera mode |
 | `/ur togglehud` | `/ur hud` | Toggle all HUD elements on/off |
 
-### Camera Rotation
-
-When the top-down camera is active, it supports four rotation angles:
-
-| Rotation | Angle |
-|----------|-------|
-| 0 | 0 degrees (default) |
-| 1 | 90 degrees |
-| 2 | 180 degrees |
-| 3 | 270 degrees |
-
 ---
 
 ## Admin Commands

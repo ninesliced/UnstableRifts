@@ -172,7 +172,7 @@ The game builds each run in this order:
 
 ## Related Pages
 
-- [Enemies and Bosses](enemies-bosses-1) -- Detailed enemy stats and boss mechanics
-- [Loot and Crates](loot-crates-1) -- What drops in each level
+- [Enemies and Bosses](enemies-and-bosses-1) -- Detailed enemy stats and boss mechanics
+- [Loot and Crates](loot-and-crates-1) -- What drops in each level
 - [Shops](shops-1) -- In-dungeon shop mechanics
-- [HUD and Interface](hud-interface-1) -- Dungeon map and minimap features
+- [HUD and Interface](hud-and-interface-1) -- Dungeon map and minimap features

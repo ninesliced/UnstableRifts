@@ -100,11 +100,11 @@ The mod ships with its own assets, so players can jump in and start using the ne
 
 ## Credits
 
-- **Created by:** Theobosse and Paralaxe
-- **Builds by:** Palomote72
-- **NPC Design:** That_Worm and TheCommando315
-- **NPC animations:** TheCommando315 and danilerts
-- **Custom Weapons:** kill_dill
+- **Created by:** [Theobosse]() and [Paralaxe]()
+- **Builds by:** [Palomote72]()
+- **NPC Design:** [That_Worm](https://linktr.ee/thatworm) and [TheCommando315](https://x.com/PolloMadafaka)
+- **NPC animations:** [TheCommando315](https://x.com/PolloMadafaka) and danilerts
+- **Custom Weapons:** [kill_dill](https://ko-fi.com/killdill)
 - **Props and items:** Sylano
 - **Other:** Xenap
 - **Team:** [Ninesliced](https://ninesliced.com/)
