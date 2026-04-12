@@ -178,5 +178,5 @@ This weapon summons a friendly Kweebec instead of shooting bullets. The summon h
 
 - [Getting Started](getting-started-1) - Starting equipment and basics
 - [Armor Sets](armor-sets-1) - Defensive gear and set bonuses
-- [Loot and Crates](loot-crates-1) - Where to find weapons
-- [Enemies and Bosses](enemies-bosses-1) - What you'll be fighting
+- [Loot and Crates](loot-and-crates-1) - Where to find weapons
+- [Enemies and Bosses](enemies-and-bosses-1) - What you'll be fighting

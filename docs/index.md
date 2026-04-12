@@ -78,7 +78,7 @@ Simple guide to rarity, effects, and bonus stats on weapon drops.
 
 All armor sets, what they do, and which one fits your playstyle.
 
-#### [Loot and Crates](unstable-rifts/loot-crates-1)
+#### [Loot and Crates](unstable-rifts/loot-and-crates-1)
 
 Crate types, loot chances, and what gear you can get from each one.
 
@@ -88,7 +88,7 @@ Crate types, loot chances, and what gear you can get from each one.
 
 Level flow, room types, and what to expect as you go deeper.
 
-#### [Enemies and Bosses](unstable-rifts/enemies-bosses-1)
+#### [Enemies and Bosses](unstable-rifts/enemies-and-bosses-1)
 
 Enemy and boss overview with clear, practical combat info.
 
@@ -102,7 +102,7 @@ How shops work, what you can buy, and when to spend your coins.
 
 How to play with friends: invites, party rules, and reconnect behavior.
 
-#### [HUD and Interface](unstable-rifts/hud-interface-1)
+#### [HUD and Interface](unstable-rifts/hud-and-interface-1)
 
 What each HUD element means during a run.
 ---

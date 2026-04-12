@@ -108,4 +108,4 @@ When the leader starts the run:
 
 - [Commands](commands-1) - Full command reference
 - [Getting Started](getting-started-1) - How to play
-- [HUD and Interface](hud-interface-1) - Party status HUD elements
+- [HUD and Interface](hud-and-interface-1) - Party status HUD elements

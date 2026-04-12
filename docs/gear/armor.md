@@ -147,6 +147,6 @@ _Warden Armor - full set_
 ## Related Pages
 
 - [Weapons](weapons-1) - Pair your armor with the right weapon
-- [Loot and Crates](loot-crates-1) - Where armor drops
+- [Loot and Crates](loot-and-crates-1) - Where armor drops
 - [Shops](shops-1) - Buy armor from the dungeon shop
 - [Getting Started](getting-started-1) - New player guide
