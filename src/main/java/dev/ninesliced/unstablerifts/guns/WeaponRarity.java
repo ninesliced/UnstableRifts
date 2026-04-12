@@ -6,10 +6,10 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public enum WeaponRarity {
     BASIC(0.45, 0.00, 0, null, "#c9d2dd", "Common", 0.0f),
-    UNCOMMON(0.25, 0.05, 1, "Drop_Uncommon", "#3e9049", "Uncommon", 0.05f),
-    RARE(0.15, 0.10, 2, "Drop_Rare", "#2770b7", "Rare", 0.1f),
-    EPIC(0.08, 0.20, 3, "Drop_Epic", "#8b339e", "Epic", 0.2f),
-    LEGENDARY(0.05, 0.50, 4, "Drop_Legendary", "#bb8a2c", "Legendary", 0.35f),
+    UNCOMMON(0.25, 0.10, 1, "Drop_Uncommon", "#3e9049", "Uncommon", 0.05f),
+    RARE(0.15, 0.25, 2, "Drop_Rare", "#2770b7", "Rare", 0.1f),
+    EPIC(0.08, 0.50, 3, "Drop_Epic", "#8b339e", "Epic", 0.2f),
+    LEGENDARY(0.05, 0.70, 4, "Drop_Legendary", "#bb8a2c", "Legendary", 0.35f),
     UNIQUE(0.02, 1.00, 5, "Drop_Unique", "#bb2f2c", "Developer", 0.5f);
 
     private final double spawnChance;
