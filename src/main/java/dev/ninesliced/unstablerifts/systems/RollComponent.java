@@ -13,6 +13,7 @@ public final class RollComponent implements Component<EntityStore> {
     private static ComponentType<EntityStore, RollComponent> componentType;
 
     private long lastRollTime;
+    private boolean rollInputDown;
     private int rollTicksRemaining;
     @Nullable
     private Vector3d rollDirection;
@@ -38,6 +39,14 @@ public final class RollComponent implements Component<EntityStore> {
 
     public void setLastRollTime(long lastRollTime) {
         this.lastRollTime = lastRollTime;
+    }
+
+    public boolean isRollInputDown() {
+        return this.rollInputDown;
+    }
+
+    public void setRollInputDown(boolean rollInputDown) {
+        this.rollInputDown = rollInputDown;
     }
 
     public boolean isRolling() {
@@ -84,6 +93,7 @@ public final class RollComponent implements Component<EntityStore> {
     public Component<EntityStore> clone() {
         RollComponent copy = new RollComponent();
         copy.lastRollTime = this.lastRollTime;
+        copy.rollInputDown = this.rollInputDown;
         copy.rollTicksRemaining = this.rollTicksRemaining;
         copy.rollDirection = this.rollDirection != null ? new Vector3d(this.rollDirection) : null;
         return copy;

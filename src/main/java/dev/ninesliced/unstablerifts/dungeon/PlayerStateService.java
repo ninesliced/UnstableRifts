@@ -38,6 +38,8 @@ public final class PlayerStateService {
     private static final Logger LOGGER = Logger.getLogger(PlayerStateService.class.getName());
     private static final float DUNGEON_BASE_SPEED = 10.0f;
     private static final float DEFAULT_SPRINT_MULTIPLIER = 1.65f;
+    private static final float ROLL_INPUT_JUMP_FORCE = 11.8f;
+    private static final float ROLL_INPUT_JUMP_BUFFER_DURATION = 0.3f;
 
     /**
      * Resets player health, stamina, death state, interaction manager, movement,
@@ -161,9 +163,10 @@ public final class PlayerStateService {
         s.autoJumpObstacleEffectDuration = 0.0f;
         s.autoJumpObstacleSprintEffectDuration = 0.0f;
 
-        // Jump: disabled (replaced by roll system)
-        s.jumpForce = 0.0f;
-        s.jumpBufferDuration = 0.0f;
+        // RollSystem consumes jump before core movement applies it, but Adventure
+        // clients still need jump enabled to keep sending that input reliably.
+        s.jumpForce = ROLL_INPUT_JUMP_FORCE;
+        s.jumpBufferDuration = ROLL_INPUT_JUMP_BUFFER_DURATION;
         s.variableJumpFallForce = 28.0f;
 
         // Air control: full authority mid-air
@@ -179,8 +182,8 @@ public final class PlayerStateService {
         s.fallJumpForce = s.jumpForce;
 
         // Slide/roll: faster combat dodging
-        s.minSlideEntrySpeed = 5.5f;
-        s.slideExitSpeed = 3.5f;
+        s.minSlideEntrySpeed = 0.0f;
+        s.slideExitSpeed = 2.5f;
         s.rollTimeToComplete = 0.2f;
         s.rollStartSpeedModifier = 4.0f;
         s.rollExitSpeedModifier = 3.0f;

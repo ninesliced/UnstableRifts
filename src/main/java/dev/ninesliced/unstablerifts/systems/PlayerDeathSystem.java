@@ -67,18 +67,20 @@ public final class PlayerDeathSystem extends EntityTickingSystem<EntityStore> {
                 ? new Vector3d(transform.getPosition())
                 : new Vector3d(0, 0, 0);
 
+        game.addDeadPlayer(playerRef.getUuid());
+        if (game.areAllPlayersDead()) {
+            death.markDead(deathPos);
+            DeathStateController.clear(commandBuffer, ref);
+            commandBuffer.run(_store -> gameManager.onAllPlayersDead(game));
+            return true;
+        }
+
         death.markDead(deathPos);
         gameManager.getReviveMarkerService().spawnReviveMarker(commandBuffer, store, ref, playerRef.getUuid(), deathPos);
         DeathStateController.apply(commandBuffer, store, ref, false);
         gameManager.getPlayerStateService().applyDungeonMovementSettings(ref, store, playerRef);
-        game.addDeadPlayer(playerRef.getUuid());
         gameManager.showPlayerToParty(playerRef.getUuid(), game.getPartyId());
         gameManager.getInventoryService().saveAndClearDeathInventory(player, playerRef);
-
-        if (game.areAllPlayersDead()) {
-            commandBuffer.run(_store -> gameManager.onAllPlayersDead(game));
-            return true;
-        }
 
         String playerName = playerRef.getUsername() != null
                 ? playerRef.getUsername()

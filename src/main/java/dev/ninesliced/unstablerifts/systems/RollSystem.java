@@ -15,6 +15,8 @@ import com.hypixel.hytale.server.core.entity.movement.MovementStatesComponent;
 import com.hypixel.hytale.server.core.entity.movement.MovementStatesSystems;
 import com.hypixel.hytale.server.core.modules.entity.component.Invulnerable;
 import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
+import com.hypixel.hytale.server.core.modules.entity.player.PlayerInput;
+import com.hypixel.hytale.server.core.modules.entity.player.PlayerSystems;
 import com.hypixel.hytale.server.core.modules.physics.component.Velocity;
 import com.hypixel.hytale.server.core.modules.physics.systems.GenericVelocityInstructionSystem;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
@@ -24,6 +26,7 @@ import dev.ninesliced.unstablerifts.camera.TopCameraService;
 import org.joml.Vector3d;
 
 import javax.annotation.Nonnull;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -31,8 +34,8 @@ import java.util.Set;
  * camera mode.
  *
  * <ul>
- *   <li>Input: jump rising edge ({@code current.jumping && !sent.jumping})</li>
- *   <li>The actual jump is suppressed</li>
+ *   <li>Input: raw jump/roll rising edge from queued player movement updates</li>
+ *   <li>The actual jump/native roll is suppressed</li>
  *   <li>A velocity impulse is applied in the player's facing direction</li>
  *   <li>The Roll animation is explicitly played on the Movement slot</li>
  *   <li>The {@link Invulnerable} component is added for the roll duration</li>
@@ -49,6 +52,8 @@ public final class RollSystem extends EntityTickingSystem<EntityStore> {
     private static final String ROLL_ANIMATION = "Roll";
     private static final Set<Dependency<EntityStore>> DEPENDENCIES = Set.of(
             new SystemDependency<>(Order.BEFORE,
+                    PlayerSystems.ProcessPlayerInput.class),
+            new SystemDependency<>(Order.BEFORE,
                     MovementStatesSystems.TickingSystem.class),
             new SystemDependency<>(Order.BEFORE,
                     PlayerVelocityInstructionSystem.class),
@@ -58,6 +63,8 @@ public final class RollSystem extends EntityTickingSystem<EntityStore> {
     private final ComponentType<EntityStore, PlayerRef> playerRefComponentType;
     @Nonnull
     private final ComponentType<EntityStore, MovementStatesComponent> movementStatesComponentType;
+    @Nonnull
+    private final ComponentType<EntityStore, PlayerInput> playerInputComponentType;
     @Nonnull
     private final ComponentType<EntityStore, Velocity> velocityComponentType;
     @Nonnull
@@ -69,6 +76,9 @@ public final class RollSystem extends EntityTickingSystem<EntityStore> {
     @Nonnull
     private final TopCameraService cameraService;
 
+    private record RollInput(boolean down, boolean pressed) {
+    }
+
     public RollSystem(
             @Nonnull TopCameraService cameraService,
             @Nonnull ComponentType<EntityStore, RollComponent> rollComponentType) {
@@ -76,11 +86,13 @@ public final class RollSystem extends EntityTickingSystem<EntityStore> {
         this.rollComponentType = rollComponentType;
         this.playerRefComponentType = PlayerRef.getComponentType();
         this.movementStatesComponentType = MovementStatesComponent.getComponentType();
+        this.playerInputComponentType = PlayerInput.getComponentType();
         this.velocityComponentType = Velocity.getComponentType();
         this.transformComponentType = TransformComponent.getComponentType();
         this.query = Query.and(
                 this.playerRefComponentType,
                 this.movementStatesComponentType,
+                this.playerInputComponentType,
                 this.velocityComponentType,
                 this.transformComponentType,
                 this.rollComponentType);
@@ -93,6 +105,34 @@ public final class RollSystem extends EntityTickingSystem<EntityStore> {
         double dirX = -Math.sin(yaw);
         double dirZ = -Math.cos(yaw);
         return new Vector3d(dirX, 0.0, dirZ);
+    }
+
+    private static RollInput consumeQueuedRollInput(
+            @Nonnull PlayerInput playerInput,
+            @Nonnull MovementStates current,
+            boolean previousInputDown) {
+        boolean sawQueuedState = false;
+        boolean rollInputDown = previousInputDown;
+        boolean rollPressed = false;
+        List<PlayerInput.InputUpdate> queue = playerInput.getMovementUpdateQueue();
+        for (PlayerInput.InputUpdate update : queue) {
+            if (update instanceof PlayerInput.SetMovementStates movementStatesUpdate) {
+                MovementStates movementStates = movementStatesUpdate.movementStates();
+                sawQueuedState = true;
+                boolean updateInputDown = movementStates.jumping || movementStates.rolling;
+                if (updateInputDown && !rollInputDown) {
+                    rollPressed = true;
+                }
+                rollInputDown = updateInputDown;
+                movementStates.jumping = false;
+                movementStates.rolling = false;
+            }
+        }
+        if (!sawQueuedState) {
+            rollInputDown = current.jumping || current.rolling;
+            rollPressed = rollInputDown && !previousInputDown;
+        }
+        return new RollInput(rollInputDown, rollPressed);
     }
 
     @Nonnull
@@ -135,22 +175,27 @@ public final class RollSystem extends EntityTickingSystem<EntityStore> {
             return;
         }
         MovementStates current = msc.getMovementStates();
-        MovementStates sent = msc.getSentMovementStates();
+        PlayerInput playerInput = archetypeChunk.getComponent(index, this.playerInputComponentType);
+        if (playerInput == null) {
+            return;
+        }
 
-        // Tick active roll — remove invulnerability and stop animation when it ends
+        // Tick active roll - remove invulnerability and stop animation when it ends.
         if (roll.isRolling()) {
             if (!roll.tickRoll()) {
-                // Roll just ended — stop animation and remove i-frames
+                // Roll just ended - stop animation and remove i-frames.
                 AnimationUtils.stopAnimation(ref, AnimationSlot.Status, true, commandBuffer);
                 commandBuffer.tryRemoveComponent(ref, Invulnerable.getComponentType());
             }
         }
-        boolean jumpRisingEdge = current.jumping && !sent.jumping;
+        RollInput rollInput = consumeQueuedRollInput(playerInput, current, roll.isRollInputDown());
+        roll.setRollInputDown(rollInput.down());
 
-        // Suppress the actual jump — we always eat it in dungeon mode
+        // Suppress the actual jump/native roll in dungeon mode.
         current.jumping = false;
+        current.rolling = roll.isRolling();
 
-        if (!jumpRisingEdge) {
+        if (!rollInput.pressed()) {
             return;
         }
 
@@ -179,15 +224,16 @@ public final class RollSystem extends EntityTickingSystem<EntityStore> {
         if (velocity == null) {
             return;
         }
-        velocity.addInstruction(impulse, null, ChangeVelocityType.Set);
+        velocity.addInstruction(impulse, null, ChangeVelocityType.Add);
 
-        // Play roll animation on Status slot — avoids conflicting with the Movement
+        // Play roll animation on Status slot - avoids conflicting with the Movement
         // state machine which would hold the last frame and fight the built-in roll.
         AnimationUtils.playAnimation(ref, AnimationSlot.Status, ROLL_ANIMATION, true, commandBuffer);
 
         // Start roll tracking
         roll.setLastRollTime(now);
         roll.startRoll(normalizedDir, ROLL_DURATION_TICKS);
+        current.rolling = true;
 
         // Grant invulnerability for the roll duration
         commandBuffer.ensureComponent(ref, Invulnerable.getComponentType());

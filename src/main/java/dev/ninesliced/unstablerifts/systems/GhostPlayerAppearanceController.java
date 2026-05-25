@@ -4,11 +4,13 @@ import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.protocol.PlayerSkin;
+import com.hypixel.hytale.protocol.PlayerSkinUpdate;
 import com.hypixel.hytale.server.core.asset.type.model.config.Model;
 import com.hypixel.hytale.server.core.asset.type.model.config.ModelAsset;
 import com.hypixel.hytale.server.core.cosmetics.CosmeticsModule;
 import com.hypixel.hytale.server.core.modules.entity.component.ModelComponent;
 import com.hypixel.hytale.server.core.modules.entity.player.PlayerSkinComponent;
+import com.hypixel.hytale.server.core.modules.entity.tracker.EntityTrackerSystems;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 
 import javax.annotation.Nonnull;
@@ -42,7 +44,7 @@ public final class GhostPlayerAppearanceController {
         }
 
         captureOriginalIfNeeded(commandBuffer, store, ref);
-        applyGhostPlayerSkin(commandBuffer, store, ref);
+        queueGhostSkinClear(store, ref);
 
         ModelComponent currentModel = store.getComponent(ref, ModelComponent.getComponentType());
         if (!isGhostModel(currentModel)) {
@@ -62,7 +64,7 @@ public final class GhostPlayerAppearanceController {
         }
 
         captureOriginalIfNeeded(store, ref);
-        applyGhostPlayerSkin(store, ref);
+        queueGhostSkinClear(store, ref);
 
         ModelComponent currentModel = store.getComponent(ref, ModelComponent.getComponentType());
         if (!isGhostModel(currentModel)) {
@@ -105,20 +107,20 @@ public final class GhostPlayerAppearanceController {
         store.tryRemoveComponent(ref, GhostPlayerAppearanceComponent.getComponentType());
     }
 
-    private static void applyGhostPlayerSkin(@Nonnull CommandBuffer<EntityStore> commandBuffer,
-                                             @Nonnull Store<EntityStore> store,
-                                             @Nonnull Ref<EntityStore> ref) {
-        PlayerSkinComponent playerSkinComponent = store.getComponent(ref, PlayerSkinComponent.getComponentType());
-        if (playerSkinComponent == null || !isBlankPlayerSkin(playerSkinComponent.getPlayerSkin())) {
-            commandBuffer.putComponent(ref, PlayerSkinComponent.getComponentType(), new PlayerSkinComponent(new PlayerSkin()));
+    private static void queueGhostSkinClear(@Nonnull Store<EntityStore> store,
+                                            @Nonnull Ref<EntityStore> ref) {
+        EntityTrackerSystems.Visible visible = store.getComponent(ref, EntityTrackerSystems.Visible.getComponentType());
+        if (visible == null || visible.visibleTo.isEmpty()) {
+            return;
         }
-    }
 
-    private static void applyGhostPlayerSkin(@Nonnull Store<EntityStore> store,
-                                             @Nonnull Ref<EntityStore> ref) {
-        PlayerSkinComponent playerSkinComponent = store.getComponent(ref, PlayerSkinComponent.getComponentType());
-        if (playerSkinComponent == null || !isBlankPlayerSkin(playerSkinComponent.getPlayerSkin())) {
-            store.putComponent(ref, PlayerSkinComponent.getComponentType(), new PlayerSkinComponent(new PlayerSkin()));
+        PlayerSkinUpdate update = new PlayerSkinUpdate((PlayerSkin) null);
+        for (EntityTrackerSystems.EntityViewer viewer : visible.visibleTo.values()) {
+            try {
+                viewer.queueUpdate(ref, update);
+            } catch (IllegalArgumentException ignored) {
+                // Viewer visibility can change between collection and queueing.
+            }
         }
     }
 
@@ -148,6 +150,9 @@ public final class GhostPlayerAppearanceController {
         Model currentModel = currentComponent != null ? currentComponent.getModel() : null;
         PlayerSkinComponent playerSkinComponent = store.getComponent(ref, PlayerSkinComponent.getComponentType());
         PlayerSkin originalSkin = playerSkinComponent != null ? playerSkinComponent.getPlayerSkin() : null;
+        if (!isValidCosmeticSkin(originalSkin)) {
+            originalSkin = null;
+        }
         boolean currentIsGhost = isGhostModel(currentComponent);
         boolean restoreFromPlayerSkin = currentModel == null
                 || currentIsGhost
@@ -172,7 +177,7 @@ public final class GhostPlayerAppearanceController {
 
             Model.ModelReference originalReference = state.getOriginalModelReference();
             if (originalReference != null) {
-                Model model = originalReference.toModel();
+                Model model = createModelFromReference(originalReference);
                 if (model != null) {
                     return new RestoreModel(model, false);
                 }
@@ -184,6 +189,10 @@ public final class GhostPlayerAppearanceController {
             Model playerSkinModel = createPlayerSkinModel(store, ref, state);
             if (playerSkinModel != null) {
                 return new RestoreModel(playerSkinModel, true);
+            }
+            Model fallbackModel = createDefaultPlayerModel();
+            if (fallbackModel != null) {
+                return new RestoreModel(fallbackModel, false);
             }
         }
 
@@ -209,13 +218,41 @@ public final class GhostPlayerAppearanceController {
                                                @Nullable GhostPlayerAppearanceComponent state) {
         PlayerSkinComponent playerSkinComponent = store.getComponent(ref, PlayerSkinComponent.getComponentType());
         PlayerSkin playerSkin = playerSkinComponent != null ? playerSkinComponent.getPlayerSkin() : null;
-        if (playerSkin == null && state != null) {
+        if (!isValidCosmeticSkin(playerSkin) && state != null) {
             playerSkin = state.getOriginalPlayerSkin();
         }
-        if (playerSkin == null) {
+        if (!isValidCosmeticSkin(playerSkin)) {
             return null;
         }
         return CosmeticsModule.get().createModel(playerSkin);
+    }
+
+    @Nullable
+    private static Model createModelFromReference(@Nonnull Model.ModelReference modelReference) {
+        String modelAssetId = modelReference.getModelAssetId();
+        if (modelAssetId == null) {
+            return null;
+        }
+        ModelAsset modelAsset = ModelAsset.getAssetMap().getAsset(modelAssetId);
+        if (modelAsset == null) {
+            return null;
+        }
+        if (modelReference.getScale() <= 0.0f) {
+            return Model.createUnitScaleModel(modelAsset);
+        }
+        try {
+            return modelReference.toModel();
+        } catch (IllegalArgumentException exception) {
+            LOGGER.warning("Failed to restore model reference " + modelReference
+                    + "; falling back to unit scale model: " + exception.getMessage());
+            return Model.createUnitScaleModel(modelAsset);
+        }
+    }
+
+    @Nullable
+    private static Model createDefaultPlayerModel() {
+        ModelAsset modelAsset = ModelAsset.getAssetMap().getAsset("Player");
+        return modelAsset != null ? Model.createUnitScaleModel(modelAsset) : null;
     }
 
     private static void restoreOriginalPlayerSkin(@Nonnull CommandBuffer<EntityStore> commandBuffer,
@@ -223,8 +260,14 @@ public final class GhostPlayerAppearanceController {
                                                   @Nonnull Ref<EntityStore> ref) {
         GhostPlayerAppearanceComponent state = store.getComponent(ref, GhostPlayerAppearanceComponent.getComponentType());
         PlayerSkin originalSkin = state != null ? state.getOriginalPlayerSkin() : null;
-        if (originalSkin != null) {
+        if (isValidCosmeticSkin(originalSkin)) {
             commandBuffer.putComponent(ref, PlayerSkinComponent.getComponentType(), new PlayerSkinComponent(new PlayerSkin(originalSkin)));
+            return;
+        }
+
+        PlayerSkinComponent currentSkin = store.getComponent(ref, PlayerSkinComponent.getComponentType());
+        if (currentSkin != null && !isValidCosmeticSkin(currentSkin.getPlayerSkin())) {
+            commandBuffer.tryRemoveComponent(ref, PlayerSkinComponent.getComponentType());
             return;
         }
 
@@ -235,8 +278,14 @@ public final class GhostPlayerAppearanceController {
                                                   @Nonnull Ref<EntityStore> ref) {
         GhostPlayerAppearanceComponent state = store.getComponent(ref, GhostPlayerAppearanceComponent.getComponentType());
         PlayerSkin originalSkin = state != null ? state.getOriginalPlayerSkin() : null;
-        if (originalSkin != null) {
+        if (isValidCosmeticSkin(originalSkin)) {
             store.putComponent(ref, PlayerSkinComponent.getComponentType(), new PlayerSkinComponent(new PlayerSkin(originalSkin)));
+            return;
+        }
+
+        PlayerSkinComponent currentSkin = store.getComponent(ref, PlayerSkinComponent.getComponentType());
+        if (currentSkin != null && !isValidCosmeticSkin(currentSkin.getPlayerSkin())) {
+            store.tryRemoveComponent(ref, PlayerSkinComponent.getComponentType());
             return;
         }
 
@@ -277,6 +326,18 @@ public final class GhostPlayerAppearanceController {
                 && skin.skinFeature == null
                 && skin.gloves == null
                 && skin.cape == null;
+    }
+
+    private static boolean isValidCosmeticSkin(@Nullable PlayerSkin skin) {
+        if (skin == null || isBlankPlayerSkin(skin)) {
+            return false;
+        }
+        try {
+            CosmeticsModule.get().validateSkin(skin);
+            return true;
+        } catch (Exception exception) {
+            return false;
+        }
     }
 
     private record RestoreModel(@Nullable Model model, boolean fromPlayerSkin) {
