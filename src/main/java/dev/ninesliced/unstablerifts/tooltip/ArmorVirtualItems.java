@@ -163,7 +163,9 @@ public final class ArmorVirtualItems {
         clone.variant = true;
         clone.translationProperties = new ItemTranslationProperties(
                 virtualId + ".n",
-                virtualId + ".d"
+                null,
+                virtualId + ".d",
+                null
         );
         String particleId = rarity.getGlowEffectId();
         if (particleId != null) {
