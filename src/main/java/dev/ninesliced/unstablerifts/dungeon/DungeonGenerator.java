@@ -2364,6 +2364,13 @@ public class DungeonGenerator {
         }
 
         @Override
+        public <T> void forEachEntity(
+                @Nonnull EntityConsumer<T> entityConsumer,
+                @Nullable T t) {
+            delegate.forEachEntity(entityConsumer, t);
+        }
+
+        @Override
         public <T> void forEachRaw(
                 @Nonnull ColumnPredicate<T> columnPredicate,
                 @Nonnull RawBlockConsumer<T> blockConsumer,

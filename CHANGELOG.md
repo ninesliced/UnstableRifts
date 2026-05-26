@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.2.1
+
+* API fixes for Hytale 0.5.0 release, including command and event updates.
+
 ## v1.2.0 - Level 3 Toxic (2026-04-26)
 
 ### New Content
